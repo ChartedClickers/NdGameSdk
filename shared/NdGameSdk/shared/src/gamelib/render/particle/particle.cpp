@@ -67,13 +67,7 @@ namespace NdGameSdk::gamelib::render::particle {
 
 			if (m_Memory->IsDebugMemoryAvailable()) {
 				
-				MemSize required_particle_mgr_size = MemSize(6.5, SizeUnit::Megabytes);
-				constexpr MemoryMapId AllocationMapId = MemoryMapId::ALLOCATION_PARTICLE_MGR;
-				auto ParticleMgrSize = m_Memory->GetMemSize(AllocationMapId);
-
-				if (ParticleMgrSize < required_particle_mgr_size) {
-					m_Memory->ModifyMemoryMap(AllocationMapId, ParticleMgrSize + (required_particle_mgr_size - ParticleMgrSize));
-				}
+				m_Memory->IncreaseMemoryMap(MemoryMapId::ALLOCATION_PARTICLE_MGR, MemSize(6.5, SizeUnit::Megabytes));
 
 				m_ParticleDebug_InitHook = Utility::MakeMidHook(ParticleDebugInitJMP,
 					[](SafetyHookContext& ctx)

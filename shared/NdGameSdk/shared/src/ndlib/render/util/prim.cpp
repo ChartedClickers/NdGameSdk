@@ -89,13 +89,7 @@ namespace NdGameSdk::ndlib::render::util {
 			}
 
 			if (m_cfg.PrimServerCreate) {
-				MemSize required_cpu_size = MemSize(2560, SizeUnit::Megabytes);
-				constexpr MemoryMapId AllocationMapId = MemoryMapId::ALLOCATION_CPU_MEMORY;
-				auto CpuMemSize = m_Memory->GetMemSize(AllocationMapId);
-
-				if (CpuMemSize < required_cpu_size) {
-					m_Memory->ModifyMemoryMap(AllocationMapId, CpuMemSize + (required_cpu_size - CpuMemSize));
-				}
+				m_Memory->IncreaseMemoryMap(MemoryMapId::ALLOCATION_CPU_MEMORY, MemSize(2560, SizeUnit::Megabytes));
 			}
 
 		});

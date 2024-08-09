@@ -34,7 +34,8 @@ namespace NdGameSdk::corelib::memory
 
 		NdGameSdk_API void ModifyMemoryMap(MemoryMapEntry* MapEntry, MemSize newSizeForId);
 		NdGameSdk_API void ModifyMemoryMap(MemoryMapId MapId, MemSize newSizeForId);
-		
+		NdGameSdk_API void IncreaseMemoryMap(MemoryMapId MapId, MemSize AddSizeForId);
+
 		std::map<MemoryMapId, MemoryMapEntry*>& GetStaticMemoryMapEntries();
 
 		HeapAllocator::HeapArena m_HeapArena{};

@@ -99,6 +99,13 @@ namespace NdGameSdk::corelib::memory {
 		ModifyMemoryMap(MapEntry, newSizeForId);
 	}
 
+	void Memory::IncreaseMemoryMap(MemoryMapId MapId, MemSize AddSizeForId) {
+		auto CurrentMemSize = GetMemSize(MapId);
+		if (CurrentMemSize < AddSizeForId) {
+			ModifyMemoryMap(MapId, CurrentMemSize + (AddSizeForId - CurrentMemSize));
+		}
+	}
+
 	std::map<MemoryMapId, MemoryMapEntry*>& Memory::GetStaticMemoryMapEntries() {
 		return m_MemoryMap.s_MemoryMap;
 	}
@@ -242,13 +249,7 @@ namespace NdGameSdk::corelib::memory {
 						SdkComponentEx::ErrorCode::DependenciesFailed, true };
 				}
 
-				uint64_t required_cpu_mem_size = (2000 * size_mb);
-				constexpr MemoryMapId AllocationMapId = MemoryMapId::ALLOCATION_CPU_MEMORY;
-				auto CpuMemSize = GetMemSize(AllocationMapId);
-
-				if (CpuMemSize < required_cpu_mem_size) {
-					ModifyMemoryMap(AllocationMapId, CpuMemSize + (required_cpu_mem_size - CpuMemSize));
-				}
+				Memory::IncreaseMemoryMap(MemoryMapId::ALLOCATION_CPU_MEMORY, 2000 * size_mb);
 
 				findpattern = Patterns::Memory_clarg_nodebugmem;
 				uint8_t byte_0 = 0;

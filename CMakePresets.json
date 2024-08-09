@@ -1,0 +1,33 @@
+﻿{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "vs2022",
+      "displayName": "Visual Studio 17 2022 (LLVM - ClangCL)",
+      "description": "Using compilers for Visual Studio 17 2022 (x64 architecture)",
+      "generator": "Visual Studio 17 2022",
+      "toolset": "ClangCL",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "Release 2022",
+      "description": "",
+      "displayName": "Release",
+      "configuration": "Release",
+      "configurePreset": "vs2022"
+    },
+    {
+      "name": "Debug 2022",
+      "description": "",
+      "displayName": "Debug",
+      "configuration": "Debug",
+      "configurePreset": "vs2022"
+    }
+  ]
+}

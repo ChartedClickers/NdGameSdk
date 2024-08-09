@@ -1,0 +1,12 @@
+# IDE
+.vs/
+.vscode/
+# cmkr
+build*/
+cmake-build*/
+CMakerLists.txt
+CMakeLists.txt.user
+
+# Researching
+researching/regenny-sdk/
+researching/regenny/*.json

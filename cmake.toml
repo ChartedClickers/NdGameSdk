@@ -1,0 +1,186 @@
+# Reference: https://build-cpp.github.io/cmkr/cmake-toml
+[project]
+name = "ND.ModClient"
+version = "1.0.0"
+languages = ["C", "CXX"]
+cmake-after = """
+add_compile_options(
+    $<$<CONFIG:Debug>:/MDd>
+    $<$<CONFIG:Release>:/MD>
+)
+
+set(SAFETYHOOK_FETCH_ZYDIS ON)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+"""
+ 
+[variables]
+RUNTIME_OUTPUT_DIRECTORY = "${CMAKE_BINARY_DIR}/bin"
+LIBRARY_OUTPUT_DIRECTORY = "${CMAKE_BINARY_DIR}/lib" 
+PROJECT_TARGET = "ND"
+
+#https://github.com/gabime/spdlog 
+[target.spdlog]
+type = "static"
+sources = ["dependencies/external/spdlog/src/*.cpp"]
+include-directories = ["dependencies/external/spdlog/include"]
+compile-definitions = ["SPDLOG_COMPILED_LIB", "SPDLOG_WCHAR_TO_UTF8_SUPPORT"]  
+alias = "spdlog::spdlog"
+
+#https://github.com/g-truc/glm
+[target.glm_static]
+type = "static" 
+sources = ["dependencies/external/glm/glm/**.cpp"]  
+include-directories = ["dependencies/external/glm"] 
+alias = "glm::glm"
+
+[fetch-content.simpleini]
+git = "https://github.com/brofield/simpleini"
+tag = "09c21bda1dc1b578fa55f4a005d79b0afd481296"
+
+[fetch-content.safetyhook]
+git = "https://github.com/cursey/safetyhook"
+tag = "629558c64009a7291ba6ed5cfb49187086a27a47"
+
+[vcpkg]
+version = "2024.05.24"
+url = "https://github.com/microsoft/vcpkg/archive/a8954b904ad2a6939ecd8fc213e87702fa1243ea.tar.gz"
+packages = ["boost-thread", "boost-signals2", "boost-container"]
+
+
+[find-package.Boost]
+version = "1.85.0"
+required = true 
+config = false
+components = ["thread", "signals2"]
+ 
+[template.NdGameSdk]
+type = "shared"
+sources = [
+"shared/NdGameSdk/*.cpp",
+"shared/NdGameSdk/components/**.cpp",
+"shared/NdGameSdk/shared/**.cpp",
+"shared/NdGameSdk/shared/**.c",
+"shared/NdGameSdk/sidbase/**.cpp"
+] 
+headers = [
+"shared/NdGameSdk/*.hpp",
+"shared/NdGameSdk/config/**.hpp",
+"shared/NdGameSdk/components/**.hpp",
+"shared/NdGameSdk/shared/**.hpp",
+"shared/NdGameSdk/shared/**.h",
+"shared/NdGameSdk/sidbase/**.hpp"
+]
+include-directories = ["shared/"]
+compile-features = ["cxx_std_23"]
+alias = "NdGameSdk::SDK"
+link-libraries = [ 
+    "spdlog::spdlog",
+    "glm_static",
+    "Utility",
+    "Boost::thread",
+	"Boost::signals2",
+    "Boost::container"
+]
+cmake-before="""
+"""
+  
+[template.NdGameSdk.properties]
+OUTPUT_NAME = "NdGameSdk"
+RUNTIME_OUTPUT_DIRECTORY = "${RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
+LIBRARY_OUTPUT_DIRECTORY = "${LIBRARY_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
+ARCHIVE_OUTPUT_DIRECTORY = "${LIBRARY_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
+#PUBLIC_HEADER = "TODO"
+  
+[template.ModClient]
+type = "shared"  
+sources = ["src/**.cpp", "src/**.c"] 
+headers = ["src/**.hpp", "src/**.h"]
+compile-features = ["cxx_std_23"]
+include-directories = ["shared/", "src/"]
+compile-definitions = ["${CMKR_TARGET}", "ND_GAME_NAME=\"${CMKR_TARGET}\"", "ND_ModClient_EXPORTS"]
+link-libraries = [
+    "${CMKR_TARGET}SDK",
+    "Utility",
+    "spdlog::spdlog"
+]
+private-link-libraries = [
+	"Boost::thread",
+	"Boost::signals2",
+    "SimpleIni"
+] 
+# causes an issue with not compiling CMKR TARGET after 0.2.17:
+# https://github.com/build-cpp/cmkr/blob/45e346b4a3cc10619fd8b5c0c6e773f3c6f04a7b/src/cmake_generator.cpp#L1328
+cmake-before="""
+"""
+
+[template.ModClient.properties]
+OUTPUT_NAME = "${PROJECT_TARGET}.ModClient"
+SUFFIX = ".asi"
+RUNTIME_OUTPUT_DIRECTORY = "${RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
+LIBRARY_OUTPUT_DIRECTORY = "${LIBRARY_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
+ARCHIVE_OUTPUT_DIRECTORY = "${LIBRARY_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
+CXX_MODULE_STD = true
+
+[template.ModModule]
+type = "shared"  
+sources = ["modmodules/*.cpp", "modmodules/*.c"] 
+headers = ["modmodules/*.hpp", "modmodules/*.h"]
+compile-features = ["cxx_std_23"]
+include-directories = ["shared/", "modmodules/"]
+compile-definitions = ["${CMKR_TARGET}", "ND_GAME_NAME=\"${PROJECT_TARGET}\"", "ND_ModModule_EXPORTS"]
+link-libraries = [
+    "${PROJECT_TARGET}SDK",
+    "Utility",
+    "spdlog::spdlog"
+]
+# causes an issue with not compiling CMKR TARGET after 0.2.17:
+# https://github.com/build-cpp/cmkr/blob/45e346b4a3cc10619fd8b5c0c6e773f3c6f04a7b/src/cmake_generator.cpp#L1328
+cmake-before="""
+"""
+
+[template.ModModule.properties]
+RUNTIME_OUTPUT_DIRECTORY = "${RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
+LIBRARY_OUTPUT_DIRECTORY = "${LIBRARY_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
+ARCHIVE_OUTPUT_DIRECTORY = "${LIBRARY_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
+CXX_MODULE_STD = true
+
+
+[target.Utility]
+type = "static"
+sources = ["shared/Utility/**.cpp", "shared/Utility/**.c"]
+headers = ["shared/Utility/**.hpp", "shared/Utility/**.h"]
+compile-features = ["cxx_std_23"]
+compile-options = ["/MP"]
+compile-definitions = ["PROJECT_NAME=\"${PROJECT_TARGET}.ModClient\""] 
+alias = "Utility::Utility"
+private-link-libraries = ["Boost::signals2"]
+link-libraries = [
+    "spdlog::spdlog",
+    "safetyhook"
+] 
+ 
+    
+[target.T1XSDK]  
+type = "NdGameSdk"
+compile-definitions = ["T1X"]
+sources = [
+"shared/NdGameSdk/ndgame/t1x/**.cpp",
+"shared/NdGameSdk/ndgame/t1x/**.c"
+] 
+headers = [
+"shared/NdGameSdk/ndgame/t1x/**.hpp", 
+"shared/NdGameSdk/ndgame/t1x/**.h",
+"shared/NdGameSdk/regenny/t1x/**.hpp",
+"shared/NdGameSdk/regenny/t1x/**.h"
+] 
+cmake-before="""
+set(PROJECT_TARGET "T1X") 
+"""
+
+[target.T1X]
+type = "ModClient"
+
+[target.testmodule]
+type = "ModModule"
+sources = ["modmodules/testmodule/*.cpp", "modmodules/testmodule/**.c"]
+headers = ["modmodules/testmodule/*.hpp", "modmodules/testmodule/**.h"]

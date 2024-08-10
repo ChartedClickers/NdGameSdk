@@ -5,12 +5,14 @@
 #include "NdGameSdk/config/DevModeCfg.hpp"
 
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
+#include <NdGameSdk/shared/src/common/common-game-init.hpp>
 #include <NdGameSdk/shared/src/ndlib/engine-components.hpp>
 #include <NdGameSdk/shared/src/ndlib/debug/nd-dmenu.hpp>
 
 #include <Utility/helper.hpp>
 
 using namespace NdGameSdk::corelib::memory;
+using namespace NdGameSdk::common;
 using namespace NdGameSdk::ndlib;
 using namespace NdGameSdk::ndlib::debug;
 
@@ -24,10 +26,9 @@ namespace NdGameSdk::gamelib::debug {
 	private:
 		void Awake() override;
 		void Initialize() override;
-
 		NdDevMenuCfg m_cfg{};
-		DMENU* m_dmenu;
 
+		MidHook m_SetRootMenuHook{};
 #if defined(T1X)
 		Patch::Ptr m_GameConfig_DevModePatch{};
 
@@ -38,6 +39,7 @@ namespace NdGameSdk::gamelib::debug {
 
 		shared_ptr<EngineComponents> m_EngineComponents;
 		shared_ptr<Memory> m_Memory;
+		shared_ptr<CommonGame> m_CommonGame;
 	};
 
 }

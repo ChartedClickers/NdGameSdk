@@ -6,34 +6,10 @@ namespace regenny::shared::ndlib::debug {
 struct DMENU {
     struct Component {
         struct VTable {
-            private: char pad_8[0xf0]; public:
-            virtual ~VTable() = default;
-            private: virtual void virtual_function_1() = 0; public:
-            private: virtual void virtual_function_2() = 0; public:
-            private: virtual void virtual_function_3() = 0; public:
-            private: virtual void virtual_function_4() = 0; public:
-            private: virtual void virtual_function_5() = 0; public:
-            private: virtual void virtual_function_6() = 0; public:
-            private: virtual void virtual_function_7() = 0; public:
-            private: virtual void virtual_function_8() = 0; public:
-            private: virtual void virtual_function_9() = 0; public:
-            private: virtual void virtual_function_10() = 0; public:
-            private: virtual void virtual_function_11() = 0; public:
-            private: virtual void virtual_function_12() = 0; public:
-            private: virtual void virtual_function_13() = 0; public:
-            private: virtual void virtual_function_14() = 0; public:
-            private: virtual void virtual_function_15() = 0; public:
-            private: virtual void virtual_function_16() = 0; public:
-            private: virtual void virtual_function_17() = 0; public:
-            private: virtual void virtual_function_18() = 0; public:
-            private: virtual void virtual_function_19() = 0; public:
-            private: virtual void virtual_function_20() = 0; public:
-            private: virtual void virtual_function_21() = 0; public:
-            private: virtual void virtual_function_22() = 0; public:
-            virtual char RenderComponent(regenny::shared::ndlib::debug::DMENU::Component* this_, uint64_t arg2, uint32_t arg3, uint32_t arg4, uint32_t arg5) = 0;
-        }; // Size: 0xf8
+            private: char pad_0[0xb8]; public:
+        }; // Size: 0xb8
 
-        VTable* vftable; // 0x0
+        void* vftable; // 0x0
         void* UnkString; // 0x8
         // Metadata: utf8*
         char m_name[32]; // 0x10
@@ -62,6 +38,10 @@ struct DMENU {
     }; // Size: 0xb0
 
     struct Menu : public Component {
+        struct VTable0 {
+            private: char pad_0[0x1b8]; public:
+        }; // Size: 0x1b8
+
         regenny::shared::ndlib::debug::DMENU::Component* m_Item; // 0xb0
         private: char pad_b8[0x4]; public:
         bool m_isActive; // 0xbc
@@ -69,18 +49,27 @@ struct DMENU {
         private: uint64_t pad_bitfield_bd_2 : 62; public:
         private: char pad_c5[0x7]; public:
         int m_MaxDisplayItems; // 0xcc
-        uint64_t Unk[3]; // 0xd0
-    }; // Size: 0xe8
+        uint64_t Unk[2]; // 0xd0
+    }; // Size: 0xe0
 
     struct MenuGroup : public Component {
+        struct VTable0 {
+            private: char pad_0[0x168]; public:
+        }; // Size: 0x168
+
         regenny::shared::ndlib::debug::DMENU::Menu* m_RootMenu; // 0xb0
         private: char pad_b8[0x8]; public:
         bool m_IsDisplayed; // 0xc0
         bool m_Rendering; // 0xc1
-        uint64_t Unk[438]; // 0xc2
-    }; // Size: 0xe72
+        uint16_t Unk[3]; // 0xc2
+        uint64_t Unk20[77]; // 0xc8
+    }; // Size: 0x330
 
     struct Item : public Component {
+        struct VTable0 {
+            private: char pad_0[0x100]; public:
+        }; // Size: 0x100
+
         void* m_callbackFunct; // 0xb0
     }; // Size: 0xb8
 

@@ -80,7 +80,6 @@ namespace NdGameSdk::common {
 					throw SdkComponentEx{ std::format("Failed to create hook {:s} in {:s}!", TOSTRING(m_PrimServer_CreateHook),GetName()),
 						SdkComponentEx::ErrorCode::PatchFailed };
 				}
-
 			}
 	#endif
 

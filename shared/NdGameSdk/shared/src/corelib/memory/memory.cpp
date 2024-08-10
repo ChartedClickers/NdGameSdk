@@ -166,7 +166,7 @@ namespace NdGameSdk::corelib::memory {
 				!Memory_GetSize ||
 				!Memory_GetAllocator ||
 				!m_HeapArena.Memory_HeapArena_Allocate
-				) { throw SdkComponentEx { "Failed to find Memory:: game functions!", SdkComponentEx::ErrorCode::PatternFailed, true }; }
+				) { throw SdkComponentEx { std::format("Failed to find {}:: game functions!", GetName()), SdkComponentEx::ErrorCode::PatternFailed, true }; }
 
 			constexpr uint64_t size_mb = (1024ULL * 1024ULL);
 			uint64_t TotalMapSize = 0;
@@ -189,7 +189,7 @@ namespace NdGameSdk::corelib::memory {
 					memory->m_MemoryMapMapped = true;
 					memory->InvokeSdkEvent(memory->e_MemoryMapMapped);
 
-				}, wstr(Patterns::Memory_AllocateMemoryMap), wstr(m_SetMemoryMapHook));
+				}, wstr(Patterns::Memory_AllocateMemoryMap), wstr(SetMemoryMapJMP));
 
 
 			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> wstring_converter{};

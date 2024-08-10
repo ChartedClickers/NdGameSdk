@@ -9,5 +9,5 @@ using namespace NdGameSdk::ndlib;
 namespace NdGameSdk::game {
 
 	class GameInfo : public ISdkRegenny<regenny::ndgame::game::GameInfo, NdGameInfo> {};
-	static_assert(sizeof(GameInfo) == 0x4970, "Size of GameInfo is not correct.");
+	static_assert(sizeof(GameInfo) == sizeof(NdGameInfo) + 0x3B0, "Size of GameInfo is not correct.");
 }

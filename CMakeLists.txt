@@ -41,6 +41,10 @@ project(ND.ModClient
 add_compile_options(
     $<$<CONFIG:Debug>:/MDd>
     $<$<CONFIG:Release>:/MD>
+    # noise
+    -Wno-unused-private-field
+    -Wno-unused-variable
+    -Wno-ignored-qualifiers
 )
 
 set(SAFETYHOOK_FETCH_ZYDIS ON)

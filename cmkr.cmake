@@ -19,13 +19,13 @@ set(CMKR_BUILD_TYPE "Debug" CACHE STRING "cmkr build configuration")
 mark_as_advanced(CMKR_REPO CMKR_TAG CMKR_COMMIT_HASH CMKR_EXECUTABLE CMKR_SKIP_GENERATION CMKR_BUILD_TYPE)
 
 # Disable cmkr if generation is disabled
-if(DEFINED ENV{CI} OR CMKR_SKIP_GENERATION OR CMKR_BUILD_SKIP_GENERATION)
-    message(STATUS "[cmkr] Skipping automatic cmkr generation")
-    unset(CMKR_BUILD_SKIP_GENERATION CACHE)
-    macro(cmkr)
-    endmacro()
-    return()
-endif()
+# if(DEFINED ENV{CI} OR CMKR_SKIP_GENERATION OR CMKR_BUILD_SKIP_GENERATION)
+#     message(STATUS "[cmkr] Skipping automatic cmkr generation")
+#     unset(CMKR_BUILD_SKIP_GENERATION CACHE)
+#     macro(cmkr)
+#     endmacro()
+#     return()
+# endif()
 
 # Disable cmkr if no cmake.toml file is found
 if(NOT CMAKE_SCRIPT_MODE_FILE AND NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/cmake.toml")

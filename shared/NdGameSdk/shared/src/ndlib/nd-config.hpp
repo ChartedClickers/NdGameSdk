@@ -17,6 +17,7 @@ namespace NdGameSdk::ndlib {
 		using Config = ::regenny::shared::ndlib::NdConfig::Config;
 
 		NdGameSdk_API ndlib::debug::DMENU& GetDmenu();
+		NdGameSdk_API ndlib::debug::DMENU::MenuGroup& GetNdDevMenu();
 
 		template <typename TConfig>
 		NdGameSdk_API TConfig* GetConfig(Config index) {

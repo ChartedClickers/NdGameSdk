@@ -18,7 +18,7 @@ namespace NdGameSdk::corelib::memory
 	class Memory : public ISdkComponent {
 	public:
 		Memory(MemoryCfg& cfg);
-		SdkEvent<> e_MemoryMapMapped{true};
+		SdkEvent<corelib::memory::Memory*> e_MemoryMapMapped{true};
 
 		class NdGameSdk_API Allocator : public ISdkRegenny<regenny::shared::corelib::memory::Allocator> 
 		{

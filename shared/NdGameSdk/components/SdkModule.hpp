@@ -14,6 +14,9 @@
 #include <NdGameSdk/components/SdkComponent.hpp>
 #include <NdGameSdk/components/event/SdkEvent.hpp>
 
+#include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
+#include <NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp>
+
 namespace NdGameSdk {
 
     class NdGameSdk_API ISdkModule
@@ -43,7 +46,8 @@ namespace NdGameSdk {
     private:
         virtual void OnModuleRegistered() = 0;
         virtual void OnGameInitialized(bool status) {};
-        virtual void OnMemoryMapped() {};
+        virtual void OnMemoryMapped(corelib::memory::Memory* Memory) {};
+        virtual void OnAppendSdkDevMenu(gamelib::debug::NdDevMenu* NdDevMenu, gamelib::debug::NdDevMenu::AppendSdkDevMenuCallback AppendSdkDevMenu) {};
 
         static std::unordered_map<HMODULE, ISdkModule*>* GetSdkModules();
 

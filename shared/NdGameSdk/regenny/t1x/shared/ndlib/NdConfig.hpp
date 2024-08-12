@@ -6,7 +6,8 @@ namespace regenny::shared::ndlib {
 struct NdConfig {
     enum Config : uint32_t {
         NetInfo = 0,
-        DevMenu = 1,
+        DMENU = 1,
+        NdDevMenu = 2,
         NameCache = 7,
     };
 

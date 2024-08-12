@@ -32,15 +32,15 @@ public:
 private:
 
 	void OnModuleRegistered() override;
-	void OnMemoryMapped() override;
+	void OnMemoryMapped(corelib::memory::Memory* Memory) override;
 	void OnGameInitialized(bool status) override;
+	void OnAppendSdkDevMenu(gamelib::debug::NdDevMenu* NdDevMenu, gamelib::debug::NdDevMenu::AppendSdkDevMenuCallback AppendSdkDevMenu) override;
 
 	bool m_initialized{false};
 	std::atomic<bool> m_ndmods_initialized{ false };
 
 	ndlib::EngineComponents* m_EngineComponents;
 	common::CommonGame* m_CommonGame;
-	corelib::memory::Memory* m_Memory;
 
 	std::unique_ptr<NdMods> m_ndmods;
 	std::recursive_mutex m_startup_mutex{};

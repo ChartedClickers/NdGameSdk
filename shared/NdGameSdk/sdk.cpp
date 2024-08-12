@@ -10,6 +10,7 @@
 
 #include "shared/src/common/common-game-init.hpp"
 #include "shared/src/corelib/memory/memory.hpp"
+#include "shared/src/gamelib/debug/nd-dev-menu.hpp"
 
 #include <windows.h>
 #include <unordered_map>
@@ -22,6 +23,7 @@ namespace NdGameSdk {
 
     corelib::memory::Memory* Memory{};
     common::CommonGame* CommonGame{};
+    gamelib::debug::NdDevMenu* NdDevMenu{};
 
     void InitializeSdk(const SdkConfig* cfg) {
 
@@ -42,9 +44,11 @@ namespace NdGameSdk {
         auto SharedComponents = ISdkComponent::GetSharedComponents();
         Memory = SharedComponents->GetComponent<corelib::memory::Memory>().get();
         CommonGame = SharedComponents->GetComponent<common::CommonGame>().get();
+        NdDevMenu = SharedComponents->GetComponent<gamelib::debug::NdDevMenu>().get();
 
         auto MissingComponents = ISdkComponent::CheckSdkComponents
-            <corelib::memory::Memory, common::CommonGame>({ Memory, CommonGame });
+            <corelib::memory::Memory, common::CommonGame, gamelib::debug::NdDevMenu>
+            ({ Memory, CommonGame, NdDevMenu });
 
         if (MissingComponents.has_value()) {
             throw NdGameSdkException
@@ -80,6 +84,7 @@ namespace NdGameSdk {
          // Registering main sdk events
          Memory->e_MemoryMapMapped.Subscribe(SdkModule, &ISdkModule::OnMemoryMapped);
          CommonGame->e_GameInitialized.Subscribe(SdkModule, &ISdkModule::OnGameInitialized);
+         NdDevMenu->e_AppendSdkMenu.Subscribe(SdkModule, &ISdkModule::OnAppendSdkDevMenu);
          SdkModule->e_OnUnregister.Subscribe(UnregisterSdkModule);
 
          if (SdkModule->m_logger) {
@@ -113,6 +118,7 @@ namespace NdGameSdk {
          // Unregistering main sdk events
          Memory->e_MemoryMapMapped.Unsubscribe({ SdkModule, &ISdkModule::OnMemoryMapped});
          CommonGame->e_GameInitialized.Unsubscribe({ SdkModule, &ISdkModule::OnGameInitialized });
+         NdDevMenu->e_AppendSdkMenu.Unsubscribe({ SdkModule, &ISdkModule::OnAppendSdkDevMenu });
          SdkModule->e_OnUnregister.Unsubscribe(UnregisterSdkModule);
 
          if (SdkModule->m_logger) {

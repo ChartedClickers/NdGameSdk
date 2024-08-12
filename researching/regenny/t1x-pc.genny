@@ -58,7 +58,8 @@ namespace shared {
     struct NdConfig {
         enum Config : uint32_t {
             NetInfo = 0x0, // m_pNetInfo
-            DevMenu = 0x1,
+            DMENU = 0x1,
+            NdDevMenu = 0x2,
             NameCache = 0x7 // m_pNameCache
         }; // 0x143646c80 (nd-config.hpp)
     }
@@ -319,7 +320,7 @@ namespace shared {
         struct DMENU 0x670 {
             // DMENU::Component (class_DMENU::Component_vfTable)
             struct Component 0xb0 {
-                struct VTable 0xb8 {}
+                struct VTable 0xb0 {}
                 void* vftable;
                 void* UnkString;
                 char m_name[0x20] [[utf8*]] // (Only if string length is less than 32 characters)
@@ -343,7 +344,6 @@ namespace shared {
 
             // DMENU::Menu | DMENU::ItemSubmenu
             struct Menu : Component 0x30 {
-                struct VTable 0x1b8 {}
                 Component* m_Item;
                 bool m_isActive + 0x4;
                 uint64_t m_pad : 2;
@@ -353,7 +353,6 @@ namespace shared {
 
             // DMENU::MenuGroup
             struct MenuGroup : Component 0x280 {
-                struct VTable 0x168 {}
                 Menu* m_RootMenu;
                 bool m_IsDisplayed + 0x8;
                 bool m_Rendering;
@@ -363,14 +362,14 @@ namespace shared {
 
             // DMENU::Item (class_Dmenu::Item_vfTable)
             struct Item : Component 0x8  {
-                struct VTable 0x100 {}
+                struct VTable : DMENU.Component.VTable 0x48 {}
                 void* m_callbackFunct;
             } // 0x14041e6b0
 
             // DMENU::ItemEntry*
             struct ItemEntry : Item 0x10  {
                 Menu* m_pHeader; // Entry Pointer
-                uint64_t Unk[0x2];
+                uint64_t Unk[0x1];
             } // 0x14041ea90
 
             // DMENU::ItemBool 

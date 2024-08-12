@@ -6,8 +6,8 @@ namespace regenny::shared::ndlib::debug {
 struct DMENU {
     struct Component {
         struct VTable {
-            private: char pad_0[0xb8]; public:
-        }; // Size: 0xb8
+            private: char pad_0[0xb0]; public:
+        }; // Size: 0xb0
 
         void* vftable; // 0x0
         void* UnkString; // 0x8
@@ -38,10 +38,6 @@ struct DMENU {
     }; // Size: 0xb0
 
     struct Menu : public Component {
-        struct VTable0 {
-            private: char pad_0[0x1b8]; public:
-        }; // Size: 0x1b8
-
         regenny::shared::ndlib::debug::DMENU::Component* m_Item; // 0xb0
         private: char pad_b8[0x4]; public:
         bool m_isActive; // 0xbc
@@ -53,10 +49,6 @@ struct DMENU {
     }; // Size: 0xe0
 
     struct MenuGroup : public Component {
-        struct VTable0 {
-            private: char pad_0[0x168]; public:
-        }; // Size: 0x168
-
         regenny::shared::ndlib::debug::DMENU::Menu* m_RootMenu; // 0xb0
         private: char pad_b8[0x8]; public:
         bool m_IsDisplayed; // 0xc0
@@ -66,17 +58,16 @@ struct DMENU {
     }; // Size: 0x330
 
     struct Item : public Component {
-        struct VTable0 {
-            private: char pad_0[0x100]; public:
-        }; // Size: 0x100
+        struct VTable0 : public regenny::shared::ndlib::debug::DMENU::Component::VTable {
+        }; // Size: 0xb0
 
         void* m_callbackFunct; // 0xb0
     }; // Size: 0xb8
 
     struct ItemEntry : public Item {
         regenny::shared::ndlib::debug::DMENU::Menu* m_pHeader; // 0xb8
-        uint64_t Unk[2]; // 0xc0
-    }; // Size: 0xd0
+        uint64_t Unk[1]; // 0xc0
+    }; // Size: 0xc8
 
     struct ItemBool : public Item {
         bool m_status; // 0xb8

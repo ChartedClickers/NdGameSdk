@@ -1,7 +1,6 @@
 #pragma once
 
 #include <windows.h>
-#include <utility>
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -10,16 +9,18 @@
 #include <typeindex>
 #include <spdlog/spdlog.h>
 
+#include <Utility/helper.hpp>
+
 #include <NdGameSdk/sdk.hpp>
 #include <NdGameSdk/sdkconfig.hpp>
 #include <NdGameSdk/sdkderived.hpp>
 #include <NdGameSdk/sdkexception.hpp>
 
-#include <NdGameSdk/components/SdkModule.hpp>
 #include <NdGameSdk/components/event/SdkEvent.hpp>
 
 namespace NdGameSdk {
 
+    class ISdkModule;
     class SdkComponentFactory;
 
     class ISdkComponent

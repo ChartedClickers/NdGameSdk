@@ -29,10 +29,11 @@ namespace NdGameSdk::Patterns
 	static inline const SdkPattern NdDevMenu_NdDevMenuAppend_Particles = { L"40 56 48 83 ec 30 48 8b f1 33 c9 e8 ?? ?? ?? ?? 84 c0 0f 84 ?? ?? ?? ?? 48 89 5c 24 40 4c 8d 0d ?? ?? ?? ??" };
 
 	static inline const SdkPattern NdDevMenu_DMENU_MenuGroup_SetRootMenu = { L"48 85 d2 0f ?? ?? ?? ?? 00 48 89 5c 24 08 57 48 83 ec 20 48 8b 81 b0 00 00 00 48 8b da 48 8b f9 48 3b" };
-
 	static inline const SdkPattern NdDevMenu_DMENU_Component = { L"40 53 57 41 57 48 83 ec 30 45 33 ff c7 41 68 c8 c8 c8 ff 4c 89 b9 80 00 00 00 48 ?? ?? ?? ?? 56 02 48 ?? ?? ?? ?? da 4c 89 79 30 48 8b f9 44 89 79 4e 4c 89 79 38 4c 89" };
 	static inline const SdkPattern NdDevMenu_DMENU_MenuGroup = { L"48 89 5c 24 08 57 48 83 ec 20 41 8b d8 48 8b f9 e8 ?? ?? ?? ?? 88 9f a0 00 00 00 48 ?? ?? ?? ?? 56 02 33 db 48 ?? ?? ?? ?? 9f c8 00 00 00 b9 00 10 00 00 48 89 9f 20 03 00 00 48 89 9f 28 03 00 00 48 89 9f a8 00 00 00 48 89 9f b0 00 00 00" };
 	static inline const SdkPattern NdDevMenu_DMENU_Menu = { L"48 89 5c 24 08 57 48 83 ec 20 41 8b d8 48 8b f9 e8 ?? ?? ?? ?? 48 ?? ?? ?? ?? 56 02 89 9f b8 00 00 00 48 ?? ?? ?? ?? 48 ?? ?? ?? ?? 48 89 87 a0 00 00 00 89 87 a8 00 00 00 48 89 87 b0 00 00 00 88 87 bc 00 00 00 48" };
+	static inline const SdkPattern NdDevMenu_DMENU_ItemEntry = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 20 49 8b d9 49 8b f0 48 8b f9 e8 ?? ?? ?? ?? 48 8b 44 24 50 33 c9 48 89 47 60 48 8b 44 24 58" };
+
 
 	static inline const SdkPattern NdDevMenu_Assert_UpdateSelectRegionByNameMenu = { L"cc 48 85 db 74 ?? 33 c9 ff d3 48 8d 05 ?? ?? ?? ?? c7 44 24 ?? 10 00 00 00 41 b9 8e 00 00 00" };
 	static inline const SdkPattern NdDevMenu_Assert_UpdateSelectIgcByNameMenu = { L"cc 48 85 db 74 ?? 33 c9 ff d3 48 8d 05 ?? ?? ?? ?? bb 10 00 00 00 41 b9 84 03 00 00" };
@@ -44,7 +45,6 @@ namespace NdGameSdk::Patterns
 	static inline const SdkPattern Particle_ParticleInternal_ParticleDebug_Constructor = { L"33 d2 b8 11 c0 00 00 66 89 41 18 48 8b c1 89 51 04 89 51 20 66 89 51 24 88 51 26 48 89 51 30 48 89 51 38 48 89 51 40 48 89 51 50 48 89 51 58 48 89 51 60 48 89 51 68 48 89 51 70 48 89 51 78 48 89 91 80 00 00 00 48 89 91 88 00 00 00 48 89 91 90 00 00 00 48 89 91 98 00 00 00 48 89 91 a0 00 00 00 48 89 91 a8 00 00 00 48" };
 	static inline const SdkPattern Particle_ParticleInternal_RenderUpdate = { L"4c 8b dc 53 56 48 81 ec a8 00 00 00 48 8b ?? ?? ?? ?? 02 48 33 c4 48 89 84 24 88 00 00 00 4c 8b 0a 48 8b f2 48 8b d9 4d 85" };
 	static inline const SdkPattern Particle_ParticleInternal_OnExecuteRootDataSelector = { L"40 53 55 56 57 41 55 48 81 ec 30 01 00 00 48 ?? ?? ?? ?? ?? 02 48 33 c4 48 89 84 24 20 01 00 00 8b da c7 44 24 38 10 00 00 00 48 8b" };
-
 
 	static inline const SdkPattern PrimServer_PrimServer = { L"48 8b ?? ?? ?? ?? ?? 48 8b d3 4c 8b 01 41 ff 90 b0 01 00 00 48 83 65 08" };
 	static inline const SdkPattern PrimServer_Create = { L"40 53 48 83 ec 30 48 8d 0d ?? ?? ?? ?? 48 8b da 48 8d 05 ?? ?? ?? ?? 48 8b d1 41 b9 60 0d 00 00" };

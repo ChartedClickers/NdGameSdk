@@ -59,12 +59,11 @@ bool NdModClient::Initialize() {
 }
 
 void NdModClient::OnModuleRegistered() {
-	m_Memory = GetSharedSdkComponent<corelib::memory::Memory>().get();
 	m_EngineComponents = GetSharedSdkComponent<ndlib::EngineComponents>().get();
 	m_CommonGame = GetSharedSdkComponent<common::CommonGame>().get();
 }
 
-void NdModClient::OnMemoryMapped() {
+void NdModClient::OnMemoryMapped(corelib::memory::Memory* Memory) {
 	spdlog::info("MemoryMapped!");
 }
 
@@ -74,4 +73,14 @@ void NdModClient::OnGameInitialized(bool status) {
 
 	auto user = m_EngineComponents->GetGameInfo()->DiscUser;
 	strcpy(user, "ALEXA DESPACITO");
+}
+
+void NdModClient::OnAppendSdkDevMenu(gamelib::debug::NdDevMenu* NdDevMenu, 
+	gamelib::debug::NdDevMenu::AppendSdkDevMenuCallback AppendSdkDevMenu) {
+
+	// We can create our menus here and also will broadcast this event to our NdMods.
+	spdlog::info("OnAppendSdkDevMenu by {}!", NdDevMenu->GetName());
+
+	// it's Invokes a private method from the NdDevMenu component that will create ItemEntry for our menus!
+	AppendSdkDevMenu(nullptr);
 }

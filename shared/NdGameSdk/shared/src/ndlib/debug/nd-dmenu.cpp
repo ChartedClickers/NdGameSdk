@@ -3,8 +3,10 @@
 namespace NdGameSdk::ndlib::debug {
 
 	regenny::shared::ndlib::debug::DMENU::Component::VTable* DMENU::Component::VTable{};
-	regenny::shared::ndlib::debug::DMENU::Menu::VTable0* DMENU::Menu::VTable{};
-	regenny::shared::ndlib::debug::DMENU::MenuGroup::VTable0* DMENU::MenuGroup::VTable{};
+	regenny::shared::ndlib::debug::DMENU::Menu::VTable* DMENU::Menu::VTable{};
+	regenny::shared::ndlib::debug::DMENU::MenuGroup::VTable* DMENU::MenuGroup::VTable{};
+
+	regenny::shared::ndlib::debug::DMENU::ItemEntry::VTable0* DMENU::ItemEntry::VTable{};
 
 	DMENU::MenuGroup* DMENU::DevMenu() {
 		return reinterpret_cast<DMENU::MenuGroup*>(this->Get()->m_DevMenu);
@@ -24,6 +26,14 @@ namespace NdGameSdk::ndlib::debug {
 
 	void DMENU::Component::SetName(const char* new_name) {
 		strcpy(this->Get()->m_pname, new_name);
+	}
+
+	DMENU::Menu* DMENU::Component::SubMenu() {
+		return reinterpret_cast<DMENU::Menu*>(this->Get()->m_pSubMenu);
+	}
+
+	DMENU::MenuGroup* DMENU::Component::MenuGroup() {
+		return reinterpret_cast<DMENU::MenuGroup*>(this->Get()->m_MenuGroup);
 	}
 
 	DMENU::Menu* DMENU::MenuGroup::RootMenu() {

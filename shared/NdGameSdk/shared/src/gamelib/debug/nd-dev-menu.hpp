@@ -31,6 +31,7 @@ namespace NdGameSdk::gamelib::debug {
 		};
 
 		NdDevMenu(NdDevMenuCfg& cfg);
+		~NdDevMenu();
 
 		SdkEvent<NdDevMenu*, DMENU::MenuGroup*> e_AppendMenuGroup;
 	    SdkEvent<NdDevMenu*, AppendSdkDevMenuCallback> e_AppendSdkMenu{true};
@@ -47,6 +48,7 @@ namespace NdGameSdk::gamelib::debug {
 		void AppendSdkDevMenus(DMENU::Menu* RootMenu, DMENU::Menu* SdkMenu);
 
 		NdDevMenuCfg m_cfg{};
+		optional<SdkAction<void(bool)>> m_OnGameInitialized{};
 		MidHook m_SetRootMenuHook{};
 #if defined(T1X)
 		Patch::Ptr m_GameConfig_DevModePatch{};

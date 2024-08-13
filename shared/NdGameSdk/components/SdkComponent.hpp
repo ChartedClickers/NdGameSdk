@@ -63,6 +63,43 @@ namespace NdGameSdk {
             return {};
         }
 
+        template <typename ComponentType, typename EventType, typename MemberFunc, typename ClassType = void>
+        NdGameSdk_API static optional<ISdkAction> SubscribeSdkEvent(
+            SdkComponentFactory* ComponentFactory,
+            EventType ComponentType::* event,
+            MemberFunc memberFunc,
+            ClassType* Instance = nullptr,
+            bool OneTimeInvoke = false) {
+            auto sdkcomponent = ComponentFactory->GetComponent<ComponentType>().get();
+            if (sdkcomponent) {
+                if constexpr (!std::is_same_v<ClassType, void>) {
+                    return (sdkcomponent->*event).Subscribe(Instance, memberFunc, OneTimeInvoke);
+                }
+                else {
+                    return (sdkcomponent->*event).Subscribe(*memberFunc, OneTimeInvoke);
+                }
+            }
+
+            return {};
+        }
+
+        template <typename ComponentType, typename EventType, typename MemberFunc, typename ClassType = void>
+        NdGameSdk_API static void UnsubscribeSdkEvent(
+            SdkComponentFactory* ComponentFactory,
+            EventType ComponentType::* event,
+            MemberFunc memberFunc,
+            ClassType* Instance = nullptr) {
+            auto sdkcomponent = ComponentFactory->GetComponent<ComponentType>().get();
+            if (sdkcomponent) {
+                if constexpr (!std::is_same_v<ClassType, void>) {
+                    (sdkcomponent->*event).Unsubscribe({ Instance, memberFunc });
+                }
+                else {
+                    (sdkcomponent->*event).Unsubscribe(*memberFunc);
+                }
+            }
+        }
+
     protected:
         ISdkComponent(std::string name);
 

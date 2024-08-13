@@ -4,6 +4,12 @@
 namespace NdGameSdk::gamelib::debug {
 
 	NdDevMenu::NdDevMenu(NdDevMenuCfg& cfg) : m_cfg{ std::move(cfg) }, ISdkComponent("DMENU") {}
+	
+	NdDevMenu::~NdDevMenu() {
+		if (m_CommonGame) {
+			m_CommonGame->e_GameInitialized.Unsubscribe(m_OnGameInitialized);
+		}
+	}
 
 	bool NdDevMenu::IsGameDebugMenu() {
 
@@ -132,7 +138,7 @@ namespace NdGameSdk::gamelib::debug {
 					throw SdkComponentEx{ std::format("Failed to find {}:: game functions!", GetName()), SdkComponentEx::ErrorCode::PatternFailed };
 				}
 
-				m_CommonGame->e_GameInitialized.Subscribe(*[](bool successful) {
+				m_OnGameInitialized = m_CommonGame->e_GameInitialized.Subscribe(*[](bool successful) {
 					if (successful) {
 						auto& DMENU = GetSharedComponents()->
 							GetComponent<NdDevMenu>()->m_EngineComponents->m_ndConfig.GetDmenu();

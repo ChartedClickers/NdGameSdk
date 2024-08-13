@@ -78,7 +78,6 @@ namespace NdGameSdk {
              auto it = m_connections.find(action);
 
              if (it != m_connections.end()) {
-
                  connection* conn = &it->second;
 
                  if (conn->connected()) {
@@ -87,7 +86,12 @@ namespace NdGameSdk {
 
                  m_connections.erase(action);
              }
+         }
 
+         void Unsubscribe(optional<SdkAction>& action) {
+             if (action.has_value()) {
+                 Unsubscribe(action.value());
+             }
          }
 
          optional<SdkAction> operator+=(const action& handler) {

@@ -4,8 +4,7 @@ namespace NdGameSdk {
 
 	class ISdkModule;
 
-	ISdkModule::ISdkModule(std::string name) 
-		: m_name{ name }, m_module{ Utility::memory::get_this_dll_handle() } {}
+	ISdkModule::ISdkModule(std::string name, HMODULE module) : m_name{ name }, m_module { module } {}
 
 	ISdkModule::~ISdkModule() {
 		e_OnUnregister.Invoke(this);

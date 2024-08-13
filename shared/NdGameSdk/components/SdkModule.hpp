@@ -41,7 +41,7 @@ namespace NdGameSdk {
 
         static ISdkModule* GetRegisteredModule(HMODULE ActionModule);
     protected:
-        ISdkModule(std::string name);
+        ISdkModule(std::string name, HMODULE module);
         std::shared_ptr<spdlog::logger> m_logger;
     private:
         virtual void OnModuleRegistered() = 0;

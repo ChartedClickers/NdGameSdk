@@ -11,7 +11,7 @@ using namespace Utils;
 std::unique_ptr<NdModClient> g_ndmodclient{};
 
 NdModClient::NdModClient(HMODULE ndgame_module) :
-	m_ndgame_module{ ndgame_module }, ISdkModule(PROJECT_NAME) {
+	m_ndgame_module{ ndgame_module }, ISdkModule(PROJECT_NAME, get_this_dll_handle()) {
 
 	auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 	auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(PROJECT_LOG_PATH, false);

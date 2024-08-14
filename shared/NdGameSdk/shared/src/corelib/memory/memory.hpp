@@ -15,6 +15,8 @@
 
 namespace NdGameSdk::corelib::memory 
 {
+	#define Memory_Source __FILE__, __LINE__, __func__
+
 	class Memory : public ISdkComponent {
 	public:
 		Memory(MemoryCfg& cfg);
@@ -36,9 +38,11 @@ namespace NdGameSdk::corelib::memory
 		NdGameSdk_API void ModifyMemoryMap(MemoryMapId MapId, MemSize newSizeForId);
 		NdGameSdk_API void IncreaseMemoryMap(MemoryMapId MapId, MemSize AddSizeForId);
 
-		std::map<MemoryMapId, MemoryMapEntry*>& GetStaticMemoryMapEntries();
+		NdGameSdk_API void PushAllocator(MemoryContextType context_type, const char* file, int line_num, const char* func);
+		NdGameSdk_API void PopAllocator();
 
 		HeapAllocator::HeapArena m_HeapArena{};
+		std::map<MemoryMapId, MemoryMapEntry*>& GetStaticMemoryMapEntries();
 	private:
 		void Initialize() override;
 		bool m_MemoryMapMapped{};

@@ -50,7 +50,10 @@ namespace NdGameSdk::gamelib::debug {
 		template <typename Component = DMENU::Component>
 		Component* DMENU_AppendComponent(DMENU::Menu* pRootMenu, DMENU::Component* pComponent) {
 			always_assert(DMENU_Menu_AppendComponent == nullptr, "Function pointer was not set!");
-			return (Component*)DMENU_Menu_AppendComponent(pRootMenu, pComponent);
+			Component* component = (Component*)DMENU_Menu_AppendComponent(pRootMenu, pComponent);
+			spdlog::debug("DMENU_Menu_AppendComponent(RootMenu: 'DMENU::Component::Menu('{:s}')', SubMenu: 'DMENU::Component::Menu('{:s}')')",
+				pRootMenu->Name(), component->SubMenu()->Name());
+			return component;
 		}
 
 		void AppendSdkDevMenus(DMENU::Menu* RootMenu, DMENU::Menu* SdkMenu);

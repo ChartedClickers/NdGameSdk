@@ -106,6 +106,16 @@ namespace NdGameSdk::corelib::memory {
 		}
 	}
 
+	void Memory::PushAllocator(MemoryContextType context_type, const char* file, int line_num, const char* func) {
+		always_assert(Memory_PushAllocator == nullptr, "Function pointer was not set!");
+		Memory_PushAllocator(&context_type, file, line_num, func);
+	}
+
+	void Memory::PopAllocator() {
+		always_assert(Memory_PopAllocator == nullptr, "Function pointer was not set!");
+		Memory_PopAllocator();
+	}
+
 	std::map<MemoryMapId, MemoryMapEntry*>& Memory::GetStaticMemoryMapEntries() {
 		return m_MemoryMap.s_MemoryMap;
 	}
@@ -152,6 +162,14 @@ namespace NdGameSdk::corelib::memory {
 			Memory_GetSize = (Memory_GetSize_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::Memory_GetSize), findpattern.offset);
 
+			findpattern = Patterns::Memory_PushAllocator;
+			Memory_PushAllocator = (Memory_PushAllocator_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::Memory_PushAllocator), findpattern.offset);
+
+			findpattern = Patterns::Memory_PopAllocator;
+			Memory_PopAllocator = (Memory_PopAllocator_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::Memory_PopAllocator), findpattern.offset);
+
 			findpattern = Patterns::Memory_GetAllocator;
 			Memory_GetAllocator = (Memory_GetAllocator_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::Memory_GetAllocator), findpattern.offset);
@@ -164,6 +182,8 @@ namespace NdGameSdk::corelib::memory {
 				!Memory_ModifyMemoryMap ||
 				!Memory_FindMemoryMap ||
 				!Memory_GetSize ||
+				!Memory_PushAllocator ||
+				!Memory_PopAllocator ||
 				!Memory_GetAllocator ||
 				!m_HeapArena.Memory_HeapArena_Allocate
 				) { throw SdkComponentEx { std::format("Failed to find {}:: game functions!", GetName()), SdkComponentEx::ErrorCode::PatternFailed, true }; }

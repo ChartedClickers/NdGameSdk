@@ -46,7 +46,7 @@ namespace NdGameSdk::gamelib::debug {
 		DMENU::ItemSubmenu* SubmenuPtr{};
 		if (HeapAllocator) {
 			memset((void*)HeapAllocator, 0, sizeof(DMENU::ItemSubmenu));
-			always_assert(DMENU_ItemSubmenu == nullptr, "Function pointer was not set!")
+			always_assert(DMENU_ItemSubmenu == nullptr, "Function pointer was not set!");
 			std::string menu_entry_text = std::format("{}...", pName);
 			SubmenuPtr = DMENU_ItemSubmenu(HeapAllocator, menu_entry_text.c_str(), pSubmenu, pCallbackFunct, pData, pDescription);
 			spdlog::debug("Created DMENU::Component::ItemSubmenu('{:s}','{:s}','DMENU::Component::Menu('{:s}')', {:#x}, {:#x}) -> {:#x}",
@@ -54,7 +54,6 @@ namespace NdGameSdk::gamelib::debug {
 				reinterpret_cast<uintptr_t>(SubmenuPtr->CallBackFunct()), SubmenuPtr->Data(), reinterpret_cast<uintptr_t>(SubmenuPtr));
 
 			DMENU_AppendComponent(pRootMenu, SubmenuPtr);
-			spdlog::debug("DMENU_Menu_AppendComponent(RootMenu: 'DMENU::Component::Menu('{:s}')', SubMenu: 'DMENU::Component::Menu('{:s}')')", pRootMenu->Name(), SubmenuPtr->SubMenu()->Name());
 			return SubmenuPtr;
 		}
 		return nullptr;

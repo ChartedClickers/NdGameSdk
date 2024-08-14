@@ -10,6 +10,9 @@ namespace NdGameSdk::corelib::memory
 {
 	namespace HeapAllocator
 	{
+		#define HeapArena_Args const char* source_func, uint32_t source_line, const char* source_file
+		#define HeapArena_Source __func__, __LINE__, __FILE__
+
 		class HeapArena {
 		public:
 			template <typename ClassType = void>

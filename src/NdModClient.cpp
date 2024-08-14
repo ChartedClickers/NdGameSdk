@@ -81,6 +81,6 @@ void NdModClient::OnAppendSdkDevMenu(gamelib::debug::NdDevMenu* NdDevMenu,
 	// We can create our menus here and also will broadcast this event to our NdMods.
 	spdlog::info("OnAppendSdkDevMenu by {}!", NdDevMenu->GetName());
 
-	// it's Invokes a private method from the NdDevMenu component that will create ItemEntry for our menus!
+	// it's Invokes a private method from the NdDevMenu component that will create ItemSubmenu for our menus!
 	AppendSdkDevMenu(nullptr);
 }

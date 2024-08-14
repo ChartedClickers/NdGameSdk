@@ -366,15 +366,17 @@ namespace shared {
                 void* m_callbackFunct;
             } // 0x14041e6b0
 
-            // DMENU::ItemEntry*
-            struct ItemEntry : Item 0x10  {
+            // DMENU::ItemSubmenu
+            struct ItemSubmenu : Item 0x10  {
                 Menu* m_pHeader; // Entry Pointer
                 uint64_t Unk[0x1];
             } // 0x14041ea90
 
-            // DMENU::ItemBool 
+            // DMENU::ItemBool
+            // Component.m_data - ValuePtr
             struct ItemBool : Item 0x8  {
                bool m_status;
+               bool m_pad[0x7];
             } // 0x14041cd70
             
             // DMENU::ItemDouble* 
@@ -390,7 +392,7 @@ namespace shared {
                 double m_DoubleStepValue [[i64]];
                 uint64_t Unk2[0x7];
                 char m_StringDisplayValue[0x20] [[utf8*]];
-                uint64_t Unk3[0x5];
+                uint64_t Unk3[0x4];
             } // 0x14041cd70
 
             // DMENU::ItemFloat* 
@@ -406,14 +408,13 @@ namespace shared {
                 float m_DoubleStepValue;
                 uint64_t Unk2[0x6];
                 char m_StringDisplayValue[0x20] [[utf8*]];
-                uint64_t Unk3[0x5];
+                uint64_t Unk3[0x4];
             } // 0x14041d960
 
             // DMENU::ItemFunction 
             struct ItemFunction : Item 0x10  {
                 void* unkData; // probably for link key->value
                 void* m_handlerFunct; // Handler for key->value component
-                uint64_t Unk2[0x1];
             } // 0x14041dad0
 
              // DMENU::ItemSelection* 
@@ -422,7 +423,6 @@ namespace shared {
                 void* m_callbackFormat;
                 uint64_t Unk2[0x3];
                 void* m_SelectionStruct;
-                void* UnkData3;
             } // 0x14041d610
 
             // DMENU::ItemSubText*

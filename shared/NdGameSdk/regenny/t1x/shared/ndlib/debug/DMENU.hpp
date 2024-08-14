@@ -64,14 +64,15 @@ struct DMENU {
         void* m_callbackFunct; // 0xb0
     }; // Size: 0xb8
 
-    struct ItemEntry : public Item {
+    struct ItemSubmenu : public Item {
         regenny::shared::ndlib::debug::DMENU::Menu* m_pHeader; // 0xb8
         uint64_t Unk[1]; // 0xc0
     }; // Size: 0xc8
 
     struct ItemBool : public Item {
         bool m_status; // 0xb8
-    }; // Size: 0xb9
+        bool m_pad[7]; // 0xb9
+    }; // Size: 0xc0
 
     struct ItemDouble : public Item {
         uint64_t* m_format; // 0xb8
@@ -91,8 +92,8 @@ struct DMENU {
         uint64_t Unk2[7]; // 0xf8
         // Metadata: utf8*
         char m_StringDisplayValue[32]; // 0x130
-        uint64_t Unk3[5]; // 0x150
-    }; // Size: 0x178
+        uint64_t Unk3[4]; // 0x150
+    }; // Size: 0x170
 
     struct ItemFloat : public Item {
         uint64_t* m_format; // 0xb8
@@ -106,22 +107,20 @@ struct DMENU {
         uint64_t Unk2[6]; // 0xe0
         // Metadata: utf8*
         char m_StringDisplayValue[32]; // 0x110
-        uint64_t Unk3[5]; // 0x130
-    }; // Size: 0x158
+        uint64_t Unk3[4]; // 0x130
+    }; // Size: 0x150
 
     struct ItemFunction : public Item {
         void* unkData; // 0xb8
         void* m_handlerFunct; // 0xc0
-        uint64_t Unk2[1]; // 0xc8
-    }; // Size: 0xd0
+    }; // Size: 0xc8
 
     struct ItemSelection : public Item {
         void* UnkData; // 0xb8
         void* m_callbackFormat; // 0xc0
         uint64_t Unk2[3]; // 0xc8
         void* m_SelectionStruct; // 0xe0
-        void* UnkData3; // 0xe8
-    }; // Size: 0xf0
+    }; // Size: 0xe8
 
     struct ItemSubText : public Item {
     }; // Size: 0xb8

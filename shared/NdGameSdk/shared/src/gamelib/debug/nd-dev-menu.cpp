@@ -7,7 +7,7 @@ namespace NdGameSdk::gamelib::debug {
 	
 	NdDevMenu::~NdDevMenu() {
 		if (m_CommonGame) {
-			m_CommonGame->e_GameInitialized.Unsubscribe(m_OnGameInitialized);
+			m_CommonGame->e_GameInitialized.Unsubscribe({ this, &NdDevMenu::OnGameInitialized });
 		}
 	}
 
@@ -25,6 +25,41 @@ namespace NdGameSdk::gamelib::debug {
 		return m_cfg.ExtendedDebugMenu;
 	}
 
+	DMENU::Menu* NdDevMenu::Create_DMENU_Menu(std::string pName, HeapArena_Args) {
+		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::Menu>
+			(sizeof(DMENU::Menu), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
+		DMENU::Menu* MenuPtr{};
+		if (HeapAllocator) {
+			memset((void*)HeapAllocator, 0, sizeof(DMENU::Menu));
+			always_assert(DMENU_Menu == nullptr, "Function pointer was not set!");
+			MenuPtr = DMENU_Menu(HeapAllocator, pName.c_str());
+			spdlog::debug("Created DMENU::Component::Menu('{:s}') -> {:#x}", MenuPtr->Name(), reinterpret_cast<uintptr_t>(MenuPtr));
+			return MenuPtr;
+		}
+		return nullptr;
+	}
+
+
+	DMENU::ItemSubmenu* NdDevMenu::Create_DMENU_ItemSubmenu(std::string pName, DMENU::Menu* pRootMenu, DMENU::Menu* pSubmenu, void* pCallbackFunct, uint64_t pData, const char* pDescription, HeapArena_Args) {
+		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::ItemSubmenu>
+			(sizeof(DMENU::ItemSubmenu), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
+		DMENU::ItemSubmenu* SubmenuPtr{};
+		if (HeapAllocator) {
+			memset((void*)HeapAllocator, 0, sizeof(DMENU::ItemSubmenu));
+			always_assert(DMENU_ItemSubmenu == nullptr, "Function pointer was not set!")
+			std::string menu_entry_text = std::format("{}...", pName);
+			SubmenuPtr = DMENU_ItemSubmenu(HeapAllocator, menu_entry_text.c_str(), pSubmenu, pCallbackFunct, pData, pDescription);
+			spdlog::debug("Created DMENU::Component::ItemSubmenu('{:s}','{:s}','DMENU::Component::Menu('{:s}')', {:#x}, {:#x}) -> {:#x}",
+				SubmenuPtr->Name(), SubmenuPtr->Description(), pSubmenu->Name(),
+				reinterpret_cast<uintptr_t>(SubmenuPtr->CallBackFunct()), SubmenuPtr->Data(), reinterpret_cast<uintptr_t>(SubmenuPtr));
+
+			DMENU_AppendComponent(pRootMenu, SubmenuPtr);
+			spdlog::debug("DMENU_Menu_AppendComponent(RootMenu: 'DMENU::Component::Menu('{:s}')', SubMenu: 'DMENU::Component::Menu('{:s}')')", pRootMenu->Name(), SubmenuPtr->SubMenu()->Name());
+			return SubmenuPtr;
+		}
+		return nullptr;
+	}
+
 	NdDevMenu::DmenuComponentType NdDevMenu::GetComponentType(DMENU::Component* component) {
 		uintptr_t vftablePtr = (uintptr_t)component->Get()->vftable;
 		auto ComponentType = m_DmenuComponentTypeMap.find(vftablePtr);
@@ -38,6 +73,16 @@ namespace NdGameSdk::gamelib::debug {
 	void NdDevMenu::AppendSdkDevMenus(DMENU::Menu* RootMenu, DMENU::Menu* CustomMenu) {
 		//always_assert(CustomMenu == nullptr, "CustomMenu pointer was not set!");
 		// will find the best place for Custom Dev Menus!
+	}
+
+	void NdDevMenu::OnGameInitialized(bool successful) {
+		if (successful) {
+			auto& DMENU = GetSharedComponents()->
+				GetComponent<NdDevMenu>()->m_EngineComponents->m_ndConfig.GetDmenu();
+
+			auto DevMenu = DMENU.DevMenu()->RootMenu();
+			DevMenu->SetName((DevMenu->Name() + std::format(" [{}]", SDK_NAME)).c_str());
+		}
 	}
 
 	void NdDevMenu::Awake() {
@@ -99,6 +144,29 @@ namespace NdGameSdk::gamelib::debug {
 				}
 	#endif
 
+				findpattern = Patterns::NdDevMenu_DMENU_MenuGroup_SetRootMenu;
+				auto SetRootMenuJMP = (void*)Utility::FindAndPrintPattern(module
+					, findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_MenuGroup_SetRootMenu), findpattern.offset + 0x93);
+
+				findpattern = Patterns::NdDevMenu_DMENU_Menu;
+				DMENU_Menu = (DMENU_Menu_ptr)Utility::FindAndPrintPattern(module,
+					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_Menu), findpattern.offset);
+
+				findpattern = Patterns::NdDevMenu_DMENU_Menu_AppendComponent;
+				DMENU_Menu_AppendComponent = (DMENU_Menu_AppendComponent_ptr)Utility::FindAndPrintPattern(module,
+					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_Menu_AppendComponent), findpattern.offset);
+
+				findpattern = Patterns::NdDevMenu_DMENU_ItemSubmenu;
+				DMENU_ItemSubmenu = (DMENU_ItemSubmenu_ptr)Utility::FindAndPrintPattern(module,
+					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemSubmenu), findpattern.offset);
+
+				if (!SetRootMenuJMP ||
+					!DMENU_Menu ||
+					!DMENU_Menu_AppendComponent ||
+					!DMENU_ItemSubmenu) {
+					throw SdkComponentEx{ std::format("Failed to find {}:: game functions!", GetName()), SdkComponentEx::ErrorCode::PatternFailed };
+				}
+
 				findpattern = Patterns::NdDevMenu_DMENU_Component;
 				DMENU::Component::VTable = (regenny::shared::ndlib::debug::DMENU::Component::VTable*)Utility::ReadLEA32(module,
 					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_Component), findpattern.offset + 0x1a, 3, 7);
@@ -108,17 +176,52 @@ namespace NdGameSdk::gamelib::debug {
 					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_MenuGroup), findpattern.offset + 0x1b, 3, 7);
 
 				findpattern = Patterns::NdDevMenu_DMENU_Menu;
-				DMENU::Menu::VTable = (regenny::shared::ndlib::debug::DMENU::Menu::VTable*)Utility::ReadLEA32(module,
+				DMENU::Menu::VTable =  (regenny::shared::ndlib::debug::DMENU::Menu::VTable*)Utility::ReadLEA32(module,
 					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_Menu), findpattern.offset + 0x15, 3, 7);
 
-				findpattern = Patterns::NdDevMenu_DMENU_ItemEntry;
-				DMENU::ItemEntry::VTable = (regenny::shared::ndlib::debug::DMENU::ItemEntry::VTable0*)Utility::ReadLEA32(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemEntry), findpattern.offset + 0x34, 3, 7);
+				findpattern = Patterns::NdDevMenu_DMENU_ItemLine;
+				DMENU::ItemLine::VTable = (regenny::shared::ndlib::debug::DMENU::ItemLine::VTable*)Utility::ReadLEA32(module,
+					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemLine), findpattern.offset + 0x5A, 3, 7);
+
+				findpattern = Patterns::NdDevMenu_DMENU_ItemSubmenu;
+				DMENU::ItemSubmenu::VTable = (regenny::shared::ndlib::debug::DMENU::ItemSubmenu::VTable0*)Utility::ReadLEA32(module,
+					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemSubmenu), findpattern.offset + 0x34, 3, 7);
+
+				findpattern = Patterns::NdDevMenu_DMENU_ItemBool;
+				DMENU::ItemBool::VTable = (regenny::shared::ndlib::debug::DMENU::ItemBool::VTable0*)Utility::ReadLEA32(module,
+					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemBool), findpattern.offset + 0x2b, 3, 7);
+
+				findpattern = Patterns::NdDevMenu_DMENU_ItemDouble;
+				DMENU::ItemDouble::VTable = (regenny::shared::ndlib::debug::DMENU::ItemDouble::VTable0*)Utility::ReadLEA32(module,
+					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemDouble), findpattern.offset + 0x50, 3, 7);
+
+				findpattern = Patterns::NdDevMenu_DMENU_ItemFloat;
+				DMENU::ItemFloat::VTable = (regenny::shared::ndlib::debug::DMENU::ItemFloat::VTable0*)Utility::ReadLEA32(module,
+					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemFloat), findpattern.offset + 0x61, 3, 7);
+
+				findpattern = Patterns::NdDevMenu_DMENU_ItemFunction;
+				DMENU::ItemFunction::VTable = (regenny::shared::ndlib::debug::DMENU::ItemFunction::VTable0*)Utility::ReadLEA32(module,
+					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemFunction), findpattern.offset + 0x25, 3, 7);
+
+				findpattern = Patterns::NdDevMenu_DMENU_ItemSelection;
+				DMENU::ItemSelection::VTable = (regenny::shared::ndlib::debug::DMENU::ItemSelection::VTable0*)Utility::ReadLEA32(module,
+					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemSelection), findpattern.offset + 0x35, 3, 7);
+
+				findpattern = Patterns::NdDevMenu_DMENU_ItemSubText;
+				DMENU::ItemSubText::VTable = (regenny::shared::ndlib::debug::DMENU::ItemSubText::VTable0*)Utility::ReadLEA32(module,
+					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemSubText), findpattern.offset + 0x35, 3, 7);
 
 				if (!DMENU::Component::VTable ||
 					!DMENU::MenuGroup::VTable ||
 					!DMENU::Menu::VTable || 
-					!DMENU::ItemEntry::VTable) {
+					!DMENU::ItemLine::VTable ||
+					!DMENU::ItemSubmenu::VTable ||
+					!DMENU::ItemBool::VTable ||
+					!DMENU::ItemDouble::VTable ||
+					!DMENU::ItemFloat::VTable || 
+					!DMENU::ItemFunction::VTable ||
+					!DMENU::ItemSelection::VTable ||
+					!DMENU::ItemSubText::VTable) {
 					throw SdkComponentEx
 					{ std::format("Failed to find VTables of DMENU Components!"),
 						SdkComponentEx::ErrorCode::PatternFailed };
@@ -127,26 +230,17 @@ namespace NdGameSdk::gamelib::debug {
 				m_DmenuComponentTypeMap = {
 					{ reinterpret_cast<uintptr_t>(DMENU::MenuGroup::VTable), DmenuComponentType::MenuGroup },
 					{ reinterpret_cast<uintptr_t>(DMENU::Menu::VTable), DmenuComponentType::Menu },
-					{ reinterpret_cast<uintptr_t>(DMENU::ItemEntry::VTable), DmenuComponentType::ItemEntry }
+					{ reinterpret_cast<uintptr_t>(DMENU::ItemLine::VTable), DmenuComponentType::ItemLine },
+					{ reinterpret_cast<uintptr_t>(DMENU::ItemSubmenu::VTable), DmenuComponentType::ItemSubmenu },
+					{ reinterpret_cast<uintptr_t>(DMENU::ItemBool::VTable), DmenuComponentType::ItemBool },
+					{ reinterpret_cast<uintptr_t>(DMENU::ItemDouble::VTable), DmenuComponentType::ItemDouble },
+					{ reinterpret_cast<uintptr_t>(DMENU::ItemFloat::VTable), DmenuComponentType::ItemFloat },
+					{ reinterpret_cast<uintptr_t>(DMENU::ItemFunction::VTable), DmenuComponentType::ItemFunction },
+					{ reinterpret_cast<uintptr_t>(DMENU::ItemSelection::VTable), DmenuComponentType::ItemSelection },
+					{ reinterpret_cast<uintptr_t>(DMENU::ItemSubText::VTable), DmenuComponentType::ItemSubText },
 				};
 
-				findpattern = Patterns::NdDevMenu_DMENU_MenuGroup_SetRootMenu;
-				auto SetRootMenuJMP = (void*)Utility::FindAndPrintPattern(module
-					, findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_MenuGroup_SetRootMenu), findpattern.offset + 0x93);
-
-				if (!SetRootMenuJMP) {
-					throw SdkComponentEx{ std::format("Failed to find {}:: game functions!", GetName()), SdkComponentEx::ErrorCode::PatternFailed };
-				}
-
-				m_OnGameInitialized = m_CommonGame->e_GameInitialized.Subscribe(*[](bool successful) {
-					if (successful) {
-						auto& DMENU = GetSharedComponents()->
-							GetComponent<NdDevMenu>()->m_EngineComponents->m_ndConfig.GetDmenu();
-
-						auto DevMenu = DMENU.DevMenu()->RootMenu();
-						DevMenu->SetName((DevMenu->Name() + std::format(" [{}]", SDK_NAME)).c_str());
-					}
-					});
+				m_CommonGame->e_GameInitialized.Subscribe(this,&NdDevMenu::OnGameInitialized);
 
 				m_SetRootMenuHook = Utility::MakeMidHook(SetRootMenuJMP,
 					[](SafetyHookContext& ctx)
@@ -162,6 +256,10 @@ namespace NdGameSdk::gamelib::debug {
 						if (MenuGroup == NdDevMenu) {
 							AppendSdkDevMenuCallback AppendCallback = boost::bind(&NdDevMenu::AppendSdkDevMenus, NdDevMenuComponent ,MenuGroup->RootMenu(), boost::placeholders::_1);
 							NdDevMenuComponent->InvokeSdkEvent(NdDevMenuComponent->e_AppendSdkMenu, NdDevMenuComponent.get(), AppendCallback);
+
+							//Test
+							auto _menu = NdDevMenuComponent->Create_DMENU_Menu("TEST MENU", HeapArena_Source);
+							NdDevMenuComponent->Create_DMENU_ItemSubmenu(_menu->Name(), MenuGroup->RootMenu(), _menu, nullptr, 0x0, "Test menu", HeapArena_Source);
 						}
 
 					}, wstr(Patterns::NdDevMenu_DMENU_MenuGroup_SetRootMenu), wstr(SetRootMenuJMP));

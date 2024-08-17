@@ -130,7 +130,7 @@ struct DMENU {
         void* UnkData; // 0xb8
         void* m_callbackFormat; // 0xc0
         uint64_t Unk2[3]; // 0xc8
-        void** m_SelectionStruct; // 0xe0
+        void* m_SelectionStruct; // 0xe0
     }; // Size: 0xe8
 
     struct ItemSubText : public Item {

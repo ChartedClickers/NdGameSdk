@@ -440,7 +440,7 @@ namespace shared {
                 void* UnkData; // m_format probably
                 void* m_callbackFormat;
                 uint64_t Unk2[0x3];
-                void** m_SelectionStruct;
+                void* m_SelectionStruct;
             } // 0x14041d610
 
             // DMENU::ItemSubText*

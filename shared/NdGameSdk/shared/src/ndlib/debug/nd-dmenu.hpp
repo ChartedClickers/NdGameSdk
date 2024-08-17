@@ -162,7 +162,7 @@ namespace NdGameSdk::ndlib::debug {
 				uint64_t selection_value;
 			};
 
-			Item_selection** ItemSelections();
+			Item_selection& ItemSelections();
 
 		private:
 			static regenny::shared::ndlib::debug::DMENU::ItemSelection::VTable0* VTable;

@@ -208,7 +208,7 @@ namespace NdGameSdk::gamelib::debug {
 			nullptr, HeapArena_Source);
 
 		itembool->SetColor(BasicColors::Green);
-		itembool->SelectedColor(BasicColors::Pink);
+		itembool->SetSelectedColor(BasicColors::Pink);
 
 		return NdGameSdkMenu;
 	}

@@ -43,7 +43,7 @@ namespace NdGameSdk::ndlib::debug {
 			Color GetColor();
 			Color GetSelectedColor();
 			void SetColor(Color color);
-			void SelectedColor(Color color);
+			void SetSelectedColor(Color color);
 
 			uint64_t Data();
 

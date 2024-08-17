@@ -57,7 +57,7 @@ namespace NdGameSdk::ndlib::debug {
 		this->Get()->m_color = color.toUint64();
 	}
 
-	void DMENU::Component::SelectedColor(Color color) {
+	void DMENU::Component::SetSelectedColor(Color color) {
 		this->Get()->m_selectcolor = color.toUint64();
 	}
 

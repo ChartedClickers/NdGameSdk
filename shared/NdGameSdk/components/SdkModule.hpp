@@ -47,7 +47,7 @@ namespace NdGameSdk {
         virtual void OnModuleRegistered() = 0;
         virtual void OnGameInitialized(bool status) {};
         virtual void OnMemoryMapped(corelib::memory::Memory* Memory) {};
-        virtual void OnAppendSdkDevMenu(gamelib::debug::NdDevMenu* NdDevMenu, gamelib::debug::NdDevMenu::AppendSdkDevMenuCallback AppendSdkDevMenu) {};
+        virtual void OnAppendSdkDevMenu(gamelib::debug::NdDevMenu* NdDevMenu, gamelib::debug::NdDevMenu::AppendSdkSubMenusCallback AppendSdkDevMenu) {};
 
         static std::unordered_map<HMODULE, ISdkModule*>* GetSdkModules();
 

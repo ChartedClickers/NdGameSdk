@@ -23,7 +23,9 @@ namespace NdGameSdk::gamelib::debug {
 
 	class NdDevMenu : public ISdkComponent {
 	public:
-		using AppendSdkDevMenuCallback = boost::function<void(DMENU::Menu*)>;
+
+		#define AppendSdkSubMenus_Args DMENU::Menu* CustomMenu, const char* Description, DMENU::ItemSubmenu::SubmenuCallback SubmenuCallback, uint64_t Data
+		using AppendSdkSubMenusCallback = boost::function<void(AppendSdkSubMenus_Args)>;
 
 		enum DmenuComponentType { Unknown, MenuGroup, Menu, ItemLine, ItemSubmenu, 
 			ItemBool, ItemDecimal, ItemFloat, ItemFunction, ItemSelection, ItemSubText
@@ -33,7 +35,7 @@ namespace NdGameSdk::gamelib::debug {
 		~NdDevMenu();
 
 		SdkEvent<NdDevMenu*, DMENU::MenuGroup*> e_AppendMenuGroup;
-	    SdkEvent<NdDevMenu*, AppendSdkDevMenuCallback> e_AppendSdkMenu{true};
+	    SdkEvent<NdDevMenu*, AppendSdkSubMenusCallback> e_AppendSdkMenu{true};
 
 		NdGameSdk_API bool IsGameDebugMenu();
 		NdGameSdk_API bool IsExtendedDebugMenu();
@@ -66,7 +68,8 @@ namespace NdGameSdk::gamelib::debug {
 
 		DMENU::Menu* CreateNdGameSdkMenu();
 
-		void AppendSdkDevMenus(DMENU::Menu* RootMenu, DMENU::Menu* SdkMenu);
+		void AppendSdkSubMenus(DMENU::Menu* RootMenu, AppendSdkSubMenus_Args);
+
 		void OnGameInitialized(bool successful);
 
 		NdDevMenuCfg m_cfg{};
@@ -79,7 +82,7 @@ namespace NdGameSdk::gamelib::debug {
 #endif
 
 		DMENU::Menu* m_NdGameSdkMenu{};
-		std::vector<DMENU::Menu*> m_SdkCustomDevMenus{};
+		std::vector<DMENU::ItemSubmenu*> m_SdkCustomSubmenus{};
 
 		std::unordered_map<uintptr_t, DmenuComponentType> m_DmenuComponentTypeMap{};
 

@@ -34,7 +34,7 @@ private:
 	void OnModuleRegistered() override;
 	void OnMemoryMapped(corelib::memory::Memory* Memory) override;
 	void OnGameInitialized(bool status) override;
-	void OnAppendSdkDevMenu(gamelib::debug::NdDevMenu* NdDevMenu, gamelib::debug::NdDevMenu::AppendSdkDevMenuCallback AppendSdkDevMenu) override;
+	void OnAppendSdkDevMenu(gamelib::debug::NdDevMenu* NdDevMenu, gamelib::debug::NdDevMenu::AppendSdkSubMenusCallback AppendSdkDevMenu) override;
 
 	bool m_initialized{false};
 	std::atomic<bool> m_ndmods_initialized{ false };

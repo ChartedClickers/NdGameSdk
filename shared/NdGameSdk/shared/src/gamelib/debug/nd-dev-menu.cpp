@@ -1,6 +1,8 @@
 #include "nd-dev-menu.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
+using namespace boost::placeholders;
+
 namespace NdGameSdk::gamelib::debug {
 
 	NdDevMenu::NdDevMenu(NdDevMenuCfg& cfg) : m_cfg{ std::move(cfg) }, ISdkComponent("DMENU") {}
@@ -210,17 +212,23 @@ namespace NdGameSdk::gamelib::debug {
 		itembool->SetColor(BasicColors::Green);
 		itembool->SetSelectedColor(BasicColors::Pink);
 
+		//TODO: Here must be the main controls of sdk and the possibility of spawning menus from other sdkcomponents 
+		// like this happening in the NdGames. 
+
 		return NdGameSdkMenu;
 	}
 
-	void NdDevMenu::AppendSdkDevMenus(DMENU::Menu* RootMenu, DMENU::Menu* CustomMenu) {
-		//always_assert(CustomMenu == nullptr, "CustomMenu pointer was not set!");
+	void NdDevMenu::AppendSdkSubMenus(DMENU::Menu* RootMenu, AppendSdkSubMenus_Args) {
+		always_assert(CustomMenu == nullptr, "CustomMenu pointer was not set!");
 
-		if (m_SdkCustomDevMenus.empty()) {
-
+		if (m_SdkCustomSubmenus.empty()) {
+			Create_DMENU_TextLineWrapper(std::string(SDK_NAME) + " Menus", RootMenu, HeapArena_Source);
 		}
 
+		auto module_menu = Create_DMENU_ItemSubmenu(CustomMenu->Name(), RootMenu, CustomMenu, SubmenuCallback,
+			Data, Description, HeapArena_Source);
 
+		m_SdkCustomSubmenus.push_back(module_menu);
 	}
 
 	void NdDevMenu::OnGameInitialized(bool successful) {
@@ -230,7 +238,8 @@ namespace NdGameSdk::gamelib::debug {
 			auto DevMenu = DMENU.DevMenu()->RootMenu();
 			DevMenu->SetName((DevMenu->Name() + std::format(" [{}]", SDK_NAME)).c_str());
 
-			AppendSdkDevMenuCallback AppendCallback = boost::bind(&NdDevMenu::AppendSdkDevMenus, this, DevMenu, boost::placeholders::_1);
+			AppendSdkSubMenusCallback AppendCallback = boost::bind(&NdDevMenu::AppendSdkSubMenus, this, DevMenu, 
+				_1, _2, _3, _4);
 			InvokeSdkEvent(e_AppendSdkMenu, this, AppendCallback);
 		}
 	}
@@ -443,8 +452,8 @@ namespace NdGameSdk::gamelib::debug {
 
 						if (MenuGroup == NdDevMenu) {
 							DMENU::Menu* NdGameSdkMenu = NdDevMenuComponent->CreateNdGameSdkMenu();
-							NdDevMenuComponent->Create_DMENU_ItemSubmenu(NdGameSdkMenu->Name(), MenuGroup->RootMenu(),
-								NdGameSdkMenu, NULL, NULL, nullptr, HeapArena_Source);
+							NdDevMenuComponent->m_NdGameSdkMenu = NdDevMenuComponent->Create_DMENU_ItemSubmenu(NdGameSdkMenu->Name(), MenuGroup->RootMenu(),
+								NdGameSdkMenu, NULL, NULL, nullptr, HeapArena_Source)->SubMenu();
 						}
 
 						NdDevMenuComponent->InvokeSdkEvent(NdDevMenuComponent->e_AppendMenuGroup, NdDevMenuComponent.get(), MenuGroup);

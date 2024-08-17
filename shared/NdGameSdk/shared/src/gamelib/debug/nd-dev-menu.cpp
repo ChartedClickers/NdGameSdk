@@ -30,7 +30,7 @@ namespace NdGameSdk::gamelib::debug {
 			(sizeof(DMENU::Menu), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
 		DMENU::Menu* MenuPtr{};
 		if (HeapAllocator) {
-			memset((void*)HeapAllocator, 0, sizeof(DMENU::Menu));
+			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::Menu));
 			always_assert(DMENU_Menu == nullptr, "Function pointer was not set!");
 			MenuPtr = DMENU_Menu(HeapAllocator, pName.c_str());
 			spdlog::debug("Created DMENU::Component::Menu('{:s}') -> {:#x}", MenuPtr->Name(), reinterpret_cast<uintptr_t>(MenuPtr));
@@ -39,24 +39,154 @@ namespace NdGameSdk::gamelib::debug {
 		return nullptr;
 	}
 
+	DMENU::ItemLine* NdDevMenu::Create_DMENU_ItemLine(DMENU::Menu* pMenu, HeapArena_Args) {
+		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::ItemLine>
+			(sizeof(DMENU::ItemLine), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
+		DMENU::ItemLine* LinePtr{};
+		if (HeapAllocator) {
+			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::ItemLine));
+			always_assert(DMENU_ItemLine == nullptr, "Function pointer was not set!");
+			LinePtr = DMENU_ItemLine(HeapAllocator);
+			spdlog::debug("Created DMENU::Component::ItemLine() -> {:#x}", reinterpret_cast<uintptr_t>(LinePtr));
+			DMENU_AppendComponent(pMenu, LinePtr);
+			return LinePtr;
+		}
+		return nullptr;
+	}
 
-	DMENU::ItemSubmenu* NdDevMenu::Create_DMENU_ItemSubmenu(std::string pName, DMENU::Menu* pRootMenu, DMENU::Menu* pSubmenu, void* pCallbackFunct, uint64_t pData, const char* pDescription, HeapArena_Args) {
+	DMENU::ItemSubText* NdDevMenu::Create_DMENU_ItemSubText(std::string pName, DMENU::Menu* pMenu, HeapArena_Args) {
+		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::ItemSubText>
+			(sizeof(DMENU::ItemSubText), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
+		DMENU::ItemSubText* SubTextPtr{};
+		if (HeapAllocator) {
+			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::ItemSubText));
+			always_assert(DMENU_ItemSubText == nullptr, "Function pointer was not set!");
+			SubTextPtr = DMENU_ItemSubText(HeapAllocator, pName.c_str());
+			spdlog::debug("Created DMENU::Component::ItemSubText('{:s}') -> {:#x}", SubTextPtr->Name(), reinterpret_cast<uintptr_t>(SubTextPtr));
+			DMENU_AppendComponent(pMenu, SubTextPtr);
+			return SubTextPtr;
+		}
+		return nullptr;
+	}
+
+	DMENU::ItemSubmenu* NdDevMenu::Create_DMENU_ItemSubmenu(std::string pName, DMENU::Menu* pRootMenu, DMENU::Menu* pSubmenu, DMENU::ItemSubmenu::SubmenuCallback pCallbackFunct, uint64_t pData, const char* pDescription, HeapArena_Args) {
 		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::ItemSubmenu>
 			(sizeof(DMENU::ItemSubmenu), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
 		DMENU::ItemSubmenu* SubmenuPtr{};
 		if (HeapAllocator) {
-			memset((void*)HeapAllocator, 0, sizeof(DMENU::ItemSubmenu));
+			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::ItemSubmenu));
 			always_assert(DMENU_ItemSubmenu == nullptr, "Function pointer was not set!");
-			std::string menu_entry_text = std::format("{}...", pName);
-			SubmenuPtr = DMENU_ItemSubmenu(HeapAllocator, menu_entry_text.c_str(), pSubmenu, pCallbackFunct, pData, pDescription);
-			spdlog::debug("Created DMENU::Component::ItemSubmenu('{:s}','{:s}','DMENU::Component::Menu('{:s}')', {:#x}, {:#x}) -> {:#x}",
-				SubmenuPtr->Name(), SubmenuPtr->Description(), pSubmenu->Name(),
-				reinterpret_cast<uintptr_t>(SubmenuPtr->CallBackFunct()), SubmenuPtr->Data(), reinterpret_cast<uintptr_t>(SubmenuPtr));
 
+			std::string menu_entry_text = std::format("{}...", pName);
+			void* SubmenuCallBackPtr = pCallbackFunct != NULL ? 
+				reinterpret_cast<void*>(*pCallbackFunct.target<DMENU::ItemSubmenu::SubmenuCallbackPtr>()) : nullptr;
+
+			SubmenuPtr = DMENU_ItemSubmenu(HeapAllocator, menu_entry_text.c_str(), pSubmenu, SubmenuCallBackPtr, pData, pDescription);
+			spdlog::debug("Created DMENU::Component::ItemSubmenu('{:s}','DMENU::Component::Menu('{:s}')',{:#x},{:#x},'{:s}') -> {:#x}",
+				SubmenuPtr->Name(), pSubmenu->Name(),
+				reinterpret_cast<uintptr_t>(SubmenuPtr->CallBackFunct()), SubmenuPtr->Data(), SubmenuPtr->Description(), reinterpret_cast<uintptr_t>(SubmenuPtr));
 			DMENU_AppendComponent(pRootMenu, SubmenuPtr);
 			return SubmenuPtr;
 		}
 		return nullptr;
+	}
+
+	DMENU::ItemBool* NdDevMenu::Create_DMENU_ItemBool(std::string pName, DMENU::Menu* pMenu, bool* pData, const char* pDescription, HeapArena_Args) {
+		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::ItemBool>
+			(sizeof(DMENU::ItemBool), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
+		DMENU::ItemBool* BoolPtr{};
+		if (HeapAllocator) {
+			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::ItemBool));
+			always_assert(DMENU_ItemBool == nullptr, "Function pointer was not set!");
+			BoolPtr = DMENU_ItemBool(HeapAllocator, pName.c_str(), pData, pDescription);
+			spdlog::debug("Created DMENU::Component::ItemBool('{:s}','{:#x}','{:s}') -> {:#x}",
+				BoolPtr->Name(), BoolPtr->Data(), BoolPtr->Description(), reinterpret_cast<uintptr_t>(BoolPtr));
+			DMENU_AppendComponent(pMenu, BoolPtr);
+			return BoolPtr;
+		}
+		return nullptr;
+	}
+
+	DMENU::ItemDecimal* NdDevMenu::Create_DMENU_ItemDecimal(std::string pName, DMENU::Menu* pMenu, int* pData,
+		DMENU::ItemDecimal::ValueParams pValueParams, DMENU::ItemDecimal::StepParams pStepParams, const char* pDescription, HeapArena_Args) {
+		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::ItemDecimal>
+			(sizeof(DMENU::ItemDecimal), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
+		DMENU::ItemDecimal* DoublePtr{};
+		if (HeapAllocator) {
+			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::ItemDecimal));
+			always_assert(DMENU_ItemDecimal == nullptr, "Function pointer was not set!");
+			DoublePtr = DMENU_ItemDecimal(HeapAllocator, pName.c_str(), reinterpret_cast<uint64_t*>(pData), &pValueParams, &pStepParams, pDescription);
+			spdlog::debug("Created DMENU::Component::ItemDecimal('{:s}','{:#x}','{:d},{:d}','{:d},{:d},'{:s}') -> {:#x}",
+				DoublePtr->Name(), DoublePtr->Data(), DoublePtr->GetValueParams().MinValue, DoublePtr->GetValueParams().MaxValue,
+				DoublePtr->GetStepParams().StepValue, DoublePtr->GetStepParams().DoubleStepValue, DoublePtr->Description(), reinterpret_cast<uintptr_t>(DoublePtr));
+			DMENU_AppendComponent(pMenu, DoublePtr);
+			return DoublePtr;
+		}
+		return nullptr;
+	}
+
+
+	DMENU::ItemFloat* NdDevMenu::Create_DMENU_ItemFloat(std::string pName, DMENU::Menu* pMenu, float* pData, DMENU::ItemFloat::ValueParams pValueParams, DMENU::ItemFloat::StepParams pStepParams, const char* pDescription, HeapArena_Args) {
+		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::ItemFloat>
+			(sizeof(DMENU::ItemFloat), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
+		DMENU::ItemFloat* FloatPtr{};
+		if (HeapAllocator) {
+			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::ItemFloat));
+			always_assert(DMENU_ItemFloat == nullptr, "Function pointer was not set!");
+			FloatPtr = DMENU_ItemFloat(HeapAllocator, pName.c_str(), reinterpret_cast<uint64_t*>(pData), &pValueParams, &pStepParams, pDescription, NULL);
+			spdlog::debug("Created DMENU::Component::ItemFloat('{:s}','{:#x}','{:.2f},{:.2f}','{:.2f},{:.2f},'{:s}') -> {:#x}",
+				FloatPtr->Name(), reinterpret_cast<uintptr_t>(pData), FloatPtr->GetValueParams().MinValue, FloatPtr->GetValueParams().MaxValue,
+				FloatPtr->GetStepParams().StepValue, FloatPtr->GetStepParams().DoubleStepValue, FloatPtr->Description(), reinterpret_cast<uintptr_t>(FloatPtr));
+			DMENU_AppendComponent(pMenu, FloatPtr);
+			return FloatPtr;
+		}
+		return nullptr;
+	}
+
+	DMENU::ItemFunction* NdDevMenu::Create_DMENU_Function(std::string pName, DMENU::Menu* pMenu, DMENU::ItemFunction::FunctionCallback pFunction, uint64_t args, bool pIsActive, HeapArena_Args) {
+		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::ItemFunction>
+			(sizeof(DMENU::ItemFunction), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
+		DMENU::ItemFunction* FunctionPtr{};
+		if (HeapAllocator) {
+			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::ItemFunction));
+			always_assert(DMENU_ItemFunction == nullptr, "Function pointer was not set!");
+
+			// We can only support free functions! For member functions consider using wrapped shells.
+			auto funcCallBackPtr = *pFunction.target<DMENU::ItemFunction::FunctionCallbackPtr>();
+			always_assert(funcCallBackPtr == nullptr, "FunctionCallback pointer was not set!");
+
+			FunctionPtr = DMENU_ItemFunction(HeapAllocator, pName.c_str(), reinterpret_cast<void*>(funcCallBackPtr), args, pIsActive);
+			spdlog::debug("Created DMENU::Component::ItemFunction('{:s}','{:#x}','{:#x}','{}') -> {:#x}",
+				FunctionPtr->Name(), reinterpret_cast<uintptr_t>(FunctionPtr->CallBackFunct()), FunctionPtr->Data(),
+				FunctionPtr->IsActive(), reinterpret_cast<uintptr_t>(FunctionPtr));
+			DMENU_AppendComponent(pMenu, FunctionPtr);
+			return FunctionPtr;
+		}
+		return nullptr;
+	}
+
+	DMENU::ItemSelection* NdDevMenu::Create_DMENU_ItemSelection(std::string pName, DMENU::Menu* pMenu, DMENU::ItemSelection::Item_selection* pItemSelection, uint64_t* pData, const char* pDescription, HeapArena_Args) {
+		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::ItemSelection>
+			(sizeof(DMENU::ItemSelection), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
+		DMENU::ItemSelection* SelectionPtr{};
+		if (HeapAllocator) {
+			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::ItemSelection));
+			always_assert(DMENU_ItemSelection == nullptr, "Function pointer was not set!");
+			SelectionPtr = DMENU_ItemSelection(HeapAllocator, pName.c_str(), pItemSelection, (void*)DMENU_Menu_DecimalCallBack, pData, NULL, NULL, NULL, pDescription);
+			spdlog::debug("Created DMENU::Component::ItemSelection('{:s}','{:#x}','{:#x}','{:#x}','{:s}') -> {:#x}",
+				SelectionPtr->Name(), reinterpret_cast<uintptr_t>(SelectionPtr->ItemSelections()), reinterpret_cast<uintptr_t>(SelectionPtr->CallBackFunct()), 
+				SelectionPtr->Data(), SelectionPtr->Description(), reinterpret_cast<uintptr_t>(SelectionPtr));
+			DMENU_AppendComponent(pMenu, SelectionPtr);
+			return SelectionPtr;
+		}
+		return nullptr;
+	}
+
+	std::pair<DMENU::ItemLine*, DMENU::ItemSubText*> NdDevMenu::Create_DMENU_TextLineWrapper(std::string pName, DMENU::Menu* pMenu, HeapArena_Args) {
+		return {
+		Create_DMENU_ItemLine(pMenu,source_func,source_line,source_file),
+		Create_DMENU_ItemSubText(pName,pMenu,source_func,source_line,source_file)
+		};
 	}
 
 	NdDevMenu::DmenuComponentType NdDevMenu::GetComponentType(DMENU::Component* component) {
@@ -71,16 +201,67 @@ namespace NdGameSdk::gamelib::debug {
 
 	void NdDevMenu::AppendSdkDevMenus(DMENU::Menu* RootMenu, DMENU::Menu* CustomMenu) {
 		//always_assert(CustomMenu == nullptr, "CustomMenu pointer was not set!");
-		// will find the best place for Custom Dev Menus!
+
+		if (m_SdkCustomDevMenus.empty()) {
+
+		}
+
+
+	}
+
+	DEFINE_DMENU_ItemSelection(TestEnum, TEST, TEST2);
+	uint64_t TestEnum_value = 0;
+
+	bool TestFunct(DMENU::ItemFunction& itemfunct, DMENU::Message message) {
+		if (message == DMENU::Message::OnExecute) {
+			spdlog::info("Hello! From component {}", itemfunct.Name());
+		}
+
+		return true;
+	}
+
+	bool TestCallBack(DMENU::ItemSubmenu& itemfunct, DMENU::Message message) {
+		if (message == DMENU::Message::OnExecute) {
+			spdlog::info("Hello TestCallBack! From component {}", itemfunct.Name());
+		}
+
+		if (message == DMENU::Message::OnUpdate) {
+			spdlog::info("Hello OnUpdate TestCallBack! From component {}", itemfunct.Name());
+		}
+
+		return true;
 	}
 
 	void NdDevMenu::OnGameInitialized(bool successful) {
 		if (successful) {
-			auto& DMENU = GetSharedComponents()->
-				GetComponent<NdDevMenu>()->m_EngineComponents->m_ndConfig.GetDmenu();
+			auto& DMENU = m_EngineComponents->m_ndConfig.GetDmenu();
 
 			auto DevMenu = DMENU.DevMenu()->RootMenu();
 			DevMenu->SetName((DevMenu->Name() + std::format(" [{}]", SDK_NAME)).c_str());
+
+
+			auto _menu = Create_DMENU_Menu("TEST MENU", HeapArena_Source);
+			Create_DMENU_ItemSubmenu(_menu->Name(), DevMenu, _menu, NULL, 0x0, "Test menu", HeapArena_Source);
+
+			Create_DMENU_ItemSubmenu("AWWW", DevMenu, _menu, &TestCallBack, 0x0, "Test menu2", HeapArena_Source);
+
+
+			static bool test_bool = false;
+			Create_DMENU_ItemBool("Test bool", _menu, &test_bool, "I'm bool", HeapArena_Source);
+			static int test_decimal = 50;
+			Create_DMENU_ItemDecimal("Test Decimal", _menu, &test_decimal, { 1, 6 }, { 1, 2 }, "I'm Decimal", HeapArena_Source);
+
+			static float test_float = 32.24f;
+			Create_DMENU_ItemFloat("Test float", _menu, &test_float, { 0.1f, 5.0f }, { 0.1f, 0.1f }, "I'm float", HeapArena_Source);
+
+			Create_DMENU_TextLineWrapper("test", _menu, HeapArena_Source);
+
+			Create_DMENU_Function("test function", _menu, &TestFunct,NULL,false, HeapArena_Source);
+
+			Create_DMENU_ItemSelection("test Selection", _menu, (DMENU::ItemSelection::Item_selection*)&TestEnum_selection, &TestEnum_value, "I'm selection", HeapArena_Source);
+
+			AppendSdkDevMenuCallback AppendCallback = boost::bind(&NdDevMenu::AppendSdkDevMenus, this, DevMenu, boost::placeholders::_1);
+			InvokeSdkEvent(e_AppendSdkMenu, this, AppendCallback);
 		}
 	}
 
@@ -151,18 +332,58 @@ namespace NdGameSdk::gamelib::debug {
 				DMENU_Menu = (DMENU_Menu_ptr)Utility::FindAndPrintPattern(module,
 					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_Menu), findpattern.offset);
 
-				findpattern = Patterns::NdDevMenu_DMENU_Menu_AppendComponent;
-				DMENU_Menu_AppendComponent = (DMENU_Menu_AppendComponent_ptr)Utility::FindAndPrintPattern(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_Menu_AppendComponent), findpattern.offset);
+				findpattern = Patterns::NdDevMenu_DMENU_ItemLine;
+				DMENU_ItemLine = (DMENU_ItemLine_ptr)Utility::FindAndPrintPattern(module,
+					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemLine), findpattern.offset);
+
+				findpattern = Patterns::NdDevMenu_DMENU_ItemSubText;
+				DMENU_ItemSubText = (DMENU_ItemSubText_ptr)Utility::FindAndPrintPattern(module,
+					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemSubText), findpattern.offset);
 
 				findpattern = Patterns::NdDevMenu_DMENU_ItemSubmenu;
 				DMENU_ItemSubmenu = (DMENU_ItemSubmenu_ptr)Utility::FindAndPrintPattern(module,
 					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemSubmenu), findpattern.offset);
 
+				findpattern = Patterns::NdDevMenu_DMENU_ItemBool;
+				DMENU_ItemBool = (DMENU_ItemBool_ptr)Utility::FindAndPrintPattern(module,
+					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemBool), findpattern.offset);
+
+				findpattern = Patterns::NdDevMenu_DMENU_ItemDecimal;
+				DMENU_ItemDecimal = (DMENU_ItemDecimal_ptr)Utility::FindAndPrintPattern(module,
+					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemDecimal), findpattern.offset);
+
+				findpattern = Patterns::NdDevMenu_DMENU_ItemFloat;
+				DMENU_ItemFloat = (DMENU_ItemFloat_ptr)Utility::FindAndPrintPattern(module,
+					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemFloat), findpattern.offset);
+
+				findpattern = Patterns::NdDevMenu_DMENU_ItemFunction;
+				DMENU_ItemFunction = (DMENU_ItemFunction_ptr)Utility::FindAndPrintPattern(module,
+					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemFunction), findpattern.offset);
+
+				findpattern = Patterns::NdDevMenu_DMENU_ItemSelection;
+				DMENU_ItemSelection = (DMENU_ItemSelection_ptr)Utility::FindAndPrintPattern(module,
+					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemSelection), findpattern.offset);
+
+				findpattern = Patterns::NdDevMenu_DMENU_Menu_AppendComponent;
+				DMENU_Menu_AppendComponent = (DMENU_Menu_AppendComponent_ptr)Utility::FindAndPrintPattern(module,
+					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_Menu_AppendComponent), findpattern.offset);
+
+				findpattern = Patterns::NdDevMenu_DMENU_DecimalCallBack;
+				DMENU_Menu_DecimalCallBack = (DMENU_Menu_DecimalCallBack_ptr)Utility::FindAndPrintPattern(module,
+					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_DecimalCallBack), findpattern.offset);
+
 				if (!SetRootMenuJMP ||
 					!DMENU_Menu ||
+					!DMENU_ItemLine ||
+					!DMENU_ItemSubText ||
+					!DMENU_ItemSubmenu ||
+					!DMENU_ItemBool ||
+					!DMENU_ItemDecimal ||
+					!DMENU_ItemFloat ||
+					!DMENU_ItemFunction ||
+					!DMENU_ItemSelection ||
 					!DMENU_Menu_AppendComponent ||
-					!DMENU_ItemSubmenu) {
+					!DMENU_Menu_DecimalCallBack) {
 					throw SdkComponentEx{ std::format("Failed to find {}:: game functions!", GetName()), SdkComponentEx::ErrorCode::PatternFailed };
 				}
 
@@ -190,9 +411,9 @@ namespace NdGameSdk::gamelib::debug {
 				DMENU::ItemBool::VTable = (regenny::shared::ndlib::debug::DMENU::ItemBool::VTable0*)Utility::ReadLEA32(module,
 					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemBool), findpattern.offset + 0x2b, 3, 7);
 
-				findpattern = Patterns::NdDevMenu_DMENU_ItemDouble;
-				DMENU::ItemDouble::VTable = (regenny::shared::ndlib::debug::DMENU::ItemDouble::VTable0*)Utility::ReadLEA32(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemDouble), findpattern.offset + 0x50, 3, 7);
+				findpattern = Patterns::NdDevMenu_DMENU_ItemDecimal;
+				DMENU::ItemDecimal::VTable = (regenny::shared::ndlib::debug::DMENU::ItemDecimal::VTable0*)Utility::ReadLEA32(module,
+					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemDecimal), findpattern.offset + 0x50, 3, 7);
 
 				findpattern = Patterns::NdDevMenu_DMENU_ItemFloat;
 				DMENU::ItemFloat::VTable = (regenny::shared::ndlib::debug::DMENU::ItemFloat::VTable0*)Utility::ReadLEA32(module,
@@ -216,7 +437,7 @@ namespace NdGameSdk::gamelib::debug {
 					!DMENU::ItemLine::VTable ||
 					!DMENU::ItemSubmenu::VTable ||
 					!DMENU::ItemBool::VTable ||
-					!DMENU::ItemDouble::VTable ||
+					!DMENU::ItemDecimal::VTable ||
 					!DMENU::ItemFloat::VTable || 
 					!DMENU::ItemFunction::VTable ||
 					!DMENU::ItemSelection::VTable ||
@@ -232,7 +453,7 @@ namespace NdGameSdk::gamelib::debug {
 					{ reinterpret_cast<uintptr_t>(DMENU::ItemLine::VTable), DmenuComponentType::ItemLine },
 					{ reinterpret_cast<uintptr_t>(DMENU::ItemSubmenu::VTable), DmenuComponentType::ItemSubmenu },
 					{ reinterpret_cast<uintptr_t>(DMENU::ItemBool::VTable), DmenuComponentType::ItemBool },
-					{ reinterpret_cast<uintptr_t>(DMENU::ItemDouble::VTable), DmenuComponentType::ItemDouble },
+					{ reinterpret_cast<uintptr_t>(DMENU::ItemDecimal::VTable), DmenuComponentType::ItemDecimal },
 					{ reinterpret_cast<uintptr_t>(DMENU::ItemFloat::VTable), DmenuComponentType::ItemFloat },
 					{ reinterpret_cast<uintptr_t>(DMENU::ItemFunction::VTable), DmenuComponentType::ItemFunction },
 					{ reinterpret_cast<uintptr_t>(DMENU::ItemSelection::VTable), DmenuComponentType::ItemSelection },
@@ -249,17 +470,7 @@ namespace NdGameSdk::gamelib::debug {
 
 						DMENU::MenuGroup* MenuGroup = reinterpret_cast<DMENU::MenuGroup*>(ctx.rdi);
 						DMENU::Menu* Menu = reinterpret_cast<DMENU::Menu*>(ctx.rbx);
-
 						NdDevMenuComponent->InvokeSdkEvent(NdDevMenuComponent->e_AppendMenuGroup, NdDevMenuComponent.get(), MenuGroup);
-						
-						if (MenuGroup == NdDevMenu) {
-							AppendSdkDevMenuCallback AppendCallback = boost::bind(&NdDevMenu::AppendSdkDevMenus, NdDevMenuComponent ,MenuGroup->RootMenu(), boost::placeholders::_1);
-							NdDevMenuComponent->InvokeSdkEvent(NdDevMenuComponent->e_AppendSdkMenu, NdDevMenuComponent.get(), AppendCallback);
-
-							//Test
-							auto _menu = NdDevMenuComponent->Create_DMENU_Menu("TEST MENU", HeapArena_Source);
-							NdDevMenuComponent->Create_DMENU_ItemSubmenu(_menu->Name(), MenuGroup->RootMenu(), _menu, nullptr, 0x0, "Test menu", HeapArena_Source);
-						}
 
 					}, wstr(Patterns::NdDevMenu_DMENU_MenuGroup_SetRootMenu), wstr(SetRootMenuJMP));
 			}

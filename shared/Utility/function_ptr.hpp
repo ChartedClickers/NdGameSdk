@@ -13,7 +13,7 @@
 
 #define MEMBER_FUNCTION_PTR(ret_type, func_name, ...) \
     typedef ret_type (*func_name##_ptr)(__VA_ARGS__); \
-    func_name##_ptr func_name = nullptr;
+    func_name##_ptr func_name = nullptr
 
 #define INIT_FUNCTION_PTR(func_name) \
     func_name##_ptr func_name = nullptr

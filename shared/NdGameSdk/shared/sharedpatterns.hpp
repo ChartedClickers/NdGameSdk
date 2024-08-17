@@ -32,16 +32,19 @@ namespace NdGameSdk::Patterns
 	static inline const SdkPattern NdDevMenu_DMENU_MenuGroup = { L"48 89 5c 24 08 57 48 83 ec 20 41 8b d8 48 8b f9 e8 ?? ?? ?? ?? 88 9f a0 00 00 00 48 ?? ?? ?? ?? 56 02 33 db 48 ?? ?? ?? ?? 9f c8 00 00 00 b9 00 10 00 00 48 89 9f 20 03 00 00 48 89 9f 28 03 00 00 48 89 9f a8 00 00 00 48 89 9f b0 00 00 00" };
 	static inline const SdkPattern NdDevMenu_DMENU_Menu = { L"48 89 5c 24 08 57 48 83 ec 20 41 8b d8 48 8b f9 e8 ?? ?? ?? ?? 48 ?? ?? ?? ?? 56 02 89 9f b8 00 00 00 48 ?? ?? ?? ?? 48 ?? ?? ?? ?? 48 89 87 a0 00 00 00 89 87 a8 00 00 00 48 89 87 b0 00 00 00 88 87 bc 00 00 00 48" };
 	static inline const SdkPattern NdDevMenu_DMENU_ItemLine = { L"33 c0 c7 41 68 c8 c8 c8 ff 48 89 41 30 89 41 4e 48 89 41 38 48 89 41 40 89 41 48" };
+	static inline const SdkPattern NdDevMenu_DMENU_ItemSubText = { L"48 89 5c 24 08 57 48 83 ec 20 48 8b da 48 8b f9 e8 ?? ?? ?? ?? 33 c0 48 89 9f b0 00 00 00 48 8b 5c 24 30 48 89 87 a0 00 00 00 48 89 47 60 48 89 87 80 00 00 00" };
 	static inline const SdkPattern NdDevMenu_DMENU_ItemSubmenu = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 20 49 8b d9 49 8b f0 48 8b f9 e8 ?? ?? ?? ?? 48 8b 44 24 50 33 c9 48 89 47 60 48 8b 44 24 58" };
 	static inline const SdkPattern NdDevMenu_DMENU_ItemBool = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 20 49 8b d9 49 8b f8 48 8b f1 e8 ?? ?? ?? ?? 33 c9 48 89 9e 80 00 00 00 48 8b 5c 24 30 48 8d 05 ?? ?? ?? ?? 48 89 06 48 8d 05 ?? ?? ?? ?? 48 89 86 b0 00 00 00 48 89 8e a0 00 00 00 48 89 4e 60 c7 86 a8 00 00 00 03 00 00 00 0f b6 07 88 86 b8 00 00 00 48 8b c6 48 89 7e 60 48 89 4e 58 c7 86 a0 00 00 00 01 00 00 00 48 8b 74 24 38 48 83 c4 20 5f c3" };
-	static inline const SdkPattern NdDevMenu_DMENU_ItemDouble = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 20 49 8b f9 49 8b d8 48 8b f1 e8 ?? ?? ?? ?? 48 8b 44 24 58 33 c9 66 c7 86 b0 00 00 00 00 07" };
+	static inline const SdkPattern NdDevMenu_DMENU_ItemDecimal = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 20 49 8b f9 49 8b d8 48 8b f1 e8 ?? ?? ?? ?? 48 8b 44 24 58 33 c9 66 c7 86 b0 00 00 00 00 07" };
 	static inline const SdkPattern NdDevMenu_DMENU_ItemFloat = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 20 49 8b f9 49 8b d8 48 8b f1 e8 ?? ?? ?? ?? 48 8b 44 24 58 33 c9 48 89 8e 00 01 00 00 48 89 8e 08 01 00 00 48 89 86 80 00 00 00" };
 	static inline const SdkPattern NdDevMenu_DMENU_ItemFunction = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 20 49 8b d9 49 8b f8 48 8b f1 e8 ?? ?? ?? ?? 33 c9 48 89 5e 60 48 8b 5c 24 30 48 8d 05 ?? ?? ?? ?? 48 89 06 0f b6 44 24 50 88 86 c1 00 00 00 48 8b c6 48 89 8e a0 00 00 00 c7 86 a8 00 00 00 05 00 00 00" };
 	static inline const SdkPattern NdDevMenu_DMENU_ItemSelection = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 20 49 8b d9 49 8b f8 48 8b f1 e8 ?? ?? ?? ?? 8b 44 24 68 33 c9 89 86 a0 00 00 00 48 8b 44 24 70 48 89 86 80 00 00 00" };
-	static inline const SdkPattern NdDevMenu_DMENU_ItemSubText = { L"48 89 5c 24 08 57 48 83 ec 20 48 8b da 48 8b f9 e8 ?? ?? ?? ?? 33 c0 48 89 9f b0 00 00 00 48 8b 5c 24 30 48 89 87 a0 00 00 00 48 89 47 60 48 89 87 80 00 00 00" };
 
 	static inline const SdkPattern NdDevMenu_DMENU_MenuGroup_SetRootMenu = { L"48 85 d2 0f ?? ?? ?? ?? 00 48 89 5c 24 08 57 48 83 ec 20 48 8b 81 b0 00 00 00 48 8b da 48 8b f9 48 3b" };
 	static inline const SdkPattern NdDevMenu_DMENU_Menu_AppendComponent = { L"40 53 48 83 ec ?? 48 8b 81 b0 00 00 00 48 8b da 48 85 c0 74 22 66 66 66 0f 1f 84 00 00 00 00 00 48 8b d0 48 8b 40 40 48 85 c0 75 f4 48 85 d2 74 06 48 89 5a 40 eb 07 48 89 99 b0 00 00 00 48 8b d3 48 c7 43 40 00 00 00 00 48 89 4b 38 e8 ?? ?? ?? ?? 48 8b c3 48 83 c4 20 5b c3" };
+	static inline const SdkPattern NdDevMenu_DMENU_Menu_DeleteItem = { L"48 89 5c 24 10 57 48 83 ec 20 48 8b 81 b0 00 00 00 48 8b fa 33 d2 48 8b d9 8b ca 48 85" };
+	static inline const SdkPattern NdDevMenu_DMENU_Menu_DeleteAllItems = { L"48 89 5c 24 ?? 48 89 74 24 ?? 57 48 83 ec ?? 0f b6 f2 c7 44 24 ?? 10 00 00 00" };
+	static inline const SdkPattern NdDevMenu_DMENU_DecimalCallBack = { L"48 89 5c 24 08 57 48 83 ec 20 48 8b 59 60 83 ea 05 74 ?? 83 ea 02 74 ?? 83 fa 01 75 ?? 48 8b 0d ?? ?? ?? ?? 8b 3b 48 85 c9" };
 
 
 	static inline const SdkPattern NdDevMenu_Assert_UpdateSelectRegionByNameMenu = { L"cc 48 85 db 74 ?? 33 c9 ff d3 48 8d 05 ?? ?? ?? ?? c7 44 24 ?? 10 00 00 00 41 b9 8e 00 00 00" };

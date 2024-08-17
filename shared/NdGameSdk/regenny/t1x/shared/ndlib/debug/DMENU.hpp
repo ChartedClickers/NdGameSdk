@@ -4,6 +4,15 @@
 namespace regenny::shared::ndlib::debug {
 #pragma pack(push, 1)
 struct DMENU {
+    enum Message : uint32_t {
+        OnOpen = 0,
+        OnClose = 1,
+        OnUpdate = 3,
+        OnExecute = 5,
+        ReadConfig = 7,
+        SaveConfig = 8,
+    };
+
     struct Component {
         struct VTable {
             private: char pad_0[0xb0]; public:
@@ -74,21 +83,21 @@ struct DMENU {
         bool m_pad[7]; // 0xb9
     }; // Size: 0xc0
 
-    struct ItemDouble : public Item {
+    struct ItemDecimal : public Item {
         uint64_t* m_format; // 0xb8
         void* m_HandlerFunc; // 0xc0
         // Metadata: i64
-        double m_DisplayValue; // 0xc8
+        uint64_t m_DisplayValue; // 0xc8
         // Metadata: i64
-        double UnkDouble; // 0xd0
+        uint64_t UnkDouble; // 0xd0
         // Metadata: i64
-        double m_MinValue; // 0xd8
+        uint64_t m_MinValue; // 0xd8
         // Metadata: i64
-        double m_MaxValue; // 0xe0
+        uint64_t m_MaxValue; // 0xe0
         // Metadata: i64
-        double m_StepValue; // 0xe8
+        uint64_t m_StepValue; // 0xe8
         // Metadata: i64
-        double m_DoubleStepValue; // 0xf0
+        uint64_t m_DoubleStepValue; // 0xf0
         uint64_t Unk2[7]; // 0xf8
         // Metadata: utf8*
         char m_StringDisplayValue[32]; // 0x130
@@ -112,14 +121,16 @@ struct DMENU {
 
     struct ItemFunction : public Item {
         void* unkData; // 0xb8
-        void* m_handlerFunct; // 0xc0
+        private: char pad_c0[0x1]; public:
+        bool m_isActive; // 0xc1
+        bool m_pad[6]; // 0xc2
     }; // Size: 0xc8
 
     struct ItemSelection : public Item {
         void* UnkData; // 0xb8
         void* m_callbackFormat; // 0xc0
         uint64_t Unk2[3]; // 0xc8
-        void* m_SelectionStruct; // 0xe0
+        void** m_SelectionStruct; // 0xe0
     }; // Size: 0xe8
 
     struct ItemSubText : public Item {

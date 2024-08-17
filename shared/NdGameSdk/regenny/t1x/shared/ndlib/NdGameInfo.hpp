@@ -4,7 +4,7 @@
 namespace regenny::shared::ndlib {
 #pragma pack(push, 1)
 struct NdGameInfo {
-    uint64_t* vftable; // 0x0
+    void* vftable; // 0x0
     private: char pad_8[0x120]; public:
     // Metadata: utf8*
     char SavePath[1024]; // 0x128

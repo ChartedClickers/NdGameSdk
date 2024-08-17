@@ -204,6 +204,8 @@ set(T1XSDK_SOURCES
 	"shared/NdGameSdk/ndgame/t1x/ndgame.cpp"
 	"shared/NdGameSdk/ndgame/t1x/ndgame.hpp"
 	"shared/NdGameSdk/ndgame/t1x/ndgamepatterns.hpp"
+	"shared/NdGameSdk/ndgame/t1x/src/game/framestate.cpp"
+	"shared/NdGameSdk/ndgame/t1x/src/game/framestate.hpp"
 	"shared/NdGameSdk/ndgame/t1x/src/game/gameinfo.cpp"
 	"shared/NdGameSdk/ndgame/t1x/src/game/gameinfo.hpp"
 	"shared/NdGameSdk/ndgame/t1x/src/game/player/player-menu.cpp"

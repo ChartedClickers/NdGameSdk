@@ -37,11 +37,28 @@ namespace NdGameSdk::ndlib::debug {
 	}
 
 	std::string DMENU::Component::Description() {
-		return this->Get()->m_pDescription;
+		auto Description = this->Get()->m_pDescription;
+		return Description != nullptr ? Description : std::string();
 	}
 
 	void DMENU::Component::SetDescription(const char* new_description) {
 		strcpy(this->Get()->m_pDescription, new_description);
+	}
+
+	Color DMENU::Component::GetColor() {
+		return Color(this->Get()->m_color);
+	}
+
+	Color DMENU::Component::GetSelectedColor() {
+		return Color(this->Get()->m_selectcolor);
+	}
+
+	void DMENU::Component::SetColor(Color color) {
+		this->Get()->m_color = color.toUint64();
+	}
+
+	void DMENU::Component::SelectedColor(Color color) {
+		this->Get()->m_selectcolor = color.toUint64();
 	}
 
 	uint64_t DMENU::Component::Data() {

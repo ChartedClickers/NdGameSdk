@@ -3,6 +3,7 @@
 #include "NdGameSdk/components/SdkRegenny.hpp"
 
 #include <Utility/cmacros/for_each.hpp>
+#include <Utility/color.hpp>
 #include <boost/function.hpp>
 
 #if defined(T1X)
@@ -38,6 +39,11 @@ namespace NdGameSdk::ndlib::debug {
 			void SetName(const char* new_name);
 			std::string Description();
 			void SetDescription(const char* new_description);
+
+			Color GetColor();
+			Color GetSelectedColor();
+			void SetColor(Color color);
+			void SelectedColor(Color color);
 
 			uint64_t Data();
 

@@ -140,6 +140,7 @@ set(Utility_SOURCES
 	"shared/Utility/assertion/assert.cpp"
 	"shared/Utility/assertion/assert.hpp"
 	"shared/Utility/cmacros/for_each.hpp"
+	"shared/Utility/color.hpp"
 	"shared/Utility/function_ptr.hpp"
 	"shared/Utility/helper.cpp"
 	"shared/Utility/helper.hpp"

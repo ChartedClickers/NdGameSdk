@@ -64,6 +64,8 @@ namespace NdGameSdk::gamelib::debug {
 			return component;
 		}
 
+		DMENU::Menu* CreateNdGameSdkMenu();
+
 		void AppendSdkDevMenus(DMENU::Menu* RootMenu, DMENU::Menu* SdkMenu);
 		void OnGameInitialized(bool successful);
 

@@ -174,7 +174,6 @@ namespace NdGameSdk::gamelib::debug {
 			always_assert(DMENU_ItemSelection == nullptr, "Function pointer was not set!");
 			SelectionPtr = DMENU_ItemSelection(HeapAllocator, pName.c_str(), pItemSelection, (void*)DMENU_Menu_DecimalCallBack, pData, NULL, NULL, NULL, pDescription);
 			spdlog::debug("Created DMENU::Component::ItemSelection('{:s}','{:#x}','{:#x}','{:#x}','{:s}') -> {:#x}",
-				SelectionPtr->Name(), reinterpret_cast<uintptr_t>(SelectionPtr->ItemSelections()), reinterpret_cast<uintptr_t>(SelectionPtr->CallBackFunct()), 
 				SelectionPtr->Name(), reinterpret_cast<uintptr_t>(&SelectionPtr->ItemSelections()), reinterpret_cast<uintptr_t>(SelectionPtr->CallBackFunct()), 
 				SelectionPtr->Data(), SelectionPtr->Description(), reinterpret_cast<uintptr_t>(SelectionPtr));
 			DMENU_AppendComponent(pMenu, SelectionPtr);
@@ -200,6 +199,20 @@ namespace NdGameSdk::gamelib::debug {
 		return DmenuComponentType::Unknown;
 	}
 
+	DMENU::Menu* NdDevMenu::CreateNdGameSdkMenu() {
+		// Create main menu for NdGameSdk
+		DMENU::Menu* NdGameSdkMenu = Create_DMENU_Menu(SDK_NAME, HeapArena_Source);
+
+		static bool color_bool;
+		auto itembool = Create_DMENU_ItemBool("color bool", NdGameSdkMenu, &color_bool,
+			nullptr, HeapArena_Source);
+
+		itembool->SetColor(BasicColors::Green);
+		itembool->SelectedColor(BasicColors::Pink);
+
+		return NdGameSdkMenu;
+	}
+
 	void NdDevMenu::AppendSdkDevMenus(DMENU::Menu* RootMenu, DMENU::Menu* CustomMenu) {
 		//always_assert(CustomMenu == nullptr, "CustomMenu pointer was not set!");
 
@@ -210,56 +223,12 @@ namespace NdGameSdk::gamelib::debug {
 
 	}
 
-	DEFINE_DMENU_ItemSelection(TestEnum, TEST, TEST2);
-	uint64_t TestEnum_value = 0;
-
-	bool TestFunct(DMENU::ItemFunction& itemfunct, DMENU::Message message) {
-		if (message == DMENU::Message::OnExecute) {
-			spdlog::info("Hello! From component {}", itemfunct.Name());
-		}
-
-		return true;
-	}
-
-	bool TestCallBack(DMENU::ItemSubmenu& itemfunct, DMENU::Message message) {
-		if (message == DMENU::Message::OnExecute) {
-			spdlog::info("Hello TestCallBack! From component {}", itemfunct.Name());
-		}
-
-		if (message == DMENU::Message::OnUpdate) {
-			spdlog::info("Hello OnUpdate TestCallBack! From component {}", itemfunct.Name());
-		}
-
-		return true;
-	}
-
 	void NdDevMenu::OnGameInitialized(bool successful) {
 		if (successful) {
 			auto& DMENU = m_EngineComponents->m_ndConfig.GetDmenu();
 
 			auto DevMenu = DMENU.DevMenu()->RootMenu();
 			DevMenu->SetName((DevMenu->Name() + std::format(" [{}]", SDK_NAME)).c_str());
-
-
-			auto _menu = Create_DMENU_Menu("TEST MENU", HeapArena_Source);
-			Create_DMENU_ItemSubmenu(_menu->Name(), DevMenu, _menu, NULL, 0x0, "Test menu", HeapArena_Source);
-
-			Create_DMENU_ItemSubmenu("AWWW", DevMenu, _menu, &TestCallBack, 0x0, "Test menu2", HeapArena_Source);
-
-
-			static bool test_bool = false;
-			Create_DMENU_ItemBool("Test bool", _menu, &test_bool, "I'm bool", HeapArena_Source);
-			static int test_decimal = 50;
-			Create_DMENU_ItemDecimal("Test Decimal", _menu, &test_decimal, { 1, 6 }, { 1, 2 }, "I'm Decimal", HeapArena_Source);
-
-			static float test_float = 32.24f;
-			Create_DMENU_ItemFloat("Test float", _menu, &test_float, { 0.1f, 5.0f }, { 0.1f, 0.1f }, "I'm float", HeapArena_Source);
-
-			Create_DMENU_TextLineWrapper("test", _menu, HeapArena_Source);
-
-			Create_DMENU_Function("test function", _menu, &TestFunct,NULL,false, HeapArena_Source);
-
-			Create_DMENU_ItemSelection("test Selection", _menu, (DMENU::ItemSelection::Item_selection*)&TestEnum_selection, &TestEnum_value, "I'm selection", HeapArena_Source);
 
 			AppendSdkDevMenuCallback AppendCallback = boost::bind(&NdDevMenu::AppendSdkDevMenus, this, DevMenu, boost::placeholders::_1);
 			InvokeSdkEvent(e_AppendSdkMenu, this, AppendCallback);
@@ -471,6 +440,13 @@ namespace NdGameSdk::gamelib::debug {
 
 						DMENU::MenuGroup* MenuGroup = reinterpret_cast<DMENU::MenuGroup*>(ctx.rdi);
 						DMENU::Menu* Menu = reinterpret_cast<DMENU::Menu*>(ctx.rbx);
+
+						if (MenuGroup == NdDevMenu) {
+							DMENU::Menu* NdGameSdkMenu = NdDevMenuComponent->CreateNdGameSdkMenu();
+							NdDevMenuComponent->Create_DMENU_ItemSubmenu(NdGameSdkMenu->Name(), MenuGroup->RootMenu(),
+								NdGameSdkMenu, NULL, NULL, nullptr, HeapArena_Source);
+						}
+
 						NdDevMenuComponent->InvokeSdkEvent(NdDevMenuComponent->e_AppendMenuGroup, NdDevMenuComponent.get(), MenuGroup);
 
 					}, wstr(Patterns::NdDevMenu_DMENU_MenuGroup_SetRootMenu), wstr(SetRootMenuJMP));

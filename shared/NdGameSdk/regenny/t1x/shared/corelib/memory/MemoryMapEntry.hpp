@@ -8,8 +8,7 @@ namespace regenny::shared::corelib::memory {
 struct MemoryMapEntry {
     regenny::shared::corelib::memory::MapId m_id; // 0x0
     regenny::shared::corelib::memory::Context m_context; // 0x4
-    uint32_t m_size; // 0x8
-    private: char pad_c[0x4]; public:
+    uint64_t m_size; // 0x8
     uint64_t m_aligned; // 0x10
     // Metadata: utf8*
     char* m_name; // 0x18

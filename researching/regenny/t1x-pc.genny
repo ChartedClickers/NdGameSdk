@@ -888,8 +888,8 @@ namespace shared {
             struct MemoryMapEntry 0x20 {
                 MapId m_id
                 Context m_context
-                uint32_t m_size
-                uint64_t m_aligned + 0x4
+                uint64_t m_size
+                uint64_t m_aligned
                 char* m_name [[utf8*]]
             }
 

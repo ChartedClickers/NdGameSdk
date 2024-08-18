@@ -69,9 +69,9 @@ void NdModClient::OnMemoryMapped(corelib::memory::Memory* Memory) {
 
 void NdModClient::OnGameInitialized(bool status) {
 	spdlog::info("GAME initialized!");
-	spdlog::info("BUILD: {}", m_EngineComponents->GetGameInfo()->BranchName);
+	spdlog::info("BUILD: {}", m_EngineComponents->GetGameInfo()->m_BranchName);
 
-	auto user = m_EngineComponents->GetGameInfo()->DiscUser;
+	auto user = m_EngineComponents->GetGameInfo()->m_DiscUser;
 	strcpy(user, "ALEXA DESPACITO");
 }
 

@@ -7,46 +7,46 @@ struct NdGameInfo {
     void* vftable; // 0x0
     private: char pad_8[0x120]; public:
     // Metadata: utf8*
-    char SavePath[1024]; // 0x128
+    char m_SavePath[1024]; // 0x128
     // Metadata: utf8*
-    char SavePath_unk[1024]; // 0x528
+    char m_SavePath_unk[1024]; // 0x528
     // Metadata: utf8*
-    char GamePath[1024]; // 0x928
+    char m_GamePath[1024]; // 0x928
     // Metadata: utf8*
-    char GamePath_unk[1024]; // 0xd28
+    char m_GamePath_unk[1024]; // 0xd28
     // Metadata: utf8*
-    char NetUserPath[1024]; // 0x1128
+    char m_NetUserPath[1024]; // 0x1128
     // Metadata: utf8*
-    char NetPath[1024]; // 0x1528
+    char m_NetPath[1024]; // 0x1528
     // Metadata: utf8*
-    char GameDataPath[1024]; // 0x1928
+    char m_GameDataPath[1024]; // 0x1928
     // Metadata: utf8*
-    char GameDataPath_unk[1024]; // 0x1d28
+    char m_GameDataPath_unk[1024]; // 0x1d28
     // Metadata: utf8*
-    char BinPath[1024]; // 0x2128
+    char m_BinPath[1024]; // 0x2128
     // Metadata: utf8*
-    char BinPath_unk[1024]; // 0x2528
+    char m_BinPath_unk[1024]; // 0x2528
     // Metadata: utf8*
-    char BranchName[64]; // 0x2928
+    char m_BranchName[64]; // 0x2928
     // Metadata: utf8*
-    char SrcPath[1024]; // 0x2968
+    char m_SrcPath[1024]; // 0x2968
     // Metadata: utf8*
-    char DbPath[1024]; // 0x2d68
+    char m_DbPath[1024]; // 0x2d68
     // Metadata: utf8*
-    char GamePath_unk2[1024]; // 0x3168
+    char m_GamePath_unk2[1024]; // 0x3168
     private: char pad_3568[0x402]; public:
     // Metadata: utf8*
-    char GamePath_unk3[1024]; // 0x396a
+    char m_GamePath_unk3[1024]; // 0x396a
     // Metadata: utf8*
-    char CfgPath[128]; // 0x3d6a
+    char m_CfgPath[128]; // 0x3d6a
     // Metadata: utf8*
-    char CfgDefaultsPath[128]; // 0x3dea
+    char m_CfgDefaultsPath[128]; // 0x3dea
     private: char pad_3e6a[0x85]; public:
     uint16_t Unk_3ef0; // 0x3eef
     // Metadata: bool*
     bool Unk_3ef1; // 0x3ef1
     // Metadata: bool*
-    bool DevConfig; // 0x3ef2
+    bool m_DevConfig; // 0x3ef2
     // Metadata: bool*
     bool m_onDisc; // 0x3ef3
     // Metadata: bool*
@@ -130,7 +130,7 @@ struct NdGameInfo {
     // Metadata: bool*
     bool Unk_3f1b; // 0x3f1b
     // Metadata: bool*
-    bool IsMultiplayer; // 0x3f1c
+    bool m_IsMultiplayer; // 0x3f1c
     // Metadata: bool*
     bool Unk_3f1d; // 0x3f1d
     // Metadata: bool*
@@ -479,12 +479,12 @@ struct NdGameInfo {
     bool Unk_3fd7; // 0x3fd7
     private: char pad_3fd8[0x30]; public:
     // Metadata: utf8*
-    char DiscUser[24]; // 0x4008
+    char m_DiscUser[24]; // 0x4008
     private: char pad_4020[0x160]; public:
     StringId64 AudioStringId; // 0x4180
     private: char pad_4188[0x2db]; public:
     // Metadata: utf8*
-    char GameStudio[64]; // 0x4463
+    char m_GameStudio[64]; // 0x4463
     private: char pad_44a3[0x11d]; public:
 }; // Size: 0x45c0
 #pragma pack(pop)

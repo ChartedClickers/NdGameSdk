@@ -256,19 +256,6 @@ namespace NdGameSdk::corelib::memory {
 			if (m_IsDebugMemoryAvailablePatch->IsEnable()) {
 
 				spdlog::warn("DebugMemory is enabled in Config");
-
-				auto SharedComponents = ISdkComponent::GetSharedComponents();
-				auto MissingDependencies = CheckSdkComponents
-					<gamelib::debug::NdDevMenu, gamelib::render::particle::ParticleManager>({
-						SharedComponents->GetComponent<gamelib::debug::NdDevMenu>().get(),
-						SharedComponents->GetComponent<gamelib::render::particle::ParticleManager>().get() }, false);
-
-				if (MissingDependencies.has_value()) {
-					throw SdkComponentEx
-					{ std::format("Necessary dependencies for DebugMemory is missing: {:s}", MissingDependencies.value()),
-						SdkComponentEx::ErrorCode::DependenciesFailed, true };
-				}
-
 				Memory::IncreaseMemoryMap(MemoryMapId::ALLOCATION_CPU_MEMORY, 2000 * size_mb);
 
 				findpattern = Patterns::Memory_clarg_nodebugmem;

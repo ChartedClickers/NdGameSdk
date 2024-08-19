@@ -61,7 +61,8 @@ namespace NdGameSdk::common {
 
 	#if defined(T1X)
 			m_PrimServer = ISdkComponent::GetSharedComponents()->GetComponent<PrimServerComponent>();
-			if (m_PrimServer.get() && m_PrimServer->m_cfg.PrimServerCreate) {
+			if (m_PrimServer.get() && m_PrimServer->IsInitialized() && 
+				m_PrimServer->m_cfg.PrimServerCreate) {
 
 				findpattern = Patterns::GameInit_PrimServer_Create;
 				auto PrimServerCreateJMP = (void*)Utility::FindAndPrintPattern(module

@@ -7,6 +7,7 @@
 #include <memory>
 #include <unordered_map>
 #include <typeindex>
+#include <deque>
 #include <spdlog/spdlog.h>
 
 #include <Utility/helper.hpp>
@@ -31,7 +32,7 @@ namespace NdGameSdk {
         NdGameSdk_API bool IsInitialized() const;
 
         template <typename... SdkComponents>
-        NdGameSdk_API static optional<std::string> CheckSdkComponents(const std::vector<ISdkComponent*>& componentList, bool MustInitialized = true) {
+        NdGameSdk_API static optional<std::string> CheckSdkComponents(const std::vector<ISdkComponent*>& componentList) {
 
             static_assert(std::conjunction_v<SdkDerived::is_derived_from_ISdkComponent<SdkComponents>...>,
                 "All types must be derived from ISdkComponent");
@@ -40,11 +41,8 @@ namespace NdGameSdk {
 
             (([&]() {
                 bool found = std::any_of(componentList.begin(), componentList.end(),
-                    [MustInitialized](ISdkComponent* component) {
+                    [](ISdkComponent* component) {
                         auto _found = component && typeid(*component) == typeid(SdkComponents);
-                        if (_found && MustInitialized) {
-                            return component->IsInitialized();
-                        }
                         return _found;
                     });
 
@@ -140,8 +138,12 @@ namespace NdGameSdk {
         template <typename ComponentType, typename... Args>
         std::shared_ptr<ComponentType> AddComponent(Args&&... args) {
             static_assert(SdkDerived::is_derived_from_ISdkComponent<ComponentType>::value, "ComponentType must be derived from ISdkComponent");
-            auto [sdkcomponent, inserted] = m_sdkcomponents.emplace(typeid(ComponentType), std::make_shared<ComponentType>(std::forward<Args>(args)...));
-            return std::static_pointer_cast<ComponentType>(sdkcomponent->second);
+            auto sdkcomponent = std::make_shared<ComponentType>(std::forward<Args>(args)...);
+            
+            m_orderedSdkComponents.push_back(sdkcomponent);
+            m_sdkcomponents.emplace(typeid(ComponentType), sdkcomponent);
+
+            return std::static_pointer_cast<ComponentType>(sdkcomponent);
         }
 
         template <typename ComponentType>
@@ -153,6 +155,7 @@ namespace NdGameSdk {
 
     private:
         std::unordered_map<std::type_index, std::shared_ptr<ISdkComponent>> m_sdkcomponents{};
+        std::deque<std::shared_ptr<ISdkComponent>> m_orderedSdkComponents{};
     };
 
     class SdkComponentEx : public NdGameSdkException {

@@ -26,33 +26,38 @@ namespace NdGameSdk {
 
 	void SdkComponentFactory::InitializeSdkComponents() {
 
-		std::for_each(m_sdkcomponents.begin(), m_sdkcomponents.end(), [](const auto& sdkcomponent) { sdkcomponent.second->Awake(); });
+		std::for_each(m_orderedSdkComponents.begin(), m_orderedSdkComponents.end(), 
+			[](const auto& sdkcomponent) { 
+				sdkcomponent->Awake(); 
+			});
 
-		for (auto& [sdkcomponent, component] : m_sdkcomponents) {
-			spdlog::info("Initialize SdkComponent: {:s}", component->GetName().data());
+		for (auto& sdkcomponent : m_orderedSdkComponents) {
+			spdlog::info("Initialize SdkComponent: {:s}", sdkcomponent->GetName().data());
 
 			try {
-				component->Initialize();
-				component->m_Initialized = true;
+				sdkcomponent->Initialize();
+				sdkcomponent->m_Initialized = true;
 			} 
 			catch (SdkComponentEx ComponentEx) {
-				spdlog::error("Error initialize {:s}: {:s}", component->GetName().data(), ComponentEx.what());
+				spdlog::error("Error initialize {:s}: {:s}", sdkcomponent->GetName().data(), ComponentEx.what());
 
 				if (ComponentEx.IsCritical())
 					throw ComponentEx;
 			}
 			catch (std::exception Ex) {
-				spdlog::error("Error initialize {:s}: {:s}", component->GetName().data(), Ex.what());
+				spdlog::error("Error initialize {:s}: {:s}", sdkcomponent->GetName().data(), Ex.what());
 				throw Ex;
 			}
 			catch (...) {
-				spdlog::error("Error initialize: {:s}", component->GetName().data());
+				spdlog::error("Error initialize: {:s}", sdkcomponent->GetName().data());
 				throw;
 			}
 		}
 
-		std::erase_if(m_sdkcomponents, [](
-			const pair<std::type_index, std::shared_ptr<ISdkComponent>>& pair) { return !pair.second->m_Initialized; });
+		m_orderedSdkComponents.clear();
+		std::erase_if(m_sdkcomponents, 
+			[](const pair<std::type_index, std::shared_ptr<ISdkComponent>>& pair) 
+			{ return !pair.second->m_Initialized; });
 	}
 
 	const auto& SdkComponentFactory::GetSdkComponents() const {

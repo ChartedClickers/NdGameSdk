@@ -473,6 +473,63 @@ namespace shared {
     // c:\branches\discbot??\1xfinal-pc-?.?.?\shared\src\ndlib\script
     namespace script {
         
+        // script-manager.cpp
+        struct ScriptManager 0x33b0 {
+            uint64_t field_0;
+            uint64_t field_10 @ 0x10;
+            uint32_t field_18;
+            uint64_t field_20 @ 0x20;
+            uint64_t field_30 @ 0x30;
+            bool field_40 @ 0x40;
+            bool DisplayRequestedModules @ 0x43;
+            uint32_t field_44 @ 0x44;
+            uint32_t field_4a @ 0x4a;
+            uint16_t field_4e;
+            uint32_t field_51 @ 0x51;
+            bool DisplayGlobalSymbols;
+            bool field_56;
+            uint32_t field_58 @ 0x58;
+            uint16_t field_5c;
+            bool field_5e;
+            uint32_t field_60 @ 0x60;
+            uint64_t field_68 @ 0x68;
+            uint64_t field_70;
+            uint64_t field_78;
+            uint64_t field_e8 @ 0xe8;
+            uint64_t field_100 @ 0x100;
+            uint32_t field_108;
+            uint32_t field_10c;
+            uint64_t field_110;
+            uint64_t field_118;
+            uint64_t field_120;
+            uint32_t field_1b0 @ 0x1b0;
+            uint32_t field_1b8 @ 0x1b8;
+            uint64_t field_1c0 @ 0x1c0;
+            uint64_t field_1c8;
+            uint64_t field_1d0;
+            uint32_t field_260 @ 0x260;
+            uint32_t field_264;
+            uint64_t field_288 @ 0x288;
+            uint64_t field_290;
+            uint64_t field_298;
+            char pad_2A0[0x2790] @ 0x02a0 [[utf8*]];
+            char pad_2A30[0x450] [[utf8*]];
+            uint64_t field_2e80;
+            char pad_2E88[0x468];
+            uint64_t field_3338 @ 0x3338;
+            bool field_3340;
+            bool field_336b @ 0x336b;
+            bool field_336c;
+            bool field_336d;
+            bool field_3371 @ 0x3371;
+            uint32_t field_3380 @ 0x3380;
+            uint64_t field_3388 @ 0x3388;
+            uint64_t field_3390;
+            uint64_t field_3398;
+            uint32_t field_33a0;
+            uint64_t field_33a8 @ 0x33a8;
+        }; // s_scriptmanager* (0x146430e70)
+
         struct ScriptValue {
             uint64_t val[0x10];
         };
@@ -911,36 +968,35 @@ namespace ndgame {
     // c:\branches\discbot??\1xfinal-pc-?.?.?\t1x\src\game
     namespace game {
 
-    struct GameInfo : shared.ndlib.NdGameInfo 0x3B0 {
-        bool m_enableNpTrophies +0x148  [[bool*]]
-        uint64_t Unk_4968 +0x25f
-    }
+        struct GameInfo : shared.ndlib.NdGameInfo 0x3B0 {
+            bool m_enableNpTrophies +0x148  [[bool*]]
+            uint64_t Unk_4968 +0x25f
+        }
 
-    struct FrameState : shared.ndlib.NdFrameState 0x160 {
-          uint64_t Unk[0x2c];
-    } 
+        struct FrameState : shared.ndlib.NdFrameState 0x160 {
+              uint64_t Unk[0x2c];
+        } 
 
-    // c:\branches\discbot??\1xfinal-pc-?.?.?\t1x\src\game\player
-    namespace player {
-        
-    }
+        // c:\branches\discbot??\1xfinal-pc-?.?.?\t1x\src\game\player
+        namespace player {
 
-    // c:\branches\discbot??\1xfinal-pc-?.?.?\t1x\src\game\weapon
-    namespace weapon {
-        
-        // #79C1042C4AB59AA8: hash-table
-        struct ScriptWeaponArt {
-            struct WeaponArt {
-                char* m_category [[utf8*]];
-                uint64_t m_processid;
-            }
+        }
 
-            uint64_t m_num;
-            uint64_t* m_hashs;
-            WeaponArt** m_defs;
-        };
-    }
-        
+        // c:\branches\discbot??\1xfinal-pc-?.?.?\t1x\src\game\weapon
+        namespace weapon {
+            
+            // #79C1042C4AB59AA8: hash-table
+            struct ScriptWeaponArt {
+                struct WeaponArt {
+                    char* m_category [[utf8*]];
+                    uint64_t m_processid;
+                }
+    
+                uint64_t m_num;
+                uint64_t* m_hashs;
+                WeaponArt** m_defs;
+            };
+        }
     }
 }
 

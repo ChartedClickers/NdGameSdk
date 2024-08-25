@@ -823,6 +823,11 @@ namespace shared {
 
             // DMENU::ItemSubText*
             struct ItemSubText : Item {} // 0x14041e6b0;
+            
+            // DMENU::ItemPlaceHolder
+            struct ItemPlaceHolder : Component 0x400 {
+                char m_placeholder[0x400] [[utf8*]];
+            } // 0x14041e880;
 
             // DMENU::ItemLine*
             struct ItemLine : Component {} // 0x14041d490;

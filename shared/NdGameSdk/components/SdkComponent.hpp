@@ -109,6 +109,15 @@ namespace NdGameSdk {
         NdGameSdk_API static SdkComponentFactory* GetSharedComponents();
         NdGameSdk_API static SdkComponentFactory* GetNdGameComponents();
     private:
+        virtual void Awake() {};
+        virtual void Initialize() = 0;
+
+        std::string m_name;
+        bool m_Initialized;
+
+        static SdkComponentFactory s_SharedComponents;
+        static SdkComponentFactory s_NdGameComponents;
+
         friend class SdkComponentFactory;
         friend class ISdkModule;
 
@@ -118,14 +127,6 @@ namespace NdGameSdk {
 
         friend void InitSharedComponents(SdkConfig& cfg);
         friend void InitNdGameComponents(SdkConfig& cfg);
-
-        std::string m_name;
-        bool m_Initialized;
-        virtual void Awake() {};
-        virtual void Initialize() = 0;
-
-        static SdkComponentFactory s_SharedComponents;
-        static SdkComponentFactory s_NdGameComponents;
     };
 
     class SdkComponentFactory final {

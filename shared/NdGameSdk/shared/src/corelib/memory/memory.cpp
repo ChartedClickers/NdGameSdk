@@ -1,11 +1,6 @@
 #include "memory.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
-#if defined(T1X)
-#include <NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp>
-#include <NdGameSdk/shared/src/gamelib/render/particle/particle.hpp>
-#endif
-
 #include <codecvt>
 
 namespace NdGameSdk::corelib::memory {
@@ -35,10 +30,10 @@ namespace NdGameSdk::corelib::memory {
 			always_assert(Memory_FindMemoryMap == nullptr, "Function pointer was not set!");
 			return Memory_FindMemoryMap(MapId);
 	#else
-			always_assert(g_pMemoryMap == nullptr, "g_pMemoryMap was not set!");
-			if (*(uintptr_t*)g_pMemoryMap != NULL)
+			always_assert(g_MemoryMap == nullptr, "g_MemoryMap was not set!");
+			if (*(uintptr_t*)g_MemoryMap != NULL)
 			{
-				auto pMemoryMap = reinterpret_cast<MemoryMapEntry*>(*g_pMemoryMap);
+				auto pMemoryMap = reinterpret_cast<MemoryMapEntry*>(g_MemoryMap);
 				while (*(uintptr_t*)pMemoryMap != NULL) {
 					if (pMemoryMap->Id() == MapId)
 						return pMemoryMap;
@@ -135,12 +130,12 @@ namespace NdGameSdk::corelib::memory {
 			auto s_MemoryMap = (MemoryMapEntry*)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::Memory_s_MemoryMap), findpattern.offset);
 
-			findpattern = Patterns::Memory_g_pMemoryMap;
-			const auto pMemoryMap = (uintptr_t*)Utility::ReadLEA32(module,
-				findpattern.pattern, wstr(Patterns::Memory_g_pMemoryMap), findpattern.offset, 3, 8);
+			findpattern = Patterns::Memory_g_MemoryMap;
+			g_MemoryMap = (MemoryMapEntry*)Utility::ReadLEA32(module,
+				findpattern.pattern, wstr(Patterns::Memory_g_MemoryMap), findpattern.offset, 3, 8);
 
 			if (!s_MemoryMap ||
-				!pMemoryMap) {
+				!g_MemoryMap) {
 				throw SdkComponentEx
 				{ std::format("Failed to find addresses!"),
 					SdkComponentEx::ErrorCode::PatternFailed, true };
@@ -200,7 +195,6 @@ namespace NdGameSdk::corelib::memory {
 			}
 
 			spdlog::info("Loaded {} Memory Map Entries with total size {:8.3f} MiB", m_MemoryMap.s_MemoryMap.size(), static_cast<double>(TotalMapSize) / size_mb);
-			g_pMemoryMap = pMemoryMap;
 
 			m_SetMemoryMapHook = Utility::MakeMidHook(SetMemoryMapJMP,
 				[](SafetyHookContext& ctx)

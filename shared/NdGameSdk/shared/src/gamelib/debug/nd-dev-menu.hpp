@@ -6,6 +6,7 @@
 
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
 #include <NdGameSdk/shared/src/common/common-game-init.hpp>
+#include <NdGameSdk/shared/src/ndlib/script/script-manager.hpp>
 #include <NdGameSdk/shared/src/ndlib/engine-components.hpp>
 #include <NdGameSdk/shared/src/ndlib/debug/nd-dmenu.hpp>
 
@@ -14,6 +15,7 @@
 
 using namespace NdGameSdk::corelib::memory;
 using namespace NdGameSdk::corelib::memory::HeapAllocator;
+using namespace NdGameSdk::ndlib::script;
 using namespace NdGameSdk::common;
 using namespace NdGameSdk::ndlib;
 using namespace NdGameSdk::ndlib::debug;
@@ -43,11 +45,11 @@ namespace NdGameSdk::gamelib::debug {
 		NdGameSdk_API DMENU::Menu* Create_DMENU_Menu(std::string pName, HeapArena_Args);
 		NdGameSdk_API DMENU::ItemLine* Create_DMENU_ItemLine(DMENU::Menu* pMenu, HeapArena_Args);
 		NdGameSdk_API DMENU::ItemSubText* Create_DMENU_ItemSubText(std::string pName, DMENU::Menu* pMenu, HeapArena_Args);
-		NdGameSdk_API DMENU::ItemSubmenu* Create_DMENU_ItemSubmenu(std::string pName, DMENU::Menu* pMenu, DMENU::Menu* pSubmenu, DMENU::ItemSubmenu::SubmenuCallback pCallbackFunct, uint64_t pData, const char* pDescription, HeapArena_Args);
+		NdGameSdk_API DMENU::ItemSubmenu* Create_DMENU_ItemSubmenu(std::string pName, DMENU::Menu* pRootMenu, DMENU::Menu* pSubmenu, DMENU::ItemSubmenu::SubmenuCallback pCallbackFunct, uint64_t pData, const char* pDescription, HeapArena_Args);
 		NdGameSdk_API DMENU::ItemBool* Create_DMENU_ItemBool(std::string pName, DMENU::Menu* pMenu, bool* pData, const char* pDescription, HeapArena_Args);
 		NdGameSdk_API DMENU::ItemDecimal* Create_DMENU_ItemDecimal(std::string pName, DMENU::Menu* pMenu, int* pData, DMENU::ItemDecimal::ValueParams pValueParams, DMENU::ItemDecimal::StepParams pStepParams, const char* pDescription, HeapArena_Args);
 		NdGameSdk_API DMENU::ItemFloat* Create_DMENU_ItemFloat(std::string pName, DMENU::Menu* pMenu, float* pData, DMENU::ItemFloat::ValueParams pValueParams, DMENU::ItemFloat::StepParams pStepParams, const char* pDescription, HeapArena_Args);
-		NdGameSdk_API DMENU::ItemFunction* Create_DMENU_Function(std::string pName, DMENU::Menu* pMenu, DMENU::ItemFunction::FunctionCallback pFunction, uint64_t args, bool pisActive, HeapArena_Args);
+		NdGameSdk_API DMENU::ItemFunction* Create_DMENU_ItemFunction(std::string pName, DMENU::Menu* pMenu, DMENU::ItemFunction::FunctionCallback pFunction, uint64_t args, bool pisActive, HeapArena_Args);
 		NdGameSdk_API DMENU::ItemSelection* Create_DMENU_ItemSelection(std::string pName, DMENU::Menu* pMenu, DMENU::ItemSelection::Item_selection* pItemSelection, uint64_t* pData, const char* pDescription, HeapArena_Args);
 		NdGameSdk_API std::pair<DMENU::ItemLine*, DMENU::ItemSubText*> Create_DMENU_TextLineWrapper(std::string pName, DMENU::Menu* pMenu, HeapArena_Args);
 

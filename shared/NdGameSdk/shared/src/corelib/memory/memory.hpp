@@ -49,7 +49,7 @@ namespace NdGameSdk::corelib::memory
 		MemoryCfg m_cfg{};
 
 		MemoryMap m_MemoryMap{};
-		uintptr_t* g_pMemoryMap{};
+		MemoryMapEntry* g_MemoryMap{};
 
 		MidHook m_SetMemoryMapHook{};
 		FunctionHook::Ptr m_AllocateHook{};

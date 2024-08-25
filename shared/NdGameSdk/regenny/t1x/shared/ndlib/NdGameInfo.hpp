@@ -44,7 +44,7 @@ struct NdGameInfo {
     private: char pad_3e6a[0x85]; public:
     uint16_t Unk_3ef0; // 0x3eef
     // Metadata: bool*
-    bool Unk_3ef1; // 0x3ef1
+    bool m_AssetView; // 0x3ef1
     // Metadata: bool*
     bool m_DevConfig; // 0x3ef2
     // Metadata: bool*

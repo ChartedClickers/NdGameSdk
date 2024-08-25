@@ -23,7 +23,13 @@ namespace NdGameSdk::Patterns
 
 	static inline const SdkPattern Memory_clarg_nodebugmem = { L"b3 01 45 85 ff 74 ?? 48 8b 0f", +0x1 };
 	static inline const SdkPattern Memory_s_MemoryMap = { L"01 00 00 00 02 00 00 00 00 00 ?? 00 00 00 00 00 00 00 10 00" };
-	static inline const SdkPattern Memory_g_pMemoryMap = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 30 48 ?? ?? ?? ?? ?? 04 00 48 8b", +0xf };
+	static inline const SdkPattern Memory_g_MemoryMap = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 30 48 ?? ?? ?? ?? ?? 04 00 48 8b", +0xf };
+
+	static inline const SdkPattern ScriptManager_ScriptGlobals = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 20 48 8b d9 48 63 fa 48 ?? ?? ?? ?? ?? ?? 45 33 c9 4c 89 49", +0x15 };
+
+	static inline const SdkPattern ScriptManager_AddModuleRequest = { L"48 8b c4 48 89 58 08 48 89 70 10 48 89 78 18 4c 89 60 20 55 41 56 41 57 48 8d a8 28 fc ff ff 48 81 ec c0 04 00 00 48 ?? ?? ?? ?? ?? ?? 48 33 c4 48 89 85 b0 03 00 00 48" };
+	static inline const SdkPattern ScriptManager_ReloadModule = { L"48 8b c4 48 89 58 08 48 89 70 10 48 89 78 18 55 41 54 41 55 41 56 41 57 48 8d a8 f8 f9 ff ff 48 81 ec e0 06 00 00 c5 f8 29 70 c8 48 ?? ?? ?? ?? ?? ?? 48 33 c4 48 89 85 c0 05 00" };
+	static inline const SdkPattern ScriptManager_IsLoadModule = { L"48 8b c4 48 89 58 08 48 89 70 10 48 89 78 18 55 48 8d 68 a1 48 81 ec c0 00 00 00 48 ?? ?? ?? ?? ?? ?? 48 33 c4 48 89 45 47 c5 f9 ef" };
 
 	static inline const SdkPattern NdDevMenu_GameConfig_DevMode = { L"8a 8f ?? ?? ?? ?? 84 c9 0f 94 c2 84 c9 0f 95 c1" };
 	static inline const SdkPattern NdDevMenu_NdDevMenuAppend_Particles = { L"40 56 48 83 ec 30 48 8b f1 33 c9 e8 ?? ?? ?? ?? 84 c0 0f 84 ?? ?? ?? ?? 48 89 5c 24 40 4c 8d 0d ?? ?? ?? ??" };
@@ -45,7 +51,6 @@ namespace NdGameSdk::Patterns
 	static inline const SdkPattern NdDevMenu_DMENU_Menu_DeleteItem = { L"48 89 5c 24 10 57 48 83 ec 20 48 8b 81 b0 00 00 00 48 8b fa 33 d2 48 8b d9 8b ca 48 85" };
 	static inline const SdkPattern NdDevMenu_DMENU_Menu_DeleteAllItems = { L"48 89 5c 24 ?? 48 89 74 24 ?? 57 48 83 ec ?? 0f b6 f2 c7 44 24 ?? 10 00 00 00" };
 	static inline const SdkPattern NdDevMenu_DMENU_DecimalCallBack = { L"48 89 5c 24 08 57 48 83 ec 20 48 8b 59 60 83 ea 05 74 ?? 83 ea 02 74 ?? 83 fa 01 75 ?? 48 8b 0d ?? ?? ?? ?? 8b 3b 48 85 c9" };
-
 
 	static inline const SdkPattern NdDevMenu_Assert_UpdateSelectRegionByNameMenu = { L"cc 48 85 db 74 ?? 33 c9 ff d3 48 8d 05 ?? ?? ?? ?? c7 44 24 ?? 10 00 00 00 41 b9 8e 00 00 00" };
 	static inline const SdkPattern NdDevMenu_Assert_UpdateSelectIgcByNameMenu = { L"cc 48 85 db 74 ?? 33 c9 ff d3 48 8d 05 ?? ?? ?? ?? bb 10 00 00 00 41 b9 84 03 00 00" };

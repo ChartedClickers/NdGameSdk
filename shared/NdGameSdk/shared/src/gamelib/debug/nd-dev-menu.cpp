@@ -145,7 +145,7 @@ namespace NdGameSdk::gamelib::debug {
 		return nullptr;
 	}
 
-	DMENU::ItemFunction* NdDevMenu::Create_DMENU_Function(std::string pName, DMENU::Menu* pMenu, DMENU::ItemFunction::FunctionCallback pFunction, uint64_t args, bool pIsActive, HeapArena_Args) {
+	DMENU::ItemFunction* NdDevMenu::Create_DMENU_ItemFunction(std::string pName, DMENU::Menu* pMenu, DMENU::ItemFunction::FunctionCallback pFunction, uint64_t args, bool pIsActive, HeapArena_Args) {
 		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::ItemFunction>
 			(sizeof(DMENU::ItemFunction), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
 		DMENU::ItemFunction* FunctionPtr{};
@@ -205,12 +205,7 @@ namespace NdGameSdk::gamelib::debug {
 		// Create main menu for NdGameSdk
 		DMENU::Menu* NdGameSdkMenu = Create_DMENU_Menu(SDK_NAME, HeapArena_Source);
 
-		static bool color_bool;
-		auto itembool = Create_DMENU_ItemBool("color bool", NdGameSdkMenu, &color_bool,
-			nullptr, HeapArena_Source);
-
-		itembool->SetColor(BasicColors::Green);
-		itembool->SetSelectedColor(BasicColors::Pink);
+		ScriptManager::CreateScriptManagerMenu(this,NdGameSdkMenu);
 
 		//TODO: Here must be the main controls of sdk and the possibility of spawning menus from other sdkcomponents 
 		// like this happening in the NdGames. 
@@ -302,164 +297,165 @@ namespace NdGameSdk::gamelib::debug {
 					spdlog::info("ExtendedDebugMenu is enabled!");
 				}
 	#endif
-
-				findpattern = Patterns::NdDevMenu_DMENU_MenuGroup_SetRootMenu;
-				auto SetRootMenuJMP = (void*)Utility::FindAndPrintPattern(module
-					, findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_MenuGroup_SetRootMenu), findpattern.offset + 0x93);
-
-				findpattern = Patterns::NdDevMenu_DMENU_Menu;
-				DMENU_Menu = (DMENU_Menu_ptr)Utility::FindAndPrintPattern(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_Menu), findpattern.offset);
-
-				findpattern = Patterns::NdDevMenu_DMENU_ItemLine;
-				DMENU_ItemLine = (DMENU_ItemLine_ptr)Utility::FindAndPrintPattern(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemLine), findpattern.offset);
-
-				findpattern = Patterns::NdDevMenu_DMENU_ItemSubText;
-				DMENU_ItemSubText = (DMENU_ItemSubText_ptr)Utility::FindAndPrintPattern(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemSubText), findpattern.offset);
-
-				findpattern = Patterns::NdDevMenu_DMENU_ItemSubmenu;
-				DMENU_ItemSubmenu = (DMENU_ItemSubmenu_ptr)Utility::FindAndPrintPattern(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemSubmenu), findpattern.offset);
-
-				findpattern = Patterns::NdDevMenu_DMENU_ItemBool;
-				DMENU_ItemBool = (DMENU_ItemBool_ptr)Utility::FindAndPrintPattern(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemBool), findpattern.offset);
-
-				findpattern = Patterns::NdDevMenu_DMENU_ItemDecimal;
-				DMENU_ItemDecimal = (DMENU_ItemDecimal_ptr)Utility::FindAndPrintPattern(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemDecimal), findpattern.offset);
-
-				findpattern = Patterns::NdDevMenu_DMENU_ItemFloat;
-				DMENU_ItemFloat = (DMENU_ItemFloat_ptr)Utility::FindAndPrintPattern(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemFloat), findpattern.offset);
-
-				findpattern = Patterns::NdDevMenu_DMENU_ItemFunction;
-				DMENU_ItemFunction = (DMENU_ItemFunction_ptr)Utility::FindAndPrintPattern(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemFunction), findpattern.offset);
-
-				findpattern = Patterns::NdDevMenu_DMENU_ItemSelection;
-				DMENU_ItemSelection = (DMENU_ItemSelection_ptr)Utility::FindAndPrintPattern(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemSelection), findpattern.offset);
-
-				findpattern = Patterns::NdDevMenu_DMENU_Menu_AppendComponent;
-				DMENU_Menu_AppendComponent = (DMENU_Menu_AppendComponent_ptr)Utility::FindAndPrintPattern(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_Menu_AppendComponent), findpattern.offset);
-
-				findpattern = Patterns::NdDevMenu_DMENU_DecimalCallBack;
-				DMENU_Menu_DecimalCallBack = (DMENU_Menu_DecimalCallBack_ptr)Utility::FindAndPrintPattern(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_DecimalCallBack), findpattern.offset);
-
-				if (!SetRootMenuJMP ||
-					!DMENU_Menu ||
-					!DMENU_ItemLine ||
-					!DMENU_ItemSubText ||
-					!DMENU_ItemSubmenu ||
-					!DMENU_ItemBool ||
-					!DMENU_ItemDecimal ||
-					!DMENU_ItemFloat ||
-					!DMENU_ItemFunction ||
-					!DMENU_ItemSelection ||
-					!DMENU_Menu_AppendComponent ||
-					!DMENU_Menu_DecimalCallBack) {
-					throw SdkComponentEx{ std::format("Failed to find {}:: game functions!", GetName()), SdkComponentEx::ErrorCode::PatternFailed };
-				}
-
-				findpattern = Patterns::NdDevMenu_DMENU_Component;
-				DMENU::Component::VTable = (regenny::shared::ndlib::debug::DMENU::Component::VTable*)Utility::ReadLEA32(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_Component), findpattern.offset + 0x1a, 3, 7);
-
-				findpattern = Patterns::NdDevMenu_DMENU_MenuGroup;
-				DMENU::MenuGroup::VTable = (regenny::shared::ndlib::debug::DMENU::MenuGroup::VTable*)Utility::ReadLEA32(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_MenuGroup), findpattern.offset + 0x1b, 3, 7);
-
-				findpattern = Patterns::NdDevMenu_DMENU_Menu;
-				DMENU::Menu::VTable =  (regenny::shared::ndlib::debug::DMENU::Menu::VTable*)Utility::ReadLEA32(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_Menu), findpattern.offset + 0x15, 3, 7);
-
-				findpattern = Patterns::NdDevMenu_DMENU_ItemLine;
-				DMENU::ItemLine::VTable = (regenny::shared::ndlib::debug::DMENU::ItemLine::VTable*)Utility::ReadLEA32(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemLine), findpattern.offset + 0x5A, 3, 7);
-
-				findpattern = Patterns::NdDevMenu_DMENU_ItemSubmenu;
-				DMENU::ItemSubmenu::VTable = (regenny::shared::ndlib::debug::DMENU::ItemSubmenu::VTable0*)Utility::ReadLEA32(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemSubmenu), findpattern.offset + 0x34, 3, 7);
-
-				findpattern = Patterns::NdDevMenu_DMENU_ItemBool;
-				DMENU::ItemBool::VTable = (regenny::shared::ndlib::debug::DMENU::ItemBool::VTable0*)Utility::ReadLEA32(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemBool), findpattern.offset + 0x2b, 3, 7);
-
-				findpattern = Patterns::NdDevMenu_DMENU_ItemDecimal;
-				DMENU::ItemDecimal::VTable = (regenny::shared::ndlib::debug::DMENU::ItemDecimal::VTable0*)Utility::ReadLEA32(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemDecimal), findpattern.offset + 0x50, 3, 7);
-
-				findpattern = Patterns::NdDevMenu_DMENU_ItemFloat;
-				DMENU::ItemFloat::VTable = (regenny::shared::ndlib::debug::DMENU::ItemFloat::VTable0*)Utility::ReadLEA32(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemFloat), findpattern.offset + 0x61, 3, 7);
-
-				findpattern = Patterns::NdDevMenu_DMENU_ItemFunction;
-				DMENU::ItemFunction::VTable = (regenny::shared::ndlib::debug::DMENU::ItemFunction::VTable0*)Utility::ReadLEA32(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemFunction), findpattern.offset + 0x25, 3, 7);
-
-				findpattern = Patterns::NdDevMenu_DMENU_ItemSelection;
-				DMENU::ItemSelection::VTable = (regenny::shared::ndlib::debug::DMENU::ItemSelection::VTable0*)Utility::ReadLEA32(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemSelection), findpattern.offset + 0x35, 3, 7);
-
-				findpattern = Patterns::NdDevMenu_DMENU_ItemSubText;
-				DMENU::ItemSubText::VTable = (regenny::shared::ndlib::debug::DMENU::ItemSubText::VTable0*)Utility::ReadLEA32(module,
-					findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemSubText), findpattern.offset + 0x35, 3, 7);
-
-				if (!DMENU::Component::VTable ||
-					!DMENU::MenuGroup::VTable ||
-					!DMENU::Menu::VTable || 
-					!DMENU::ItemLine::VTable ||
-					!DMENU::ItemSubmenu::VTable ||
-					!DMENU::ItemBool::VTable ||
-					!DMENU::ItemDecimal::VTable ||
-					!DMENU::ItemFloat::VTable || 
-					!DMENU::ItemFunction::VTable ||
-					!DMENU::ItemSelection::VTable ||
-					!DMENU::ItemSubText::VTable) {
-					throw SdkComponentEx
-					{ std::format("Failed to find VTables of DMENU Components!"),
-						SdkComponentEx::ErrorCode::PatternFailed };
-				}
-
-				m_DmenuComponentTypeMap = {
-					{ reinterpret_cast<uintptr_t>(DMENU::MenuGroup::VTable), DmenuComponentType::MenuGroup },
-					{ reinterpret_cast<uintptr_t>(DMENU::Menu::VTable), DmenuComponentType::Menu },
-					{ reinterpret_cast<uintptr_t>(DMENU::ItemLine::VTable), DmenuComponentType::ItemLine },
-					{ reinterpret_cast<uintptr_t>(DMENU::ItemSubmenu::VTable), DmenuComponentType::ItemSubmenu },
-					{ reinterpret_cast<uintptr_t>(DMENU::ItemBool::VTable), DmenuComponentType::ItemBool },
-					{ reinterpret_cast<uintptr_t>(DMENU::ItemDecimal::VTable), DmenuComponentType::ItemDecimal },
-					{ reinterpret_cast<uintptr_t>(DMENU::ItemFloat::VTable), DmenuComponentType::ItemFloat },
-					{ reinterpret_cast<uintptr_t>(DMENU::ItemFunction::VTable), DmenuComponentType::ItemFunction },
-					{ reinterpret_cast<uintptr_t>(DMENU::ItemSelection::VTable), DmenuComponentType::ItemSelection },
-					{ reinterpret_cast<uintptr_t>(DMENU::ItemSubText::VTable), DmenuComponentType::ItemSubText },
-				};
-
-				m_CommonGame->e_GameInitialized.Subscribe(this,&NdDevMenu::OnGameInitialized);
-
-				m_SetRootMenuHook = Utility::MakeMidHook(SetRootMenuJMP,
-					[](SafetyHookContext& ctx)
-					{
-						auto NdDevMenuComponent = GetSharedComponents()->GetComponent<NdDevMenu>();
-						DMENU::MenuGroup* NdDevMenu = &NdDevMenuComponent->m_EngineComponents->m_ndConfig.GetNdDevMenu();
-
-						DMENU::MenuGroup* MenuGroup = reinterpret_cast<DMENU::MenuGroup*>(ctx.rdi);
-						DMENU::Menu* Menu = reinterpret_cast<DMENU::Menu*>(ctx.rbx);
-
-						if (MenuGroup == NdDevMenu) {
-							DMENU::Menu* NdGameSdkMenu = NdDevMenuComponent->CreateNdGameSdkMenu();
-							NdDevMenuComponent->m_NdGameSdkMenu = NdDevMenuComponent->Create_DMENU_ItemSubmenu(NdGameSdkMenu->Name(), MenuGroup->RootMenu(),
-								NdGameSdkMenu, NULL, NULL, nullptr, HeapArena_Source)->SubMenu();
-						}
-
-						NdDevMenuComponent->InvokeSdkEvent(NdDevMenuComponent->e_AppendMenuGroup, NdDevMenuComponent.get(), MenuGroup);
-
-					}, wstr(Patterns::NdDevMenu_DMENU_MenuGroup_SetRootMenu), wstr(SetRootMenuJMP));
 			}
+
+			findpattern = Patterns::NdDevMenu_DMENU_MenuGroup_SetRootMenu;
+			auto SetRootMenuJMP = (void*)Utility::FindAndPrintPattern(module
+				, findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_MenuGroup_SetRootMenu), findpattern.offset + 0x93);
+
+			findpattern = Patterns::NdDevMenu_DMENU_Menu;
+			DMENU_Menu = (DMENU_Menu_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_Menu), findpattern.offset);
+
+			findpattern = Patterns::NdDevMenu_DMENU_ItemLine;
+			DMENU_ItemLine = (DMENU_ItemLine_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemLine), findpattern.offset);
+
+			findpattern = Patterns::NdDevMenu_DMENU_ItemSubText;
+			DMENU_ItemSubText = (DMENU_ItemSubText_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemSubText), findpattern.offset);
+
+			findpattern = Patterns::NdDevMenu_DMENU_ItemSubmenu;
+			DMENU_ItemSubmenu = (DMENU_ItemSubmenu_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemSubmenu), findpattern.offset);
+
+			findpattern = Patterns::NdDevMenu_DMENU_ItemBool;
+			DMENU_ItemBool = (DMENU_ItemBool_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemBool), findpattern.offset);
+
+			findpattern = Patterns::NdDevMenu_DMENU_ItemDecimal;
+			DMENU_ItemDecimal = (DMENU_ItemDecimal_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemDecimal), findpattern.offset);
+
+			findpattern = Patterns::NdDevMenu_DMENU_ItemFloat;
+			DMENU_ItemFloat = (DMENU_ItemFloat_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemFloat), findpattern.offset);
+
+			findpattern = Patterns::NdDevMenu_DMENU_ItemFunction;
+			DMENU_ItemFunction = (DMENU_ItemFunction_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemFunction), findpattern.offset);
+
+			findpattern = Patterns::NdDevMenu_DMENU_ItemSelection;
+			DMENU_ItemSelection = (DMENU_ItemSelection_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemSelection), findpattern.offset);
+
+			findpattern = Patterns::NdDevMenu_DMENU_Menu_AppendComponent;
+			DMENU_Menu_AppendComponent = (DMENU_Menu_AppendComponent_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_Menu_AppendComponent), findpattern.offset);
+
+			findpattern = Patterns::NdDevMenu_DMENU_DecimalCallBack;
+			DMENU_Menu_DecimalCallBack = (DMENU_Menu_DecimalCallBack_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_DecimalCallBack), findpattern.offset);
+
+			if (!SetRootMenuJMP ||
+				!DMENU_Menu ||
+				!DMENU_ItemLine ||
+				!DMENU_ItemSubText ||
+				!DMENU_ItemSubmenu ||
+				!DMENU_ItemBool ||
+				!DMENU_ItemDecimal ||
+				!DMENU_ItemFloat ||
+				!DMENU_ItemFunction ||
+				!DMENU_ItemSelection ||
+				!DMENU_Menu_AppendComponent ||
+				!DMENU_Menu_DecimalCallBack) {
+				throw SdkComponentEx{ std::format("Failed to find {}:: game functions!", GetName()), SdkComponentEx::ErrorCode::PatternFailed };
+			}
+
+			findpattern = Patterns::NdDevMenu_DMENU_Component;
+			DMENU::Component::VTable = (regenny::shared::ndlib::debug::DMENU::Component::VTable*)Utility::ReadLEA32(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_Component), findpattern.offset + 0x1a, 3, 7);
+
+			findpattern = Patterns::NdDevMenu_DMENU_MenuGroup;
+			DMENU::MenuGroup::VTable = (regenny::shared::ndlib::debug::DMENU::MenuGroup::VTable*)Utility::ReadLEA32(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_MenuGroup), findpattern.offset + 0x1b, 3, 7);
+
+			findpattern = Patterns::NdDevMenu_DMENU_Menu;
+			DMENU::Menu::VTable = (regenny::shared::ndlib::debug::DMENU::Menu::VTable*)Utility::ReadLEA32(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_Menu), findpattern.offset + 0x15, 3, 7);
+
+			findpattern = Patterns::NdDevMenu_DMENU_ItemLine;
+			DMENU::ItemLine::VTable = (regenny::shared::ndlib::debug::DMENU::ItemLine::VTable*)Utility::ReadLEA32(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemLine), findpattern.offset + 0x5A, 3, 7);
+
+			findpattern = Patterns::NdDevMenu_DMENU_ItemSubmenu;
+			DMENU::ItemSubmenu::VTable = (regenny::shared::ndlib::debug::DMENU::ItemSubmenu::VTable0*)Utility::ReadLEA32(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemSubmenu), findpattern.offset + 0x34, 3, 7);
+
+			findpattern = Patterns::NdDevMenu_DMENU_ItemBool;
+			DMENU::ItemBool::VTable = (regenny::shared::ndlib::debug::DMENU::ItemBool::VTable0*)Utility::ReadLEA32(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemBool), findpattern.offset + 0x2b, 3, 7);
+
+			findpattern = Patterns::NdDevMenu_DMENU_ItemDecimal;
+			DMENU::ItemDecimal::VTable = (regenny::shared::ndlib::debug::DMENU::ItemDecimal::VTable0*)Utility::ReadLEA32(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemDecimal), findpattern.offset + 0x50, 3, 7);
+
+			findpattern = Patterns::NdDevMenu_DMENU_ItemFloat;
+			DMENU::ItemFloat::VTable = (regenny::shared::ndlib::debug::DMENU::ItemFloat::VTable0*)Utility::ReadLEA32(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemFloat), findpattern.offset + 0x61, 3, 7);
+
+			findpattern = Patterns::NdDevMenu_DMENU_ItemFunction;
+			DMENU::ItemFunction::VTable = (regenny::shared::ndlib::debug::DMENU::ItemFunction::VTable0*)Utility::ReadLEA32(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemFunction), findpattern.offset + 0x25, 3, 7);
+
+			findpattern = Patterns::NdDevMenu_DMENU_ItemSelection;
+			DMENU::ItemSelection::VTable = (regenny::shared::ndlib::debug::DMENU::ItemSelection::VTable0*)Utility::ReadLEA32(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemSelection), findpattern.offset + 0x35, 3, 7);
+
+			findpattern = Patterns::NdDevMenu_DMENU_ItemSubText;
+			DMENU::ItemSubText::VTable = (regenny::shared::ndlib::debug::DMENU::ItemSubText::VTable0*)Utility::ReadLEA32(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemSubText), findpattern.offset + 0x35, 3, 7);
+
+			if (!DMENU::Component::VTable ||
+				!DMENU::MenuGroup::VTable ||
+				!DMENU::Menu::VTable ||
+				!DMENU::ItemLine::VTable ||
+				!DMENU::ItemSubmenu::VTable ||
+				!DMENU::ItemBool::VTable ||
+				!DMENU::ItemDecimal::VTable ||
+				!DMENU::ItemFloat::VTable ||
+				!DMENU::ItemFunction::VTable ||
+				!DMENU::ItemSelection::VTable ||
+				!DMENU::ItemSubText::VTable) {
+				throw SdkComponentEx
+				{ std::format("Failed to find VTables of DMENU Components!"),
+					SdkComponentEx::ErrorCode::PatternFailed };
+			}
+
+			m_DmenuComponentTypeMap = {
+				{ reinterpret_cast<uintptr_t>(DMENU::MenuGroup::VTable), DmenuComponentType::MenuGroup },
+				{ reinterpret_cast<uintptr_t>(DMENU::Menu::VTable), DmenuComponentType::Menu },
+				{ reinterpret_cast<uintptr_t>(DMENU::ItemLine::VTable), DmenuComponentType::ItemLine },
+				{ reinterpret_cast<uintptr_t>(DMENU::ItemSubmenu::VTable), DmenuComponentType::ItemSubmenu },
+				{ reinterpret_cast<uintptr_t>(DMENU::ItemBool::VTable), DmenuComponentType::ItemBool },
+				{ reinterpret_cast<uintptr_t>(DMENU::ItemDecimal::VTable), DmenuComponentType::ItemDecimal },
+				{ reinterpret_cast<uintptr_t>(DMENU::ItemFloat::VTable), DmenuComponentType::ItemFloat },
+				{ reinterpret_cast<uintptr_t>(DMENU::ItemFunction::VTable), DmenuComponentType::ItemFunction },
+				{ reinterpret_cast<uintptr_t>(DMENU::ItemSelection::VTable), DmenuComponentType::ItemSelection },
+				{ reinterpret_cast<uintptr_t>(DMENU::ItemSubText::VTable), DmenuComponentType::ItemSubText },
+			};
+
+			m_CommonGame->e_GameInitialized.Subscribe(this, &NdDevMenu::OnGameInitialized);
+
+			m_SetRootMenuHook = Utility::MakeMidHook(SetRootMenuJMP,
+				[](SafetyHookContext& ctx)
+				{
+					auto NdDevMenuComponent = GetSharedComponents()->GetComponent<NdDevMenu>();
+					DMENU::MenuGroup* NdDevMenu = &NdDevMenuComponent->m_EngineComponents->m_ndConfig.GetNdDevMenu();
+
+					DMENU::MenuGroup* MenuGroup = reinterpret_cast<DMENU::MenuGroup*>(ctx.rdi);
+					DMENU::Menu* Menu = reinterpret_cast<DMENU::Menu*>(ctx.rbx);
+
+					if (MenuGroup == NdDevMenu) {
+						DMENU::Menu* NdGameSdkMenu = NdDevMenuComponent->CreateNdGameSdkMenu();
+						NdDevMenuComponent->m_NdGameSdkMenu = NdDevMenuComponent->Create_DMENU_ItemSubmenu(NdGameSdkMenu->Name(), MenuGroup->RootMenu(),
+							NdGameSdkMenu, NULL, NULL, nullptr, HeapArena_Source)->SubMenu();
+					}
+
+					NdDevMenuComponent->InvokeSdkEvent(NdDevMenuComponent->e_AppendMenuGroup, NdDevMenuComponent.get(), MenuGroup);
+
+				}, wstr(Patterns::NdDevMenu_DMENU_MenuGroup_SetRootMenu), wstr(SetRootMenuJMP));
+
 		});
 	}
 }

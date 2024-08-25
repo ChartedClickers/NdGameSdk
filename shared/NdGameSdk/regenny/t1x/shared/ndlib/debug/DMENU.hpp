@@ -9,8 +9,8 @@ struct DMENU {
         OnClose = 1,
         OnUpdate = 3,
         OnExecute = 5,
-        ReadConfig = 7,
-        SaveConfig = 8,
+        OnReadConfig = 7,
+        OnSaveConfig = 8,
     };
 
     struct Component {

@@ -2,6 +2,7 @@
 
 #include "src/corelib/memory/memory.hpp"
 #include "src/ndlib/engine-components.hpp"
+#include "src/ndlib/script/script-manager.hpp"
 #include "src/ndlib/render/util/prim.hpp"
 #include "src/common/common-game-init.hpp"
 #include "src/gamelib/debug/nd-dev-menu.hpp"
@@ -12,25 +13,24 @@ namespace NdGameSdk {
 	void InitSharedComponents(SdkConfig& cfg)
 	{
 		auto SharedComponents = ISdkComponent::GetSharedComponents();
-		auto MemoryComponent = 
-			SharedComponents->AddComponent<corelib::memory::Memory>(cfg.Memory);
+		auto MemComponent = SharedComponents->AddComponent<corelib::memory::Memory>(cfg.Memory);
 
 		SharedComponents->AddComponent<ndlib::EngineComponents>();
+		SharedComponents->AddComponent<ndlib::script::ScriptManager>();
 #if defined(T1X)
 		SharedComponents->AddComponent<ndlib::render::util::PrimServerComponent>(cfg.PrimServer);
-		SharedComponents->AddComponent<gamelib::render::particle::ParticleManager>();
+		auto ParticleMgr = SharedComponents->AddComponent<gamelib::render::particle::ParticleManager>();
 #endif
 		SharedComponents->AddComponent<common::CommonGame>();
-		SharedComponents->AddComponent<gamelib::debug::NdDevMenu>(cfg.NdDevMenu);
+		auto DmenuComponent = SharedComponents->AddComponent<gamelib::debug::NdDevMenu>(cfg.NdDevMenu);
 
 		SharedComponents->InitializeSdkComponents();
 
 #if defined(T1X)
-		if (MemoryComponent->IsDebugMemoryAvailable()) {
+		if (MemComponent->IsDebugMemoryAvailable()) {
 			auto MissingDependencies = ISdkComponent::CheckSdkComponents
 				<gamelib::debug::NdDevMenu, gamelib::render::particle::ParticleManager>({
-					SharedComponents->GetComponent<gamelib::debug::NdDevMenu>().get(),
-					SharedComponents->GetComponent<gamelib::render::particle::ParticleManager>().get() });
+					ParticleMgr.get(), DmenuComponent.get() });
 
 			if (MissingDependencies.has_value()) {
 				throw SdkComponentEx

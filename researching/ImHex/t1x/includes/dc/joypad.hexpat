@@ -4,7 +4,6 @@ import dc.dctypes;
 
 namespace DC {
 
-   // WIP
    namespace joypad {
         
         /*
@@ -46,19 +45,19 @@ namespace DC {
                 StringId64 *m_pArray[m_numInputs] : StringId64;
             };   
             
-            // @ 793D1D63A0498239
+            // @ #793D1D63A0498239
             struct inputKeyboardScheme {
                 u64 m_count;
                 inputKeyboard *m_scheme[m_count] : u64;
             };
             
-            // @ 674A8555C679C8ED
+            // @ #674A8555C679C8ED
             struct inputJoypadScheme {
                 u64 m_count;
                 inputJoypad *m_scheme[m_count] : u64;
             };
             
-            // @ 66D642190729CBE3
+            // @ #66D642190729CBE3
             struct inputMouseScheme {
                 u64 m_count; // always 2?
                 
@@ -71,13 +70,13 @@ namespace DC {
                 
             };
             
-            // @ 5688596AABA88521
+            // @ #5688596AABA88521
             struct inputScheme {
                 u64 m_count;
                 Input *m_scheme[m_count] : u64;
             };
             
-            // @ FD17AE86396612F7
+            // @ #FD17AE86396612F7
             struct inputCommand {            
                 NullablePtr<inputJoypadScheme> m_Joypadinputs;
                 NullablePtr<inputKeyboardScheme> m_Keyboardinputs;
@@ -85,7 +84,7 @@ namespace DC {
                 NullablePtr<inputMouseScheme> m_Mouseinputs;
                 NullablePtr<inputMouseScheme> inputMouseButtons; // always nullptr in raw module
                 bool field_28;
-                padding[7];
+                padding[0x7];
                 NullablePtr<inputScheme> m_inputs; // Common for inputKeyboardButtons & inputMouseButtons & m_inputButtons?
                 NullablePtr<inputJoypadScheme> m_inputButtons; // always nullptr in raw module
                 u32 field_40;
@@ -141,6 +140,90 @@ namespace DC {
             bool use_raw_input;
             padding[0x18];
         };
+
+        /*
+        @ ScriptId: *analog-stick-icon-paths*
+        @ TYPE: Array
+        @ EntryPtr: FixedSizeArray<AnalogStickIconPath>
+        */
+        struct AnalogStickIconPath {
+            char *m_Path[] : u64;
+            char *m_Path2[] : u64;
+            StringId64 m_hash;
+        };
+
+        /*
+        @ ScriptId: *action-map*
+        @ TYPE: #AF5C458ED236456E
+        @ EntryPtr: ActionSet
+        */
+        namespace actionmap { 
+            
+            // @ Array
+            struct ActionDefinition {
+                u64 field_0;
+                u64 field_8;
+                u64 field_10;
+            };
+            
+            // @ #11AE032C43498287
+            struct kActionDefinition {
+                u64 m_size;
+                ActionDefinition *field_8[m_size] : u64;
+            };
+
+            // @ #78A4C32D131A03BD
+            struct InputDefinition {
+                u64 field_0;
+                u64 field_8;
+                u64 field_10;
+                u64 field_18;
+                StringId64 field_20;
+                StringId64 field_28;
+                u64 field_30;
+                StringId64 field_38;
+            };
+
+            // @ #AF5C458ED236456E
+            struct ActionSet {
+                map<StringId64,Array<InputDefinition>> *m_InputDef: u64;
+                StringId64 *field_8[m_InputDef.m_size] : StringId64;
+                kActionDefinition *field_10: u64;
+            };   
+        }
+
+        /*
+        @ ScriptId: *joypad-additional-presets*
+        @ TYPE: array*
+        @ EntryPtr: FixedSizeArray<Array<AdditionalPresets>>
+        */
+        namespace presets  {
+
+            // @ #??????????????????
+            struct Preset { 
+                StringId64 field_0;
+                u64 field_8;
+                u32 field_10;
+                u32 field_14;
+                u16 field_18;
+                u32 field_1a;
+                padding[2];
+            };
+
+            // @ #6043A6D761AA41FF
+            struct AdditionalPresets {
+                u64 field_0;
+                StringId64 field_8;
+                StringId64 field_10;
+                u64 field_18;
+                $ += 0x8;
+                u32 m_count;
+                $ -= 0xc;
+                Preset *m_presets[m_count] : u64;
+                $ += 0x8;
+                u64 field_30;
+            };
+        } 
         
    }
     

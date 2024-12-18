@@ -1,12 +1,18 @@
 #pragma once
 
+#include <NdModClient.hpp>
+#include <NdMods.hpp>
+
 #include <windows.h>
 #include <string_view>
 #include <vector>
 #include <unordered_map>
 #include <memory>
 
-#include <NdModClient.hpp>
+class NdModClient;
+class NdModComponentEx;
+
+extern std::unique_ptr<NdModClient> g_ndmodclient;
 
 class NdMod
 {

@@ -1,4 +1,4 @@
-#include "FunctionHook.hpp";
+#include "FunctionHook.hpp"
 
 #include <stdexcept>
 #include <spdlog/spdlog.h>

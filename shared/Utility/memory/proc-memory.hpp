@@ -18,6 +18,8 @@ https://github.com/cursey/kananlib
 #include <safetyhook.hpp>
 #include <safetyhook/inline_hook.hpp>
 
+#include "Pattern.hpp"
+
 namespace Utility::memory {
 
     template <typename CharT>

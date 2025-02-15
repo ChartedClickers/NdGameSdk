@@ -17,6 +17,8 @@
 #include <NdGameSdk/sdkderived.hpp>
 #include <NdGameSdk/sdkexception.hpp>
 
+#include <NdGameSdk/components/SdkModule.hpp>
+
 #include <NdGameSdk/components/event/SdkEvent.hpp>
 
 namespace NdGameSdk {

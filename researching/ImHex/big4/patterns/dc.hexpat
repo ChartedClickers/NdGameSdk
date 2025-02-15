@@ -1,53 +1,37 @@
 #pragma loop_limit 500000
 
 import dc.dctypes;
-import dc.modules;
-import dc.joypad;
 
 namespace DC {
-
+         
    struct Entry {
-        StringId64 m_scriptId;
-        StringId64 m_typeId;
-
+        StringId32 m_scriptId;
+        StringId32 m_typeId;
+     
     match (m_scriptId, m_typeId) {
-        /* modules.bin */
-        (ScriptId::modules, Type::module_info_array): modules::ModuleInfoArray *m_entryPtr : u64;
-        /* joypad.bin */
-        (_, Type::action_scheme): joypad::actionscheme::ActionScheme *m_entryPtr : u64;
-        (ScriptId::persistent_command_list, Type::command_list): joypad::CommandList *m_entryPtr : u64;
-        (ScriptId::mouse_default_settings, Type::mouse_settings): joypad::MouseSettings *m_entryPtr : u64;
-        (ScriptId::analog_stick_icon_paths, Type::Array): FixedSizeArray<joypad::AnalogStickIconPath> *m_entryPtr : u64;
-        (ScriptId::melee_override_ids, Type::Array): FixedSizeArray<StringId64> *m_entryPtr : u64;
-        (ScriptId::weapon_cross_press_release_blacklist, Type::Array): FixedSizeArray<StringId64> *m_entryPtr : u64;
-        (ScriptId::action_map, Type::input_scheme): joypad::actionmap::ActionSet *m_entryPtr : u64;
-        (ScriptId::joypad_additional_presets, Type::_array): FixedSizeArray<Array<joypad::presets::AdditionalPresets>> *m_entryPtr : u64;
         /* unknown.bin */
         (_,_): u64 *m_entryPtr : u64;
 
         /* Base dc entry types */
-        (_, Type::string): String *m_entryPtr : u64;
-        (_, Type::symbol): StringId64 *m_entryPtr : u64;
         (_, Type::_float): float *m_entryPtr : u64;
-    }
-
-   };
-
+    }  
+       
+   };   
+            
     struct Header {
         u32 m_magic;
-        u32 m_version;
-        u32 m_size;
+        u32 m_versionNumber;
+        u32 m_textSize;
         u32 unk;
         u32 unk1;
         u32 m_numEntries;
         Entry *m_pStartOfData[m_numEntries] : u64;
-    };
+    };  
 }
 
-DC::Header dc_module @ 0x00;
-
+DC::Header dc_header @ 0x00;
 namespace Script {
-
+    
     struct BitReader {
         u64 m_FixUpTable;
         u32 m_bitIndex;
@@ -61,33 +45,33 @@ namespace Script {
 
          u64 byteIndex = bitdata.m_byteIndex;
          u8 bitIndex = bitdata.m_bitIndex;
-
+         
          u8 CheckByteIndex_value @ (byteIndex + bitdata.m_FixUpTable);
-         u8 CheckByteIndex = CheckByteIndex_value;
-
+         u8 CheckByteIndex = CheckByteIndex_value;    
+         
          bitdata.m_bitIndex = (bitdata.m_bitIndex + 1);
          CheckByteIndex = (CheckByteIndex >> bitIndex);
-
+         
          if(bitdata.m_bitIndex == 8) {
             bitdata.m_bitIndex = 0;
             bitdata.m_byteIndex = (byteIndex + 1);
          }
 
-         return CheckByteIndex & 1;
-    };
-
-    fn Login(ref DC::Header pHeader, u64 pFile, u64 lowerBound, u64 upperBound) {
-
+         return CheckByteIndex & 1;        
+    };    
+    
+    fn Login(ref DC::Header pHeader, u64 pFile, u64 lowerBound, u64 upperBound) {     
+        
         const u32 MagicNumber = 0x44433030;
         const u32 VersionNumber = 1;
 
         std::assert(pHeader.m_magic == MagicNumber, "Error! Invalid magic number!");
-        std::assert(pHeader.m_version == VersionNumber, "Error! Wrong version number.");
-
+        std::assert(pHeader.m_versionNumber == VersionNumber, "Error! Wrong version number.");
+        
         u64 FileModuleAddr = pFile;
         u64 OffsetIndex = addressof(pHeader);
-        u32 FixUpTable = addressof(pHeader.m_version) + pHeader.m_size;
-        u32 size @ pHeader.m_size;
+        u32 FixUpTable = addressof(pHeader.m_versionNumber) + pHeader.m_textSize;
+        u32 size @ pHeader.m_textSize;
 
         BitReader bitdata;
         bitdata.m_FixUpTable = FixUpTable;
@@ -96,14 +80,14 @@ namespace Script {
         bitdata.m_size = size;
 
         // Each 8-byte allocated will take 8 bits (1 byte) in the FixUpTable.
-        // ((pHeader.m_size / 0x8) + 0x7) / 0x8 = FixUpTableSize
-
+        // ((pHeader.m_textSize / 8) + 7) / 8 = FixUpTableSize
+        
         u32 iQword = 0;
         u32 FixUpTableBits = (bitdata.m_size * 8);
 
         std::print("BitReader: {}", bitdata);
         std::print("FixUpTableBits: 0x{:016X}", FixUpTableBits);
-
+        
         if(FixUpTableBits != 0) {
             while(iQword < FixUpTableBits) {
 
@@ -113,17 +97,17 @@ namespace Script {
                     std::assert(loc == 0 || (loc >= lowerBound && loc < upperBound), "loc == 0 || (loc >= lowerBound && loc < upperBound)");
 
                     u8 CheckByteIndex_value @ (bitdata.m_byteIndex + bitdata.m_FixUpTable);
-                    u8 CheckByteIndex = CheckByteIndex_value;
+                    u8 CheckByteIndex = CheckByteIndex_value;    
 
                     std::print("FixUpTableIndex: 0x{:016X}/0x{:016X}", CheckByteIndex_value, (bitdata.m_byteIndex + bitdata.m_FixUpTable) + bitdata.m_bitIndex);
                     std::print("OffsetIndex: 0x{:016X}", (FileModuleAddr + loc));
                 }
-
+                
                 OffsetIndex += 8;
                 iQword = (iQword + 1);
             }
         }
-
+        
         return true;
     };
 }

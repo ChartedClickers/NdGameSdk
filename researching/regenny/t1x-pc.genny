@@ -889,23 +889,49 @@ namespace shared {
         }
     }
 
+    // c:\branches\discbot??\1xfinal-pc-?.?.?\shared\src\ndlib\util
+    namespace util {
+        // bit-reader.h
+        struct BitReader 0x18 {
+            uint64_t m_FixUpTable;
+            uint32_t m_bitIndex;
+            uint32_t m_byteIndex;
+            uint32_t m_size;
+            uint32_t field_14;
+        };
+    }
+
 
     // c:\branches\discbot??\1xfinal-pc-?.?.?\shared\src\ndlib\script
     namespace script {
         
-        // build/pc/main/bin/dc1
+        // #lang dc
         namespace DC {
-            
+
              /* 
             DC::ScriptId:
-                *modules* (#0B4B7080C994E5B8)
+                modules = 0x0B4B7080C994E5B8, // *modules*
+                persistent_command_list = 0x0D4214F3AB9F95C3, // *persistent-command-list*
+                mouse_default_settings = 0x153A061C977AB3B4, // *mouse-default-settings*
+                analog_stick_icon_paths = 0x6ECB9D5F76F9A2E7, // *analog-stick-icon-paths*
+                melee_override_ids = 0x7E555F8321D35D11, // *melee-override-ids*
+                weapon_cross_press_release_blacklist = 0xB8A76AAD46BA03C6, // *weapon-cross-press-release-blacklist*
+                joypad_additional_presets = 0xF1F762C8F706097D, // *joypad-additional-presets*
+                action_map = 0x939AA361BA96F916, // *action-map*
             */
 
             /* 
             DC::TYPE:
-                Array (#4F9E14B634C6B026)
-                symbol-array (#C8F749F92779D489)
-                module-info-array (#E442DCB00300FB28)
+                Array = 0x4F9E14B634C6B026, // @ Array
+                _array = 0x104D3D9BAD9D2464, // @ array*
+                map = 0x080F5919176D2D91, // @ map
+                _float = 0xA00A62A942B20165, // @ float
+                symbol_array = 0xC8F749F92779D489, // @ symbol-array
+                module_info_array = 0xE442DCB00300FB28, // @ module-info-array
+                action_scheme = 0x9FF30B9A5C83CB5D, // @ action-scheme
+                command_list = 0xB18C294ADE7B782B, // @ B18C294ADE7B782B
+                mouse_settings = 0xD6BCF8E23269E80E, // @ D6BCF8E23269E80E
+                input_scheme = 0xAF5C458ED236456E, // @ AF5C458ED236456E
             */
 
             struct Entry 0x18 {
@@ -924,21 +950,21 @@ namespace shared {
                 Entry* m_pStartOfData;
             };
 
-            // build/pc/main/bin/dc1/modules.bin
+            // @ map
+            struct map {
+                uint64_t m_size;
+            };
+
+            // @ modules.bin
             namespace modules {
-                
+
                 /*
-                @ ScriptId: *modules*
-                @ TYPE: module-info-array
-                @ EntryPtr: ModuleInfoArray
+                   @ file: modules.bin
+                   @ ScriptId: *modules*
+                   @ TYPE: module-info-array
+                   @ EntryPtr: ModuleInfoArray
                 */ 
                 struct modules {
-                    
-                    // @ symbol-array
-                    struct ModuleCollection 0x10 {
-                        uint64_t m_numModules;
-                        StringId64* m_modules; // @ Array
-                    };
 
                     // @ symbol-array
                     struct ModuleUnkCollection 0x10 {
@@ -946,21 +972,242 @@ namespace shared {
                         StringId64* m_pArray; // @ Array
                     };
 
+                    // @ symbol-array
+                    struct ModuleCollection 0x10 {
+                        uint64_t m_num;
+                        StringId64* m_modules; // @ Array
+                    }   
                     // @ Array
                     struct ModuleInfo 0x28 {
                         char* m_name [[utf8*]];
                         StringId64 m_hash;
                         uint64_t m_size;
-                        ModuleCollection* m_pCollection; // module Dependities?
+                        ModuleCollection* m_pCollection;
                         ModuleUnkCollection* m_unkCollection;
-                    };
-
+                    }   
                     // @ module-info-array
                     struct ModuleInfoArray 0x10 {
-                        uint32_t m_numModules;
-                        ModuleInfo* m_modules; // @ Array
+                        uint64_t m_numModules;
+                        ModuleInfo* m_modules;
                     };   
                 }
+            }
+
+            // @ joypad.bin
+            namespace joypad {
+
+                /*
+                    @ ScriptIds: *joypad-???*
+                    @ TYPE: action-scheme
+                    @ EntryPtr: ActionScheme 
+                */
+                struct actionscheme { 
+
+                    // @ Array
+                    struct inputKeyboard 0x10 {
+                        uint64_t m_flag;
+                        uint64_t m_keycode;
+                    };
+
+                    // @ Array
+                    struct inputJoypad 0x10 {
+                        uint64_t m_flag;
+                        uint64_t m_iBtn;
+                    };
+
+                    // @ Array
+                    struct inputMouse 0x18 {
+                        uint64_t m_flag;
+                        uint64_t m_keycode;
+                        uint64_t m_keycode2;
+                    };
+
+                    // @ Array
+                    struct Input 0x10 {
+                        uint64_t m_flag;
+                        StringId64 m_hash;
+                    };
+
+                    // @ symbol-array
+                    struct InputCollection 0x10 {
+                        uint64_t m_numInputs;
+                        StringId64* m_pArray;
+                    };   
+
+                    // @ #793D1D63A0498239
+                    struct inputKeyboardScheme 0x10 {
+                        uint64_t m_count;
+                        inputKeyboard* m_scheme;
+                    };
+
+                    // @ #674A8555C679C8ED
+                    struct inputJoypadScheme 0x10 {
+                        uint64_t m_count;
+                        inputJoypad* m_scheme;
+                    };
+
+                    // @ #66D642190729CBE3
+                    struct inputMouseScheme 0x10 {
+                        uint64_t m_count; // always 2?
+                        inputMouse* m_scheme;
+                    };
+
+                    // @ #5688596AABA88521
+                    struct inputScheme 0x10 {
+                        uint64_t m_count;
+                        Input* m_scheme;
+                    };
+
+                    // @ #FD17AE86396612F7
+                    struct inputCommand 0x90 {            
+                        inputJoypadScheme* m_Joypadinputs;
+                        inputKeyboardScheme* m_Keyboardinputs;
+                        inputKeyboardScheme* inputKeyboardButtons; // always nullptr in raw module
+                        inputMouseScheme* m_Mouseinputs;
+                        inputMouseScheme* inputMouseButtons; // always nullptr in raw module
+                        bool field_28;
+                        inputScheme* m_inputs @ 0x30; // Common for inputKeyboardButtons & inputMouseButtons & m_inputButtons?
+                        inputJoypadScheme* m_inputButtons; // always nullptr in raw module
+                        uint32_t field_40;
+                        uint32_t field_44;
+                        uint64_t field_48; // always 000000003DCCCCCD?
+                        StringId64 m_InputHash; // Example: *gesture-tap-left-stick-up-wide* (Manually allocated in the game)
+                        uint64_t field_58;
+                        InputCollection*  m_InputCollection; // i guess 
+                        uint64_t field_68;
+                        bool field_70; // something for field_68
+                        bool field_80 @ 0x80;
+                        bool field_81; // inputs allocated??
+                        char* field_88 @ 0x88 [[utf8*]];
+                    };
+
+                    // @ action-scheme
+                    struct ActionScheme 0x10 {
+                        struct Scheme : map {
+                            StringId64* m_key;
+                            inputCommand* m_value;
+                        }
+
+                        Scheme *m_scheme @ 0x8;
+                    };   
+                }
+
+                /*
+                    @ ScriptId: *persistent-command-list*
+                    @ TYPE: #B18C294ADE7B782B
+                    @ EntryPtr: CommandList 
+                */
+                struct CommandList 0x10 {
+                   uint64_t m_size;
+                   StringId64* m_commands;
+                };
+
+                 /*
+                    @ ScriptId: *mouse-default-settings*
+                    @ TYPE: #D6BCF8E23269E80E
+                    @ EntryPtr: MouseSettings 
+                */
+                struct MouseSettings 0x40 {
+                    uint32_t global_sensitivity;
+                    uint32_t aim_sensitivity_x;
+                    uint32_t aim_sensitivity_y;
+                    uint32_t look_sensitivity_x;
+                    uint32_t look_sensitivity_y;
+                    uint32_t snipe_sensitivity_x;
+                    uint32_t snipe_sensitivity_y;
+                    uint32_t acceleration_x;
+                    uint32_t acceleration_y;
+                    bool invert_x;
+                    bool invert_y;
+                    bool field_26;
+                    bool use_raw_input;
+                };
+
+                /*
+                    @ ScriptId: *analog-stick-icon-paths*
+                    @ TYPE: Array
+                    @ EntryPtr: AnalogStickIconPath
+                */
+                struct AnalogStickIconPath 0x18 {
+                    char* m_Path [[utf8*]];
+                    char* m_Path2 [[utf8*]];
+                    StringId64 m_hash;
+                };
+
+                /*
+                    @ ScriptId: *analog-stick-icon-paths*
+                    @ TYPE: Array
+                    @ EntryPtr: AnalogStickIconPath
+                */
+                struct actionmap {
+
+                     // @ Array
+                    struct ActionDefinition 0x18 {
+                        uint64_t field_0;
+                        uint64_t field_8;
+                        uint64_t field_10;
+                    };
+
+                    // @ #11AE032C43498287
+                    struct kActionDefinition 0x10 {
+                        uint64_t m_size;
+                        ActionDefinition* field_8;
+                    };
+
+                    // @ #78A4C32D131A03BD
+                    struct InputDefinition 0x40 {
+                        uint64_t field_0;
+                        uint64_t field_8;
+                        uint64_t field_10;
+                        uint64_t field_18;
+                        StringId64 field_20;
+                        StringId64 field_28;
+                        uint64_t field_30;
+                        StringId64 field_38;
+                    };
+
+                    // @ #AF5C458ED236456E
+                    struct ActionSet 0x18 {
+
+                        struct InputDefScheme : map {
+                            StringId64* m_key;
+                            InputDefinition* m_value;
+                        }
+
+                        InputDefScheme* m_InputDef;
+                        StringId64* field_8;
+                        kActionDefinition* field_10;
+                    };   
+                };
+
+                 /*
+                    @ ScriptId: *joypad-additional-presets*
+                    @ TYPE: array*
+                    @ EntryPtr: FixedSizeArray<Array<AdditionalPresets>>
+                */
+                struct presets {
+                    
+                    // @ #??????????????????
+                    struct Preset 0x20 { 
+                        StringId64 field_0;
+                        uint64_t field_8;
+                        uint32_t field_10;
+                        uint32_t field_14;
+                        uint16_t field_18;
+                        uint32_t field_1a;
+                    };
+
+                    // @ #6043A6D761AA41FF
+                    struct AdditionalPresets 0x38 {
+                        uint64_t field_0;
+                        StringId64 field_8;
+                        StringId64 field_10;
+                        uint64_t field_18;
+                        Preset* m_presets;
+                        uint32_t m_count;
+                        uint64_t field_30;
+                    };
+                };
             }
         }
 
@@ -1003,26 +1250,26 @@ namespace shared {
             uint64_t field_10;
             uint64_t field_18;
             uint64_t field_20;
-            uint64_t field_28;
+            StringId64 m_modulehash;
             StringId64 field_30;
-            uint64_t m_numEntries;
-            struct DC.Entry* m_Data;
+            uint32_t m_numEntries;
+            struct DC.Entry* m_Data @ 0x40;
             uint64_t field_48;
             struct DC.Header* m_header;
             uint64_t field_58;
             uint32_t field_60;
             uint32_t field_64;
             uint32_t field_68;
-            uint32_t m_UpperBound;
+            uint32_t m_size;
         };
 
         // ScriptManager::ModuleInfo::Constructor (0x141e71328)
         struct ModuleInfo 0x60 { 
              uint64_t field_0;
              uint64_t field_8;
-             char* name [[utf8*]];
+             char* m_name [[utf8*]];
              StringId64 hash;
-             uint64_t size;
+             size_t m_size;
              uint64_t m_pCollection;
              uint32_t m_pNumModules;
              uint64_t m_pUnkCollection @ 0x38;
@@ -1033,7 +1280,7 @@ namespace shared {
              bool field_5c;
              bool field_5d;
              bool field_5e;
-             bool field_5f;
+             bool m_isLoaded;
         }
 
         struct relocatableModule 0x22 {
@@ -1115,6 +1362,11 @@ namespace shared {
             uint64_t field_33a8 @ 0x33a8;
         }; // g_scriptGlobals (0x146430e70)
         
+    }
+
+    // // c:\branches\discbot??\1xfinal-pc-?.?.?\shared\src\ndlib\io
+    namespace io {
+
     }
 
     }

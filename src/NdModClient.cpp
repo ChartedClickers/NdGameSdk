@@ -1,9 +1,9 @@
-#include "NdModClient.hpp"
-
 #include <NdGameSdk/sdk.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
 #include <NdGameSdk/shared/src/ndlib/engine-components.hpp>
 #include <NdGameSdk/shared/src/common/common-game-init.hpp>
+
+#include "NdModClient.hpp"
 
 using namespace std;
 using namespace Utils;

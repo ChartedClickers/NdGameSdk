@@ -21,7 +21,7 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
 	set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 	# Create a configure-time dependency on cmake.toml to improve IDE support
-	configure_file(cmake.toml cmake.toml COPYONLY)
+	set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS cmake.toml)
 endif()
 
 # Variables
@@ -29,6 +29,7 @@ set(RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(PROJECT_TARGET ND)
 
+# vcpkg settings
 project(ND.ModClient
 	LANGUAGES
 		C
@@ -52,15 +53,22 @@ if(CMKR_ROOT_PROJECT AND NOT CMKR_DISABLE_VCPKG)
 		cmake_policy(SET CMP0135 NEW)
 	endif()
 	message(STATUS "Fetching vcpkg (https://github.com/microsoft/vcpkg/archive/a8954b904ad2a6939ecd8fc213e87702fa1243ea.tar.gz)...")
-	FetchContent_Declare(vcpkg URL "https://github.com/microsoft/vcpkg/archive/a8954b904ad2a6939ecd8fc213e87702fa1243ea.tar.gz")
-	FetchContent_GetProperties(vcpkg)
-	if(NOT vcpkg_POPULATED)
-		FetchContent_Populate(vcpkg)
-		if(CMAKE_HOST_SYSTEM_NAME STREQUAL Darwin AND CMAKE_OSX_ARCHITECTURES STREQUAL "")
-			set(CMAKE_OSX_ARCHITECTURES ${CMAKE_HOST_SYSTEM_PROCESSOR} CACHE STRING "" FORCE)
-		endif()
-		include("${vcpkg_SOURCE_DIR}/scripts/buildsystems/vcpkg.cmake")
+	FetchContent_Declare(vcpkg
+		URL
+			"https://github.com/microsoft/vcpkg/archive/a8954b904ad2a6939ecd8fc213e87702fa1243ea.tar.gz"
+		SUBBUILD_DIR
+			"CMakeFiles/vcpkg-subbuild"
+		SOURCE_DIR
+			vcpkg
+		BINARY_DIR
+			"CMakeFiles/vcpkg-build"
+	)
+	FetchContent_MakeAvailable(vcpkg)
+
+	if(CMAKE_HOST_SYSTEM_NAME STREQUAL Darwin AND CMAKE_OSX_ARCHITECTURES STREQUAL "")
+		set(CMAKE_OSX_ARCHITECTURES ${CMAKE_HOST_SYSTEM_PROCESSOR} CACHE STRING "" FORCE)
 	endif()
+	include("${vcpkg_SOURCE_DIR}/scripts/buildsystems/vcpkg.cmake")
 endif()
 
 # Packages
@@ -73,7 +81,7 @@ find_package(Boost 1.85.0 REQUIRED
 include(FetchContent)
 
 message(STATUS "Fetching simpleini (09c21bda1dc1b578fa55f4a005d79b0afd481296)...")
-FetchContent_Declare(simpleini SYSTEM
+FetchContent_Declare(simpleini
 	GIT_REPOSITORY
 		"https://github.com/brofield/simpleini"
 	GIT_TAG
@@ -82,7 +90,7 @@ FetchContent_Declare(simpleini SYSTEM
 FetchContent_MakeAvailable(simpleini)
 
 message(STATUS "Fetching safetyhook (629558c64009a7291ba6ed5cfb49187086a27a47)...")
-FetchContent_Declare(safetyhook SYSTEM
+FetchContent_Declare(safetyhook
 	GIT_REPOSITORY
 		"https://github.com/cursey/safetyhook"
 	GIT_TAG

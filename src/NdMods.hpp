@@ -2,7 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "NdMod.hpp"
+#include "NdModClient.hpp"
 #include "NdDerived.hpp"
 
 class NdMod;
@@ -10,7 +10,7 @@ class NdMod;
 class NdMods final {
 public:
 	NdMods();
-	virtual ~NdMods() {}
+	virtual ~NdMods() {};
 
 	void InitializeNdMods();
 	void SaveConfig(Utils::Config& cfg);

@@ -25,7 +25,7 @@ void NdMods::InitializeNdMods()
     }
 
     std::erase_if(m_ndmods, [](
-        const pair<std::type_index, std::shared_ptr<NdMod>>& pair) { return !pair.second->m_Initialized; });
+        const pair<std::type_index, std::shared_ptr<NdMod>>& NdMod) { return !NdMod.second->m_Initialized; });
 
 
     Utils::Config cfg{};

@@ -15,12 +15,12 @@ namespace DC {
         (ScriptId::modules, Type::module_info_array): modules::ModuleInfoArray *m_entryPtr : u64;
         /* joypad.bin */
         (_, Type::action_scheme): joypad::actionscheme::ActionScheme *m_entryPtr : u64;
-        (ScriptId::persistent_command_list, Type::command_list): joypad::CommandList *m_entryPtr : u64;
-        (ScriptId::mouse_default_settings, Type::mouse_settings): joypad::MouseSettings *m_entryPtr : u64;
+        (ScriptId::persistent_command_list, Type::command_list): joypad::PersistentCommandList *m_entryPtr : u64;
+        (ScriptId::mouse_default_settings, Type::mouse_default_settings): joypad::MouseSettings *m_entryPtr : u64;
         (ScriptId::analog_stick_icon_paths, Type::Array): FixedSizeArray<joypad::AnalogStickIconPath> *m_entryPtr : u64;
         (ScriptId::melee_override_ids, Type::Array): FixedSizeArray<StringId64> *m_entryPtr : u64;
         (ScriptId::weapon_cross_press_release_blacklist, Type::Array): FixedSizeArray<StringId64> *m_entryPtr : u64;
-        (ScriptId::action_map, Type::input_scheme): joypad::actionmap::ActionSet *m_entryPtr : u64;
+        (ScriptId::action_map, Type::action_collection): joypad::actionmap::ActionCollection *m_entryPtr : u64;
         (ScriptId::joypad_additional_presets, Type::_array): FixedSizeArray<Array<joypad::presets::AdditionalPresets>> *m_entryPtr : u64;
         /* unknown.bin */
         (_,_): u64 *m_entryPtr : u64;

@@ -29,9 +29,9 @@ namespace DC {
         symbol_array = 0xC8F749F92779D489, // @ symbol-array
         module_info_array = 0xE442DCB00300FB28, // @ module-info-array
         action_scheme = 0x9FF30B9A5C83CB5D, // @ action-scheme
-        command_list = 0xB18C294ADE7B782B, // @ B18C294ADE7B782B
-        mouse_settings = 0xD6BCF8E23269E80E, // @ D6BCF8E23269E80E
-        input_scheme = 0xAF5C458ED236456E, // @ AF5C458ED236456E
+        command_list = 0xB18C294ADE7B782B, // @ joypad-persistent-command-list
+        mouse_default_settings = 0xD6BCF8E23269E80E, // @ mouse-default-settings
+        action_collection = 0xAF5C458ED236456E, // @ action-collection
     };
 
     // @ Array

@@ -7,22 +7,22 @@ namespace DC {
    namespace joypad {
 
         /*
-        @ ScriptIds: *joypad-evade-on-release* | *joypad-adrenaline-hold-square* |#23785CAAD94AB956 | *joypad-l2-hold-x-evade* | #54975C1BD1D22399 | #69F055D6705E10A0 |
-        *joypad-r3-lock-on-toggle-evade* | *joypad-hold-for-repeat* | *joypad-sprint-square* | *joypad-adrenaline-square-x* | *joypad-cinematic* | #9F0A26F152F6F126 |
-        *joypad-swap-sticks* | #B03FEAADB8BC3F3B | #C26197132329B14A
+        @ ScriptIds: *joypad-evade-on-release* | *joypad-adrenaline-hold-square* | *joypad-bond-L4-R4-sprint-dodge-jump* | *joypad-l2-hold-x-evade* | *joypad-dmatts-test* | *joypad-bond-L4-R4-weapon-cross* |
+        *joypad-r3-lock-on-toggle-evade* | *joypad-hold-for-repeat* | *joypad-sprint-square* | *joypad-adrenaline-square-x* | *joypad-cinematic* | *joypad-bond-L4-R4-sprint-dodge-melee* |
+        *joypad-swap-sticks* | *joypad-efm-mirror* | *joypad-bond-L4-R4-sprint-crouch*
         @ TYPE: action-scheme
         @ EntryPtr: ActionScheme
         */
         namespace actionscheme {
             // @ Array
             struct inputKeyboard {
-                u64 m_flag; // used if inputCommand.field_80 == true
+                u64 m_flag; // used if ActionCommand.field_80 == true
                 u64 m_keycode;
             };
 
             // @ Array
             struct inputJoypad {
-                u64 m_flag; // used if inputCommand.field_80 == true
+                u64 m_flag; // used if ActionCommand.field_80 == true
                 u64 m_iBtn;
             };
 
@@ -45,48 +45,48 @@ namespace DC {
                 StringId64 *m_pArray[m_numInputs] : StringId64;
             };
 
-            // @ #793D1D63A0498239
-            struct inputKeyboardScheme {
+            // @ action-keyboard-button-list
+            struct ActionKeyboardButtonList {
                 u64 m_count;
                 inputKeyboard *m_scheme[m_count] : u64;
             };
 
-            // @ #674A8555C679C8ED
-            struct inputJoypadScheme {
+            // @ action-button-list
+            struct ActionButtonList {
                 u64 m_count;
                 inputJoypad *m_scheme[m_count] : u64;
             };
 
-            // @ #66D642190729CBE3
-            struct inputMouseScheme {
+            // @ action-mouse-button-list
+            struct ActionMouseButtonList {
                 u64 m_count; // always 2?
 
                 if(m_count == 2) {
                     inputMouse *m_scheme : u64;
                 } else {
-                    std::warning("Undefinded inputMouseScheme: {}", addressof(this));
+                    std::warning("Undefinded ActionMouseButtonList: {}", addressof(this));
                     u64 *m_scheme : u64;
                 }
 
             };
 
-            // @ #5688596AABA88521
-            struct inputScheme {
+            // @ action-input-list
+            struct ActionInputList {
                 u64 m_count;
                 Input *m_scheme[m_count] : u64;
             };
 
-            // @ #FD17AE86396612F7
-            struct inputCommand {
-                NullablePtr<inputJoypadScheme> m_Joypadinputs;
-                NullablePtr<inputKeyboardScheme> m_Keyboardinputs;
-                NullablePtr<inputKeyboardScheme> inputKeyboardButtons; // always nullptr in raw module
-                NullablePtr<inputMouseScheme> m_Mouseinputs;
-                NullablePtr<inputMouseScheme> inputMouseButtons; // always nullptr in raw module
+            // @ action-command
+            struct ActionCommand {
+                NullablePtr<ActionButtonList> m_Joypadinputs;
+                NullablePtr<ActionKeyboardButtonList> m_Keyboardinputs;
+                NullablePtr<ActionKeyboardButtonList> inputKeyboardButtons; // always nullptr in raw module
+                NullablePtr<ActionMouseButtonList> m_Mouseinputs;
+                NullablePtr<ActionMouseButtonList> inputMouseButtons; // always nullptr in raw module
                 bool field_28;
                 padding[0x7];
-                NullablePtr<inputScheme> m_inputs; // Common for inputKeyboardButtons & inputMouseButtons & m_inputButtons?
-                NullablePtr<inputJoypadScheme> m_inputButtons; // always nullptr in raw module
+                NullablePtr<ActionInputList> m_inputs; // Common for inputKeyboardButtons & inputMouseButtons & m_inputButtons?
+                NullablePtr<ActionButtonList> m_inputButtons; // always nullptr in raw module
                 u32 field_40;
                 u32 field_44;
                 u64 field_48; // always 000000003DCCCCCD?
@@ -105,23 +105,23 @@ namespace DC {
             // @ action-scheme
             struct ActionScheme {
                 padding[0x8]; // Not used but a pointer must be specified
-                map<StringId64,Array<inputCommand>> *m_scheme : u64;
+                map<StringId64,Array<ActionCommand>> *m_scheme : u64;
             };
         }
 
         /*
         @ ScriptId: *persistent-command-list*
-        @ TYPE: #B18C294ADE7B782B
-        @ EntryPtr: CommandList
+        @ TYPE: #joypad-persistent-command-list
+        @ EntryPtr: PersistentCommandList
         */
-        struct CommandList {
+        struct PersistentCommandList {
            u64 m_size;
            StringId64 *m_commands[m_size] : StringId64;
         };
 
         /*
         @ ScriptId: *mouse-default-settings*
-        @ TYPE: #D6BCF8E23269E80E
+        @ TYPE: mouse-default-settings
         @ EntryPtr: MouseSettings
         */
         struct MouseSettings {
@@ -154,8 +154,8 @@ namespace DC {
 
         /*
         @ ScriptId: *action-map*
-        @ TYPE: #AF5C458ED236456E
-        @ EntryPtr: ActionSet
+        @ TYPE: action-collection
+        @ EntryPtr: ActionCollection
         */
         namespace actionmap {
 
@@ -166,13 +166,13 @@ namespace DC {
                 u64 field_10;
             };
 
-            // @ #11AE032C43498287
-            struct kActionDefinition {
+            // @ action-sets
+            struct ActionCollections {
                 u64 m_size;
                 ActionDefinition *field_8[m_size] : u64;
             };
 
-            // @ #78A4C32D131A03BD
+            // @ action-def
             struct InputDefinition {
                 u64 field_0;
                 u64 field_8;
@@ -184,11 +184,11 @@ namespace DC {
                 StringId64 field_38;
             };
 
-            // @ #AF5C458ED236456E
-            struct ActionSet {
+            // @ action-collection
+            struct ActionCollection {
                 map<StringId64,Array<InputDefinition>> *m_InputDef: u64;
                 StringId64 *field_8[m_InputDef.m_size] : StringId64;
-                kActionDefinition *field_10: u64;
+                ActionCollections *field_10: u64;
             };
         }
 
@@ -210,7 +210,7 @@ namespace DC {
                 padding[2];
             };
 
-            // @ #6043A6D761AA41FF
+            // @ action-scheme-preset
             struct AdditionalPresets {
                 u64 field_0;
                 StringId64 field_8;

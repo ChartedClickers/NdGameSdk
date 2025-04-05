@@ -8,7 +8,8 @@ namespace NdGameSdk::Patterns
 	static inline const SdkPattern EngineComponents_s_table = { L"48 89 74 24 20 41 54 41 56 41 57 48 83 EC 30 8B F1 45 8B F8 4C 8D 25 ?? ?? ?? ?? 4C 8B F2 48 85 D2 0F 84 ?? ?? ?? ??", +0x14 };
 	static inline const SdkPattern EngineComponents_s_ndConfig = { L"48 8D 0D ?? ?? ?? ?? B8 04 00 00 00 48 8D 89 80 00 00 00 C5 F8 10 03 48 8D 9B 80 00 00 00 C5 F8 11 41 80 C5 F8 10 4B 90 C5 F8 11 49 90 C5 F8 10 43 A0 C5 F8 11 41 A0 C5 F8 10 4B B0 C5 F8 11 49 B0 C5 F8 10 43 C0 C5 F8 11 41 C0 C5 F8 10 4B D0 C5 F8 11 49" };
 
-	static inline const SdkPattern GameInit_ReturnHook = { L"33 C0 C6 05 ?? ?? ?? ?? 01 89 03 48 89 43 08 48 8B C3 48 83 C4 30 5B C3", +0x12 };
+	static inline const SdkPattern GameInit_ReturnHook = { L"40 53 48 83 EC 30 48 8B D9 48 8D 4C 24 20 E8 ?? ?? ?? ?? 8B 10 85 D2 7E 11 C5 F8 10 00 C5 F8 11 03 48 8B C3 48 83 C4 30 5B C3", +0x13 };
+	static inline const SdkPattern NIXXES_StdHandle = { L"40 53 48 83 EC 20 48 8B 01 48 8B D9 FF 50 20 48 8B 03 48 8B CB FF 50 30 48 8B C8 48 8D 15 ?? ?? ?? ?? E8 ?? ?? ?? ??" };
 
 #endif
 

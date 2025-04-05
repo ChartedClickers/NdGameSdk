@@ -62,6 +62,16 @@ namespace NdGameSdk::common {
 
 				}, wstr(Patterns::GameInit_ReturnHook), wstr(GameInitJMP));
 
+	#if defined(T2R)
+			findpattern = Patterns::NIXXES_StdHandle;
+			m_NxAppHooks.m_StdHandleHook = Utility::WritePatchPattern_Hook(module, findpattern.pattern, wstr(Patterns::NIXXES_StdHandle),
+				findpattern.offset, (void*)NxAppHooks_StdHandle_CC);
+
+			if (!m_NxAppHooks.m_StdHandleHook) {
+				spdlog::warn("Failed to patch {:s}! Logs may not work!", TOSTRING(Patterns::NIXXES_StdHandle));
+			}
+
+	#endif
 
 	#if defined(T1X)
 			m_PrimServer = ISdkComponent::GetSharedComponents()->GetComponent<PrimServerComponent>();

@@ -68,7 +68,7 @@ namespace regenny {
                     NameCache = 0x7, // m_pNameCache
                     BUILD_NUMBER = 0x1e,
                     GameTitle = 0x20
-                }; // (nd-config.hpp)
+                }; // nd-config.hpp
             }
 
             struct NdGameInfo 0x4660 {

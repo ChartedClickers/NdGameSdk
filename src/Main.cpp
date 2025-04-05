@@ -46,13 +46,14 @@ BOOL Initialize(HMODULE dllModule) {
     // will use values from Config ini.
     SdkConfig pSdkCfg{};
     pSdkCfg.Sidbase = true;
-
-    pSdkCfg.Memory.DebugMemory = true;
     
     pSdkCfg.NdDevMenu.GameDebugMenu = true;
-    pSdkCfg.NdDevMenu.ExtendedDebugMenu = true;
 
+#if defined(T1X)
+    pSdkCfg.Memory.DebugMemory = true;
+    pSdkCfg.NdDevMenu.ExtendedDebugMenu = true;
     pSdkCfg.PrimServer.PrimServerCreate = true;
+#endif
 
     NdGameSdk::InitializeSdk(&pSdkCfg);
     NdGameSdk::RegisterSdkModule(g_ndmodclient.get());

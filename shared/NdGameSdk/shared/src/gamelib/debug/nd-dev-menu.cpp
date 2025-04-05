@@ -1,3 +1,4 @@
+#if defined(T1X)
 #include "nd-dev-menu.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
@@ -459,3 +460,4 @@ namespace NdGameSdk::gamelib::debug {
 		});
 	}
 }
+#endif

@@ -2,6 +2,9 @@
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/components/SdkRegenny.hpp"
 
+#if defined(T1X)
+
+
 #include <Utility/cmacros/for_each.hpp>
 #include <Utility/color.hpp>
 #include <boost/function.hpp>
@@ -195,3 +198,4 @@ namespace NdGameSdk::ndlib::debug {
 	static_assert(sizeof(DMENU::ItemSelection) == sizeof(DMENU::Item) + 0x30, "Size of DMENU::ItemSelection is not correct.");
 
 }
+#endif

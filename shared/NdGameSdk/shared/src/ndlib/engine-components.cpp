@@ -43,6 +43,7 @@ namespace NdGameSdk::ndlib {
 		return *GetEngineComponent<ndlib::NdGameInfo>(EngineComponent::NdGameInfo);
 	}
 
+#if defined(T1X)
 	game::FrameState& EngineComponents::GetFrameState() {
 		return *GetEngineComponent<game::FrameState>(EngineComponent::NdFrameState);
 	}
@@ -50,4 +51,5 @@ namespace NdGameSdk::ndlib {
 	ndlib::NdFrameState& EngineComponents::GetNdFrameState() {
 		return *GetEngineComponent<ndlib::NdFrameState>(EngineComponent::NdFrameState);
 	}
+#endif
 }

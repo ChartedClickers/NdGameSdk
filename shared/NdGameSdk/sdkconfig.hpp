@@ -6,9 +6,8 @@
 
 #if defined(T1X)
 #include "config/PrimServerCfg.hpp"
-#endif
-
 using namespace NdGameSdk::config;
+#endif
 
 namespace NdGameSdk {
 
@@ -17,10 +16,10 @@ namespace NdGameSdk {
         bool Sidbase{};
         std::string SidbasePath{ "sidbase.bin" };
 
-        MemoryCfg Memory{};
         NdDevMenuCfg NdDevMenu{};
 
     #if defined(T1X)
+        MemoryCfg Memory{};
         PrimServerCfg PrimServer{};
     #endif
 

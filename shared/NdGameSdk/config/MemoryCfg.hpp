@@ -1,5 +1,6 @@
 #pragma once
 
+#if defined(T1X)
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/shared/src/corelib/memory/memory-map.hpp"
 
@@ -20,3 +21,4 @@ namespace NdGameSdk::config {
         std::unordered_map<MemoryMapId, MemSize> ModifiedMapEntries;
     };
 }
+#endif

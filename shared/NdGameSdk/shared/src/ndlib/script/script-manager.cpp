@@ -1,6 +1,9 @@
 #include "script-manager.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
+#if defined(T1X)
+
+
 #include <NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp>
 
 using namespace NdGameSdk::gamelib::debug;
@@ -66,3 +69,4 @@ namespace NdGameSdk::ndlib::script {
 	}
 
 }
+#endif

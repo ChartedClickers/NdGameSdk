@@ -1,3 +1,4 @@
+#if defined(T1X)
 #include "memory.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
@@ -334,3 +335,4 @@ namespace NdGameSdk::corelib::memory {
 		}
 	}
 }
+#endif

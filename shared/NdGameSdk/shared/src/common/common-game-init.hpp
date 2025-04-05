@@ -7,8 +7,10 @@
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
 #include <NdGameSdk/shared/src/ndlib/render/util/prim.hpp>
 
+#if defined(T1X)
 using namespace NdGameSdk::corelib::memory;
 using namespace NdGameSdk::ndlib::render::util;
+#endif
 
 namespace NdGameSdk::common {
 
@@ -29,9 +31,9 @@ namespace NdGameSdk::common {
 		bool m_GameInitialized;
 
 		MidHook m_GameInitHook{};
-		shared_ptr<Memory> m_Memory;
 
 #if defined(T1X)
+		shared_ptr<Memory> m_Memory;
 		MidHook m_PrimServer_CreateHook{};
 		shared_ptr<PrimServerComponent> m_PrimServer;
 #endif

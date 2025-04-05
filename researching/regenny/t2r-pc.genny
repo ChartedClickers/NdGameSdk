@@ -1,0 +1,123 @@
+#include <cstdint>
+#include <NdGameSdk/sdkstringid.hpp>
+
+type int 4 [[i32]]
+type uint64_t 8 [[u64]]
+type uintptr_t 8 [[u64]]
+type uint32_t 4 [[u32]]
+type size_t 8 [[u32]]
+type uint16_t 2 [[u16]]
+type uint8_t 1 [[u8]]
+type bool 1 [[bool]]
+type void 0
+type char 1
+type float 4 [[f32]]
+type double 8
+type StringId64 8 [[u64]]
+
+namespace regenny {
+
+    // c:\branches\discbot??\t2r-pc-?.?.?\shared\src
+    namespace shared {
+        
+        // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib
+        namespace corelib {
+            
+            // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib\memory
+            namespace memory {
+                
+            }
+        }
+
+        // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib
+        namespace ndlib {
+
+            struct EngineComponents {
+                enum Component : uint32_t {
+                    NdGameInfo = 0x0,
+                    NdFrameState = 0x1,
+                    PhotoModeManager = 0x2,
+                    FileSystem = 0x3,
+                    PackageMgr = 0x4,
+                    PrefetchMgr = 0x5,
+                    LevelMgr = 0x6,
+                    LevelStreamingMgr = 0x7,
+                    NdMessageManager = 0x8,
+                    PSNTelemetry = 0xA,
+                    AudioManager = 0xB,
+                    NdDialogManager = 0xE,
+                    NavMeshMgr = 0xF,
+                    musicManager = 0xd,
+                    NpcManager = 0x10,
+                    AnimMgr = 0x11,
+                    FgDrawMgr = 0x12,
+                    ProcessMgr = 0x13,
+                    ScriptManager = 0x14,
+                    AnimStreamManager = 0x15,
+                    Gui2 = 0x17,
+                    TextureMgrPub = 0x18,
+                    ParticleDebug = 0x1D
+                }; // engine-components.hpp
+            }
+
+            struct NdConfig {
+                enum Config : uint32_t {
+                    NetInfo = 0x0, // m_pNetInfo
+                    DMENU = 0x1,
+                    NdDevMenu = 0x2,
+                    NameCache = 0x7, // m_pNameCache
+                    BUILD_NUMBER = 0x1e,
+                    GameTitle = 0x20
+                }; // (nd-config.hpp)
+            }
+
+            struct NdGameInfo 0x4660 {
+                void* vftable;
+                uint64_t m_internalname @ 0x118 [[utf8*]];
+                StringId64 m_gametitlehash @ 0x120;
+                char m_buidtype[0x128] @ 0x128 [[utf8*]]; // IDK
+                char m_SavePath[0x400] @ 0x548 [[utf8*]];
+                char m_GamePath[0x400] [[utf8*]]; 
+                char m_GamePath_unk[0x400] [[utf8*]]; 
+                char m_NetUserPath[0x400] [[utf8*]]; 
+                char m_NetPath[0x400] [[utf8*]]; 
+                char m_GameDataPath[0x400] [[utf8*]]; 
+                char m_GameDataPath_unk[0x400] [[utf8*]]; 
+                char m_BinPath[0x400] [[utf8*]]; 
+                char m_BinPath_unk[0x400] [[utf8*]];
+                char m_BranchName[0x40] [[utf8*]]; 
+                char m_SrcPath[0x400] [[utf8*]]; 
+                char m_DbPath[0x400] [[utf8*]]; 
+                char m_GamePath_unk2[0x400] [[utf8*]];
+                char m_CfgPath[0x80] @ 0x3d8a [[utf8*]];
+                char m_CfgDefaultsPath[0x80] [[utf8*]];
+                bool m_AssetView @ 0x3f11 [[bool*]];
+                bool m_DevConfig @ 0x3f12 [[bool*]];
+                bool m_onDisc [[bool*]];
+                bool m_onDiscUseManifest [[bool*]];
+                bool m_IsMultiplayer @ 0x3f3c [[bool*]];
+                bool m_DevMode @ 0x3f50 [[bool*]];
+                char m_DiscUser[0x18] @ 0x4030 [[utf8*]];
+                StringId64 AudioStringId @ 0x41B0;
+                char m_GameStudio[0x40] @ 0x44E3 [[utf8*]];
+                uint64_t Unk_4658 @ 0x4658;
+            }
+        }
+        
+    }
+
+    // c:\branches\discbot??\t2r-pc-?.?.?\t2r\src
+    namespace ndgame {
+        
+        // c:\branches\discbot??\t2r-pc-?.?.?\t2r\src\game
+        namespace game {
+
+            struct GameInfo : shared.ndlib.NdGameInfo 0x570 {
+                bool m_enableNpTrophies +0x148  [[bool*]];
+                uint64_t Unk_4BC8 @ 0x4BC8;
+            }
+        }
+        
+    }
+
+}

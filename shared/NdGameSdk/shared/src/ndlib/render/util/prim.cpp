@@ -1,3 +1,6 @@
+#if defined(T1X)
+
+
 #include "prim.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
@@ -95,3 +98,4 @@ namespace NdGameSdk::ndlib::render::util {
 		});
 	}
 }
+#endif

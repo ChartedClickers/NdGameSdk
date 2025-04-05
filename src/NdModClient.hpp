@@ -8,7 +8,10 @@
 
 #include <NdGameSdk/shared/src/common/common-game-init.hpp>
 #include <NdGameSdk/shared/src/ndlib/engine-components.hpp>
+
+#if defined(T1X)
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
+#endif
 
 #include "Utils/config.hpp"
 #include "Utils/logger.hpp"
@@ -32,9 +35,11 @@ public:
 private:
 
 	void OnModuleRegistered() override;
-	void OnMemoryMapped(corelib::memory::Memory* Memory) override;
 	void OnGameInitialized(bool status) override;
+	#if defined(T1X)
+	void OnMemoryMapped(corelib::memory::Memory* Memory) override;
 	void OnAppendSdkDevMenu(gamelib::debug::NdDevMenu* NdDevMenu, gamelib::debug::NdDevMenu::AppendSdkSubMenusCallback AppendSdkDevMenu) override;
+	#endif
 
 	bool m_initialized{false};
 	std::atomic<bool> m_ndmods_initialized{ false };

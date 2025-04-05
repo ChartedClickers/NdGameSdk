@@ -2,6 +2,7 @@
 
 namespace NdGameSdk::ndlib {
 
+#if defined(T1X)
 	ndlib::debug::DMENU& NdConfig::GetDmenu() {
 		return *GetConfig<ndlib::debug::DMENU>(Config::DMENU);
 	}
@@ -9,4 +10,5 @@ namespace NdGameSdk::ndlib {
 	ndlib::debug::DMENU::MenuGroup& NdConfig::GetNdDevMenu() {
 		return *GetConfig<ndlib::debug::DMENU::MenuGroup>(Config::NdDevMenu);
 	}
+#endif
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#if defined(T1X)
 #include "NdGameSdk/sdk.hpp"
 
 #include <Windows.h>
@@ -27,3 +28,4 @@ namespace NdGameSdk::gamelib::render::particle
 		};
 	}
 }
+#endif

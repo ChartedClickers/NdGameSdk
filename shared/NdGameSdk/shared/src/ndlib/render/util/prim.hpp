@@ -1,5 +1,8 @@
 #pragma once
 
+#if defined(T1X)
+
+
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/config/PrimServerCfg.hpp"
 #include "NdGameSdk/components/SdkComponent.hpp"
@@ -58,3 +61,4 @@ namespace NdGameSdk::ndlib::render::util {
 	static_assert(sizeof(PrimServer) == 0x1370, "Size of PrimServer is not correct.");
 	static_assert(sizeof(PrimServer::InitParams) == 0x4c, "Size of PrimServer::InitParams is not correct.");
 }
+#endif

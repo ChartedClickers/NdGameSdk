@@ -3,6 +3,8 @@
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/components/SdkComponent.hpp"
 
+#if defined(T1X)
+
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
 #include <NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp>
 
@@ -31,3 +33,4 @@ namespace NdGameSdk::gamelib::render::particle {
 	};
 
 }
+#endif

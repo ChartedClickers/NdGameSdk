@@ -6,11 +6,16 @@
 #include "shared/shared.hpp"
 #if defined(T1X)
 #include "ndgame/t1x/ndgame.hpp"
+#elif defined(T2R)
+#include "ndgame/t2r/ndgame.hpp"
 #endif
 
 #include "shared/src/common/common-game-init.hpp"
+
+#if defined(T1X)
 #include "shared/src/corelib/memory/memory.hpp"
 #include "shared/src/gamelib/debug/nd-dev-menu.hpp"
+#endif
 
 #include <windows.h>
 #include <unordered_map>
@@ -28,9 +33,12 @@ namespace NdGameSdk {
         auto sdklogger = SdkLogger::GetLogger();
         auto sdkcfg = cfg ? std::move(*cfg) : SdkConfig{};
 
+
+        #if defined(T1X)
         if (sdkcfg.NdDevMenu.ExtendedDebugMenu) {
             sdkcfg.Memory.DebugMemory = true;
         }
+        #endif
 
         set_default_logger(sdklogger);
 
@@ -65,12 +73,15 @@ namespace NdGameSdk {
         
         // Registering main sdk events
         auto SharedComponents = ISdkComponent::GetSharedComponents();
+
+        #if defined(T1X)
         ISdkComponent::SubscribeSdkEvent<corelib::memory::Memory>(
             SharedComponents,
             &corelib::memory::Memory::e_MemoryMapMapped,
             &ISdkModule::OnMemoryMapped,
             SdkModule
         );
+        #endif
 
         ISdkComponent::SubscribeSdkEvent<common::CommonGame>(
             SharedComponents,
@@ -79,12 +90,14 @@ namespace NdGameSdk {
             SdkModule
         );
 
+        #if defined(T1X)
         ISdkComponent::SubscribeSdkEvent<gamelib::debug::NdDevMenu>(
             SharedComponents,
             &gamelib::debug::NdDevMenu::e_AppendSdkMenu,
             &ISdkModule::OnAppendSdkDevMenu,
             SdkModule
         );
+        #endif
 
         SdkModule->e_OnUnregister.Subscribe(UnregisterSdkModule);
 
@@ -118,12 +131,15 @@ namespace NdGameSdk {
 
         // Unregistering main sdk events
         auto SharedComponents = ISdkComponent::GetSharedComponents();
+
+        #if defined(T1X)
         ISdkComponent::UnsubscribeSdkEvent<corelib::memory::Memory>(
             SharedComponents,
             &corelib::memory::Memory::e_MemoryMapMapped,
             &ISdkModule::OnMemoryMapped,
             SdkModule
         );
+        #endif
 
         ISdkComponent::UnsubscribeSdkEvent<common::CommonGame>(
             SharedComponents,
@@ -132,12 +148,14 @@ namespace NdGameSdk {
             SdkModule
         );
 
+        #if defined(T1X)
         ISdkComponent::UnsubscribeSdkEvent<gamelib::debug::NdDevMenu>(
             SharedComponents,
             &gamelib::debug::NdDevMenu::e_AppendSdkMenu,
             &ISdkModule::OnAppendSdkDevMenu,
             SdkModule
         );
+        #endif
 
         SdkModule->e_OnUnregister.Unsubscribe(UnregisterSdkModule);
 

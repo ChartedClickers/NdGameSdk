@@ -1,3 +1,4 @@
+#if defined(T1X)
 #include "particle.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
@@ -118,3 +119,4 @@ namespace NdGameSdk::gamelib::render::particle {
 		}
 	}
 }
+#endif

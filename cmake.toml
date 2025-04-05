@@ -25,7 +25,7 @@ sources = ["dependencies/external/spdlog/src/*.cpp"]
 include-directories = ["dependencies/external/spdlog/include"]
 compile-definitions = ["SPDLOG_COMPILED_LIB", "SPDLOG_WCHAR_TO_UTF8_SUPPORT"]  
 alias = "spdlog::spdlog"
-
+ 
 #https://github.com/g-truc/glm
 [target.glm_static]
 type = "static" 
@@ -90,6 +90,14 @@ RUNTIME_OUTPUT_DIRECTORY = "${RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
 LIBRARY_OUTPUT_DIRECTORY = "${LIBRARY_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
 ARCHIVE_OUTPUT_DIRECTORY = "${LIBRARY_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
 #PUBLIC_HEADER = "TODO"
+
+[template.ModClient.properties]
+OUTPUT_NAME = "${PROJECT_TARGET}.ModClient"
+SUFFIX = ".asi"
+RUNTIME_OUTPUT_DIRECTORY = "${RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
+LIBRARY_OUTPUT_DIRECTORY = "${LIBRARY_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
+ARCHIVE_OUTPUT_DIRECTORY = "${LIBRARY_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
+CXX_MODULE_STD = true
   
 [template.ModClient]
 type = "shared"  
@@ -112,14 +120,6 @@ private-link-libraries = [
 # https://github.com/build-cpp/cmkr/blob/45e346b4a3cc10619fd8b5c0c6e773f3c6f04a7b/src/cmake_generator.cpp#L1328
 cmake-before="""
 """
-
-[template.ModClient.properties]
-OUTPUT_NAME = "${PROJECT_TARGET}.ModClient"
-SUFFIX = ".asi"
-RUNTIME_OUTPUT_DIRECTORY = "${RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
-LIBRARY_OUTPUT_DIRECTORY = "${LIBRARY_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
-ARCHIVE_OUTPUT_DIRECTORY = "${LIBRARY_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
-CXX_MODULE_STD = true
 
 [template.ModModule]
 type = "shared"  
@@ -180,7 +180,27 @@ set(PROJECT_TARGET "T1X")
 [target.T1X]
 type = "ModClient"
 
-[target.testmodule]
-type = "ModModule"
-sources = ["modmodules/testmodule/*.cpp", "modmodules/testmodule/**.c"]
-headers = ["modmodules/testmodule/*.hpp", "modmodules/testmodule/**.h"]
+[target.T2RSDK]  
+type = "NdGameSdk"
+compile-definitions = ["T2R"]
+sources = [
+"shared/NdGameSdk/ndgame/t2r/**.cpp",
+"shared/NdGameSdk/ndgame/t2r/**.c"
+] 
+headers = [
+"shared/NdGameSdk/ndgame/t2r/**.hpp", 
+"shared/NdGameSdk/ndgame/t2r/**.h",
+"shared/NdGameSdk/regenny/t2r/**.hpp",  
+"shared/NdGameSdk/regenny/t2r/**.h"
+] 
+cmake-before=""" 
+set(PROJECT_TARGET "T2R") 
+"""
+
+[target.T2R]
+type = "ModClient"
+
+#[target.testmodule]
+#type = "ModModule"
+#sources = ["modmodules/testmodule/*.cpp", "modmodules/testmodule/**.c"]
+#headers = ["modmodules/testmodule/*.hpp", "modmodules/testmodule/**.h"]

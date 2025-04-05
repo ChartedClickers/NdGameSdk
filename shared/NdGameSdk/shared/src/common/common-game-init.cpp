@@ -15,7 +15,9 @@ namespace NdGameSdk::common {
 
 	void CommonGame::Awake() {
 		auto SharedComponents = ISdkComponent::GetSharedComponents();
+	#if defined(T1X)
 		m_Memory = SharedComponents->GetComponent<Memory>();
+	#endif
 	}
 
 	void CommonGame::Initialize() {
@@ -25,6 +27,7 @@ namespace NdGameSdk::common {
 			
 			spdlog::info("Initializing {} patterns...", GetName());
 
+			#if defined(T1X)
 			auto MissingDependencies = CheckSdkComponents
 				<Memory>({ m_Memory.get() });
 
@@ -33,6 +36,7 @@ namespace NdGameSdk::common {
 				{ std::format("Missing necessary dependencies: {:s}", MissingDependencies.value()),
 					SdkComponentEx::ErrorCode::DependenciesFailed, true };
 			}
+			#endif
 
 			auto module = Utility::memory::get_executable();
 

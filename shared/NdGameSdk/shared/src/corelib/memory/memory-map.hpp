@@ -2,6 +2,7 @@
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/components/SdkRegenny.hpp"
 
+#if defined(T1X)
 #include <map>
 
 #if defined(T1X)
@@ -102,3 +103,4 @@ namespace NdGameSdk::corelib::memory
 		std::map<MemoryMapId, MemoryMapEntry*> s_OffsiteMap{};
 	};
 }
+#endif

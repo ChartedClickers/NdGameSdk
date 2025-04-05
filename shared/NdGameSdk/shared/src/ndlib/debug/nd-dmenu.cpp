@@ -1,3 +1,5 @@
+#if defined(T1X)
+
 #include "nd-dmenu.hpp"
 
 namespace NdGameSdk::ndlib::debug {
@@ -114,3 +116,4 @@ namespace NdGameSdk::ndlib::debug {
 	}
 
 }
+#endif

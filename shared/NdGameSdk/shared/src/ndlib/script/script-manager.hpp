@@ -3,6 +3,8 @@
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/components/SdkComponent.hpp"
 
+#if defined(T1X)
+
 #include <NdGameSdk/shared/src/ndlib/debug/nd-dmenu.hpp>
 
 #include <Utility/helper.hpp>
@@ -34,3 +36,5 @@ namespace NdGameSdk::ndlib::script {
 	class NdGameSdk_API ScriptManagerGlobals : public ISdkRegenny<regenny::shared::ndlib::script::ScriptManagerGlobals> {};
 	static_assert(sizeof(ScriptManagerGlobals) == 0x33b0, "Size of ScriptManagerGlobals is not correct.");
 }
+
+#endif

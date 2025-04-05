@@ -1,4 +1,5 @@
 #pragma once
+#if defined(T1X)
 #include "particle-debug.hpp"
 
 namespace NdGameSdk::gamelib::render::particle
@@ -16,3 +17,4 @@ namespace NdGameSdk::gamelib::render::particle
 		}
 	}
 }
+#endif

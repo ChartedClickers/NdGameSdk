@@ -13,17 +13,20 @@ namespace NdGameSdk {
 	void InitSharedComponents(SdkConfig& cfg)
 	{
 		auto SharedComponents = ISdkComponent::GetSharedComponents();
-		auto MemComponent = SharedComponents->AddComponent<corelib::memory::Memory>(cfg.Memory);
-
-		SharedComponents->AddComponent<ndlib::EngineComponents>();
-		SharedComponents->AddComponent<ndlib::script::ScriptManager>();
 #if defined(T1X)
+		auto MemComponent = SharedComponents->AddComponent<corelib::memory::Memory>(cfg.Memory);
+#endif
+		SharedComponents->AddComponent<ndlib::EngineComponents>();
+
+#if defined(T1X)
+		SharedComponents->AddComponent<ndlib::script::ScriptManager>();
 		SharedComponents->AddComponent<ndlib::render::util::PrimServerComponent>(cfg.PrimServer);
 		auto ParticleMgr = SharedComponents->AddComponent<gamelib::render::particle::ParticleManager>();
 #endif
 		SharedComponents->AddComponent<common::CommonGame>();
+#if defined(T1X)
 		auto DmenuComponent = SharedComponents->AddComponent<gamelib::debug::NdDevMenu>(cfg.NdDevMenu);
-
+#endif
 		SharedComponents->InitializeSdkComponents();
 
 #if defined(T1X)

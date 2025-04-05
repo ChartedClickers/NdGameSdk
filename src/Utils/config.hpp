@@ -13,6 +13,8 @@
 
 #if defined(T1X)
 #define GAME_MODULE_NAME "tlou-i.exe"
+#elif defined(T2R)
+#define GAME_MODULE_NAME "tlou-ii.exe"
 #endif
 
 namespace Utils {

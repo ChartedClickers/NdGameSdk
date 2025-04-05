@@ -92,7 +92,7 @@ namespace DC {
                 u64 field_48; // always 000000003DCCCCCD?
                 StringId64 m_InputHash; // Example: *gesture-tap-left-stick-up-wide* (Manually allocated in the game)
                 u64 field_58;
-                NullablePtr<InputCollection>  m_InputCollection; // i guess
+                NullablePtr<InputCollection> m_InputCollection; // i guess
                 u64 field_68;
                 bool field_70; // something for field_68
                 padding[0xf];

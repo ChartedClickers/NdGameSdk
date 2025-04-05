@@ -2,6 +2,8 @@
 
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/components/SdkComponent.hpp"
+
+#if defined(T1X)
 #include "NdGameSdk/config/DevModeCfg.hpp"
 
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
@@ -110,3 +112,4 @@ namespace NdGameSdk::gamelib::debug {
 	};
 
 }
+#endif

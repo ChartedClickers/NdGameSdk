@@ -63,16 +63,21 @@ void NdModClient::OnModuleRegistered() {
 	m_CommonGame = GetSharedSdkComponent<common::CommonGame>().get();
 }
 
-void NdModClient::OnMemoryMapped(corelib::memory::Memory* Memory) {
-	spdlog::info("MemoryMapped!");
-}
-
 void NdModClient::OnGameInitialized(bool status) {
 	spdlog::info("GAME initialized!");
-	spdlog::info("BUILD: {}", m_EngineComponents->GetGameInfo()->m_BranchName);
 
-	auto user = m_EngineComponents->GetGameInfo()->m_DiscUser;
-	strcpy(user, "ALEXA DESPACITO");
+	auto& gameconfig = m_EngineComponents->GetGameInfo();
+
+	spdlog::info("BUILD: {}", gameconfig->m_BranchName);
+	gameconfig->m_DevMode = true;
+
+	auto user = gameconfig->m_DiscUser;
+	strcpy(user, "NdGameSdk");
+}
+
+#if defined(T1X)
+void NdModClient::OnMemoryMapped(corelib::memory::Memory* Memory) {
+	spdlog::info("MemoryMapped!");
 }
 
 void NdModClient::OnAppendSdkDevMenu(gamelib::debug::NdDevMenu* NdDevMenu, 
@@ -87,3 +92,4 @@ void NdModClient::OnAppendSdkDevMenu(gamelib::debug::NdDevMenu* NdDevMenu,
 	// I am not sure that this is a good implementation. I will be considered to change this.
 	AppendSdkDevMenu(NdModClientMenu,"Test menu", NULL, NULL);
 }
+#endif

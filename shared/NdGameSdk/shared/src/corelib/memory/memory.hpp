@@ -1,5 +1,6 @@
 #pragma once
 
+#if defined(T1X)
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/config/MemoryCfg.hpp"
 #include "NdGameSdk/components/SdkComponent.hpp"
@@ -69,3 +70,4 @@ namespace NdGameSdk::corelib::memory
 		MEMBER_FUNCTION_PTR(Allocator*, Memory_GetAllocator, MemoryContextType* memory_context);
 	};
 }
+#endif

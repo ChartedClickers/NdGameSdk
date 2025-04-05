@@ -409,43 +409,178 @@ set_target_properties(T1X PROPERTIES
 		ON
 )
 
-# Target: testmodule
-set(CMKR_TARGET testmodule)
-set(testmodule_SOURCES
+# Target: T2RSDK
+set(CMKR_TARGET T2RSDK)
+ 
+set(PROJECT_TARGET "T2R") 
+
+set(T2RSDK_SOURCES
 	cmake.toml
-	"modmodules/testmodule/Main.cpp"
-	"modmodules/testmodule/NdTestModule.cpp"
-	"modmodules/testmodule/NdTestModule.hpp"
-	"modmodules/testmodule/config.hpp"
+	"shared/NdGameSdk/components/SdkComponent.cpp"
+	"shared/NdGameSdk/components/SdkComponent.hpp"
+	"shared/NdGameSdk/components/SdkModule.cpp"
+	"shared/NdGameSdk/components/SdkModule.hpp"
+	"shared/NdGameSdk/components/SdkRegenny.hpp"
+	"shared/NdGameSdk/components/event/SdkAction.hpp"
+	"shared/NdGameSdk/components/event/SdkEvent.hpp"
+	"shared/NdGameSdk/config/DevModeCfg.hpp"
+	"shared/NdGameSdk/config/MemoryCfg.hpp"
+	"shared/NdGameSdk/config/PrimServerCfg.hpp"
+	"shared/NdGameSdk/ndgame/t2r/ndgame.cpp"
+	"shared/NdGameSdk/ndgame/t2r/ndgame.hpp"
+	"shared/NdGameSdk/ndgame/t2r/src/game/gameinfo.cpp"
+	"shared/NdGameSdk/ndgame/t2r/src/game/gameinfo.hpp"
+	"shared/NdGameSdk/regenny/t2r/ndgame/game/GameInfo.hpp"
+	"shared/NdGameSdk/regenny/t2r/shared/ndlib/EngineComponents.hpp"
+	"shared/NdGameSdk/regenny/t2r/shared/ndlib/NdConfig.hpp"
+	"shared/NdGameSdk/regenny/t2r/shared/ndlib/NdGameInfo.hpp"
+	"shared/NdGameSdk/sdk.cpp"
+	"shared/NdGameSdk/sdk.hpp"
+	"shared/NdGameSdk/sdkconfig.hpp"
+	"shared/NdGameSdk/sdkconst.hpp"
+	"shared/NdGameSdk/sdkderived.hpp"
+	"shared/NdGameSdk/sdkexception.hpp"
+	"shared/NdGameSdk/sdklogger.cpp"
+	"shared/NdGameSdk/sdklogger.hpp"
+	"shared/NdGameSdk/sdkpattern.hpp"
+	"shared/NdGameSdk/sdkstringid.hpp"
+	"shared/NdGameSdk/shared/shared.cpp"
+	"shared/NdGameSdk/shared/shared.hpp"
+	"shared/NdGameSdk/shared/sharedpatterns.hpp"
+	"shared/NdGameSdk/shared/src/common/common-game-config.cpp"
+	"shared/NdGameSdk/shared/src/common/common-game-config.hpp"
+	"shared/NdGameSdk/shared/src/common/common-game-init.cpp"
+	"shared/NdGameSdk/shared/src/common/common-game-init.hpp"
+	"shared/NdGameSdk/shared/src/common/common-main-win.cpp"
+	"shared/NdGameSdk/shared/src/common/common-main-win.hpp"
+	"shared/NdGameSdk/shared/src/corelib/memory/heaparena.cpp"
+	"shared/NdGameSdk/shared/src/corelib/memory/heaparena.hpp"
+	"shared/NdGameSdk/shared/src/corelib/memory/memory-map.cpp"
+	"shared/NdGameSdk/shared/src/corelib/memory/memory-map.hpp"
+	"shared/NdGameSdk/shared/src/corelib/memory/memory.cpp"
+	"shared/NdGameSdk/shared/src/corelib/memory/memory.hpp"
+	"shared/NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.cpp"
+	"shared/NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp"
+	"shared/NdGameSdk/shared/src/gamelib/render/particle/particle-debug.cpp"
+	"shared/NdGameSdk/shared/src/gamelib/render/particle/particle-debug.hpp"
+	"shared/NdGameSdk/shared/src/gamelib/render/particle/particle.cpp"
+	"shared/NdGameSdk/shared/src/gamelib/render/particle/particle.hpp"
+	"shared/NdGameSdk/shared/src/ndlib/debug/nd-dmenu.cpp"
+	"shared/NdGameSdk/shared/src/ndlib/debug/nd-dmenu.hpp"
+	"shared/NdGameSdk/shared/src/ndlib/engine-components.cpp"
+	"shared/NdGameSdk/shared/src/ndlib/engine-components.hpp"
+	"shared/NdGameSdk/shared/src/ndlib/nd-config.cpp"
+	"shared/NdGameSdk/shared/src/ndlib/nd-config.hpp"
+	"shared/NdGameSdk/shared/src/ndlib/nd-frame-state.cpp"
+	"shared/NdGameSdk/shared/src/ndlib/nd-frame-state.hpp"
+	"shared/NdGameSdk/shared/src/ndlib/nd-game-info.cpp"
+	"shared/NdGameSdk/shared/src/ndlib/nd-game-info.hpp"
+	"shared/NdGameSdk/shared/src/ndlib/render/dev/debugdraw-common.cpp"
+	"shared/NdGameSdk/shared/src/ndlib/render/dev/debugdraw-common.hpp"
+	"shared/NdGameSdk/shared/src/ndlib/render/util/prim.cpp"
+	"shared/NdGameSdk/shared/src/ndlib/render/util/prim.hpp"
+	"shared/NdGameSdk/shared/src/ndlib/script/script-manager-eval.cpp"
+	"shared/NdGameSdk/shared/src/ndlib/script/script-manager-eval.hpp"
+	"shared/NdGameSdk/shared/src/ndlib/script/script-manager.cpp"
+	"shared/NdGameSdk/shared/src/ndlib/script/script-manager.hpp"
+	"shared/NdGameSdk/sidbase/sidbase.cpp"
+	"shared/NdGameSdk/sidbase/sidbase.hpp"
 )
 
-add_library(testmodule SHARED)
+add_library(T2RSDK SHARED)
 
-target_sources(testmodule PRIVATE ${testmodule_SOURCES})
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${testmodule_SOURCES})
+target_sources(T2RSDK PRIVATE ${T2RSDK_SOURCES})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${T2RSDK_SOURCES})
 
-target_compile_definitions(testmodule PUBLIC
-	${CMKR_TARGET}
-	"ND_GAME_NAME=\"${PROJECT_TARGET}\""
-	ND_ModModule_EXPORTS
-)
-
-target_compile_features(testmodule PUBLIC
+target_compile_features(T2RSDK PUBLIC
 	cxx_std_23
 )
 
-target_include_directories(testmodule PUBLIC
+target_include_directories(T2RSDK PUBLIC
 	"shared/"
-	"modmodules/"
 )
 
-target_link_libraries(testmodule PUBLIC
-	${PROJECT_TARGET}SDK
+target_link_libraries(T2RSDK PUBLIC
+	spdlog::spdlog
+	glm_static
+	Utility
+	Boost::thread
+	Boost::signals2
+	Boost::container
+)
+
+target_compile_definitions(T2RSDK PUBLIC
+	T2R
+)
+
+set_target_properties(T2RSDK PROPERTIES
+	OUTPUT_NAME
+		NdGameSdk
+	RUNTIME_OUTPUT_DIRECTORY
+		"${RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
+	LIBRARY_OUTPUT_DIRECTORY
+		"${LIBRARY_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
+	ARCHIVE_OUTPUT_DIRECTORY
+		"${LIBRARY_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
+)
+
+# Target: T2R
+set(CMKR_TARGET T2R)
+set(T2R_SOURCES
+	cmake.toml
+	"src/Main.cpp"
+	"src/NdDerived.hpp"
+	"src/NdMod.hpp"
+	"src/NdModClient.cpp"
+	"src/NdModClient.hpp"
+	"src/NdModClientException.hpp"
+	"src/NdMods.cpp"
+	"src/NdMods.hpp"
+	"src/NdMods/ExampleMod.cpp"
+	"src/NdMods/ExampleMod.hpp"
+	"src/Utils/config.cpp"
+	"src/Utils/config.hpp"
+	"src/Utils/logger.cpp"
+	"src/Utils/logger.hpp"
+)
+
+add_library(T2R SHARED)
+
+target_sources(T2R PRIVATE ${T2R_SOURCES})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${T2R_SOURCES})
+
+target_compile_definitions(T2R PUBLIC
+	${CMKR_TARGET}
+	"ND_GAME_NAME=\"${CMKR_TARGET}\""
+	ND_ModClient_EXPORTS
+)
+
+target_compile_features(T2R PUBLIC
+	cxx_std_23
+)
+
+target_include_directories(T2R PUBLIC
+	"shared/"
+	"src/"
+)
+
+target_link_libraries(T2R PUBLIC
+	${CMKR_TARGET}SDK
 	Utility
 	spdlog::spdlog
 )
 
-set_target_properties(testmodule PROPERTIES
+target_link_libraries(T2R PRIVATE
+	Boost::thread
+	Boost::signals2
+	SimpleIni
+)
+
+set_target_properties(T2R PROPERTIES
+	OUTPUT_NAME
+		${PROJECT_TARGET}.ModClient
+	SUFFIX
+		.asi
 	RUNTIME_OUTPUT_DIRECTORY
 		"${RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
 	LIBRARY_OUTPUT_DIRECTORY

@@ -7,6 +7,8 @@
 
 namespace NdGameSdk::ndlib {
 
+#if defined(T1X)
 	class NdFrameState : public ISdkRegenny<regenny::shared::ndlib::NdFrameState> {};
 	static_assert(sizeof(NdFrameState) == 0x288a0, "Size of NdFrameState is not correct.");
+#endif
 }

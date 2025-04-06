@@ -45,12 +45,11 @@ BOOL Initialize(HMODULE dllModule) {
 
     // will use values from Config ini.
     SdkConfig pSdkCfg{};
-    pSdkCfg.Sidbase = true;
-    
-    pSdkCfg.NdDevMenu.GameDebugMenu = true;
-    pSdkCfg.Memory.DebugMemory = false;
 
 #if defined(T1X)
+    pSdkCfg.Sidbase = true;
+    pSdkCfg.NdDevMenu.GameDebugMenu = true;
+    pSdkCfg.Memory.DebugMemory = true;
     pSdkCfg.NdDevMenu.ExtendedDebugMenu = true;
     pSdkCfg.PrimServer.PrimServerCreate = true;
 #endif

@@ -262,8 +262,25 @@ namespace NdGameSdk::corelib::memory {
 				spdlog::warn("DebugMemory is enabled in Config");
 
 			#if defined(T2R)
-				Memory::IncreaseMemoryMap(MemoryMapId::ALLOCATION_CPU_MEMORY, 2000 * size_mb);
+				
+				// Temporary solutions for bypassing crash in the debug menu. (Work in progress)
+				Memory::ModifyMemoryMap(MemoryMapId::ALLOCATION_DEV_CPU_MEM, 5000 * size_mb);
 
+				const unsigned char TaggedHeapjmp_0[] = { 0xeb };
+				const unsigned char frameparamjmp_0[] = { 0xe9, 0x1d, 0x01, 0x00, 0x00, 0x90 };
+				const unsigned char NxAppHooksret_0[] = { 0xc3, 0x90, 0x90, 0x90 };
+
+				findpattern = NdGameSdk::Patterns::SdkPattern{ L"48 89 5c 24 08 48 89 74 24 10 48 89 7c 24 18 4c 89 64 24 20 55 41 56 41 57 48 8d 6c 24 b9 48 81 ec 00 01 00 00 48 ?? ?? ?? ?? ?? ?? 48 33 c4 48 89 45 37 b9 20 00 00 00 e8 ?? ?? ?? ?? ?? b8 80 00 00 00 8b c8 48 8d 54 24 20 c7 44 24 20 0a 00 00 00 8b d8 e8 ?? ?? ?? ?? ?? a2 00 00 00 48 8b f8", +0x77 };
+				static Patch::Ptr skiptagget_debug = Utility::WritePatchPattern(module, findpattern.pattern, TaggedHeapjmp_0, sizeof(TaggedHeapjmp_0),
+					wstr(Patterns::NdDevMenu_GameConfig_DevMode), findpattern.offset);
+
+				findpattern = NdGameSdk::Patterns::SdkPattern{ L"49 89 86 70 77 01 00 e8 ?? ?? ?? ?? 48 8b 08 4c 8b 41 28 41 8b d7 48 8b c8 41 ff d0 49 89 86 58 77 01 00 41 c6 86 60 77 01 00 01 33 c9", +0x34 };
+				static Patch::Ptr skipframeparams_debug = Utility::WritePatchPattern(module, findpattern.pattern, frameparamjmp_0, sizeof(frameparamjmp_0),
+					wstr(Patterns::NdDevMenu_GameConfig_DevMode), findpattern.offset);
+
+				findpattern = NdGameSdk::Patterns::SdkPattern{ L"4c 8b 41 40 49 3b d0 72 ?? 48 8b 49 38 49 03 c8 48 3b d1 73 ?? b0 01 c3 32 c0" };
+				static Patch::Ptr skipNxAppHooks_debug = Utility::WritePatchPattern(module, findpattern.pattern, NxAppHooksret_0, sizeof(NxAppHooksret_0),
+					wstr(Patterns::NdDevMenu_GameConfig_DevMode), findpattern.offset);
 
 			#elif defined(T1X)
 				Memory::IncreaseMemoryMap(MemoryMapId::ALLOCATION_CPU_MEMORY, 2000 * size_mb);

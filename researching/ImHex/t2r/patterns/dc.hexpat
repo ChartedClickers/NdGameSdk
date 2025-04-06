@@ -1,6 +1,7 @@
 #pragma loop_limit 500000
 
 import dc.dctypes;
+import dc.modules;
 
 namespace DC {
 
@@ -9,6 +10,8 @@ namespace DC {
         StringId64 m_typeId;
 
     match (m_scriptId, m_typeId) {
+        /* modules.bin */
+        (ScriptId::modules, Type::module_info_array): modules::ModuleInfoArray *m_entryPtr : u64;
         /* unknown.bin */
         (_,_): u64 *m_entryPtr : u64;
 

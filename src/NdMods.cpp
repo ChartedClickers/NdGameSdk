@@ -1,10 +1,10 @@
 #include "NdMods.hpp"
 
-#include "NdMods/ExampleMod.hpp"
+#include "NdMods/DevSandboxMod.hpp"
 
 NdMods::NdMods()
 {
-    AddNdModComponent<ExampleMod::Example>();
+    AddNdModComponent<ExampleMod::DevSandboxMod>();
 }
 
 void NdMods::InitializeNdMods()

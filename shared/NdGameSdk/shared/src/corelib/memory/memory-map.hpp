@@ -2,11 +2,12 @@
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/components/SdkRegenny.hpp"
 
-#if defined(T1X)
 #include <map>
 
 #if defined(T1X)
 #include <NdGameSdk/regenny/t1x/shared/corelib/memory/MemoryMapEntry.hpp>
+#elif defined(T2R)
+#include <NdGameSdk/regenny/t2r/shared/corelib/memory/MemoryMapEntry.hpp>
 #endif
 
 using MemoryMapId = ::regenny::shared::corelib::memory::MapId;
@@ -103,4 +104,3 @@ namespace NdGameSdk::corelib::memory
 		std::map<MemoryMapId, MemoryMapEntry*> s_OffsiteMap{};
 	};
 }
-#endif

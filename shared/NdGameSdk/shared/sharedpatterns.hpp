@@ -9,11 +9,25 @@ namespace NdGameSdk::Patterns
 	static inline const SdkPattern EngineComponents_s_ndConfig = { L"48 8d 0d ?? ?? ?? ?? b8 04 00 00 00 48 8d 89 80 00 00 00 c5 f8 10 03 48 8d 9b 80 00 00 00 c5 f8 11 41 80 c5 f8 10 4b 90 c5 f8 11 49 90 c5 f8 10 43 a0 c5 f8 11 41 a0 c5 f8 10 4b b0 c5 f8 11 49 b0 c5 f8 10 43 c0 c5 f8 11 41 c0 c5 f8 10 4b d0 c5 f8 11 49" };
 
 	static inline const SdkPattern GameInit_ReturnHook = { L"40 53 48 83 ec 30 48 8b d9 48 8d 4c 24 20 e8 ?? ?? ?? ?? 8b 10 85 d2 7e 11 c5 f8 10 00 c5 f8 11 03 48 8b c3 48 83 c4 30 5b c3", +0x13 };
+	
 	static inline const SdkPattern NIXXES_StdHandle = { L"40 53 48 83 ec 20 48 8b 01 48 8b d9 ff 50 20 48 8b 03 48 8b cb ff 50 30 48 8b c8 48 8d 15 ?? ?? ?? ?? e8 ?? ?? ?? ??" };
 
-#endif
+	static inline const SdkPattern Memory_AllocateMemoryMap = { L"48 83 ec 58 48 89 5c 24 60 48 89 6c 24 68 48 89 7c 24 50 4c 89 6c 24 40 4c 89 74 24 38 4c 8b f2 4c 63 e9 48 8d 15 ?? ?? ?? ?? 48 8d 0d ?? ?? ?? ?? 4c 89 7c 24 30", +0xaa };
+	static inline const SdkPattern Memory_ValidateContext = { L"4c 89 6c 24 28 4c 8d 0d ?? ?? ?? ?? 4c 8d 05 ?? ?? ?? ?? c7 44 24 20 27 00 00 00 48 8d", +0x30 };
+	static inline const SdkPattern Memory_ModifyMemoryMap = { L"48 89 5c 24 18 48 89 74 24 20 57 48 83 ec 30 48 b8 00 00 00 00 02 00 00 00 48 8b fa 8b f1 48 3b d0 0f 82 a9 00 00 00 48 89 6c 24 40" };
+	static inline const SdkPattern Memory_GetSize = { L"48 8b 05 ?? ?? ?? ?? 48 85 c0 74 14 0f 1f 40 00 8b 10 85 d2 74 0a 3b d1 74 09 48 83 c0 20 75 f0 33 c0 c3 48 8b 40 08 c3" };
+	static inline const SdkPattern Memory_PushAllocator = { L"48 89 5c 24 08 48 89 6c 24 10 56 57 41 54 41 56 41 57 48 83 ec 30 8b 01 48 8b d9 48 8d 4c 24 70 89 44 24 70 49 8b e9 45 8b f0 4c 8b fa" };
+	static inline const SdkPattern Memory_PopAllocator = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 30 e8 ?? ?? ?? ?? 33 f6 48 8b d8 48 85 c0 75 6d e8 ?? ?? ?? ?? 48 8b f8 48 85 c0 74 04" };
+	static inline const SdkPattern Memory_Allocate = { L"48 89 5c 24 08 57 48 83 ec 30 8b 02 48 8b f9 48 8d 4c 24 48 89 44 24 48 49 8b d8 e8 30 28 00 00 4c 8d 0d a9 aa 8f 01 4c 8b c3 4c 89 4c 24 28 48 8b c8 c7 44 24 20 00 00 00 00 48 8b 10 4c 8b 52 38 48 8b d7 41 ff d2 48 8b 5c 24 40 48 83 c4 30 5f" }; // TODO: make pattern
+	static inline const SdkPattern Memory_HeapAllocator_Allocate = { L"40 53 55 56 57 41 56 48 83 ec 40 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 38 4c 8b b4 24 90 00 00 00 48 85 c9 bf 01 00 00 00 41 8b e9 48 0f 45 f9 49 8b f0 48 8b da e8 ?? ?? ?? ?? 84 c0 74 31 48 8d 54 24 30 b9 03 00 00 00 e8 ?? ?? ?? ?? 48 8b 4c 24 30 4c 8b ce 4c 89 74 24 28 4c 8b c3 48 8b d7 89 6c 24 20 48 8b 01 ff 50 38 e9 9a 00 00 00" };
+	static inline const SdkPattern Memory_GetAllocator = { L"48 83 ec 28 8b 01 83 f8 73 75 1e e8 ?? ?? ?? ?? 48 8b 0d ?? ?? ?? ??" };
 
-#if defined(T1X)
+	static inline const SdkPattern Memory_clarg_nodebugmem = { L"40 b7 01 85 db 0f ?? 7d 00 00 00 8b eb", +0x1 };
+	static inline const SdkPattern Memory_g_MemoryMap = { L"48 89 5c 24 18 56 48 83 ec 30 48 83 3d ?? ?? ?? ?? 00 48 8b f2 48 89 6c 24 40 48 8b e9", +0xa };
+
+	static inline const SdkPattern NdDevMenu_NdDevMenuAppend_Particles = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 40 48 8b f1 33 c9 e8 ?? ?? ?? ?? 84 c0 0f 84 9d" };
+
+#elif defined(T1X)
 	static inline const SdkPattern EngineComponents_s_table = { L"48 89 6c 24 18 56 41 56 41 57 48 83 ec 30 8b f1 45 8b", +0x13 };
 	static inline const SdkPattern EngineComponents_s_ndConfig = { L"B8 04 00 00 00 48 8D ?? ?? ?? ?? ?? 8D 50 7C C5 F8 10 03 C5 F8 11 01 C5 F8 10 4B 10 C5 F8 11 49 10 C5 F8 10 43 20 C5 F8 11 41 20 C5 F8 10 4B 30 C5 F8 11 49 30 C5 F8 10 43 40 C5 F8 11 41 40 C5 F8 10 4B 50 C5 F8 11 49 50 C5 F8 10 43 60 C5 F8 11 41 60", +0x5 };
 
@@ -32,7 +46,6 @@ namespace NdGameSdk::Patterns
 	static inline const SdkPattern Memory_HeapAllocator_Allocate = { L"48 89 5c 24 ?? 48 89 6c 24 ?? 48 89 74 24 ?? 57 48 83 ec 30 48 85 c9 bf 01 00 00 00 41 8b f1 49 8b e8 48 0f 45 f9 48 8b da e8 ?? ?? 00 00 84 c0 ??" };
 
 	static inline const SdkPattern Memory_clarg_nodebugmem = { L"b3 01 45 85 ff 74 ?? 48 8b 0f", +0x1 };
-	static inline const SdkPattern Memory_s_MemoryMap = { L"01 00 00 00 02 00 00 00 00 00 ?? 00 00 00 00 00 00 00 10 00" };
 	static inline const SdkPattern Memory_g_MemoryMap = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 30 48 ?? ?? ?? ?? ?? 04 00 48 8b", +0xf };
 
 	static inline const SdkPattern ScriptManager_ScriptGlobals = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 20 48 8b d9 48 63 fa 48 ?? ?? ?? ?? ?? ?? 45 33 c9 4c 89 49", +0x15 };
@@ -76,6 +89,7 @@ namespace NdGameSdk::Patterns
 	static inline const SdkPattern PrimServer_PrimServer = { L"48 8b ?? ?? ?? ?? ?? 48 8b d3 4c 8b 01 41 ff 90 b0 01 00 00 48 83 65 08" };
 	static inline const SdkPattern PrimServer_Create = { L"40 53 48 83 ec 30 48 8d 0d ?? ?? ?? ?? 48 8b da 48 8d 05 ?? ?? ?? ?? 48 8b d1 41 b9 60 0d 00 00" };
 
-
 #endif
+
+	static inline const SdkPattern Memory_s_MemoryMap = { L"01 00 00 00 02 00 00 00 00 00 ?? 00 00 00 00 00 00 00 10 00" };
 }

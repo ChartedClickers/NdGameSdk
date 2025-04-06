@@ -11,9 +11,9 @@
 #endif
 
 #include "shared/src/common/common-game-init.hpp"
+#include "shared/src/corelib/memory/memory.hpp"
 
 #if defined(T1X)
-#include "shared/src/corelib/memory/memory.hpp"
 #include "shared/src/gamelib/debug/nd-dev-menu.hpp"
 #endif
 
@@ -74,14 +74,12 @@ namespace NdGameSdk {
         // Registering main sdk events
         auto SharedComponents = ISdkComponent::GetSharedComponents();
 
-        #if defined(T1X)
         ISdkComponent::SubscribeSdkEvent<corelib::memory::Memory>(
             SharedComponents,
             &corelib::memory::Memory::e_MemoryMapMapped,
             &ISdkModule::OnMemoryMapped,
             SdkModule
         );
-        #endif
 
         ISdkComponent::SubscribeSdkEvent<common::CommonGame>(
             SharedComponents,
@@ -132,14 +130,12 @@ namespace NdGameSdk {
         // Unregistering main sdk events
         auto SharedComponents = ISdkComponent::GetSharedComponents();
 
-        #if defined(T1X)
         ISdkComponent::UnsubscribeSdkEvent<corelib::memory::Memory>(
             SharedComponents,
             &corelib::memory::Memory::e_MemoryMapMapped,
             &ISdkModule::OnMemoryMapped,
             SdkModule
         );
-        #endif
 
         ISdkComponent::UnsubscribeSdkEvent<common::CommonGame>(
             SharedComponents,

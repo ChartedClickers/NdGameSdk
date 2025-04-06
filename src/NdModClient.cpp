@@ -69,17 +69,20 @@ void NdModClient::OnGameInitialized(bool status) {
 	auto& gameconfig = m_EngineComponents->GetGameInfo();
 
 	spdlog::info("BUILD: {}", gameconfig->m_BranchName);
+
+#if defined(T2R)
 	gameconfig->m_DevMode = true;
+#endif
 
 	auto user = gameconfig->m_DiscUser;
 	strcpy(user, "NdGameSdk");
 }
 
-#if defined(T1X)
 void NdModClient::OnMemoryMapped(corelib::memory::Memory* Memory) {
 	spdlog::info("MemoryMapped!");
 }
 
+#if defined(T1X)
 void NdModClient::OnAppendSdkDevMenu(gamelib::debug::NdDevMenu* NdDevMenu, 
 	gamelib::debug::NdDevMenu::AppendSdkSubMenusCallback AppendSdkDevMenu) {
 

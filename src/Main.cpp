@@ -48,9 +48,9 @@ BOOL Initialize(HMODULE dllModule) {
     pSdkCfg.Sidbase = true;
     
     pSdkCfg.NdDevMenu.GameDebugMenu = true;
+    pSdkCfg.Memory.DebugMemory = false;
 
 #if defined(T1X)
-    pSdkCfg.Memory.DebugMemory = true;
     pSdkCfg.NdDevMenu.ExtendedDebugMenu = true;
     pSdkCfg.PrimServer.PrimServerCreate = true;
 #endif

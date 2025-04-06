@@ -1,4 +1,3 @@
-#if defined(T1X)
 #include "memory-map.hpp"
 
 namespace NdGameSdk::corelib::memory {
@@ -42,4 +41,3 @@ namespace NdGameSdk::corelib::memory {
 			Size().GetSize<double>(SizeUnit::Megabytes), Size().GetSize<double>(SizeUnit::Kilobytes), Size().GetSize<uint64_t>(SizeUnit::Bytes));
 	}
 }
-#endif

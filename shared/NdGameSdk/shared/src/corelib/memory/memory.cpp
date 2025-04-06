@@ -1,4 +1,3 @@
-#if defined(T1X)
 #include "memory.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
@@ -16,7 +15,6 @@ namespace NdGameSdk::corelib::memory {
 	}
 
 	bool Memory::IsDebugMemoryAvailable() {
-
 		if (m_IsDebugMemoryAvailablePatch) {
 			return m_IsDebugMemoryAvailablePatch->IsEnable();
 		}
@@ -150,10 +148,6 @@ namespace NdGameSdk::corelib::memory {
 			Memory_ModifyMemoryMap = (Memory_ModifyMemoryMap_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::Memory_ModifyMemoryMap), findpattern.offset);
 
-			findpattern = Patterns::Memory_FindMemoryMap;
-			Memory_FindMemoryMap = (Memory_FindMemoryMap_ptr)Utility::FindAndPrintPattern(module,
-				findpattern.pattern, wstr(Patterns::Memory_FindMemoryMap), findpattern.offset);
-
 			findpattern = Patterns::Memory_GetSize;
 			Memory_GetSize = (Memory_GetSize_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::Memory_GetSize), findpattern.offset);
@@ -170,13 +164,22 @@ namespace NdGameSdk::corelib::memory {
 			Memory_GetAllocator = (Memory_GetAllocator_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::Memory_GetAllocator), findpattern.offset);
 
+
+		#if defined(T1X)
+			findpattern = Patterns::Memory_FindMemoryMap;
+			Memory_FindMemoryMap = (Memory_FindMemoryMap_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::Memory_FindMemoryMap), findpattern.offset);
+		#endif
+
 			findpattern = Patterns::Memory_HeapAllocator_Allocate;
 			m_HeapArena.Memory_HeapArena_Allocate = (HeapAllocator::HeapArena::Memory_HeapArena_Allocate_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::Memory_HeapAllocator_Allocate), findpattern.offset);
 
 			if (!SetMemoryMapJMP ||
 				!Memory_ModifyMemoryMap ||
+				#if defined(T1X)
 				!Memory_FindMemoryMap ||
+				#endif
 				!Memory_GetSize ||
 				!Memory_PushAllocator ||
 				!Memory_PopAllocator ||
@@ -206,7 +209,6 @@ namespace NdGameSdk::corelib::memory {
 
 				}, wstr(Patterns::Memory_AllocateMemoryMap), wstr(SetMemoryMapJMP));
 
-
 			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> wstring_converter{};
 
 			if (!m_cfg.ModifiedMapEntries.empty()) {
@@ -231,26 +233,39 @@ namespace NdGameSdk::corelib::memory {
 
 			}
 
-#if defined(T1X)
+	#if defined(T1X) || defined(T2R)
+
+	#if defined(T1X)
+			constexpr size_t kOffsetToIsDebugMemoryAvailable = 0x0C;
+	#elif defined(T2R)
+			constexpr size_t kOffsetToIsDebugMemoryAvailable = 0x15;
+	#endif
+
 			findpattern = Patterns::NdDevMenu_NdDevMenuAppend_Particles;
 			auto ParticlesMenu = Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::NdDevMenu_NdDevMenuAppend_Particles), findpattern.offset);
 
 			if (!ParticlesMenu) {
 				throw SdkComponentEx
-				{ std::format("Failed to find T1X addresses!"),
+				{ std::format("Failed to find pattern"),
 					SdkComponentEx::ErrorCode::PatternFailed, true };
 			}
 
 			int32_t OffsetToisDebugMemoryAval = 0;
-			ParticlesMenu = ParticlesMenu + 0xc;
+			ParticlesMenu = ParticlesMenu + kOffsetToIsDebugMemoryAvailable;
 			OffsetToisDebugMemoryAval = *(uint32_t*)(ParticlesMenu);
 			m_IsDebugMemoryAvailablePatch = Utility::WritePatchAddress(module,
 				ParticlesMenu + OffsetToisDebugMemoryAval + 4, { 0xb0, 0x01, 0xc3 }, wstr(m_IsDebugMemoryAvailablePatch), IsDebugMemoryAvailable());
 
+			// pSdkCfg.Memory.DebugMemory = true;
 			if (m_IsDebugMemoryAvailablePatch->IsEnable()) {
-
 				spdlog::warn("DebugMemory is enabled in Config");
+
+			#if defined(T2R)
+				Memory::IncreaseMemoryMap(MemoryMapId::ALLOCATION_CPU_MEMORY, 2000 * size_mb);
+
+
+			#elif defined(T1X)
 				Memory::IncreaseMemoryMap(MemoryMapId::ALLOCATION_CPU_MEMORY, 2000 * size_mb);
 
 				findpattern = Patterns::Memory_clarg_nodebugmem;
@@ -281,6 +296,8 @@ namespace NdGameSdk::corelib::memory {
 					}
 				}
 
+				
+
 				findpattern = Patterns::Memory_Allocate;
 				m_AllocateHook = Utility::WritePatchPattern_Hook(module, findpattern.pattern, wstr(Patterns::Memory_Allocate),
 					findpattern.offset, (void*)Memory_Allocate_CC);
@@ -290,15 +307,16 @@ namespace NdGameSdk::corelib::memory {
 						SdkComponentEx::ErrorCode::PatchFailed, true };
 				}
 
-				Memory_Allocate_ReturnAddr = m_AllocateHook->get_original();
-
+				Memory_Allocate_ReturnAddr = m_AllocateHook->get_original();		
+			#endif
 			}
+	#endif
+
 			if (!m_cfg.ModifiedMapEntries.empty() || m_IsDebugMemoryAvailablePatch->IsEnable()) {
 				findpattern = Patterns::Memory_ValidateContext;
 				m_ValidateContextPatch = Utility::WritePatchNop(module, findpattern.pattern, 0x1,
-				wstr(Patterns::Memory_ValidateContext), findpattern.offset);
+					wstr(Patterns::Memory_ValidateContext), findpattern.offset);
 			}
-	#endif
 
 		});
 	}
@@ -335,4 +353,3 @@ namespace NdGameSdk::corelib::memory {
 		}
 	}
 }
-#endif

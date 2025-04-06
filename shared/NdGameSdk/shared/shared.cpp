@@ -13,9 +13,9 @@ namespace NdGameSdk {
 	void InitSharedComponents(SdkConfig& cfg)
 	{
 		auto SharedComponents = ISdkComponent::GetSharedComponents();
-#if defined(T1X)
+
 		auto MemComponent = SharedComponents->AddComponent<corelib::memory::Memory>(cfg.Memory);
-#endif
+
 		SharedComponents->AddComponent<ndlib::EngineComponents>();
 
 #if defined(T1X)

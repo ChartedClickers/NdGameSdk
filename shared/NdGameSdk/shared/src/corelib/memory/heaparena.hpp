@@ -1,6 +1,5 @@
 #pragma once
 
-#if defined(T1X)
 #include "NdGameSdk/sdk.hpp"
 #include "memory-map.hpp"
 
@@ -27,4 +26,3 @@ namespace NdGameSdk::corelib::memory
 		};
 	}
 }
-#endif

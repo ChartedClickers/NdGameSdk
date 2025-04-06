@@ -1,6 +1,5 @@
 #pragma once
 
-#if defined(T1X)
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/config/MemoryCfg.hpp"
 #include "NdGameSdk/components/SdkComponent.hpp"
@@ -12,6 +11,8 @@
 
 #if defined(T1X)
 #include <NdGameSdk/regenny/t1x/shared/corelib/memory/Allocator.hpp>
+#elif defined(T2R)
+#include <NdGameSdk/regenny/t2r/shared/corelib/memory/Allocator.hpp>
 #endif
 
 namespace NdGameSdk::corelib::memory 
@@ -56,11 +57,12 @@ namespace NdGameSdk::corelib::memory
 		FunctionHook::Ptr m_AllocateHook{};
 		std::map<MemoryMapId,Patch::Ptr> m_resizedmaps{};
 
-#if defined(T1X)
-		MEMBER_FUNCTION_PTR(MemoryMapEntry*, Memory_FindMemoryMap, MemoryMapId);
 		Patch::Ptr m_ValidateContextPatch{};
 		Patch::Ptr m_IsDebugMemoryAvailablePatch{};
 		Patch::Ptr m_clarg_nodebugmemPatch{};
+
+#if defined(T1X)
+		MEMBER_FUNCTION_PTR(MemoryMapEntry*, Memory_FindMemoryMap, MemoryMapId);
 #endif
 		MEMBER_FUNCTION_PTR(void*, Memory_Allocate, size_t heap_size, MemoryContextType* memory_context, size_t align);
 		MEMBER_FUNCTION_PTR(uintptr_t*, Memory_ModifyMemoryMap, MemoryMapId MapId, uint64_t newSizeForId);
@@ -70,4 +72,3 @@ namespace NdGameSdk::corelib::memory
 		MEMBER_FUNCTION_PTR(Allocator*, Memory_GetAllocator, MemoryContextType* memory_context);
 	};
 }
-#endif

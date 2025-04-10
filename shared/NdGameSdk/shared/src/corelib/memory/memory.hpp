@@ -6,13 +6,15 @@
 
 #include "memory-map.hpp"
 #include "heaparena.hpp"
+#include "allocator-tagged-heap.hpp"
+#include "memory-area-win.hpp"
 
 #include <Utility/helper.hpp>
 
-#if defined(T1X)
-#include <NdGameSdk/regenny/t1x/shared/corelib/memory/Allocator.hpp>
-#elif defined(T2R)
+#if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/corelib/memory/Allocator.hpp>
+#elif defined(T1X)
+#include <NdGameSdk/regenny/t1x/shared/corelib/memory/Allocator.hpp>
 #endif
 
 namespace NdGameSdk::corelib::memory 
@@ -44,7 +46,12 @@ namespace NdGameSdk::corelib::memory
 		NdGameSdk_API void PopAllocator();
 
 		HeapAllocator::HeapArena m_HeapArena{};
+		Area::MemoryArea m_MemArea{};
+#if defined(T2R)
+		AllocatorTaggedHeap m_AllocatorTaggedHeap{};
+#endif
 		std::map<MemoryMapId, MemoryMapEntry*>& GetStaticMemoryMapEntries();
+
 	private:
 		void Initialize() override;
 		bool m_MemoryMapMapped{};
@@ -59,16 +66,17 @@ namespace NdGameSdk::corelib::memory
 
 		Patch::Ptr m_ValidateContextPatch{};
 		Patch::Ptr m_IsDebugMemoryAvailablePatch{};
-		Patch::Ptr m_clarg_nodebugmemPatch{};
 
-#if defined(T1X)
-		MEMBER_FUNCTION_PTR(MemoryMapEntry*, Memory_FindMemoryMap, MemoryMapId);
-#endif
 		MEMBER_FUNCTION_PTR(void*, Memory_Allocate, size_t heap_size, MemoryContextType* memory_context, size_t align);
 		MEMBER_FUNCTION_PTR(uintptr_t*, Memory_ModifyMemoryMap, MemoryMapId MapId, uint64_t newSizeForId);
 		MEMBER_FUNCTION_PTR(uint64_t, Memory_GetSize, MemoryMapId MapId);
 		MEMBER_FUNCTION_PTR(uint64_t, Memory_PushAllocator, MemoryContextType* memory_context, const char* file, int line_num, const char* func);
 		MEMBER_FUNCTION_PTR(uint64_t, Memory_PopAllocator);
 		MEMBER_FUNCTION_PTR(Allocator*, Memory_GetAllocator, MemoryContextType* memory_context);
+
+#if defined(T1X)
+		MEMBER_FUNCTION_PTR(MemoryMapEntry*, Memory_FindMemoryMap, MemoryMapId);
+#endif
+
 	};
 }

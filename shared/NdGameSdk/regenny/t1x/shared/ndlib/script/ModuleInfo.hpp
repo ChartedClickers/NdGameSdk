@@ -10,9 +10,9 @@ struct ModuleInfo {
     uint64_t field_0; // 0x0
     uint64_t field_8; // 0x8
     // Metadata: utf8*
-    char* name; // 0x10
+    char* m_name; // 0x10
     StringId64 hash; // 0x18
-    uint64_t size; // 0x20
+    size_t m_size; // 0x20
     uint64_t m_pCollection; // 0x28
     uint32_t m_pNumModules; // 0x30
     private: char pad_34[0x4]; public:
@@ -25,7 +25,7 @@ struct ModuleInfo {
     bool field_5c; // 0x5c
     bool field_5d; // 0x5d
     bool field_5e; // 0x5e
-    bool field_5f; // 0x5f
+    bool m_isLoaded; // 0x5f
 }; // Size: 0x60
 #pragma pack(pop)
 }

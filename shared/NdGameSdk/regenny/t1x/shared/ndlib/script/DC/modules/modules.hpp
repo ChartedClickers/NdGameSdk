@@ -4,14 +4,14 @@
 namespace regenny::shared::ndlib::script::DC::modules {
 #pragma pack(push, 1)
 struct modules {
-    struct ModuleCollection {
-        uint64_t m_numModules; // 0x0
-        StringId64* m_modules; // 0x8
-    }; // Size: 0x10
-
     struct ModuleUnkCollection {
         uint64_t m_num; // 0x0
         StringId64* m_pArray; // 0x8
+    }; // Size: 0x10
+
+    struct ModuleCollection {
+        uint64_t m_num; // 0x0
+        StringId64* m_modules; // 0x8
     }; // Size: 0x10
 
     struct ModuleInfo {
@@ -24,9 +24,8 @@ struct modules {
     }; // Size: 0x28
 
     struct ModuleInfoArray {
-        uint32_t m_numModules; // 0x0
-        regenny::shared::ndlib::script::DC::modules::modules::ModuleInfo* m_modules; // 0x4
-        private: char pad_c[0x4]; public:
+        uint64_t m_numModules; // 0x0
+        regenny::shared::ndlib::script::DC::modules::modules::ModuleInfo* m_modules; // 0x8
     }; // Size: 0x10
 
 }; // Size: 0x0

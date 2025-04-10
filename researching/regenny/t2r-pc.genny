@@ -409,6 +409,14 @@ namespace regenny {
                     uintptr_t m_end_addr
                     size_t m_heap_size
                 }
+
+                struct TaggedHeap 0xDB308 {
+                    struct VTable {
+                        virtual uint64_t GetBlockSize() @ 0x30
+                    } 
+                    VTable* vftable;
+                }
+
             }
         }
 

@@ -136,6 +136,11 @@ struct DMENU {
     struct ItemSubText : public Item {
     }; // Size: 0xb8
 
+    struct ItemPlaceHolder : public Component {
+        // Metadata: utf8*
+        char m_placeholder[1024]; // 0xb0
+    }; // Size: 0x4b0
+
     struct ItemLine : public Component {
     }; // Size: 0xb0
 

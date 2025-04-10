@@ -15,9 +15,8 @@ namespace NdGameSdk::common {
 
 	void CommonGame::Awake() {
 		auto SharedComponents = ISdkComponent::GetSharedComponents();
-	#if defined(T1X)
 		m_Memory = SharedComponents->GetComponent<Memory>();
-	#endif
+		m_EngineComponents = SharedComponents->GetComponent<ndlib::EngineComponents>();
 	}
 
 	void CommonGame::Initialize() {
@@ -27,7 +26,6 @@ namespace NdGameSdk::common {
 			
 			spdlog::info("Initializing {} patterns...", GetName());
 
-			#if defined(T1X)
 			auto MissingDependencies = CheckSdkComponents
 				<Memory>({ m_Memory.get() });
 
@@ -36,7 +34,6 @@ namespace NdGameSdk::common {
 				{ std::format("Missing necessary dependencies: {:s}", MissingDependencies.value()),
 					SdkComponentEx::ErrorCode::DependenciesFailed, true };
 			}
-			#endif
 
 			auto module = Utility::memory::get_executable();
 
@@ -59,6 +56,11 @@ namespace NdGameSdk::common {
 					bool successful = !((*(uint32_t*)ctx.rax) > 0);
 					gameinit->m_GameInitialized = successful;
 					gameinit->InvokeSdkEvent(gameinit->e_GameInitialized, successful);
+					
+					if (gameinit->m_EngineComponents) {
+						auto& ndgameinfo = gameinit->m_EngineComponents->GetNdGameInfo();
+						strcpy(ndgameinfo->m_DiscUser, SDK_NAME);
+					}
 
 				}, wstr(Patterns::GameInit_ReturnHook), wstr(GameInitJMP));
 
@@ -71,9 +73,30 @@ namespace NdGameSdk::common {
 				spdlog::warn("Failed to patch {:s}! Logs may not work!", TOSTRING(Patterns::NIXXES_StdHandle));
 			}
 
-	#endif
+			//m_IAllocator.Init(*this, *m_Memory);
 
-	#if defined(T1X)
+			if (m_Memory->IsDebugMemoryAvailable()) {
+				findpattern = Patterns::IAllocator_Init;
+				auto InitTaggedHeapsJMP = (void*)Utility::FindAndPrintPattern(module
+					, findpattern.pattern, wstr(Patterns::GameInit_PrimServer_Create), (findpattern.offset + 0x4a7));
+
+				m_IAllocator.m_IAllocator_InitTaggedHeapsHook = Utility::MakeMidHook(InitTaggedHeapsJMP,
+					[](SafetyHookContext& ctx)
+					{
+						auto iallocator_init = GetSharedComponents()->GetComponent<CommonGame>();
+						iallocator_init->m_Memory->m_AllocatorTaggedHeap.SetTaggedGpuDevHeap();
+
+					}, wstr(Patterns::IAllocator_Init), wstr(InitTaggedHeapsJMP));
+
+
+				if (!m_IAllocator.m_IAllocator_InitTaggedHeapsHook) {
+					throw SdkComponentEx{ std::format("Failed to create hook {:s} in {:s}!", TOSTRING(m_IAllocator_InitTaggedHeapsHook), TOSTRING(IAllocator)),
+						SdkComponentEx::ErrorCode::PatchFailed };
+				}
+			}
+
+
+	#elif defined(T1X)
 			m_PrimServer = ISdkComponent::GetSharedComponents()->GetComponent<PrimServerComponent>();
 			if (m_PrimServer.get() && m_PrimServer->IsInitialized() && 
 				m_PrimServer->m_cfg.PrimServerCreate) {

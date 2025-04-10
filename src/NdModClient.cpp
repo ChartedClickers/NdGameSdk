@@ -74,8 +74,6 @@ void NdModClient::OnGameInitialized(bool status) {
 	gameconfig->m_DevMode = true;
 #endif
 
-	auto user = gameconfig->m_DiscUser;
-	strcpy(user, "NdGameSdk");
 }
 
 void NdModClient::OnMemoryMapped(corelib::memory::Memory* Memory) {

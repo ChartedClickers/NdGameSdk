@@ -9,6 +9,8 @@ struct NdConfig {
         DMENU = 1,
         NdDevMenu = 2,
         NameCache = 7,
+        BUILD_NUMBER = 30,
+        GameTitle = 32,
     };
 
 }; // Size: 0x0

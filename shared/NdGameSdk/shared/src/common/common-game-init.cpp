@@ -55,12 +55,13 @@ namespace NdGameSdk::common {
 					auto gameinit = GetSharedComponents()->GetComponent<CommonGame>();
 					bool successful = !((*(uint32_t*)ctx.rax) > 0);
 					gameinit->m_GameInitialized = successful;
-					gameinit->InvokeSdkEvent(gameinit->e_GameInitialized, successful);
-					
+
 					if (gameinit->m_EngineComponents) {
 						auto& ndgameinfo = gameinit->m_EngineComponents->GetNdGameInfo();
 						strcpy(ndgameinfo->m_DiscUser, SDK_NAME);
 					}
+
+					gameinit->InvokeSdkEvent(gameinit->e_GameInitialized, successful);
 
 				}, wstr(Patterns::GameInit_ReturnHook), wstr(GameInitJMP));
 

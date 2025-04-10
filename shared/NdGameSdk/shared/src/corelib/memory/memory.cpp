@@ -257,25 +257,19 @@ namespace NdGameSdk::corelib::memory {
 			m_IsDebugMemoryAvailablePatch = Utility::WritePatchAddress(module,
 				ParticlesMenu + OffsetToisDebugMemoryAval + 4, { 0xb0, 0x01, 0xc3 }, wstr(m_IsDebugMemoryAvailablePatch), IsDebugMemoryAvailable());
 
-			// pSdkCfg.Memory.DebugMemory = true;
 			if (m_IsDebugMemoryAvailablePatch->IsEnable()) {
 				spdlog::warn("DebugMemory is enabled in Config");
 
 				uint8_t byte_0 = 0;
 
 			#if defined(T2R)
-				findpattern = Patterns::Memory_TaggedHeap_s_TaggedGpuDevHeap;
-				m_AllocatorTaggedHeap.s_TaggedGpuDevHeap = (TaggedHeap*)Utility::ReadLEA32(module,
-					findpattern.pattern, wstr(Patterns::Memory_TaggedHeap_s_TaggedGpuDevHeap), findpattern.offset, 3, 7);
-
-				if (!m_AllocatorTaggedHeap.s_TaggedGpuDevHeap) {
-					throw SdkComponentEx
-					{ std::format("Failed to find TaggedHeap addresses!"),
-						SdkComponentEx::ErrorCode::PatternFailed, true };
-				}
 
 				Memory::ModifyMemoryMap(MemoryMapId::ALLOCATION_DEV_CPU_MEM, 5000 * size_mb);
 				Memory::ModifyMemoryMap(MemoryMapId::ALLOCATION_DEV_GPU_MEM, 1256 * size_mb);
+
+				findpattern = Patterns::Memory_TaggedHeap_TaggedGpuDevHeap;
+				m_AllocatorTaggedHeap.TaggedGpuHeapDev = (TaggedHeap*)Utility::ReadLEA32(module,
+					findpattern.pattern, wstr(Patterns::Memory_TaggedHeap_TaggedGpuDevHeap), findpattern.offset, 3, 7);
 
 				findpattern = Patterns::Memory_TaggedHeap_SetTaggedGpuDevHeap;
 				m_AllocatorTaggedHeap.Memory_TaggedHeap_SetTaggedGpuDevHeap = (AllocatorTaggedHeap::Memory_TaggedHeap_SetTaggedGpuDevHeap_ptr)Utility::FindAndPrintPattern(module,
@@ -285,9 +279,10 @@ namespace NdGameSdk::corelib::memory {
 				m_MemArea.m_AllocateGpuVirtualMemoryPatch = Utility::WritePatchPattern(module, findpattern.pattern, &byte_0, sizeof(byte_0),
 					wstr(Patterns::Memory_Area_bAllocateGpuVm), findpattern.offset);
 
-				if (!m_AllocatorTaggedHeap.Memory_TaggedHeap_SetTaggedGpuDevHeap ||
-				!m_MemArea.m_AllocateGpuVirtualMemoryPatch
-				) { throw SdkComponentEx {  "Failed to find DebugMemory game data!", SdkComponentEx::ErrorCode::PatternFailed, true}; }
+				if (!(m_AllocatorTaggedHeap.Memory_TaggedHeap_SetTaggedGpuDevHeap || m_AllocatorTaggedHeap.TaggedGpuHeapDev) ||
+					!m_MemArea.m_AllocateGpuVirtualMemoryPatch
+					) { throw SdkComponentEx{ "Failed to find DebugMemory game data!", SdkComponentEx::ErrorCode::PatternFailed, true };
+				}
 
 			#elif defined(T1X)
 				Memory::IncreaseMemoryMap(MemoryMapId::ALLOCATION_CPU_MEMORY, 2000 * size_mb);

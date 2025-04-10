@@ -17,6 +17,7 @@ namespace NdGameSdk::common {
 		auto SharedComponents = ISdkComponent::GetSharedComponents();
 		m_Memory = SharedComponents->GetComponent<Memory>();
 		m_EngineComponents = SharedComponents->GetComponent<ndlib::EngineComponents>();
+		m_IAllocator.emplace(this, m_Memory.get());
 	}
 
 	void CommonGame::Initialize() {
@@ -74,28 +75,7 @@ namespace NdGameSdk::common {
 				spdlog::warn("Failed to patch {:s}! Logs may not work!", TOSTRING(Patterns::NIXXES_StdHandle));
 			}
 
-			//m_IAllocator.Init(*this, *m_Memory);
-
-			if (m_Memory->IsDebugMemoryAvailable()) {
-				findpattern = Patterns::IAllocator_Init;
-				auto InitTaggedHeapsJMP = (void*)Utility::FindAndPrintPattern(module
-					, findpattern.pattern, wstr(Patterns::GameInit_PrimServer_Create), (findpattern.offset + 0x4a7));
-
-				m_IAllocator.m_IAllocator_InitTaggedHeapsHook = Utility::MakeMidHook(InitTaggedHeapsJMP,
-					[](SafetyHookContext& ctx)
-					{
-						auto iallocator_init = GetSharedComponents()->GetComponent<CommonGame>();
-						iallocator_init->m_Memory->m_AllocatorTaggedHeap.SetTaggedGpuDevHeap();
-
-					}, wstr(Patterns::IAllocator_Init), wstr(InitTaggedHeapsJMP));
-
-
-				if (!m_IAllocator.m_IAllocator_InitTaggedHeapsHook) {
-					throw SdkComponentEx{ std::format("Failed to create hook {:s} in {:s}!", TOSTRING(m_IAllocator_InitTaggedHeapsHook), TOSTRING(IAllocator)),
-						SdkComponentEx::ErrorCode::PatchFailed };
-				}
-			}
-
+			m_IAllocator->Init();
 
 	#elif defined(T1X)
 			m_PrimServer = ISdkComponent::GetSharedComponents()->GetComponent<PrimServerComponent>();

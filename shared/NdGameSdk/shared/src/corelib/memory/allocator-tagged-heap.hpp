@@ -17,12 +17,16 @@ namespace NdGameSdk::corelib::memory
 {
 	class AllocatorTaggedHeap {
 	public:
-		TaggedHeap* SetTaggedGpuDevHeap() {
-			always_assert(Memory_TaggedHeap_SetTaggedGpuDevHeap == nullptr, "Function pointer was not set!");
-			return Memory_TaggedHeap_SetTaggedGpuDevHeap(*s_TaggedGpuDevHeap);
+		TaggedHeap* SetTaggedGpuDevHeap(TaggedHeap* pTaggedHeap) {
+			if (Memory_TaggedHeap_SetTaggedGpuDevHeap != nullptr) {
+				return Memory_TaggedHeap_SetTaggedGpuDevHeap(*pTaggedHeap);
+			}
+
+			TaggedGpuHeapDev = pTaggedHeap;
+			return TaggedGpuHeapDev;
 		}
 	private:
-		TaggedHeap* s_TaggedGpuDevHeap;
+		TaggedHeap* TaggedGpuHeapDev;
 		MEMBER_FUNCTION_PTR(TaggedHeap*, Memory_TaggedHeap_SetTaggedGpuDevHeap, TaggedHeap tag);
 		friend class Memory;
 	};

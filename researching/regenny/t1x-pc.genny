@@ -25,13 +25,13 @@ namespace regenny {
      }
 
 
-    // c:\branches\discbot??\1xfinal-pc-?.?.?\shared\src
+    // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src
     namespace shared {
 
-        // c:\branches\discbot??\1xfinal-pc-?.?.?\shared\src\corelib
+        // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\corelib
         namespace corelib {
 
-            // c:\branches\discbot??\1xfinal-pc-?.?.?\shared\src\corelib\memory
+            // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\corelib\memory
             namespace memory {
 
             enum Context : uint32_t {
@@ -414,7 +414,7 @@ namespace regenny {
             }
         }
 
-    // c:\branches\discbot??\1xfinal-pc-?.?.?\shared\src\ndlib
+    // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib
     namespace ndlib {
 
         struct EngineComponents {
@@ -714,7 +714,7 @@ namespace regenny {
         }
     */
 
-    // c:\branches\discbot??\1xfinal-pc-?.?.?\shared\src\ndlib\debug
+    // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\debug
     namespace debug {
 
         struct DMENU 0x670 {
@@ -870,15 +870,15 @@ namespace regenny {
         }  
     }
 
-    // c:\branches\discbot??\1xfinal-pc-?.?.?\shared\src\ndlib\process
+    // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\process
     namespace process {
         struct process 0x100 {}
     }
 
-    // c:\branches\discbot??\1xfinal-pc-?.?.?\shared\src\ndlib\render
+    // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\render
     namespace render {
 
-        // c:\branches\discbot??\1xfinal-pc-?.?.?\shared\src\ndlib\render\util
+        // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\render\util
         namespace util {
 
             struct PrimServer 0x1370 {
@@ -906,7 +906,7 @@ namespace regenny {
         }
     }
 
-    // c:\branches\discbot??\1xfinal-pc-?.?.?\shared\src\ndlib\util
+    // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\util
     namespace util {
         // bit-reader.h
         struct BitReader 0x18 {
@@ -919,7 +919,7 @@ namespace regenny {
     }
 
 
-    // c:\branches\discbot??\1xfinal-pc-?.?.?\shared\src\ndlib\script
+    // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\script
     namespace script {
         
         // #lang dc
@@ -1381,21 +1381,21 @@ namespace regenny {
         
     }
 
-    // c:\branches\discbot??\1xfinal-pc-?.?.?\shared\src\ndlib\io
+    // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\io
     namespace io {
 
     }
 
     }
 
-    // c:\branches\discbot??\1xfinal-pc-?.?.?\shared\src\common
+    // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\common
     namespace common {}
     }
 
-    // c:\branches\discbot??\1xfinal-pc-?.?.?\t1x\src
+    // c:\branches\discbot??\t1xfinal-pc-?.?.?\t1x\src
     namespace ndgame {
     
-        // c:\branches\discbot??\1xfinal-pc-?.?.?\t1x\src\game
+        // c:\branches\discbot??\t1xfinal-pc-?.?.?\t1x\src\game
         namespace game {
 
             struct GameInfo : shared.ndlib.NdGameInfo 0x3B0 {
@@ -1407,12 +1407,12 @@ namespace regenny {
               uint64_t Unk[0x2c];
             } 
 
-        // c:\branches\discbot??\1xfinal-pc-?.?.?\t1x\src\game\player
+        // c:\branches\discbot??\t1xfinal-pc-?.?.?\t1x\src\game\player
         namespace player {
 
         }
 
-        // c:\branches\discbot??\1xfinal-pc-?.?.?\t1x\src\game\weapon
+        // c:\branches\discbot??\t1xfinal-pc-?.?.?\t1x\src\game\weapon
         namespace weapon {
             
             // #79C1042C4AB59AA8: hash-table

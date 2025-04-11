@@ -2,6 +2,10 @@ name: Build NdGameSdk
 
 on:
   workflow_dispatch:
+    inputs:
+      pre-release:
+        type: boolean
+        description: 'Mark release as pre-release.'
 
 jobs:
   build:
@@ -17,6 +21,11 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
+      - name: Setup environment variables (workflow_dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          $ret = "${{ github.event.inputs.pre-release }}" -ieq "true" ? " --prerelease" : ""
+          echo release_arg="$ret" >> ${{ github.env }}
       - name: Cache
         uses: actions/cache@v4
         with:
@@ -58,4 +67,4 @@ jobs:
           gh release create "$_ver" `
           "$zip_name.7z" `
           "$zip_name-pdb.7z" `
-          --target ${{ GITHUB.SHA }} -t "$_ver" --prerelease
+          --target ${{ GITHUB.SHA }} -t "$_ver"${{ env.release_arg }}

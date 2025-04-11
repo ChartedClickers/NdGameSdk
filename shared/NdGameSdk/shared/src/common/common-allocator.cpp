@@ -36,6 +36,7 @@ namespace NdGameSdk::common {
 				[](SafetyHookContext& ctx) {
 					
 					s_Instance->m_Memory->m_AllocatorTaggedHeap.SetTaggedGpuDevHeap(s_TaggedGpuDevHeap);
+					spdlog::info("TaggedGpuDevHeap installed!");
 
 				}, wstr(Patterns::IAllocator_Init), wstr(InitTaggedHeapsJMP));
 

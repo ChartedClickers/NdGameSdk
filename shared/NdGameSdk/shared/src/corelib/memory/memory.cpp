@@ -264,7 +264,7 @@ namespace NdGameSdk::corelib::memory {
 
 			#if defined(T2R)
 
-				Memory::ModifyMemoryMap(MemoryMapId::ALLOCATION_DEV_CPU_MEM, 5000 * size_mb);
+				Memory::ModifyMemoryMap(MemoryMapId::ALLOCATION_DEV_CPU_MEM, 2000 * size_mb);
 				Memory::ModifyMemoryMap(MemoryMapId::ALLOCATION_DEV_GPU_MEM, 1256 * size_mb);
 
 				findpattern = Patterns::Memory_TaggedHeap_TaggedGpuDevHeap;

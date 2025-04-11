@@ -11,6 +11,8 @@ add_compile_options(
     -Wno-unused-private-field
     -Wno-unused-variable
     -Wno-ignored-qualifiers
+    -Wno-reorder-ctor
+    -Wno-microsoft-unqualified-friend
 )
 
 set(SAFETYHOOK_FETCH_ZYDIS ON)

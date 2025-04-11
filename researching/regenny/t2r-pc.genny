@@ -494,6 +494,172 @@ namespace regenny {
                 uint64_t Unk_4658 @ 0x4658;
             }
         }
+
+        // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\debug
+        namespace debug {
+
+            struct DMENU 0x670 {
+
+                enum Message : uint32_t
+                {
+                    OnOpen = 0x0,
+                    OnClose = 0x1,
+                    OnUpdate = 0x3,
+                    OnExecute = 0x5,
+                    OnReadConfig = 0x7,
+                    OnSaveConfig = 0x8
+                };
+    
+                 // DMENU::Component (class_DMENU::Component_vfTable)
+                 struct Component 0xb0 {
+                    struct VTable 0xb0 {}
+                    void* vftable;
+                    void* UnkString;
+                    char m_name[0x20] [[utf8*]] // (Only if string length is less than 32 characters)
+                    char* m_pname [[utf8*]];
+                    Component* m_pSubMenu;
+                    Component* m_NextDMenuComponent;
+                    uint64_t Unk2[0x3];
+                    uint64_t m_data; // For arguments or link variable
+                    uint32_t m_color;
+                    uint32_t m_selectcolor;
+                    uint32_t m_editedcolor; // maybe
+                    bool m_Islinked; // BY KEY ID
+                    char* m_pDescription +0xb [[utf8*]];
+                    bool m_atsign;
+                    Component* m_MenuGroup + 0x7;
+                    bool m_isfavorite + 0x1;
+                    int m_PagePointer +0x6; // Only with menu component?
+                    int m_MaxPagePointers;
+                    uint64_t m_ExtraArg;
+                }
+    
+                 // DMENU::Menu | DMENU::ItemSubmenu
+                 struct Menu : Component 0x30 {
+                    Component* m_Item;
+                    bool m_isActive + 0x4;
+                    uint64_t m_pad : 2;
+                    int m_MaxDisplayItems +0x7;
+                    uint64_t Unk[0x2];
+                }
+    
+                // DMENU::MenuGroup
+                struct MenuGroup : Component 0x280 {
+                    Menu* m_RootMenu;
+                    bool m_IsDisplayed + 0x8;
+                    bool m_Rendering;
+                    uint16_t Unk[0x3];
+                    uint64_t Unk2[0x4d];
+                }
+    
+                // DMENU::Item (class_Dmenu::Item_vfTable)
+                struct Item : Component 0x8  {
+                    struct VTable : DMENU.Component.VTable 0x48 {}
+                    void* m_callbackFunct;
+                }
+
+                // DMENU::ItemSubmenu
+                struct ItemSubmenu : Item 0x10  {
+                    Menu* m_pHeader; // Entry Pointer
+                    uint64_t Unk[0x1];
+                }
+
+                // DMENU::ItemBool
+                // Component.m_data - ValuePtr
+                struct ItemBool : Item 0x8 {
+                    bool m_status;
+                    bool m_pad[0x7];
+                 }
+
+                // DMENU::ItemDecimal* 
+                // Component.m_data - ValuePtr
+                // Different Size in T2R
+                /*
+                struct ItemDecimal : Item 0xb8  {
+                    uint64_t* m_format; // format Printf %d 
+                    void* m_HandlerFunc; // handler slider function 
+                    uint64_t m_DisplayValue [[i64]];
+                    uint64_t UnkDouble [[i64]];
+                    uint64_t m_MinValue [[i64]];
+                    uint64_t m_MaxValue [[i64]];
+                    uint64_t m_StepValue [[i64]];
+                    uint64_t m_DoubleStepValue [[i64]];
+                    uint64_t Unk2[0x7];
+                    char m_StringDisplayValue[0x20] [[utf8*]];
+                    uint64_t Unk3[0x4];
+                } 
+                */
+
+                // DMENU::ItemFloat* 
+                // Component.m_data - ValuePtr
+                // Different Size in T2R
+                /*
+                struct ItemFloat : Item 0x98  {
+                    uint64_t* m_format; // format Printf %6.2f
+                    void* m_HandlerFunc; // handler slider function 
+                    float m_DisplayValue;
+                    float UnkFloat;
+                    float m_MinValue;
+                    float m_MaxValue;
+                    float m_StepValue;
+                    float m_DoubleStepValue;
+                    uint64_t Unk2[0x6];
+                    char m_StringDisplayValue[0x20] [[utf8*]];
+                    uint64_t Unk3[0x4];
+                }
+                */
+
+                // DMENU::ItemFunction 
+                struct ItemFunction : Item 0x10  {
+                    void* unkData; // probably for link key->value
+                    bool m_isActive @ 0xc1;
+                    bool m_pad[0x6];
+                }
+
+                // DMENU::ItemSelection*
+                // Different Size in T2R
+                /*
+                struct ItemSelection : Item 0x30  {
+                    void* UnkData; // m_format probably
+                    void* m_callbackFormat;
+                    uint64_t Unk2[0x3];
+                    void* m_SelectionStruct;
+                } 
+                */
+
+                // DMENU::ItemSubText*
+                //struct ItemSubText : Item {}
+
+                // DMENU::ItemPlaceHolder
+                struct ItemPlaceHolder : Component 0x400 {
+                    char m_placeholder[0x400] [[utf8*]];
+                }
+
+                // DMENU::ItemLine*
+                //struct ItemLine : Component {}
+
+                void* vftable;
+                bool m_Text2DropShadows +0x8
+                bool m_PauseDuringMenus
+                bool m_PauseDuringMenusMP 
+                bool m_Pauseonexit
+                bool m_ShowPausedIndicator
+                bool UnkBool;
+                bool m_SquareButtontoBackOutofMenus
+                bool m_ChordtoSave
+                bool m_AlignMenusRight
+                int  m_Rightmargin @0x1c
+                float m_MenuAlpha [[f32]]
+                float m_MenuScale [[f32]]
+                bool m_Pause @0x61
+                MenuGroup* m_CurrentMenu +0xe [[u64]]
+                MenuGroup* m_QuickMenu
+                MenuGroup* m_DevMenu [[u64]]
+                MenuGroup* m_FavoritesMenu [[u64]]
+                uint64_t Unk2[0xbc];
+            }
+
+        }
         
     }
 

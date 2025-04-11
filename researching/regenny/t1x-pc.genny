@@ -751,7 +751,7 @@ namespace regenny {
                 int m_PagePointer +0x6; // Only with menu component?
                 int m_MaxPagePointers;
                 uint64_t m_ExtraArg;
-            } // 0x14041c8b0
+            } 
 
             // DMENU::Menu | DMENU::ItemSubmenu
             struct Menu : Component 0x30 {
@@ -851,16 +851,17 @@ namespace regenny {
             void* vftable;
             bool m_Text2DropShadows +0x8
             bool m_PauseDuringMenus
-            bool m_PauseDuringMenusMP
+            bool m_PauseDuringMenusMP 
             bool m_Pauseonexit
             bool m_ShowPausedIndicator
             bool UnkBool;
             bool m_SquareButtontoBackOutofMenus
             bool m_ChordtoSave
             bool m_AlignMenusRight
-            double m_Rightmargin +0x3 [[f64]]
-            double m_MenuScale [[f64]]
-            bool m_Pause +0x35
+            int  m_Rightmargin @0x1c
+            float m_MenuAlpha [[f32]]
+            float m_MenuScale [[f32]]
+            bool m_Pause @0x61
             MenuGroup* m_CurrentMenu +0xe [[u64]]
             MenuGroup* m_QuickMenu
             MenuGroup* m_DevMenu [[u64]]
@@ -1380,7 +1381,7 @@ namespace regenny {
         
     }
 
-    // // c:\branches\discbot??\1xfinal-pc-?.?.?\shared\src\ndlib\io
+    // c:\branches\discbot??\1xfinal-pc-?.?.?\shared\src\ndlib\io
     namespace io {
 
     }

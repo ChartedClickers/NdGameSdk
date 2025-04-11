@@ -44,17 +44,18 @@ jobs:
       - name: Pack binary
         working-directory: build
         run: |
-          $ASI_x64 = "Ultimate-ASI-Loader_x64.zip"
-          $ASIDownloadLink = "https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases/latest/download"
+          $ASI_x64 = "winmm-x64.zip"
+          $ASIDownloadLink = "https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases/download/x64-latest"
           $ASIPath = "bin/!ASI_Loader_x64"
           curl -fLJO "$ASIDownloadLink/$ASI_x64"
           7z x $ASI_x64 -o"$ASIPath"
-          mv "$ASIPath/dinput8.dll" "$ASIPath/winmm.dll"
           rm $ASI_x64
           
           7z a -mx9 -mtm- ${{ env.zip_pdb }} bin
           Remove-Item -Path bin -Recurse -Include *.lib,*.pdb
           7z a -mx9 -mtm- ${{ env.zip }} bin
+          # Clear it for cache
+          Remove-Item -Path bin -Recurse
       - name: Create Release
         if: github.event_name == 'workflow_dispatch'
         env:

@@ -28,8 +28,29 @@ jobs:
       - name: Setup environment variables (workflow_dispatch)
         if: github.event_name == 'workflow_dispatch'
         run: |
-          $ret = "${{ github.event.inputs.pre-release }}" -ieq "true" ? " --prerelease" : ""
+          $r = "${{ github.event.inputs.pre-release }}" -ieq "true"
+          $ret = $r ? " --prerelease" : ""
+          $rel_title = $r ? " PRE-RELEASE" : ""
           echo release_arg="$ret" >> ${{ github.env }}
+          echo release_title="$rel_title" >> ${{ github.env }}
+          
+          $content = Get-Content -Raw -Path "cmake.toml"
+          if ($content -match '\[project\](.*?)\n\s*name\s*=\s*"(.*?)"\s*\n\s*version\s*=\s*"(.*?)"')
+          {
+              $projectName = $matches[2]
+              $version = $matches[3]
+              
+              echo "projectName: $projectName"
+              echo "version: $version"
+
+              echo "projectName=$projectName" >> ${{ github.env }}
+              echo "projectVersion=$version" >> ${{ github.env }}
+          }
+          else
+          {
+              echo "Project section not found"
+              false
+          }
       - name: Cache
         uses: actions/cache@v4
         with:
@@ -61,15 +82,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $cmdOutput = Split-Path -Path $pwd -Leaf
           $branch = "${{ github.ref_name }}"
           $branch = $branch.replace('/','-')
-          $_ver = "0.0.$(git rev-list HEAD --count)-$(git rev-parse --short=8 HEAD)+${{ github.run_number }}-branch-$branch"
-          $zip_name="$cmdOutput-$_ver"
+          $_ver = "${{ env.projectVersion }}-$(git rev-list HEAD --count)-$(git rev-parse --short=8 HEAD)+${{ github.run_number }}-$branch"
+          $zip_name="${{ env.projectName }}-$_ver"
           cp "${{ env.zip }}" "$zip_name.7z"
           cp "${{ env.zip_pdb }}" "$zip_name-pdb.7z"
           
           gh release create "$_ver" `
           "$zip_name.7z" `
           "$zip_name-pdb.7z" `
-          --target ${{ GITHUB.SHA }} -t "$_ver"${{ env.release_arg }}
+          --target ${{ GITHUB.SHA }} -t "${{ env.projectName }} ${{ env.projectVersion }}${{ env.release_title }}"${{ env.release_arg }}

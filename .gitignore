@@ -5,6 +5,7 @@
 build*/
 cmake-build*/
 CMakerLists.txt
+CMakeLists.txt
 CMakeLists.txt.user
 
 # Researching

@@ -24,9 +24,8 @@ namespace NdGameSdk {
 		auto ParticleMgr = SharedComponents->AddComponent<gamelib::render::particle::ParticleManager>();
 #endif
 		SharedComponents->AddComponent<common::CommonGame>();
-#if defined(T1X)
 		auto DmenuComponent = SharedComponents->AddComponent<gamelib::debug::NdDevMenu>(cfg.NdDevMenu);
-#endif
+
 		SharedComponents->InitializeSdkComponents();
 
 #if defined(T1X)

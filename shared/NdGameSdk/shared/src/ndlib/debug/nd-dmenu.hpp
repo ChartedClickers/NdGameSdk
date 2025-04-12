@@ -2,14 +2,13 @@
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/components/SdkRegenny.hpp"
 
-#if defined(T1X)
-
-
 #include <Utility/cmacros/for_each.hpp>
 #include <Utility/color.hpp>
 #include <boost/function.hpp>
 
-#if defined(T1X)
+#if defined(T2R)
+#include <NdGameSdk/regenny/t2r/shared/ndlib/debug/DMENU.hpp>
+#elif defined(T1X)
 #include <NdGameSdk/regenny/t1x/shared/ndlib/debug/DMENU.hpp>
 #endif
 
@@ -183,6 +182,10 @@ namespace NdGameSdk::ndlib::debug {
 		MenuGroup* FavoritesMenu();
 	};
 
+#define ASSERT_DMENU_ITEM_SIZE(type, base_offset) \
+    static_assert(sizeof(DMENU::type) == sizeof(DMENU::Item) + base_offset, \
+    #type " size mismatch: expected sizeof(Item) + 0x" #base_offset)
+
 	static_assert(sizeof(DMENU) == 0x670, "Size of DMENU is not correct.");
 	static_assert(sizeof(DMENU::Component) == 0xb0, "Size of DMENU::Component is not correct.");
 
@@ -190,12 +193,22 @@ namespace NdGameSdk::ndlib::debug {
 	static_assert(sizeof(DMENU::MenuGroup) == sizeof(DMENU::Component) + 0x280, "Size of DMENU::MenuGroup is not correct.");
 	static_assert(sizeof(DMENU::Item) == sizeof(DMENU::Component) + 0x8, "Size of DMENU::Item is not correct.");
 
-	static_assert(sizeof(DMENU::ItemSubmenu) == sizeof(DMENU::Item) + 0x10, "Size of DMENU::ItemSubmenu is not correct.");
-	static_assert(sizeof(DMENU::ItemBool) == sizeof(DMENU::Item) + 0x8, "Size of DMENU::ItemBool is not correct.");
-	static_assert(sizeof(DMENU::ItemDecimal) == sizeof(DMENU::Item) + 0xb8, "Size of DMENU::ItemDecimal is not correct.");
-	static_assert(sizeof(DMENU::ItemFloat) == sizeof(DMENU::Item) + 0x98, "Size of DMENU::ItemFloat is not correct.");
-	static_assert(sizeof(DMENU::ItemFunction) == sizeof(DMENU::Item) + 0x10, "Size of DMENU::ItemFunction is not correct.");
-	static_assert(sizeof(DMENU::ItemSelection) == sizeof(DMENU::Item) + 0x30, "Size of DMENU::ItemSelection is not correct.");
+	ASSERT_DMENU_ITEM_SIZE(ItemSubmenu, 0x10);
+	ASSERT_DMENU_ITEM_SIZE(ItemBool, 0x08);
+	ASSERT_DMENU_ITEM_SIZE(ItemFunction, 0x10);
+
+#if defined(T1X)
+	ASSERT_DMENU_ITEM_SIZE(ItemDecimal, 0xb8);
+	ASSERT_DMENU_ITEM_SIZE(ItemFloat, 0x98);
+	ASSERT_DMENU_ITEM_SIZE(ItemSelection, 0x30);
+#elif defined(T2R)
+	ASSERT_DMENU_ITEM_SIZE(ItemDecimal, 0xc8);
+	ASSERT_DMENU_ITEM_SIZE(ItemFloat, 0xa8);
+	ASSERT_DMENU_ITEM_SIZE(ItemSelection, 0x38);
+#else
+#error "Unsupported Build for NdDevMenu."
+#endif
+
+#undef ASSERT_DMENU_ITEM_SIZE
 
 }
-#endif

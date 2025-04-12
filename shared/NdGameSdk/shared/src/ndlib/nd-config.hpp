@@ -5,10 +5,10 @@
 #include <cstdint>
 #include <Utility/assertion/assert.hpp>
 
-#if defined(T1X)
-#include <NdGameSdk/regenny/t1x/shared/ndlib/NdConfig.hpp>
-#else
+#if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/ndlib/NdConfig.hpp>
+#elif defined(T1X)
+#include <NdGameSdk/regenny/t1x/shared/ndlib/NdConfig.hpp>
 #endif
 
 #include "debug/nd-dmenu.hpp"
@@ -18,10 +18,8 @@ namespace NdGameSdk::ndlib {
 	public:
 		using Config = ::regenny::shared::ndlib::NdConfig::Config;
 
-#if defined(T1X)
 		NdGameSdk_API ndlib::debug::DMENU& GetDmenu();
 		NdGameSdk_API ndlib::debug::DMENU::MenuGroup& GetNdDevMenu();
-#endif
 
 		template <typename TConfig>
 		NdGameSdk_API TConfig* GetConfig(Config index) {

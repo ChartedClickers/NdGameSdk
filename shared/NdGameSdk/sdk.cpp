@@ -33,12 +33,9 @@ namespace NdGameSdk {
         auto sdklogger = SdkLogger::GetLogger();
         auto sdkcfg = cfg ? std::move(*cfg) : SdkConfig{};
 
-
-        #if defined(T1X)
         if (sdkcfg.NdDevMenu.ExtendedDebugMenu) {
             sdkcfg.Memory.DebugMemory = true;
         }
-        #endif
 
         set_default_logger(sdklogger);
 

@@ -79,18 +79,3 @@ void NdModClient::OnGameInitialized(bool status) {
 void NdModClient::OnMemoryMapped(corelib::memory::Memory* Memory) {
 	spdlog::info("MemoryMapped!");
 }
-
-#if defined(T1X)
-void NdModClient::OnAppendSdkDevMenu(gamelib::debug::NdDevMenu* NdDevMenu, 
-	gamelib::debug::NdDevMenu::AppendSdkSubMenusCallback AppendSdkDevMenu) {
-
-	// We can create our menus here and also will broadcast this event to our NdMods.
-	spdlog::info("OnAppendSdkDevMenu by {}!", NdDevMenu->GetName());
-
-
-	auto NdModClientMenu = NdDevMenu->Create_DMENU_Menu("Test menu", HeapArena_Source);
-
-	// I am not sure that this is a good implementation. I will be considered to change this.
-	AppendSdkDevMenu(NdModClientMenu,"Test menu", NULL, NULL);
-}
-#endif

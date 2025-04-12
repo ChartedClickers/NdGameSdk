@@ -456,6 +456,7 @@ set(T2RSDK_SOURCES
 	"shared/NdGameSdk/regenny/t2r/shared/ndlib/EngineComponents.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/ndlib/NdConfig.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/ndlib/NdGameInfo.hpp"
+	"shared/NdGameSdk/regenny/t2r/shared/ndlib/debug/DMENU.hpp"
 	"shared/NdGameSdk/sdk.cpp"
 	"shared/NdGameSdk/sdk.hpp"
 	"shared/NdGameSdk/sdkconfig.hpp"

@@ -6,7 +6,7 @@ languages = ["C", "CXX"]
 cmake-after = """
 add_compile_options(
     $<$<CONFIG:Debug>:/MDd>
-    $<$<CONFIG:Release>:/MD>
+    $<$<CONFIG:RelWithDebInfo>:/MD>
     # noise
     -Wno-unused-private-field
     -Wno-unused-variable
@@ -20,6 +20,7 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 """
  
 [variables]
+CMAKE_CONFIGURATION_TYPES = "Debug;RelWithDebInfo"
 RUNTIME_OUTPUT_DIRECTORY = "${CMAKE_BINARY_DIR}/bin"
 LIBRARY_OUTPUT_DIRECTORY = "${CMAKE_BINARY_DIR}/lib" 
 PROJECT_TARGET = "ND"

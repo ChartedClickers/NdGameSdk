@@ -39,7 +39,6 @@ namespace NdGameSdk::gamelib::debug {
 	    SdkEvent<NdDevMenu*, AppendSdkSubMenusCallback> e_AppendSdkMenu{true};
 
 		NdGameSdk_API bool IsGameDebugMenu();
-		NdGameSdk_API bool IsExtendedDebugMenu();
 
 		NdGameSdk_API DMENU::Menu* Create_DMENU_Menu(std::string pName, HeapArena_Args);
 		NdGameSdk_API DMENU::ItemLine* Create_DMENU_ItemLine(DMENU::Menu* pMenu, HeapArena_Args);

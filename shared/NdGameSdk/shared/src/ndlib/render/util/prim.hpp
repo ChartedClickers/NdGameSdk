@@ -4,7 +4,6 @@
 
 
 #include "NdGameSdk/sdk.hpp"
-#include "NdGameSdk/config/PrimServerCfg.hpp"
 #include "NdGameSdk/components/SdkComponent.hpp"
 
 #include <Utility/helper.hpp>
@@ -40,7 +39,7 @@ namespace NdGameSdk::ndlib::render::util {
 	class PrimServerComponent : public ISdkComponent
 	{
 	public:
-		PrimServerComponent(PrimServerCfg& cfg);
+		PrimServerComponent();
 		NdGameSdk_API bool IsCreated();
 		void Create(PrimServer::InitParams* InitParams);
 	private:
@@ -50,7 +49,6 @@ namespace NdGameSdk::ndlib::render::util {
 		bool m_IsCreated{};
 
 		PrimServer* m_PrimServer;
-		PrimServerCfg m_cfg{};
 		
 		shared_ptr<Memory> m_Memory;
 

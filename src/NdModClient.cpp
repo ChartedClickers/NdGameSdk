@@ -67,12 +67,7 @@ void NdModClient::OnGameInitialized(bool status) {
 	spdlog::info("GAME initialized!");
 
 	auto& gameconfig = m_EngineComponents->GetGameInfo();
-
 	spdlog::info("BUILD: {}", gameconfig->m_BranchName);
-
-#if defined(T2R)
-	gameconfig->m_DevMode = true;
-#endif
 
 }
 

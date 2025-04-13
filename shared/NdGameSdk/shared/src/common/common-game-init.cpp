@@ -78,26 +78,27 @@ namespace NdGameSdk::common {
 			m_IAllocator->Init();
 
 	#elif defined(T1X)
-			m_PrimServer = ISdkComponent::GetSharedComponents()->GetComponent<PrimServerComponent>();
-			if (m_PrimServer.get() && m_PrimServer->IsInitialized() && 
-				m_PrimServer->m_cfg.PrimServerCreate) {
+			if (m_Memory->IsDebugMemoryAvailable()) {
+				m_PrimServer = ISdkComponent::GetSharedComponents()->GetComponent<PrimServerComponent>();
+				if (m_PrimServer.get() && m_PrimServer->IsInitialized()) {
 
-				findpattern = Patterns::GameInit_PrimServer_Create;
-				auto PrimServerCreateJMP = (void*)Utility::FindAndPrintPattern(module
-					, findpattern.pattern, wstr(Patterns::GameInit_PrimServer_Create), findpattern.offset);
+					findpattern = Patterns::GameInit_PrimServer_Create;
+					auto PrimServerCreateJMP = (void*)Utility::FindAndPrintPattern(module
+						, findpattern.pattern, wstr(Patterns::GameInit_PrimServer_Create), findpattern.offset);
 
-				m_PrimServer_CreateHook = Utility::MakeMidHook(PrimServerCreateJMP,
-					[](SafetyHookContext& ctx)
-					{
-						auto gameinit = GetSharedComponents()->GetComponent<CommonGame>();
-						MemoryMapEntry* DebugDrawing = gameinit->m_Memory->GetMemoryMapEntry(MemoryMapId::ALLOCATION_DEBUG_DRAWING);
-						PrimServer::InitParams pParams{ DebugDrawing->Size() };
-						gameinit->m_PrimServer->Create(&pParams);
-					}, wstr(Patterns::GameInit_PrimServer_Create), wstr(PrimServerCreateJMP));
+					m_PrimServer_CreateHook = Utility::MakeMidHook(PrimServerCreateJMP,
+						[](SafetyHookContext& ctx)
+						{
+							auto gameinit = GetSharedComponents()->GetComponent<CommonGame>();
+							MemoryMapEntry* DebugDrawing = gameinit->m_Memory->GetMemoryMapEntry(MemoryMapId::ALLOCATION_DEBUG_DRAWING);
+							PrimServer::InitParams pParams{ DebugDrawing->Size() };
+							gameinit->m_PrimServer->Create(&pParams);
+						}, wstr(Patterns::GameInit_PrimServer_Create), wstr(PrimServerCreateJMP));
 
-				if (!m_PrimServer_CreateHook) {
-					throw SdkComponentEx{ std::format("Failed to create hook {:s} in {:s}!", TOSTRING(m_PrimServer_CreateHook),GetName()),
-						SdkComponentEx::ErrorCode::PatchFailed };
+					if (!m_PrimServer_CreateHook) {
+						throw SdkComponentEx{ std::format("Failed to create hook {:s} in {:s}!", TOSTRING(m_PrimServer_CreateHook),GetName()),
+							SdkComponentEx::ErrorCode::PatchFailed };
+					}
 				}
 			}
 	#endif

@@ -4,10 +4,6 @@
 #include "config/MemoryCfg.hpp"
 #include "config/DevModeCfg.hpp"
 
-#if defined(T1X)
-#include "config/PrimServerCfg.hpp"
-#endif
-
 using namespace NdGameSdk::config;
 
 namespace NdGameSdk {
@@ -19,10 +15,6 @@ namespace NdGameSdk {
 
         NdDevMenuCfg NdDevMenu{};
         MemoryCfg Memory{};
-
-    #if defined(T1X)
-        PrimServerCfg PrimServer{};
-    #endif
 
     };
 }

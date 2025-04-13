@@ -7,8 +7,5 @@ namespace NdGameSdk {
     public:
         NdDevMenuCfg() {}
         bool GameDebugMenu = SDK_DEBUG;
-        bool GameDebugConfig{};
-        bool ExtendedDebugMenu{};
-
     };
 }

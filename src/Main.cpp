@@ -39,20 +39,13 @@ BOOL Initialize(HMODULE dllModule) {
     SPDLOG_INFO(L"Game Path: {}", exePath);
     SPDLOG_INFO(L"Game Name: {}", VerProductName);
 
-    std::this_thread::sleep_for(std::chrono::seconds(3));
-
     g_ndmodclient = std::make_unique<NdModClient>(baseModule);
 
-    // will use values from Config ini.
     SdkConfig pSdkCfg{};
-
-#if defined(T1X)
-    pSdkCfg.Sidbase = true;
-    pSdkCfg.NdDevMenu.GameDebugMenu = true;
-    pSdkCfg.Memory.DebugMemory = true;
-    pSdkCfg.NdDevMenu.ExtendedDebugMenu = true;
-    pSdkCfg.PrimServer.PrimServerCreate = true;
-#endif
+    if (cfg.IsLoaded()) {
+        pSdkCfg.NdDevMenu.GameDebugMenu = cfg.get<bool>(PROJECT_SDK, "bGameDebugMenu", g_bGameDebugMenu).value();
+        pSdkCfg.Memory.DebugMemory = cfg.get<bool>(PROJECT_SDK, "bDebugMemory", g_bDebugMemory).value();
+    }
 
     NdGameSdk::InitializeSdk(&pSdkCfg);
     NdGameSdk::RegisterSdkModule(g_ndmodclient.get());

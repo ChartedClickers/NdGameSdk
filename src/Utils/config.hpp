@@ -74,3 +74,6 @@ namespace Utils {
 }
 
 extern bool g_bShowDebugConsole;
+extern bool g_bGameDebugMenu;
+extern bool g_bDebugMemory;
+

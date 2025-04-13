@@ -20,7 +20,7 @@ namespace NdGameSdk {
 
 #if defined(T1X)
 		SharedComponents->AddComponent<ndlib::script::ScriptManager>();
-		SharedComponents->AddComponent<ndlib::render::util::PrimServerComponent>(cfg.PrimServer);
+		SharedComponents->AddComponent<ndlib::render::util::PrimServerComponent>();
 		auto ParticleMgr = SharedComponents->AddComponent<gamelib::render::particle::ParticleManager>();
 #endif
 		SharedComponents->AddComponent<common::CommonGame>();

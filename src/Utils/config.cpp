@@ -5,12 +5,10 @@
 #include <string>
 
 // Global INI Variables
-#if NDEBUG
-bool g_bShowDebugConsole{false};
-#else
-bool g_bShowDebugConsole{true};
-#endif
-	
+bool g_bShowDebugConsole{};
+bool g_bGameDebugMenu{true}; 
+bool g_bDebugMemory{};
+
 namespace Utils {
 
 	Config::Config(const std::string& config_path) : m_configpath { config_path }  {
@@ -56,9 +54,14 @@ namespace Utils {
 
 	void Config::SetDefaultValues(CSimpleIniA& Ini)
 	{
+#ifndef NDEBUG
+		g_bShowDebugConsole = true;
+		g_bGameDebugMenu = true;
+		g_bDebugMemory = true;
+#endif
 		Ini.SetBoolValue(PROJECT_NAME, "bShowDebugConsole", g_bShowDebugConsole);
-
-		Ini.SetBoolValue(PROJECT_SDK, "btest", true);
+		Ini.SetBoolValue(PROJECT_SDK, "bGameDebugMenu", g_bGameDebugMenu);
+		Ini.SetBoolValue(PROJECT_SDK, "bDebugMemory", g_bDebugMemory);
 	}
 
 	void Config::LogConfigParse()

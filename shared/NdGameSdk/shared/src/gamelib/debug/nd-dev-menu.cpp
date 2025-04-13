@@ -8,7 +8,7 @@ namespace NdGameSdk::gamelib::debug {
 	NdDevMenu::NdDevMenu(NdDevMenuCfg& cfg) : m_cfg{ std::move(cfg) }, ISdkComponent("DMENU") {}
 	
 	NdDevMenu::~NdDevMenu() {
-		if (m_CommonGame) {
+		if (IsInitialized()) {
 			m_CommonGame->e_GameInitialized.Unsubscribe({ this, &NdDevMenu::OnGameInitialized });
 		}
 	}
@@ -21,10 +21,6 @@ namespace NdGameSdk::gamelib::debug {
 		}
 
 		return m_cfg.GameDebugMenu;
-	}
-
-	bool NdDevMenu::IsExtendedDebugMenu() {
-		return m_cfg.ExtendedDebugMenu;
 	}
 
 	DMENU::Menu* NdDevMenu::Create_DMENU_Menu(std::string pName, HeapArena_Args) {
@@ -308,27 +304,24 @@ namespace NdGameSdk::gamelib::debug {
 
 			if (m_GameConfig_DevModePatch->IsEnable()) {
 				spdlog::info("GameDebugMenu is enabled!");
+			}
 
-	
-				if (m_cfg.ExtendedDebugMenu && m_Memory->IsDebugMemoryAvailable()) {
+			if (m_Memory->IsDebugMemoryAvailable()) {
+			#if defined(T1X)
+				findpattern = Patterns::NdDevMenu_Assert_UpdateSelectRegionByNameMenu;
+				m_Assert_UpdateSelectRegionByNameMenuPatch = Utility::WritePatchNop(module, findpattern.pattern, 0x1,
+					wstr(Patterns::NdDevMenu_Assert_UpdateSelectRegionByNameMenu), findpattern.offset);
 
-				#if defined(T1X)
-					findpattern = Patterns::NdDevMenu_Assert_UpdateSelectRegionByNameMenu;
-					m_Assert_UpdateSelectRegionByNameMenuPatch = Utility::WritePatchNop(module, findpattern.pattern, 0x1,
-						wstr(Patterns::NdDevMenu_Assert_UpdateSelectRegionByNameMenu), findpattern.offset);
+				findpattern = Patterns::NdDevMenu_Assert_UpdateSelectIgcByNameMenu;
+				m_Assert_UpdateSelectIgcByNameMenuPatch = Utility::WritePatchNop(module, findpattern.pattern, 0x1,
+					wstr(Patterns::NdDevMenu_Assert_UpdateSelectIgcByNameMenu), findpattern.offset);
 
-					findpattern = Patterns::NdDevMenu_Assert_UpdateSelectIgcByNameMenu;
-					m_Assert_UpdateSelectIgcByNameMenuPatch = Utility::WritePatchNop(module, findpattern.pattern, 0x1,
-						wstr(Patterns::NdDevMenu_Assert_UpdateSelectIgcByNameMenu), findpattern.offset);
+				findpattern = Patterns::NdDevMenu_Assert_UpdateSelectSpawnerByNameMenu;
+				m_Assert_UpdateSelectSpawnerByNameMenuPatch = Utility::WritePatchNop(module, findpattern.pattern, 0x1,
+					wstr(Patterns::NdDevMenu_Assert_UpdateSelectSpawnerByNameMenu), findpattern.offset);
+			#endif
 
-					findpattern = Patterns::NdDevMenu_Assert_UpdateSelectSpawnerByNameMenu;
-					m_Assert_UpdateSelectSpawnerByNameMenuPatch = Utility::WritePatchNop(module, findpattern.pattern, 0x1,
-						wstr(Patterns::NdDevMenu_Assert_UpdateSelectSpawnerByNameMenu), findpattern.offset);
-				#endif
-
-					spdlog::info("ExtendedDebugMenu is enabled!");
-				}
-
+				spdlog::info("ExtendedDebugMenu is enabled!");
 			}
 
 			findpattern = Patterns::NdDevMenu_DMENU_MenuGroup_SetRootMenu;

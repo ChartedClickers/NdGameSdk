@@ -34,7 +34,7 @@ namespace NdGameSdk::ndlib::render::util {
 		return memoryBufferSizeArray;
 	}
 
-	PrimServerComponent::PrimServerComponent(PrimServerCfg& cfg) : m_cfg { std::move(cfg) }, ISdkComponent("PrimServer") {}
+	PrimServerComponent::PrimServerComponent() : ISdkComponent("PrimServer") {}
 	
 	bool PrimServerComponent::IsCreated() {
 		return m_IsCreated;
@@ -70,28 +70,29 @@ namespace NdGameSdk::ndlib::render::util {
 					SdkComponentEx::ErrorCode::DependenciesFailed };
 			}
 
-			Patterns::SdkPattern findpattern{};
-			auto module = Utility::memory::get_executable();
+			if (m_Memory->IsDebugMemoryAvailable()) {
 
-			findpattern = Patterns::PrimServer_PrimServer;
-			m_PrimServer = (PrimServer*)Utility::ReadLEA32(module,
-				findpattern.pattern, wstr(Patterns::PrimServer_PrimServer), findpattern.offset, 3, 7);
+				Patterns::SdkPattern findpattern{};
+				auto module = Utility::memory::get_executable();
 
-			if (!m_PrimServer) {
-				throw SdkComponentEx
-				{ std::format("Failed to find addresses!"),
-					SdkComponentEx::ErrorCode::PatternFailed };
-			}
+				findpattern = Patterns::PrimServer_PrimServer;
+				m_PrimServer = (PrimServer*)Utility::ReadLEA32(module,
+					findpattern.pattern, wstr(Patterns::PrimServer_PrimServer), findpattern.offset, 3, 7);
 
-			findpattern = Patterns::PrimServer_Create;
-			PrimServer_Create = (PrimServer_Create_ptr)Utility::FindAndPrintPattern(module,
-				findpattern.pattern, wstr(Patterns::PrimServer_Create), findpattern.offset);
+				if (!m_PrimServer) {
+					throw SdkComponentEx
+					{ std::format("Failed to find addresses!"),
+						SdkComponentEx::ErrorCode::PatternFailed };
+				}
 
-			if (!PrimServer_Create) {
-				throw SdkComponentEx{ "Failed to find PrimServer:: game functions!", SdkComponentEx::ErrorCode::PatternFailed };
-			}
+				findpattern = Patterns::PrimServer_Create;
+				PrimServer_Create = (PrimServer_Create_ptr)Utility::FindAndPrintPattern(module,
+					findpattern.pattern, wstr(Patterns::PrimServer_Create), findpattern.offset);
 
-			if (m_cfg.PrimServerCreate) {
+				if (!PrimServer_Create) {
+					throw SdkComponentEx{ "Failed to find PrimServer:: game functions!", SdkComponentEx::ErrorCode::PatternFailed };
+				}
+
 				m_Memory->IncreaseMemoryMap(MemoryMapId::ALLOCATION_CPU_MEMORY, MemSize(2560, SizeUnit::Megabytes));
 			}
 

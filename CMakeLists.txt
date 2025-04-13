@@ -25,6 +25,7 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
 endif()
 
 # Variables
+set(CMAKE_CONFIGURATION_TYPES "Debug;RelWithDebInfo")
 set(RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(PROJECT_TARGET ND)
@@ -40,11 +41,13 @@ project(ND.ModClient
 
 add_compile_options(
     $<$<CONFIG:Debug>:/MDd>
-    $<$<CONFIG:Release>:/MD>
+    $<$<CONFIG:RelWithDebInfo>:/MD>
     # noise
     -Wno-unused-private-field
     -Wno-unused-variable
     -Wno-ignored-qualifiers
+    -Wno-reorder-ctor
+    -Wno-microsoft-unqualified-friend
 )
 
 set(SAFETYHOOK_FETCH_ZYDIS ON)

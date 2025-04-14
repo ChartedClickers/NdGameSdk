@@ -40,11 +40,20 @@ namespace NdGameSdk::common {
 
 			Patterns::SdkPattern findpattern{};
 
-			findpattern = Patterns::GameInit_ReturnHook;
-			auto GameInitJMP = (void*)Utility::FindAndPrintPattern(module
-				, findpattern.pattern, wstr(Patterns::GameInit_ReturnHook), findpattern.offset);
+#if defined(T2R)
+			constexpr size_t GameInitReturnHook_Offset = 0x13;
+#elif defined(T1X)
+			constexpr size_t GameInitReturnHook_Offset = 0x4c;
+#endif
 
-			if (!GameInitJMP) {
+			findpattern = Patterns::GameInit;
+			auto GameInitJMP = (void*)Utility::FindAndPrintPattern(module
+				, findpattern.pattern, wstr(Patterns::GameInit), findpattern.offset);
+			auto GameInitReturnJMP = (void*)Utility::FindAndPrintPattern(module
+				, findpattern.pattern, wstr(Patterns::GameInit), findpattern.offset + GameInitReturnHook_Offset);
+
+			if (!GameInitJMP ||
+				!GameInitReturnJMP) {
 				throw SdkComponentEx
 				{ std::format("Failed to find addresses!"),
 					SdkComponentEx::ErrorCode::PatternFailed };
@@ -53,18 +62,36 @@ namespace NdGameSdk::common {
 			m_GameInitHook = Utility::MakeMidHook(GameInitJMP,
 				[](SafetyHookContext& ctx)
 				{
-					auto gameinit = GetSharedComponents()->GetComponent<CommonGame>();
-					bool successful = !((*(uint32_t*)ctx.rax) > 0);
-					gameinit->m_GameInitialized = successful;
+					//Reconfiguring the NdGame
+					auto pCommonGame = GetSharedComponents()->GetComponent<CommonGame>();
 
-					if (gameinit->m_EngineComponents) {
-						auto& ndgameinfo = gameinit->m_EngineComponents->GetNdGameInfo();
+					if (pCommonGame->m_EngineComponents) {
+						auto& ndgameinfo = pCommonGame->m_EngineComponents->GetNdGameInfo();
+					#if defined(T2R)
+						// Rollback original cfg path to game path (Like it was in T1X)
+						strcpy(ndgameinfo->m_CfgPath, ndgameinfo->m_GamePath);
+					#endif
+						ndgameinfo->m_DevConfig = true;
+					}
+
+				}, wstr(Patterns::GameInit), wstr(GameInitJMP));
+
+
+			m_GameInitReturnHook = Utility::MakeMidHook(GameInitReturnJMP,
+				[](SafetyHookContext& ctx)
+				{
+					auto pCommonGame = GetSharedComponents()->GetComponent<CommonGame>();
+					bool successful = !((*(uint32_t*)ctx.rax) > 0);
+					pCommonGame->m_GameInitialized = successful;
+
+					if (pCommonGame->m_EngineComponents) {
+						auto& ndgameinfo = pCommonGame->m_EngineComponents->GetNdGameInfo();
 						strcpy(ndgameinfo->m_DiscUser, SDK_NAME);
 					}
 
-					gameinit->InvokeSdkEvent(gameinit->e_GameInitialized, successful);
+					pCommonGame->InvokeSdkEvent(pCommonGame->e_GameInitialized, successful);
 
-				}, wstr(Patterns::GameInit_ReturnHook), wstr(GameInitJMP));
+				}, wstr(Patterns::GameInit), wstr(GameInitReturnJMP));
 
 	#if defined(T2R)
 			findpattern = Patterns::NIXXES_StdHandle;
@@ -103,7 +130,8 @@ namespace NdGameSdk::common {
 			}
 	#endif
 
-			if (!m_GameInitHook) {
+			if (!m_GameInitHook ||
+				!m_GameInitReturnHook) {
 				throw SdkComponentEx{ "Failed to hook CommonGame functions!",
 					SdkComponentEx::ErrorCode::PatchFailed };
 			}

@@ -39,9 +39,9 @@ struct NdGameInfo {
     char m_GamePath_unk2[1024]; // 0x3168
     private: char pad_3568[0x402]; public:
     // Metadata: utf8*
-    char m_GamePath_unk3[1024]; // 0x396a
+    char m_CfgPath[1024]; // 0x396a
     // Metadata: utf8*
-    char m_CfgPath[128]; // 0x3d6a
+    char m_CfgFolderName[128]; // 0x3d6a
     // Metadata: utf8*
     char m_CfgDefaultsPath[128]; // 0x3dea
     private: char pad_3e6a[0x85]; public:

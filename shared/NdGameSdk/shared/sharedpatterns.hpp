@@ -8,7 +8,7 @@ namespace NdGameSdk::Patterns
 	static inline const SdkPattern EngineComponents_s_table = { L"48 89 74 24 20 41 54 41 56 41 57 48 83 ec 30 8b f1 45 8b f8 4c 8d 25 ?? ?? ?? ?? 4c 8b f2 48 85 d2 0f 84 ?? ?? ?? ??", +0x14 };
 	static inline const SdkPattern EngineComponents_s_ndConfig = { L"48 8d 0d ?? ?? ?? ?? b8 04 00 00 00 48 8d 89 80 00 00 00 c5 f8 10 03 48 8d 9b 80 00 00 00 c5 f8 11 41 80 c5 f8 10 4b 90 c5 f8 11 49 90 c5 f8 10 43 a0 c5 f8 11 41 a0 c5 f8 10 4b b0 c5 f8 11 49 b0 c5 f8 10 43 c0 c5 f8 11 41 c0 c5 f8 10 4b d0 c5 f8 11 49" };
 
-	static inline const SdkPattern GameInit_ReturnHook = { L"40 53 48 83 ec 30 48 8b d9 48 8d 4c 24 20 e8 ?? ?? ?? ?? 8b 10 85 d2 7e 11 c5 f8 10 00 c5 f8 11 03 48 8b c3 48 83 c4 30 5b c3", +0x13 };
+	static inline const SdkPattern GameInit = { L"40 53 48 83 ec 30 48 8b d9 48 8d 4c 24 20 e8 ?? ?? ?? ?? 8b 10 85 d2 7e 11 c5 f8 10 00 c5 f8 11 03 48 8b c3 48 83 c4 30 5b c3" };
 	
 	static inline const SdkPattern IAllocator_Init = { L"48 89 5c 24 10 55 56 57 41 54 41 55 41 56 41 57 48 8b ec 48 83 ec 50 4c 63 f9 4c 8b f2 33 c9 e8 ?? ?? ?? ?? 84 c0 c7 45 40 07 00 00 00 48 8d 3d ?? ?? ?? ?? 48 8d 1d ?? ?? ?? ?? 48 8d 15 ?? ?? ?? ?? 48 0f 45 df 48 8d 4d 40" };
 	static inline const SdkPattern IAllocator_s_TaggedGpuDevHeap = { L"48 83 ec 28 48 8d 15 ?? ?? ?? ?? 48 8d 0d ?? ?? ?? ?? e8 ?? ?? ?? ?? 48 8d 0d ?? ?? ?? ?? 48 83 c4 28 e9 ?? ?? ?? ?? cc cc cc cc cc cc cc cc cc 48 83 ec 28 48 8d 0d ?? ?? ?? ?? e8 ?? ?? ?? ?? 48 8d 0d ?? ?? ?? ?? 48 83 c4 28 e9 ?? ?? ?? ?? 48 83 ec 28 48 8d 0d ?? ?? ?? ?? e8 ?? ?? ?? ?? 48 8d 0d ?? ?? ?? ?? 48 83 c4 28 e9 ?? ?? ?? ??", +0x54 };
@@ -50,7 +50,7 @@ namespace NdGameSdk::Patterns
 	static inline const SdkPattern EngineComponents_s_table = { L"48 89 6c 24 18 56 41 56 41 57 48 83 ec 30 8b f1 45 8b", +0x13 };
 	static inline const SdkPattern EngineComponents_s_ndConfig = { L"B8 04 00 00 00 48 8D ?? ?? ?? ?? ?? 8D 50 7C C5 F8 10 03 C5 F8 11 01 C5 F8 10 4B 10 C5 F8 11 49 10 C5 F8 10 43 20 C5 F8 11 41 20 C5 F8 10 4B 30 C5 F8 11 49 30 C5 F8 10 43 40 C5 F8 11 41 40 C5 F8 10 4B 50 C5 F8 11 49 50 C5 F8 10 43 60 C5 F8 11 41 60", +0x5 };
 
-	static inline const SdkPattern GameInit_ReturnHook = { L"83 23 00 48 83 63 08 00 48 83 C4 40 5B", +0x8 };
+	static inline const SdkPattern GameInit = { L"40 53 48 83 ec 40 80 3d ?? ?? ?? ?? 00 48 8b d9 74 0c 48 8d 4c 24 20 e8 ?? ?? ?? ?? eb 0a 48 8d 4c 24 30"};
 	static inline const SdkPattern GameInit_PrimServer_Create = { L"41 ff 90 ?? ?? ?? ?? 48 83 65 ?? 00 48 8d 05 ?? ?? ?? ??" };
 
 	static inline const SdkPattern Memory_AllocateMemoryMap = { L"48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 41 56 41 57 48 83 EC 30 48 8B F2 8B F9 E8 ?? ?? ?? ?? 48 8B D6 8B", +0x42 };

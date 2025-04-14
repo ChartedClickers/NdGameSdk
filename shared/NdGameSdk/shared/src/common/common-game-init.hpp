@@ -37,6 +37,8 @@ namespace NdGameSdk::common {
 		bool m_GameInitialized;
 
 		MidHook m_GameInitHook{};
+		MidHook m_GameInitReturnHook{};
+
 		shared_ptr<Memory> m_Memory;
 		shared_ptr<EngineComponents> m_EngineComponents;
 		optional<IAllocator> m_IAllocator;

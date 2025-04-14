@@ -458,7 +458,8 @@ namespace regenny {
                     NdDevMenu = 0x2,
                     NameCache = 0x7, // m_pNameCache
                     BUILD_NUMBER = 0x1e,
-                    GameTitle = 0x20
+                    GameTitle = 0x20,
+                    IsGameConfigured = 0xd2
                 }; // nd-config.hpp
             }
 
@@ -480,7 +481,8 @@ namespace regenny {
                 char m_SrcPath[0x400] [[utf8*]]; 
                 char m_DbPath[0x400] [[utf8*]]; 
                 char m_GamePath_unk2[0x400] [[utf8*]];
-                char m_CfgPath[0x80] @ 0x3d8a [[utf8*]];
+                char m_CfgPath[0x400] @0x398a [[utf8*]]
+                char m_CfgFolderName[0x80] @ 0x3d8a [[utf8*]];
                 char m_CfgDefaultsPath[0x80] [[utf8*]];
                 bool m_AssetView @ 0x3f11 [[bool*]];
                 bool m_DevConfig @ 0x3f12 [[bool*]];

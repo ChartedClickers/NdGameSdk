@@ -156,11 +156,12 @@ struct DMENU {
     bool m_ChordtoSave; // 0x17
     bool m_AlignMenusRight; // 0x18
     private: char pad_19[0x3]; public:
-    // Metadata: f64
-    double m_Rightmargin; // 0x1c
-    // Metadata: f64
-    double m_MenuScale; // 0x24
-    private: char pad_2c[0x35]; public:
+    int m_Rightmargin; // 0x1c
+    // Metadata: f32
+    float m_MenuAlpha; // 0x20
+    // Metadata: f32
+    float m_MenuScale; // 0x24
+    private: char pad_28[0x39]; public:
     bool m_Pause; // 0x61
     private: char pad_62[0xe]; public:
     // Metadata: u64

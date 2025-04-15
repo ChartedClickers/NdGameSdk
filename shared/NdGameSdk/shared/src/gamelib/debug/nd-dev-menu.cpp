@@ -251,8 +251,6 @@ namespace NdGameSdk::gamelib::debug {
 			auto& DMENU = m_EngineComponents->m_ndConfig.GetDmenu();
 
 			auto DevMenu = DMENU.DevMenu()->RootMenu();
-			DevMenu->SetName((DevMenu->Name() + std::format(" [{}]", SDK_NAME)).c_str());
-
 			AppendSdkSubMenusCallback AppendCallback = boost::bind(&NdDevMenu::AppendSdkSubMenus, this, DevMenu, 
 				_1, _2, _3, _4);
 			InvokeSdkEvent(e_AppendSdkMenu, this, AppendCallback);

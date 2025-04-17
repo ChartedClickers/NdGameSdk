@@ -1,5 +1,5 @@
-#include "player-menu.hpp"
-#include "./NdGameSdk/ndgame/t1x/ndgamepatterns.hpp"
+﻿#include "player-menu.hpp"
+#include "./NdGameSdk/ndgame/t2r/ndgamepatterns.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,6 +40,7 @@ namespace NdGameSdk::game::player {
 			findpattern = Patterns::Player_PlayerMenu_GiveMenuWeapon_Entry;
 			m_GiveMenuWeaponEntryHook = Utility::WritePatchPattern_Hook(module, findpattern.pattern, wstr(Patterns::Player_PlayerMenu_GiveMenuWeapon_Entry),
 				findpattern.offset, (void*)GivePlayerWeapon_EntryCC);
+			
 
 			findpattern = Patterns::Player_PlayerMenu_GiveMenuWeapon_SubSection;
 			m_GiveMenuWeaponSubSectionHook = Utility::WritePatchPattern_Hook(module, findpattern.pattern, wstr(Patterns::Player_PlayerMenu_GiveMenuWeapon_SubSection),
@@ -60,7 +61,12 @@ namespace NdGameSdk::game::player {
 
     const char* GivePlayerWeaponMain(const int32_t index, const int32_t mode)
     {
-		static const char* weapon_subentry_names[] = { "Melee", "Joel", "Ellie", "Throwables", "Consumables", "Misc" };
+		// #B78DFC2E510485DB #E61312674499B2A9 #DB35453D4F747864 #166ED2C1FA5BC9D4 #9EFE91A1AC1F64D8 
+		// #A873779C91F76893 #9742480A993DEC85 #A18BDCC8FC70124F #DFCAF5B819BDEE75 #1E8C90BB6A39D105
+		// TODO: Will be rewritten on HashResolver
+		static const char* weapon_subentry_names[] = { "Melee", "EllieGuns", "AbbyGuns", "BuddyGuns", "Throwables",
+			"Consumables", "MilitiaGuns", "ScarGuns", "SlaverGuns", "MiscProto" };
+
 		static const constexpr uint32_t GivePlayerWeapon_EntryListMax = sizeof(weapon_subentry_names) / sizeof(weapon_subentry_names[0]);
 		static const char* string_index = nullptr;
 
@@ -93,7 +99,7 @@ namespace NdGameSdk::game::player {
 			push rcx;
 			push r9;
 			mov rcx, qword ptr[r15 + 0x10];
-			mov r9, qword ptr[rsi + rcx];
+			mov r9, qword ptr[rdi + rcx];
 			mov rdx, qword ptr[r9 + 0x38];
 			pop r9;
 			pop rcx;
@@ -101,9 +107,14 @@ namespace NdGameSdk::game::player {
 		}
 	}
 
-	void __attribute__((naked)) GivePlayerWeapon_SubCC() {
-		__asm {
+	void __attribute__((naked)) GivePlayerWeapon_SubCC()
+	{
+		__asm
+		{
 			push rcx;
+			push rdi;
+			push r9;
+			push r8;
 			push r15;
 			push r14;
 			push rsi;
@@ -134,14 +145,18 @@ namespace NdGameSdk::game::player {
 			pop rsi;
 			pop r14;
 			pop r15;
+			pop r8;
+			pop r9;
+			pop rdi;
 			pop rcx;
 			jmp[rip + GiveMenuWeaponMain_SubSection_ReturnAddr];
 		}
 	}
 
+
 	void __attribute__((naked)) GivePlayerWeapon_SubMenuCC() {
 		__asm {
-			mov ecx, esi;
+			mov ecx, r13d;
 			mov edx, 1;
 			call GivePlayerWeaponMain;
 			mov rdx, rax;
@@ -151,7 +166,7 @@ namespace NdGameSdk::game::player {
 
 	void __attribute__((naked)) GivePlayerWeapon_EntryCC() {
 		__asm {
-			mov ecx, esi;
+			mov ecx, r13d;
 			mov edx, 2;
 			call GivePlayerWeaponMain;
 			mov r8, rax;

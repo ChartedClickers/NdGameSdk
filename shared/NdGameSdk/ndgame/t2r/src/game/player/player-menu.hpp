@@ -8,7 +8,7 @@
 #include "NdGameSdk/components/SdkComponent.hpp"
 
 #include <NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp>
-#include <NdGameSdk/ndgame/t1x/src/game/weapon/process-weapon.hpp>
+#include <NdGameSdk/ndgame/t2r/src/game/weapon/process-weapon.hpp>
 
 namespace NdGameSdk::game::player {
 

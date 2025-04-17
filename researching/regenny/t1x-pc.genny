@@ -1408,26 +1408,26 @@ namespace regenny {
               uint64_t Unk[0x2c];
             } 
 
-        // c:\branches\discbot??\t1xfinal-pc-?.?.?\t1x\src\game\player
-        namespace player {
+            // c:\branches\discbot??\t1xfinal-pc-?.?.?\t1x\src\game\player
+            namespace player {
 
-        }
+            }
 
-        // c:\branches\discbot??\t1xfinal-pc-?.?.?\t1x\src\game\weapon
-        namespace weapon {
-            
-            // #79C1042C4AB59AA8: hash-table
-            struct ScriptWeaponArt {
-                struct WeaponArt {
-                    char* m_category [[utf8*]];
-                    uint64_t m_processid;
-                }
-    
-                uint64_t m_num;
-                uint64_t* m_hashs;
-                WeaponArt** m_defs;
-            };
-        }
+            // c:\branches\discbot??\t1xfinal-pc-?.?.?\t1x\src\game\weapon
+            namespace weapon {
+
+                // #79C1042C4AB59AA8: hash-table
+                struct ScriptWeaponArt {
+                    struct WeaponArt {
+                        char* m_category [[utf8*]];
+                        uint64_t m_processid;
+                    }
+                
+                    uint64_t m_num;
+                    uint64_t* m_hashs;
+                    WeaponArt** m_defs;
+                };
+            }
         }
     }
 

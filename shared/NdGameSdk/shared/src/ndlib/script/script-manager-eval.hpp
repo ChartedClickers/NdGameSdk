@@ -1,11 +1,10 @@
 #pragma once
 #include "NdGameSdk/components/SdkRegenny.hpp"
 
-#if defined(T1X)
-
-#if defined(T1X)
+#if defined(T2R)
+#include <NdGameSdk/regenny/t2r/shared/ndlib/script/ScriptValue.hpp>
+#elif defined(T1X) 
 #include <NdGameSdk/regenny/t1x/shared/ndlib/script/ScriptValue.hpp>
-#include <NdGameSdk/regenny/t1x/shared/ndlib/script/ScriptCFunc.hpp>
 #endif
 
 namespace NdGameSdk::ndlib::script {
@@ -25,5 +24,3 @@ namespace NdGameSdk::ndlib::script {
 
 	static_assert(sizeof(ScriptValue) == 0x80, "Size of ScriptValue is not correct.");
 }
-
-#endif

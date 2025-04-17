@@ -1,6 +1,6 @@
 #include "player.hpp"
 
-#include <NdGameSdk/ndgame/t1x/src/game/weapon/process-weapon.hpp>
+#include <NdGameSdk/ndgame/t2r/src/game/weapon/process-weapon.hpp>
 
 namespace NdGameSdk::game::player {
 

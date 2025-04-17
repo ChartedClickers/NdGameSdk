@@ -650,6 +650,13 @@ namespace regenny {
                 }
 
             }
+            
+            // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\script
+            namespace script {
+                struct ScriptValue {
+                    uint64_t val[0x10];
+                };
+            }
 
         }
         

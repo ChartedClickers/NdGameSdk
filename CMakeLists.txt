@@ -42,7 +42,8 @@ project(ND.ModClient
 add_compile_options(
     $<$<CONFIG:Debug>:/MDd>
     $<$<CONFIG:RelWithDebInfo>:/MD>
-    # noise
+    $<$<CONFIG:RelWithDebInfo>:/Od>
+    # noise 
     -Wno-unused-private-field
     -Wno-unused-variable
     -Wno-ignored-qualifiers

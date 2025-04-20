@@ -60,7 +60,19 @@ struct NdGameInfo {
     private: char pad_3f3d[0x13]; public:
     // Metadata: bool*
     bool m_DevMode; // 0x3f50
-    private: char pad_3f51[0xdf]; public:
+    private: char pad_3f51[0xd]; public:
+    // Metadata: bool*
+    bool m_DebugRendering; // 0x3f5e
+    private: char pad_3f5f[0x29]; public:
+    // Metadata: bool*
+    bool m_DisableFpsStat; // 0x3f88
+    private: char pad_3f89[0x11]; public:
+    // Metadata: bool*
+    bool m_showBuildInfo; // 0x3f9a
+    private: char pad_3f9b[0xd]; public:
+    // Metadata: bool*
+    bool m_MsgConDrawBuffers; // 0x3fa8
+    private: char pad_3fa9[0x87]; public:
     // Metadata: utf8*
     char m_DiscUser[24]; // 0x4030
     private: char pad_4048[0x168]; public:

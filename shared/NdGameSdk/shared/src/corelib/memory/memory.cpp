@@ -314,8 +314,6 @@ namespace NdGameSdk::corelib::memory {
 					}
 				}
 
-				
-
 				findpattern = Patterns::Memory_Allocate;
 				m_AllocateHook = Utility::WritePatchPattern_Hook(module, findpattern.pattern, wstr(Patterns::Memory_Allocate),
 					findpattern.offset, (void*)Memory_Allocate_CC);

@@ -17,6 +17,7 @@ using namespace NdGameSdk::ndlib::render::util;
 #include "common-allocator.hpp"
 
 using namespace NdGameSdk::corelib::memory;
+using namespace NdGameSdk::ndlib;
 
 namespace NdGameSdk::common {
 

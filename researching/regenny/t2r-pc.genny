@@ -490,10 +490,25 @@ namespace regenny {
                 bool m_onDiscUseManifest [[bool*]];
                 bool m_IsMultiplayer @ 0x3f3c [[bool*]];
                 bool m_DevMode @ 0x3f50 [[bool*]];
+                bool m_DebugRendering @ 0x3f5e [[bool*]];
+                bool m_DisableFpsStat @ 0x3f88 [[bool*]];
+                bool m_MsgConDrawBuffers @ 0x3fa8 [[bool*]];
+                bool m_showBuildInfo @ 0x3f9a [[bool*]];
                 char m_DiscUser[0x18] @ 0x4030 [[utf8*]];
                 StringId64 AudioStringId @ 0x41B0;
                 char m_GameStudio[0x40] @ 0x44E3 [[utf8*]];
                 uint64_t Unk_4658 @ 0x4658;
+            }
+
+            struct NdFrameState 0x29518 {
+                void* vftable;
+                uint64_t m_gameFrameNumber @ 0x40
+                bool m_KeyboardDevMode @ 0xe5c0
+            }
+
+            struct FrameParams 0x1a8280 {
+                uint64_t m_frameNumber
+                void* m_DynamicRenderContext @ 0x6a80
             }
 
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\debug
@@ -650,6 +665,32 @@ namespace regenny {
                 }
 
             }
+
+            // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\render
+            namespace render {
+
+                enum WindowContextType : uint32_t
+                {
+                    Context0 = 0x0,
+                    Context1 = 0x1,
+                    Context2 = 0x2,
+                    Context3 = 0x3,
+                    Context4 = 0x4,
+                    Context5 = 0x5,
+                    Context6 = 0x6,
+                    Context7 = 0x7,
+                    Context8 = 0x8
+                };
+                
+                struct WindowContext 0x30 {
+                    WindowContextType m_ContextType;
+                    void* FrameParams;
+                    uint64_t field_10;
+                    uint64_t field_18;
+                    uint64_t field_20;
+                    uint64_t field_28;
+                }
+            }
             
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\script
             namespace script {
@@ -672,6 +713,10 @@ namespace regenny {
                 bool m_enableNpTrophies +0x148  [[bool*]];
                 uint64_t Unk_4BC8 @ 0x4BC8;
             }
+
+            struct FrameState : shared.ndlib.NdFrameState 0x168 {
+                uint64_t Unk[0x2d];
+            } 
         }
         
     }

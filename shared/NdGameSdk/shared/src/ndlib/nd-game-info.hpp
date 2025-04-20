@@ -1,10 +1,10 @@
 #pragma once
 #include "NdGameSdk/components/SdkRegenny.hpp"
 
-#if defined(T1X)
-#include <NdGameSdk/regenny/t1x/shared/ndlib/NdGameInfo.hpp>
-#else
+#if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/ndlib/NdGameInfo.hpp>
+#elif defined(T1X)
+#include <NdGameSdk/regenny/t1x/shared/ndlib/NdGameInfo.hpp>
 #endif
 
 namespace NdGameSdk::ndlib {

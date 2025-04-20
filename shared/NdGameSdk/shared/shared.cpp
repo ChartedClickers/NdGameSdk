@@ -4,6 +4,7 @@
 #include "src/ndlib/engine-components.hpp"
 #include "src/ndlib/script/script-manager.hpp"
 #include "src/ndlib/render/util/prim.hpp"
+#include "src/ndlib/render/dev/debugdraw-common.hpp"
 #include "src/common/common-game-init.hpp"
 #include "src/gamelib/debug/nd-dev-menu.hpp"
 #include "src/gamelib/render/particle/particle.hpp"
@@ -18,7 +19,9 @@ namespace NdGameSdk {
 
 		SharedComponents->AddComponent<ndlib::EngineComponents>();
 
-#if defined(T1X)
+#if defined (T2R)
+		SharedComponents->AddComponent<ndlib::render::dev::DebugDrawCommon>();
+#elif defined(T1X)
 		SharedComponents->AddComponent<ndlib::script::ScriptManager>();
 		SharedComponents->AddComponent<ndlib::render::util::PrimServerComponent>();
 		auto ParticleMgr = SharedComponents->AddComponent<gamelib::render::particle::ParticleManager>();

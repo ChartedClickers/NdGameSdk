@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include <sstream>
 #include <iomanip>
@@ -34,10 +36,10 @@ public:
 
     // Constructor from uint64_t (ARGB format)
     Color(uint64_t color) {
-        a = (color >> 24) & 0xFF;
         r = (color >> 16) & 0xFF;
         g = (color >> 8) & 0xFF;
         b = color & 0xFF;
+        a = (color >> 24) & 0xFF;
     }
 
     Color(BasicColors color) {

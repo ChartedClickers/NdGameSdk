@@ -46,6 +46,15 @@ namespace NdGameSdk::Patterns
 	static inline const SdkPattern NdDevMenu_DMENU_MenuGroup_SetRootMenu = { L"48 85 d2 0f 84 96 00 00 00 48 89 5c 24 08 57 48 83 ec 20 48 8b da 48 8b f9 48 8b 81 b0 00 00 00 48 3b d0 74 70 48 85 c0 74 43" };
 	static inline const SdkPattern NdDevMenu_DMENU_Menu_AppendComponent = { L"40 56 57 41 56 48 83 ec 20 80 3d ?? ?? ?? ?? 00 48 8b f2 4c 8b f1 0f 84 ?? ?? ?? ?? 48 8b ca e8 ?? ?? ?? ?? 84 c0 0f 85 ?? ?? ?? ?? 48 8b 06 48 8b ce 48 89 5c 24 40 4c 89 64 24 50 4c 89 7c 24 58 ff 50 68 33 c9 48 85 c0 74 10" };
 
+	/*DebugDraw*/
+	static inline const SdkPattern GameFramePreRenderUpdate = { L"48 89 5c 24 08 48 89 74 24 10 48 89 7c 24 18 4c 89 74 24 20 55 48 81 ec 20 06 00 00 48 8d ac 24 90 00 00 00 48 83 e5 c0 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 85 80 05 00 00 c5 f9 ef c0 c5 fc 11 85 80 02 00 00 c5 fc 11 85 a0 02 00 00 c5 fc 11 85 c0 02 00 00 c5 fc 11 85 e0 02 00 00 45 33 c0 48 8d 15 ?? ?? ?? ?? 48 8d 8d 80 02 00 00" };
+	static inline const SdkPattern GameDebugDraw_StaticContextHook = { L"e8 ?? ?? ?? ?? 48 89 44 24 20 44 0f b6 cf 44 0f b6 c6 48 8b d5 48 8b cb e8 ?? ?? ?? ?? e8 ?? ?? ?? ?? 0f 1f 40 00 66 66 0f 1f 84 00 00 00 00 00 48 8b 5c 24 40 48 8b 6c 24 48 48 8b 74 24 58 48 83 c4 30 5f c3", +0x30 };
+	static inline const SdkPattern WindowContext_WindowContext = { L"48 89 5c 24 18 48 89 6c 24 20 56 48 83 ec 30 80 3d ?? ?? ?? ?? 00 49 8b f0 48 63 ea 48 8b d9 74 ?? 33 c0 c7 01 ff ff ff ff 48 89 41 08 48 89 41 10 48 89 41 18 48 8b c1 c7 41 20 ff ff ff ff 48 8b 5c 24 50 48 8b 6c 24 58" };
+	static inline const SdkPattern FrameParams_GetFrameParams = { L"40 57 48 83 ec 30 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 28 e8 ?? ?? ?? ?? 0f b6 f8 84 c0 74 ?? 48 8d 54 24 20 b9 02 00 00 00 e8 ?? ?? ?? ?? 84 c0 74 ?? 48 8b 44 24 20 48 8b 4c 24 28 48 33 cc e8 ?? ?? ?? ?? 48 83 c4 30 5f c3" };
+	static inline const SdkPattern Text_textPrintV = { L"4c 8b dc 48 83 ec 58 c5 fa 10 84 24 80 00 00 00 49 8d 43 40 49 89 43 f0 49 8b 43 38 49 89 43 e8 33 c0 89 44 24 38 89 44 24 30 8b 84 24 88 00 00 00 89 44 24 28 c5 fa 11 44 24 20" };
+	static inline const SdkPattern Text2_GetTextWidthHeight = { L"4c 8b dc 53 56 57 48 81 ec f0 00 00 00 c4 c1 78 29 73 d8 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 d0 00 00 00 33 c0 48 8b f1 48 8d 4c 24 40 41 89 43 a0 49 89 43 a8 49 8b f8 c5 f8 28 f3 8b da" };
+
+
 #elif defined(T1X)
 	static inline const SdkPattern EngineComponents_s_table = { L"48 89 6c 24 18 56 41 56 41 57 48 83 ec 30 8b f1 45 8b", +0x13 };
 	static inline const SdkPattern EngineComponents_s_ndConfig = { L"B8 04 00 00 00 48 8D ?? ?? ?? ?? ?? 8D 50 7C C5 F8 10 03 C5 F8 11 01 C5 F8 10 4B 10 C5 F8 11 49 10 C5 F8 10 43 20 C5 F8 11 41 20 C5 F8 10 4B 30 C5 F8 11 49 30 C5 F8 10 43 40 C5 F8 11 41 40 C5 F8 10 4B 50 C5 F8 11 49 50 C5 F8 10 43 60 C5 F8 11 41 60", +0x5 };

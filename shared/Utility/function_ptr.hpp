@@ -9,6 +9,10 @@
 
 #define TYPEDEF_FUNCTION_PTR(ret_type, func_name, ...) \
     typedef ret_type (*func_name##_ptr)(__VA_ARGS__); \
+    static func_name##_ptr func_name
+
+#define TYPEDEF_EXTERN_FUNCTION_PTR(ret_type, func_name, ...) \
+    typedef ret_type (*func_name##_ptr)(__VA_ARGS__); \
     extern func_name##_ptr func_name
 
 #define MEMBER_FUNCTION_PTR(ret_type, func_name, ...) \

@@ -16,6 +16,14 @@
 
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
 #include <NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp>
+#if defined(T2R)
+#include <NdGameSdk/shared/src/ndlib/render/dev/debugdraw-common.hpp>
+#include <NdGameSdk/shared/src/ndlib/render/frame-params.hpp>
+#endif
+
+namespace NdGameSdk::ndlib::render::dev {
+    class DebugDrawCommon;
+}
 
 namespace NdGameSdk {
 
@@ -47,6 +55,9 @@ namespace NdGameSdk {
         virtual void OnModuleRegistered() = 0;
         virtual void OnGameInitialized(bool status) {};
         virtual void OnMemoryMapped(corelib::memory::Memory* Memory) {};
+#if defined(T2R)
+        virtual void DebugDraw(FrameParams* frame) {};
+#endif 
         virtual void OnAppendSdkDevMenu(gamelib::debug::NdDevMenu* NdDevMenu, gamelib::debug::NdDevMenu::AppendSdkSubMenusCallback AppendSdkDevMenu) {};
 
         static std::unordered_map<HMODULE, ISdkModule*>* GetSdkModules();
@@ -61,6 +72,7 @@ namespace NdGameSdk {
 
         friend void RegisterSdkModule(ISdkModule* SdkModule);
         friend void UnregisterSdkModule(ISdkModule* SdkModule);
+        friend class ndlib::render::dev::DebugDrawCommon;
 
         static std::unordered_map<HMODULE, ISdkModule*> s_SdkModules;
     };

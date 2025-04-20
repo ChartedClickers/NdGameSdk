@@ -20,7 +20,7 @@ namespace NdGameSdk::game::player {
 	uintptr_t GiveMenuWeaponMain_SubSection_ReturnAddr = NULL;
 	void GivePlayerWeapon_SubCC();
 
-	void PlayerMenu::PatchGiveMenuWeaponItems(/*DMENU::Menu* pMenu*/) {
+	void PlayerMenu::GiveMenuWeaponItemsPatch(/*DMENU::Menu* pMenu*/) {
 
 			GiveWeaponArtFn functionPointer = &weapon::Weapon::GiveWeaponArt;
 			std::memcpy(&GiveWeaponArtFunctAddr[0x0], &functionPointer, sizeof(GiveWeaponArtFn));

@@ -22,7 +22,7 @@ namespace NdGameSdk::game::player {
 			spdlog::info("Initializing {} components...", GetName());
 
 			if (m_DMENU->IsGameDebugMenu()) {
-				m_PlayerMenu->PatchGiveMenuWeaponItems();
+				m_PlayerMenu->GiveMenuWeaponItemsPatch();
 			}
 
 		});

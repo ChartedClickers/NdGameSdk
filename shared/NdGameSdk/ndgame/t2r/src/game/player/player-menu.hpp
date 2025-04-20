@@ -17,7 +17,7 @@ namespace NdGameSdk::game::player {
 	public:
 		explicit PlayerMenu(weapon::Weapon* pWeaponProcess);
 	private:
-		void PatchGiveMenuWeaponItems(/*DMENU::Menu* pMenu*/);
+		void GiveMenuWeaponItemsPatch(/*DMENU::Menu* pMenu*/);
 
 		weapon::Weapon* m_WeaponProcess;
 

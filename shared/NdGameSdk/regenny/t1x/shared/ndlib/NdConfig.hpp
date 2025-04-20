@@ -11,6 +11,7 @@ struct NdConfig {
         NameCache = 7,
         BUILD_NUMBER = 30,
         GameTitle = 32,
+        IsGameConfigured = 210,
     };
 
 }; // Size: 0x0

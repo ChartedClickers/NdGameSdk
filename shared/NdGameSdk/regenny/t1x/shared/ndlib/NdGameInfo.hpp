@@ -199,7 +199,7 @@ struct NdGameInfo {
     // Metadata: bool*
     bool Unk_3f3c; // 0x3f3c
     // Metadata: bool*
-    bool Unk_3f3d; // 0x3f3d
+    bool m_DebugRendering; // 0x3f3d
     // Metadata: bool*
     bool Unk_3f3e; // 0x3f3e
     // Metadata: bool*
@@ -263,7 +263,7 @@ struct NdGameInfo {
     bool Unk_3f5f; // 0x3f5f
     uint32_t Unk_3f60; // 0x3f60
     // Metadata: bool*
-    bool Unk_3f64; // 0x3f64
+    bool m_DisableFpsStat; // 0x3f64
     // Metadata: bool*
     bool Unk_3f65; // 0x3f65
     // Metadata: bool*
@@ -293,7 +293,7 @@ struct NdGameInfo {
     // Metadata: bool*
     bool Unk_3f72; // 0x3f72
     // Metadata: bool*
-    bool Unk_3f73; // 0x3f73
+    bool m_showBuildInfo; // 0x3f73
     // Metadata: bool*
     bool Unk_3f74; // 0x3f74
     // Metadata: bool*

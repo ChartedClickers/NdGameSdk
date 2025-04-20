@@ -1,7 +1,10 @@
 #include "nd-dev-menu.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
+#include <NdGameSdk/shared/src/ndlib/render/dev/debugdraw-common.hpp>
+
 using namespace boost::placeholders;
+using namespace NdGameSdk::ndlib::render::dev;
 
 namespace NdGameSdk::gamelib::debug {
 
@@ -224,9 +227,10 @@ namespace NdGameSdk::gamelib::debug {
 			DMENU::ItemDecimal::ValueParams{ 1, 10 }, DMENU::ItemDecimal::StepParams{ 1, 2 }, "Test component", HeapArena_Source);
 
 		itemdecimal->SetColor(Color(0xFF00FF00));
-
+		
+		DebugDrawCommon::CreateDebugDrawMenu(this, NdGameSdkMenu);
 		//ScriptManager::CreateScriptManagerMenu(this,NdGameSdkMenu);
-
+		
 		//TODO: Here must be the main controls of sdk and the possibility of spawning menus from other sdkcomponents 
 		// like this happening in the NdGames. 
 

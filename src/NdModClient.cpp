@@ -85,6 +85,6 @@ void NdModClient::DebugDraw(FrameParams* frame) {
 	WindowContext::GetWindowContext(&ctx, WindowContext::ContextType::Context4, frame->m_DynamicRenderContext);
 	char print_text[256]{};
 	_snprintf_s(print_text, sizeof(print_text), PROJECT_NAME);
-	m_DebugDraw->m_Text.TextPrintV(&ctx, 50., 180., 0.8, 0.8, Color(BasicColors::White), print_text);
+	m_DebugDraw->m_Text.TextPrintV(&ctx, 50., 180., 0.8, 0.8, print_text);
 }
 #endif

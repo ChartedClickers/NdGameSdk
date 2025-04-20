@@ -18,9 +18,9 @@ namespace NdGameSdk {
 		auto MemComponent = SharedComponents->AddComponent<corelib::memory::Memory>(cfg.Memory);
 
 		SharedComponents->AddComponent<ndlib::EngineComponents>();
+		SharedComponents->AddComponent<ndlib::render::dev::DebugDrawCommon>();
 
 #if defined (T2R)
-		SharedComponents->AddComponent<ndlib::render::dev::DebugDrawCommon>();
 #elif defined(T1X)
 		SharedComponents->AddComponent<ndlib::script::ScriptManager>();
 		SharedComponents->AddComponent<ndlib::render::util::PrimServerComponent>();

@@ -7,6 +7,9 @@
 
 #if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/ndlib/FrameParams.hpp>
+#elif defined(T1X)
+#include <NdGameSdk/regenny/t1x/shared/ndlib/FrameParams.hpp>
+#endif
 
 namespace NdGameSdk::ndlib::render::dev {
 	class DebugDrawCommon;
@@ -25,4 +28,3 @@ namespace NdGameSdk::ndlib::render
 	};
 }
 
-#endif

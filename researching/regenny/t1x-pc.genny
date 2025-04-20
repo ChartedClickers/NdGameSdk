@@ -555,7 +555,7 @@ namespace regenny {
             bool Unk_3f3a [[bool*]]
             bool Unk_3f3b [[bool*]]
             bool Unk_3f3c [[bool*]]
-            bool Unk_3f3d [[bool*]]
+            bool m_DebugRendering [[bool*]]
             bool Unk_3f3e [[bool*]]
             bool Unk_3f3f [[bool*]]
             bool Unk_3f40 [[bool*]]
@@ -588,7 +588,7 @@ namespace regenny {
             bool Unk_3f5e [[bool*]]
             bool Unk_3f5f [[bool*]]
             uint32_t Unk_3f60
-            bool Unk_3f64 [[bool*]]
+            bool m_DisableFpsStat [[bool*]]
             bool Unk_3f65 [[bool*]]
             bool Unk_3f66 [[bool*]]
             bool Unk_3f67 [[bool*]]
@@ -603,7 +603,7 @@ namespace regenny {
             bool Unk_3f70 [[bool*]]
             bool Unk_3f71 [[bool*]]
             bool Unk_3f72 [[bool*]]
-            bool Unk_3f73 [[bool*]]
+            bool m_showBuildInfo [[bool*]]
             bool Unk_3f74 [[bool*]]
             bool Unk_3f75 [[bool*]]
             bool Unk_3f76 [[bool*]]
@@ -707,7 +707,12 @@ namespace regenny {
             void* vftable;
             uint64_t m_gameFrameNumber @ 0x40
             bool m_KeyboardDevMode @ 0x51a // Enable toggle devmode menu via the keyboard
-        } 
+        }
+
+        struct FrameParams 0x1a3180 {
+            uint64_t m_frameNumber
+            void* m_DynamicRenderContext @ 0x6a80
+        }
 
     /*
         struct NetInfo 0x238 {
@@ -878,6 +883,28 @@ namespace regenny {
 
     // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\render
     namespace render {
+
+        enum WindowContextType : uint32_t
+        {
+            Context0 = 0x0,
+            Context1 = 0x1,
+            Context2 = 0x2,
+            Context3 = 0x3,
+            Context4 = 0x4,
+            Context5 = 0x5,
+            Context6 = 0x6,
+            Context7 = 0x7,
+            Context8 = 0x8
+        };
+                
+        struct WindowContext 0x30 {
+            WindowContextType m_ContextType;
+            void* FrameParams;
+            uint64_t field_10;
+            uint64_t field_18;
+            uint64_t field_20;
+            uint64_t field_28;
+        }
 
         // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\render\util
         namespace util {

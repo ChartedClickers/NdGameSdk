@@ -1,6 +1,6 @@
 #pragma once
 
-#if defined(T2R)
+
 
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/components/SdkRegenny.hpp"
@@ -8,7 +8,11 @@
 #include <Utility/helper.hpp>
 #include <Utility/function_ptr.hpp>
 
+#if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/ndlib/render/WindowContext.hpp>
+#elif defined(T1X)
+#include <NdGameSdk/regenny/t1x/shared/ndlib/render/WindowContext.hpp>
+#endif
 
 #include "frame-params.hpp"
 
@@ -31,4 +35,3 @@ namespace NdGameSdk::ndlib::render {
 
 }
 
-#endif

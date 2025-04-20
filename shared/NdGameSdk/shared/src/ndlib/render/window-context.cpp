@@ -1,7 +1,5 @@
 #include "window-context.hpp"
 
-#if defined(T2R)
-
 namespace NdGameSdk::ndlib::render {
 
 	WindowContext* WindowContext::GetWindowContext(WindowContext* storage, ContextType type, void* params)
@@ -12,5 +10,3 @@ namespace NdGameSdk::ndlib::render {
 
 	INIT_FUNCTION_PTR(WindowContext_WindowContext);
 }
-
-#endif

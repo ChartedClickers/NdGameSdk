@@ -24,6 +24,33 @@ namespace NdGameSdk {
 		return &s_NdGameComponents;
 	}
 
+	const vector<ISdkComponent*> ISdkComponent::GetSdkComponents() {
+
+		if (!g_SdkInitialized) {
+			throw SdkComponentEx(
+				"SDK is not initialized! Cannot access components.",
+				SdkComponentEx::ErrorCode::SdkNotInitialized,
+				true
+			);
+		}
+
+		std::vector<ISdkComponent*> SdkComponents;
+
+		auto& shared = s_SharedComponents.GetSdkComponents();
+		auto& NdGame = s_NdGameComponents.GetSdkComponents();
+
+		SdkComponents.reserve(shared.size() + NdGame.size());
+
+		for (const auto& [_, comp] : shared) {
+			SdkComponents.push_back(comp.get());
+		}
+		for (const auto& [_, comp] : NdGame) {
+			SdkComponents.push_back(comp.get());
+		}
+
+		return SdkComponents;
+	}
+
 	void SdkComponentFactory::InitializeSdkComponents() {
 
 		std::for_each(m_orderedSdkComponents.begin(), m_orderedSdkComponents.end(), 

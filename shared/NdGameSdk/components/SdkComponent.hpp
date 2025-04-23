@@ -131,6 +131,8 @@ namespace NdGameSdk {
         std::string m_name;
         bool m_Initialized;
 
+        static const std::vector<ISdkComponent*> GetSdkComponents();
+
         static SdkComponentFactory s_SharedComponents;
         static SdkComponentFactory s_NdGameComponents;
 
@@ -149,6 +151,7 @@ namespace NdGameSdk {
             DependenciesFailed,
             PatternFailed,
             PatchFailed,
+            SdkNotInitialized,
             NotAllowed
         };
 

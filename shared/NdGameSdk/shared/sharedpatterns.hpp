@@ -53,6 +53,7 @@ namespace NdGameSdk::Patterns
 	static inline const SdkPattern FrameParams_GetFrameParams = { L"40 57 48 83 ec 30 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 28 e8 ?? ?? ?? ?? 0f b6 f8 84 c0 74 ?? 48 8d 54 24 20 b9 02 00 00 00 e8 ?? ?? ?? ?? 84 c0 74 ?? 48 8b 44 24 20 48 8b 4c 24 28 48 33 cc e8 ?? ?? ?? ?? 48 83 c4 30 5f c3" };
 	static inline const SdkPattern Text_textPrintV = { L"4c 8b dc 48 83 ec 58 c5 fa 10 84 24 80 00 00 00 49 8d 43 40 49 89 43 f0 49 8b 43 38 49 89 43 e8 33 c0 89 44 24 38 89 44 24 30 8b 84 24 88 00 00 00 89 44 24 28 c5 fa 11 44 24 20" };
 	static inline const SdkPattern Text2_GetTextWidthHeight = { L"4c 8b dc 53 56 57 48 81 ec f0 00 00 00 c4 c1 78 29 73 d8 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 d0 00 00 00 33 c0 48 8b f1 48 8d 4c 24 40 41 89 43 a0 49 89 43 a8 49 8b f8 c5 f8 28 f3 8b da" };
+	static inline const SdkPattern Msg_s_MsgCon = { L"4c 8b dc 48 81 ec 88 00 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 70 48 8d 05 ?? ?? ?? ?? 49 c7 43 a0 00 10 00 00 49 89 43 98 49 8d 4b 98 48 8d 05", +0x81 };
 	static inline const SdkPattern Msg_PrintToActiveMsgOutput = { L"48 89 4c 24 08 48 89 54 24 10 4c 89 44 24 18 4c 89 4c 24 20 48 83 ec 38 48 85 c9 75 ?? 48 89 5c 24 30 e8 ?? ?? ?? ?? 48 8b d8 48 85 c0 74 ?? b1 01 ff d3 e8 ?? ?? ?? ?? 48 85 c0 74 ?? ff d0 e8 ?? ?? ?? ?? 48 85 c0 74" };
 
 
@@ -114,15 +115,18 @@ namespace NdGameSdk::Patterns
 	/*DebugDraw*/
 	static inline const SdkPattern GameFramePreRenderUpdate = { L"48 8b c4 48 89 58 08 48 89 70 10 48 89 78 18 55 41 54 41 55 41 56 41 57 48 81 ec a0 03 00 00 48 8d a8 c8 fc ff ff 48 83 e5 c0 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 85 00 03 00 00" };
 	static inline const SdkPattern GameDebugDraw_StaticContextHook = { L"e8 ?? ?? ?? ?? 44 0f b6 cf 48 89 44 24 20 44 0f b6 c6 48 8b d5 48 8b cb e8 ?? ?? ?? ?? 48 8b 74 24 48", +0x32 };
-	static inline const SdkPattern WindowContext_WindowContext = { L"48 8b c4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 56 48 83 ec 30 33 ff 49 8b f0 40 38 3d ?? ?? ?? ?? 8b ea 48 8b d9 74 17" };
+	static inline const SdkPattern WindowContext_WindowContext = { L"48 8b c4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 56 48 83 ec ?? 33 ff 49 8b f0 40 38 3d ?? ?? ?? ?? 8b ea 48 8b d9" };
 	static inline const SdkPattern FrameParams_GetFrameParams = { L"40 53 48 83 ec 20 e8 ?? ?? ?? ?? 8a d8 84 c0 74 1a 48 8d 54 24 30 b9 02 00 00 00 e8 ?? ?? ?? ?? 84 c0 74 07 48 8b 44 24 30 eb 6a e8 6c 00 00 00 4c 8b 05" };
 	static inline const SdkPattern Text_textPrintV = { L"4c 8b dc 48 83 ec 58 c5 fa 10 84 24 80 00 00 00 49 8d 43 40 49 89 43 f0 49 8b 43 38 49 89 43 e8 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 8b 84 24 88 00 00 00 89 44 24 28 c5 fa 11 44 24 20" };
 	static inline const SdkPattern Text2_GetTextWidthHeight = { L"48 8b c4 53 56 57 48 81 ec ?? ?? ?? ?? c5 f8 29 70 ?? 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 ?? ?? ?? ?? 48 8b f1 49 8b f8 48 8d 4c 24 40 8b da c5 f8 28 f3 e8 ?? ?? ?? ??" };
+	static inline const SdkPattern Msg_s_MsgCon = { L"4c 8b dc 53 48 81 ec 80 00 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 70 b9 00 a0 00 00 49 c7 43 a0 00 10 00 00 48 8d 05 ?? ?? ?? ?? 49 c7 43 b0 00 80 00 00 49 89 43 98 48 8d 05 ?? ?? ?? ?? 49 89 43 a8 48 8d 05 ?? ?? ?? ?? 49 89 43 b8 48 8d 05", +0x7e };
 	static inline const SdkPattern Msg_PrintToActiveMsgOutput = { L"48 8b c4 48 89 48 08 48 89 50 10 4c 89 40 18 4c 89 48 20 53 48 83 ec 30 48 85 c9 75 ?? 48 8b 1d ?? ?? ?? ?? 48 85 db 74 ?? b1 01 ff d3 48 8b 05 ?? ?? ?? ?? 48 85 c0 74 ??" };
-	static inline const SdkPattern Msg_MsgConDrawBuffers = { L"48 8b c4 48 89 58 08 55 56 57 41 54 41 55 41 56 41 57 48 8d 68 b1 48 81 ec d0 00 00 00 c5 f8 29 70 b8 c5 f8 29 78 a8 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 45 ef" };
+	static inline const SdkPattern Msg_MsgConDrawBuffersHook = { L"8a 4c 24 30 e8 ?? ?? ?? ?? 48 8b 4d ef 48 33 cc e8 ?? ?? ?? ??", +0x9 };
 
 	static inline const SdkPattern PrimServer_PrimServer = { L"48 8b ?? ?? ?? ?? ?? 48 8b d3 4c 8b 01 41 ff 90 b0 01 00 00 48 83 65 08" };
 	static inline const SdkPattern PrimServer_Create = { L"40 53 48 83 ec 30 48 8d 0d ?? ?? ?? ?? 48 8b da 48 8d 05 ?? ?? ?? ?? 48 8b d1 41 b9 60 0d 00 00" };
+
+	static inline const SdkPattern SsManager_StateScriptConsolePrinter = { L"48 89 5c 24 ?? 55 56 57 41 54 41 55 41 56 41 57 48 8d ac 24 ?? ?? ?? ?? b8 d0 11 00 00 e8 ?? ?? ?? ?? 48 2b e0 c5 f8 29 b4 24 ?? ?? ?? ?? c5 f8 29 bc 24 ?? ?? ?? ?? c5 78 29 84 24 ?? ?? ?? ?? c5 78 29 8c 24 ?? ?? ?? ?? c5 78 29 94 24 ?? ?? ?? ?? 48 8b 05 ?? ?? ?? ??" };
 
 #endif
 

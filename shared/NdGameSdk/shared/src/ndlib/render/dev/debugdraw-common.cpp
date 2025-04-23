@@ -39,6 +39,16 @@ namespace NdGameSdk::ndlib::render::dev {
 			Patterns::SdkPattern findpattern{};
 			auto module = Utility::memory::get_executable();
 		
+			findpattern = Patterns::Msg_s_MsgCon;
+			m_Msg.s_MsgCon = (MsgCon*)Utility::ReadLEA32(module,
+				findpattern.pattern, wstr(Patterns::Memory_TaggedHeap_TaggedGpuDevHeap), findpattern.offset, 3, 7);
+
+			if (!m_Msg.s_MsgCon) {
+				throw SdkComponentEx
+				{ std::format("Failed to find addresses!"),
+					SdkComponentEx::ErrorCode::PatternFailed, true };
+			}
+
 			findpattern = Patterns::WindowContext_WindowContext;
 			WindowContext_WindowContext = (WindowContext_WindowContext_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::WindowContext_WindowContext), findpattern.offset);

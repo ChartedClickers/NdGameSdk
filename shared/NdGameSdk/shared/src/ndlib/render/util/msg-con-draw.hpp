@@ -21,10 +21,14 @@ namespace NdGameSdk::ndlib::render::util {
 		explicit MsgConDraw(DebugDrawCommon* pDebugDrawCommon, Memory* pMemory);
 		void MsgConDrawBuffersPatch();
 	private:
+		static void MsgConDrawBuffers(const char* msgcon_buffer);
 		DebugDrawCommon* m_DebugDrawCommon{};
 		Memory* m_Memory{};
-		MidHook m_MsgConDraw_MsgConDrawBuffers{};
-		inline static MsgConDraw* s_Instance = nullptr;
 
+#if defined(T1X)
+		FunctionHook::Ptr m_StateScriptPrinterStrncpyHook{};
+		FunctionHook::Ptr m_Msg_MsgConDrawBuffersHook{};
+#endif
+		inline static MsgConDraw* s_Instance = nullptr;
 	};
 }

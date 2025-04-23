@@ -418,6 +418,24 @@ namespace regenny {
                 }
 
             }
+
+            // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib\util
+            namespace util {
+                 struct MsgCon 0x118 {
+                    void* vftable;
+                    float m_MsgConScale @0x10
+                    int m_MsgConLeftPad
+                    int m_MsgConHorizontalSize
+                    int m_MsgConVerticalSize
+                    int m_MsgConTopPad
+                    bool m_DrawRedisTTYTimes @0x32;
+                    bool m_DrawRedisTTYStatus;
+                    bool m_ApplyMsgConScaletoDebugText @0x36;
+                    bool m_EnableMsgConLineWrap;
+                    bool m_EnableMsgConAutoResize;
+                    bool m_ShowCacheMissesDebugText;
+                 }
+            }
         }
 
         // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib

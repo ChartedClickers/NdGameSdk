@@ -36,7 +36,6 @@ namespace NdGameSdk::ndlib::render::dev {
 		Msg m_Msg{};
 
 		static DMENU::ItemSubmenu* CreateDebugDrawMenu(NdDevMenu* pdmenu, DMENU::Menu* pMenu);
-
 	private:
 		void Awake() override;
 		void Initialize() override;
@@ -57,5 +56,4 @@ namespace NdGameSdk::ndlib::render::dev {
 
 		friend class ISdkModule;
 	};
-
 }

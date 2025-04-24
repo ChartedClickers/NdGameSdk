@@ -24,7 +24,9 @@ namespace NdGameSdk {
 		return &s_NdGameComponents;
 	}
 
-	const vector<ISdkComponent*> ISdkComponent::GetSdkComponents() {
+	const std::vector<ISdkComponent*>& ISdkComponent::GetSdkComponents() {
+		static std::vector<ISdkComponent*> CachedComponents;
+		static std::once_flag initFlag;
 
 		if (!g_SdkInitialized) {
 			throw SdkComponentEx(
@@ -34,22 +36,24 @@ namespace NdGameSdk {
 			);
 		}
 
-		std::vector<ISdkComponent*> SdkComponents;
+		std::call_once(initFlag, [] {
+			const auto& sharedComponents = GetSharedComponents()->GetSdkComponents();
+			const auto& ndGameComponents = GetNdGameComponents()->GetSdkComponents();
 
-		auto& shared = s_SharedComponents.GetSdkComponents();
-		auto& NdGame = s_NdGameComponents.GetSdkComponents();
+			CachedComponents.reserve(sharedComponents.size() + ndGameComponents.size());
 
-		SdkComponents.reserve(shared.size() + NdGame.size());
+			for (const auto& [_, comp] : sharedComponents) {
+				CachedComponents.push_back(comp.get());
+			}
+			for (const auto& [_, comp] : ndGameComponents) {
+				CachedComponents.push_back(comp.get());
+			}
+			});
 
-		for (const auto& [_, comp] : shared) {
-			SdkComponents.push_back(comp.get());
-		}
-		for (const auto& [_, comp] : NdGame) {
-			SdkComponents.push_back(comp.get());
-		}
-
-		return SdkComponents;
+		return CachedComponents;
 	}
+
+
 
 	void SdkComponentFactory::InitializeSdkComponents() {
 
@@ -87,7 +91,7 @@ namespace NdGameSdk {
 			{ return !pair.second->m_Initialized; });
 	}
 
-	const auto& SdkComponentFactory::GetSdkComponents() const {
+	const std::unordered_map<std::type_index, std::shared_ptr<ISdkComponent>>& SdkComponentFactory::GetSdkComponents() const {
 		return m_sdkcomponents;
 	}
 

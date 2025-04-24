@@ -26,7 +26,7 @@ namespace NdGameSdk {
         SdkComponentFactory() = default;
 
         void InitializeSdkComponents();
-        const auto& GetSdkComponents() const;
+        const std::unordered_map<std::type_index, std::shared_ptr<ISdkComponent>>& GetSdkComponents() const;
 
         template <typename ComponentType, typename... Args>
         std::shared_ptr<ComponentType> AddComponent(Args&&... args) {
@@ -131,7 +131,7 @@ namespace NdGameSdk {
         std::string m_name;
         bool m_Initialized;
 
-        static const std::vector<ISdkComponent*> GetSdkComponents();
+        static const std::vector<ISdkComponent*>& GetSdkComponents();
 
         static SdkComponentFactory s_SharedComponents;
         static SdkComponentFactory s_NdGameComponents;

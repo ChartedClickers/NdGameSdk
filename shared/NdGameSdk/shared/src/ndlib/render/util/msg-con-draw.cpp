@@ -75,7 +75,7 @@ namespace NdGameSdk::ndlib::render::util {
 		WindowContext::GetWindowContext(&ctx, WindowContext::ContextType::Context4,
 			DebugDraw->m_RenderFrameParams.GetRenderFrameParams()->m_DynamicRenderContext);
 
-		auto MsgCon_view = DebugDraw->m_Msg.s_MsgCon->Get();
+		auto MsgCon_view = DebugDraw->GetMsgCon()->Get();
 		StateScriptConsoleInfo Console
 		{
 			MsgCon_view->m_MsgConLeftPad,

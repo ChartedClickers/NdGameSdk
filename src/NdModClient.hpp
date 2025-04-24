@@ -34,19 +34,14 @@ private:
 	void OnModuleRegistered() override;
 	void OnGameInitialized(bool status) override;
 	void OnMemoryMapped(corelib::memory::Memory* Memory) override;
-
-#if defined(T2R)
 	void DebugDraw(FrameParams* frame) override;
-#endif 
 
 	bool m_initialized{false};
 	std::atomic<bool> m_ndmods_initialized{ false };
 
 	ndlib::EngineComponents* m_EngineComponents;
 	common::CommonGame* m_CommonGame;
-#if defined(T2R)
 	ndlib::render::dev::DebugDrawCommon* m_DebugDraw;
-#endif
 
 	std::unique_ptr<NdMods> m_ndmods;
 	std::recursive_mutex m_startup_mutex{};

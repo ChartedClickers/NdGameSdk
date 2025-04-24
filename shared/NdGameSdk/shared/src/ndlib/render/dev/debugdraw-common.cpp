@@ -12,6 +12,25 @@ namespace NdGameSdk::ndlib::render::dev {
 		}
 	}
 
+	void DebugDrawCommon::TextPrintV(WindowContext* ctx, const TextLayout& layout, const char* fmt, ...) {
+		
+		if (m_EngineComponents->GetNdGameInfo()->m_DisableFpsStat)
+			return;
+
+		va_list args;
+		va_start(args, fmt);
+		m_Text.TextPrintV(ctx, layout.font_x, layout.font_y, layout.font_scale_x, layout.font_scale_y, fmt, args);
+		va_end(args);
+	}
+
+	void DebugDrawCommon::PrintToActiveMsgOutput(const char* pStr) {
+		m_Msg.PrintToActiveMsgOutput(pStr);
+	}
+
+	MsgCon* DebugDrawCommon::GetMsgCon() {
+		return m_Msg.s_MsgCon;
+	}
+
 	void DebugDrawCommon::Awake() {
 		auto SharedComponents = ISdkComponent::GetSharedComponents();
 		m_CommonGame = SharedComponents->GetComponent<CommonGame>();
@@ -94,31 +113,34 @@ namespace NdGameSdk::ndlib::render::dev {
 	}
 
 	void DebugDrawCommon::DebugDraw(SafetyHookContext& ctx) {
+		if (!s_Instance) return;
+		DebugDrawCommon* DebugDraw{ s_Instance };
 
-		if (!s_Instance || s_Instance->m_EngineComponents->GetNdGameInfo()->m_DisableFpsStat) return;
+		auto* frame = s_Instance->m_RenderFrameParams.GetRenderFrameParams();
+		if (frame) {
 
-		if (s_Instance->m_CustomMsgCon) {
-			s_Instance->m_Msg.PrintToActiveMsgOutput(ANSI_CYN "==============" SDK_NAME " Debug Info ==============\n" ANSI_RESET);
-
-			s_Instance->m_Msg.PrintToActiveMsgOutput(ANSI_GRN "TEST INFO\n");
-
-			s_Instance->m_Msg.PrintToActiveMsgOutput(ANSI_WHT "--------------------------------------------------\n");
-		}
-
-		if (s_Instance->m_CustomTextPrintV) {
-			auto* frame = s_Instance->m_RenderFrameParams.GetRenderFrameParams();
-			if (frame) {
+			if (DebugDraw->m_DebugTextPrintV) {
 				WindowContext ctx{};
 				WindowContext::GetWindowContext(&ctx, WindowContext::ContextType::Context4, frame->m_DynamicRenderContext);
-				s_Instance->m_Text.TextPrintV(&ctx, 50., 150., 0.6, 0.6, ANSI_RED "The" " " ANSI_GRN "quick" " " ANSI_YEL "brown" " " ANSI_BLU  "fox\n\n\n" ANSI_MAG "jumps" " " ANSI_CYN "over" " " ANSI_WHT "the\n" ANSI_RED "lazy" " " ANSI_WHT "dog");
-				s_Instance->m_Text.TextPrintV(&ctx, 50., 100., 0.8, 0.8, SDK_NAME);
 
-				auto pSdkModules = ISdkModule::GetSdkModules();
+				const auto& layout = DebugDraw->m_DebugTextLayout;
+				char debug_text[256]{};
+				_snprintf_s(debug_text, sizeof(debug_text),
+					"%s: scale(%.2f %.2f) pos(%.2f %.2f)",
+					SDK_NAME,
+					layout.font_scale_x, layout.font_scale_y,
+					layout.font_x, layout.font_y
+				);
 
-				for (auto& [hmod, module] : *pSdkModules)
-					if (module && module->IsRegistered()) {
-						module->DebugDraw(frame);
-					}
+				DebugDraw->TextPrintV(&ctx, layout, debug_text);
+				DebugDraw->TextPrintV(&ctx, { 50., 150., 0.6, 0.6 }, ANSI_RED "The" " " ANSI_GRN "quick" " " ANSI_YEL "brown" " " ANSI_BLU  "fox\n\n\n" ANSI_MAG "jumps" " " ANSI_CYN "over" " " ANSI_WHT "the\n" ANSI_RED "lazy" " " ANSI_WHT "dog");
+			}
+
+			auto pSdkModules = ISdkModule::GetSdkModules();
+			for (auto& [hmod, module] : *pSdkModules) {
+				if (module && module->IsRegistered()) {
+					module->DebugDraw(frame);
+				}
 			}
 		}
 	}
@@ -129,8 +151,17 @@ namespace NdGameSdk::ndlib::render::dev {
 			DMENU::Menu* DebugDrawMenu = pdmenu->Create_DMENU_Menu("DebugDraw", HeapArena_Source);
 
 			if (DebugDrawMenu) {
-				pdmenu->Create_DMENU_ItemBool("CustomDebugDraw TextPrintV", DebugDrawMenu, &s_Instance->m_CustomTextPrintV, nullptr, HeapArena_Source);
-				pdmenu->Create_DMENU_ItemBool("CustomDebugDraw CustomMsgCon", DebugDrawMenu, &s_Instance->m_CustomMsgCon, nullptr, HeapArena_Source);
+
+				DMENU::ItemFloat::ValueParams scaleRange{ 0.0f, 2.0f };
+				DMENU::ItemFloat::ValueParams positionRange{ 0.0f, 2000.0f };
+				DMENU::ItemFloat::StepParams steps{ 0.1f, 1.0f };
+
+				pdmenu->Create_DMENU_ItemBool("Debug TextPrintV", DebugDrawMenu, &s_Instance->m_DebugTextPrintV, nullptr, HeapArena_Source);
+				pdmenu->Create_DMENU_ItemFloat("Font Scale X", DebugDrawMenu, &s_Instance->m_DebugTextLayout.font_scale_x, scaleRange, steps, "Scale X", HeapArena_Source);
+				pdmenu->Create_DMENU_ItemFloat("Font Scale Y", DebugDrawMenu, &s_Instance->m_DebugTextLayout.font_scale_y, scaleRange, steps, "Scale Y", HeapArena_Source);
+				pdmenu->Create_DMENU_ItemFloat("Font Pos X", DebugDrawMenu, &s_Instance->m_DebugTextLayout.font_x, positionRange, steps, "Position X", HeapArena_Source);
+				pdmenu->Create_DMENU_ItemFloat("Font Pos Y", DebugDrawMenu, &s_Instance->m_DebugTextLayout.font_y, positionRange, steps, "Position Y", HeapArena_Source);
+
 				return pdmenu->Create_DMENU_ItemSubmenu(DebugDrawMenu->Name(),
 					pMenu, DebugDrawMenu, NULL, NULL, nullptr, HeapArena_Source);
 			}

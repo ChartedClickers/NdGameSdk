@@ -19,9 +19,7 @@
 #include <NdGameSdk/shared/src/ndlib/render/dev/debugdraw-common.hpp>
 #include <NdGameSdk/shared/src/ndlib/render/frame-params.hpp>
 
-namespace NdGameSdk::ndlib::render::dev {
-    class DebugDrawCommon;
-}
+namespace NdGameSdk::ndlib::render::dev { class DebugDrawCommon; }
 
 namespace NdGameSdk {
 

@@ -61,9 +61,7 @@ bool NdModClient::Initialize() {
 void NdModClient::OnModuleRegistered() {
 	m_EngineComponents = GetSharedSdkComponent<ndlib::EngineComponents>().get();
 	m_CommonGame = GetSharedSdkComponent<common::CommonGame>().get();
-#if defined(T2R)
 	m_DebugDraw = GetSharedSdkComponent<ndlib::render::dev::DebugDrawCommon>().get();
-#endif
 }
 
 void NdModClient::OnGameInitialized(bool status) {
@@ -78,13 +76,12 @@ void NdModClient::OnMemoryMapped(corelib::memory::Memory* Memory) {
 	spdlog::info("MemoryMapped!");
 }
 
-
-#if defined(T2R)
 void NdModClient::DebugDraw(FrameParams* frame) {
+	/*
 	WindowContext ctx{};
 	WindowContext::GetWindowContext(&ctx, WindowContext::ContextType::Context4, frame->m_DynamicRenderContext);
 	char print_text[256]{};
 	_snprintf_s(print_text, sizeof(print_text), PROJECT_NAME);
-	m_DebugDraw->m_Text.TextPrintV(&ctx, 50., 180., 0.8, 0.8, print_text);
+	m_DebugDraw->TextPrintV(&ctx, { 50., 180., 0.8, 0.8 }, print_text);
+	*/
 }
-#endif

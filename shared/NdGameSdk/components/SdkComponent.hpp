@@ -17,6 +17,10 @@
 #include <NdGameSdk/sdkexception.hpp>
 #include <NdGameSdk/components/event/SdkEvent.hpp>
 
+#include <NdGameSdk/shared/src/ndlib/render/frame-params.hpp>
+
+namespace NdGameSdk::ndlib::render::dev { class DebugDrawCommon; }
+
 namespace NdGameSdk {
 
     class ISdkComponent;
@@ -127,6 +131,7 @@ namespace NdGameSdk {
     private:
         virtual void Awake() {};
         virtual void Initialize() = 0;
+        virtual void DebugDraw(FrameParams* frame) {};
 
         std::string m_name;
         bool m_Initialized;
@@ -138,6 +143,9 @@ namespace NdGameSdk {
 
         friend class SdkComponentFactory;
         friend class ISdkModule;
+
+        friend class ndlib::render::dev::DebugDrawCommon;
+
         friend void InitializeSdk(const SdkConfig* cfg);
         friend void RegisterSdkModule(ISdkModule* SdkModule);
         friend void UnregisterSdkModule(ISdkModule* SdkModule);

@@ -15,6 +15,7 @@
 #include <NdGameSdk/sdkconfig.hpp>
 #include <NdGameSdk/sdkderived.hpp>
 #include <NdGameSdk/sdkexception.hpp>
+#include <NdGameSdk/components/SdkSubComponent.hpp>
 #include <NdGameSdk/components/event/SdkEvent.hpp>
 
 #include <NdGameSdk/shared/src/ndlib/render/frame-params.hpp>
@@ -24,6 +25,7 @@ namespace NdGameSdk::ndlib::render::dev { class DebugDrawCommon; }
 namespace NdGameSdk {
 
     class ISdkComponent;
+    class ISdkSubComponent;
 
     class SdkComponentFactory final {
     public:
@@ -83,6 +85,15 @@ namespace NdGameSdk {
             return {};
         }
 
+        template<typename SubT>
+        NdGameSdk_API std::shared_ptr<SubT> GetSubComponent() {
+            static_assert(SdkDerived::is_derived_from_ISdkSubComponent<SubT>::value, "SubT must derive from ISdkSubComponent");
+            auto it = m_subcomponents.find(typeid(SubT));
+            return (it != m_subcomponents.end())
+                ? std::static_pointer_cast<SubT>(it->second)
+                : nullptr;
+        }
+
         template <typename ComponentType, typename EventType, typename MemberFunc, typename ClassType = void>
         NdGameSdk_API static optional<ISdkAction> SubscribeSdkEvent(
             SdkComponentFactory* ComponentFactory,
@@ -128,6 +139,17 @@ namespace NdGameSdk {
         NdGameSdk_API static SdkComponentFactory* GetSharedComponents();
         NdGameSdk_API static SdkComponentFactory* GetNdGameComponents();
 
+        void InitSubComponents();
+
+        template<typename SubT, typename... Args>
+        std::shared_ptr<SubT> AddSubComponent(Args&&... a)
+        {
+            static_assert(SdkDerived::is_derived_from_ISdkSubComponent<SubT>::value, "SubT must derive from ISdkSubComponent");
+            auto sub = std::make_shared<SubT>(std::forward<Args>(a)...);
+            m_subcomponents[typeid(SubT)] = sub;
+            return sub;
+        }
+
     private:
         virtual void Awake() {};
         virtual void Initialize() = 0;
@@ -136,6 +158,8 @@ namespace NdGameSdk {
         std::string m_name;
         bool m_Initialized;
 
+        std::unordered_map<std::type_index, std::shared_ptr<ISdkSubComponent>> m_subcomponents;
+
         static const std::vector<ISdkComponent*>& GetSdkComponents();
 
         static SdkComponentFactory s_SharedComponents;
@@ -143,7 +167,6 @@ namespace NdGameSdk {
 
         friend class SdkComponentFactory;
         friend class ISdkModule;
-
         friend class ndlib::render::dev::DebugDrawCommon;
 
         friend void InitializeSdk(const SdkConfig* cfg);

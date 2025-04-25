@@ -10,6 +10,7 @@
 namespace NdGameSdk {
 
 	class ISdkComponent;
+	class ISdkSubComponent;
 	class ISdkModule;
 	class SdkConfig;
 

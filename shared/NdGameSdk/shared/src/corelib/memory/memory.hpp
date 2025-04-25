@@ -5,7 +5,7 @@
 #include "NdGameSdk/components/SdkComponent.hpp"
 
 #include "memory-map.hpp"
-#include "heaparena.hpp"
+#include "allocator-heap.hpp"
 #include "allocator-tagged-heap.hpp"
 #include "memory-area-win.hpp"
 

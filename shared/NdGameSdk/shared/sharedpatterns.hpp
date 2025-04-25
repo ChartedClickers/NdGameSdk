@@ -56,6 +56,7 @@ namespace NdGameSdk::Patterns
 	static inline const SdkPattern Msg_s_MsgCon = { L"4c 8b dc 48 81 ec 88 00 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 70 48 8d 05 ?? ?? ?? ?? 49 c7 43 a0 00 10 00 00 49 89 43 98 49 8d 4b 98 48 8d 05", +0x81 };
 	static inline const SdkPattern Msg_PrintToActiveMsgOutput = { L"48 89 4c 24 08 48 89 54 24 10 4c 89 44 24 18 4c 89 4c 24 20 48 83 ec 38 48 85 c9 75 ?? 48 89 5c 24 30 e8 ?? ?? ?? ?? 48 8b d8 48 85 c0 74 ?? b1 01 ff d3 e8 ?? ?? ?? ?? 48 85 c0 74 ?? ff d0 e8 ?? ?? ?? ?? 48 85 c0 74" };
 
+	static inline const SdkPattern PrimServer_PrimServer = { L"48 89 8d 80 00 00 00 48 89 75 18 c7 44 24 40 01 00 00 00 48 c7 44 24 38 ff ff ff ff c6 44 24 30 03 4c 89 74 24 28 c7 44 24 20 df 0e 00 00 4c 8d 0d", 0x5b };
 
 #elif defined(T1X)
 	static inline const SdkPattern EngineComponents_s_table = { L"48 89 6c 24 18 56 41 56 41 57 48 83 ec 30 8b f1 45 8b", +0x13 };

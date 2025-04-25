@@ -20,6 +20,15 @@ namespace regenny {
     // c:\branches\discbot??\t2r-pc-?.?.?\shared\src
     namespace shared {
         
+        // Forward declared structures.
+        namespace ndlib {
+            struct FrameParams{};
+
+            namespace render {
+                struct WindowContext{};
+            }
+        }
+
         // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib
         namespace corelib {
             
@@ -421,20 +430,21 @@ namespace regenny {
 
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib\util
             namespace util {
-                 struct MsgCon 0x118 {
+
+                struct MsgCon 0x118 {
                     void* vftable;
                     float m_MsgConScale @0x10
-                    int m_MsgConLeftPad
-                    int m_MsgConHorizontalSize
-                    int m_MsgConVerticalSize
-                    int m_MsgConTopPad
+                    uint32_t m_MsgConLeftPad
+                    uint32_t m_MsgConHorizontalSize
+                    uint32_t m_MsgConVerticalSize
+                    uint32_t m_MsgConTopPad
                     bool m_DrawRedisTTYTimes @0x32;
                     bool m_DrawRedisTTYStatus;
                     bool m_ApplyMsgConScaletoDebugText @0x36;
                     bool m_EnableMsgConLineWrap;
                     bool m_EnableMsgConAutoResize;
                     bool m_ShowCacheMissesDebugText;
-                 }
+                }
             }
         }
 
@@ -527,7 +537,7 @@ namespace regenny {
             struct FrameParams 0x1a8280 {
                 uint64_t m_frameNumber
                 void* m_DynamicRenderContext @ 0x6a80
-            }
+            } // frame-params.cpp
 
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\debug
             namespace debug {
@@ -707,6 +717,32 @@ namespace regenny {
                     uint64_t field_18;
                     uint64_t field_20;
                     uint64_t field_28;
+                }
+
+                // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\render\util
+                namespace util {
+
+                    struct PrimServer 0x1380 {
+                    
+                        struct VTable 0x210 {
+                            virtual void Render(PrimServer* this_, ndlib.render.WindowContext* WindowContext) @ 0x8
+                            virtual void Render2D(PrimServer* this_, ndlib.render.WindowContext* WindowContext) @ 0x10
+                            virtual void Render3D(PrimServer* this_, ndlib.render.WindowContext* WindowContext) @ 0x18
+                            virtual uint64_t RenderString(PrimServer* this_, uint64_t* position, char* text, void* flags) @ 0xC8
+                            virtual void InitFrameParams(PrimServer* this_, ndlib.FrameParams* RenderFrameParams) @ 0x1b0
+                            virtual void ClearAll(PrimServer* this_) @ 0x1B8
+                            virtual void ReleaseMem(PrimServer* this_) @ 0x1C0
+                            virtual void ReleaseFrameHeap(PrimServer* this_) @ 0x1C8
+                            virtual void SetPaused(PrimServer* this_, bool arg2, bool arg3, int arg4) @ 0x1D0
+                            virtual void CullStale(PrimServer* this_) @ 0x1D8
+                        } 
+                    
+                        struct InitParams 0x4c {
+                            uint32_t m_memoryBufferSize[0x13];
+                        }
+                    
+                        VTable* vftable;
+                    }
                 }
             }
             

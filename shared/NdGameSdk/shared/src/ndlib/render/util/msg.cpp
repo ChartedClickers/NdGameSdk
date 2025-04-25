@@ -11,7 +11,6 @@ namespace NdGameSdk::ndlib::render::util
 	{
 		always_assert(Msg_PrintToActiveMsgOutput == nullptr, "function pointer is not initialized!");
 		Msg_PrintToActiveMsgOutput(pStr);
-
 	}
 
 }

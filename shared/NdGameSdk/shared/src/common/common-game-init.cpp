@@ -1,6 +1,8 @@
 #include "common-game-init.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
+#include <NdGameSdk/shared/src/ndlib/render/dev/debugdraw-common.hpp>
+
 namespace NdGameSdk::common {
 
 	CommonGame::CommonGame() : ISdkComponent("CommonGameInit") {}
@@ -17,6 +19,7 @@ namespace NdGameSdk::common {
 		auto SharedComponents = ISdkComponent::GetSharedComponents();
 		m_Memory = SharedComponents->GetComponent<Memory>();
 		m_EngineComponents = SharedComponents->GetComponent<ndlib::EngineComponents>();
+		m_PrimServer = SharedComponents->GetComponent<ndlib::render::dev::DebugDrawCommon>()->GetSubComponent<PrimServerManager>();
 		m_IAllocator.emplace(this, m_Memory.get());
 	}
 
@@ -106,7 +109,6 @@ namespace NdGameSdk::common {
 
 	#elif defined(T1X)
 			if (m_Memory->IsDebugMemoryAvailable()) {
-				m_PrimServer = ISdkComponent::GetSharedComponents()->GetComponent<PrimServerComponent>();
 				if (m_PrimServer.get() && m_PrimServer->IsInitialized()) {
 
 					findpattern = Patterns::GameInit_PrimServer_Create;
@@ -120,6 +122,7 @@ namespace NdGameSdk::common {
 							MemoryMapEntry* DebugDrawing = gameinit->m_Memory->GetMemoryMapEntry(MemoryMapId::ALLOCATION_DEBUG_DRAWING);
 							PrimServer::InitParams pParams{ DebugDrawing->Size() };
 							gameinit->m_PrimServer->Create(&pParams);
+
 						}, wstr(Patterns::GameInit_PrimServer_Create), wstr(PrimServerCreateJMP));
 
 					if (!m_PrimServer_CreateHook) {

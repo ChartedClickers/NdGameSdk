@@ -6,11 +6,7 @@ namespace NdGameSdk::ndlib::render::dev {
 
 	DebugDrawCommon::DebugDrawCommon() : ISdkComponent("DebugDraw") {}
 
-	DebugDrawCommon::~DebugDrawCommon() {
-		if (IsInitialized()) {
-			m_CommonGame->e_GameInitialized.Unsubscribe({ this, &DebugDrawCommon::OnGameInitialized });
-		}
-	}
+	DebugDrawCommon::~DebugDrawCommon() {}
 
 	void DebugDrawCommon::TextPrintV(WindowContext* ctx, const TextLayout& layout, const char* fmt, ...) {
 		
@@ -33,9 +29,11 @@ namespace NdGameSdk::ndlib::render::dev {
 
 	void DebugDrawCommon::Awake() {
 		auto SharedComponents = ISdkComponent::GetSharedComponents();
-		m_CommonGame = SharedComponents->GetComponent<CommonGame>();
 		m_EngineComponents = SharedComponents->GetComponent<EngineComponents>();
-		m_MsgConDraw.emplace(this, SharedComponents->GetComponent<Memory>().get());
+		m_Memory = SharedComponents->GetComponent<Memory>();
+
+		AddSubComponent<MsgConDraw>(this);
+		AddSubComponent<PrimServerManager>(this);
 	}
 
 	void DebugDrawCommon::Initialize()
@@ -46,8 +44,8 @@ namespace NdGameSdk::ndlib::render::dev {
 
 			spdlog::info("Initializing {} patterns...", GetName());
 
-			auto MissingDependencies = CheckSdkComponents<CommonGame, EngineComponents> 
-				({ m_CommonGame.get(), m_EngineComponents.get()});
+			auto MissingDependencies = CheckSdkComponents<Memory, EngineComponents>
+				({ m_Memory.get(), m_EngineComponents.get()});
 
 			if (MissingDependencies.has_value()) {
 				throw SdkComponentEx
@@ -97,8 +95,9 @@ namespace NdGameSdk::ndlib::render::dev {
 				throw SdkComponentEx{ std::format("Failed to find {}:: game functions!", GetName()), SdkComponentEx::ErrorCode::PatternFailed };
 			}
 
+			this->InitSubComponents();
+
 			s_Instance = this;
-			m_CommonGame->e_GameInitialized.Subscribe(this, &DebugDrawCommon::OnGameInitialized);
 
 			findpattern = Patterns::GameDebugDraw_StaticContextHook;
 			auto GameDebugDrawJMP = (void*)Utility::FindAndPrintPattern(module
@@ -106,8 +105,6 @@ namespace NdGameSdk::ndlib::render::dev {
 
 			m_DebugDrawHook = Utility::MakeMidHook(GameDebugDrawJMP,
 				DebugDraw, wstr(Patterns::GameDebugDraw_StaticContextHook), wstr(GameDebugDrawJMP));
-
-			m_MsgConDraw->MsgConDrawBuffersPatch();
 
 		});
 	}
@@ -171,12 +168,6 @@ namespace NdGameSdk::ndlib::render::dev {
 		return nullptr;
 	}
 
-	void DebugDrawCommon::OnGameInitialized(bool successful) {
-		if (successful) {
-			
-		}
-	}
-
 	DebugDrawCommon* DebugDrawCommon::s_Instance = nullptr;
 
-	}
+}

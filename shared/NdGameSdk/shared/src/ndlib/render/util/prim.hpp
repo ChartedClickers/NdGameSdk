@@ -1,10 +1,7 @@
 #pragma once
 
-#if defined(T1X)
-
-
 #include "NdGameSdk/sdk.hpp"
-#include "NdGameSdk/components/SdkComponent.hpp"
+#include "NdGameSdk/components/SdkSubComponent.hpp"
 
 #include <Utility/helper.hpp>
 #include <Utility/assertion/assert.hpp>
@@ -12,15 +9,16 @@
 
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
 
-#if defined(T1X)
+#if defined(T2R)
+#include <NdGameSdk/regenny/t2r/shared/ndlib/render/util/PrimServer.hpp>
+#elif defined(T1X)
 #include <NdGameSdk/regenny/t1x/shared/ndlib/render/util/PrimServer.hpp>
 #endif
 
-using namespace NdGameSdk::corelib::memory;
+namespace NdGameSdk::ndlib::render::dev { class DebugDrawCommon; }
 
-namespace NdGameSdk::common {
-	class CommonGame;
-}
+using namespace NdGameSdk::corelib::memory;
+using namespace NdGameSdk::ndlib::render::dev;
 
 namespace NdGameSdk::ndlib::render::util {
 
@@ -36,27 +34,22 @@ namespace NdGameSdk::ndlib::render::util {
 		};
 	};
 
-	class PrimServerComponent : public ISdkComponent
-	{
+	class PrimServerManager : public ISdkSubComponent {
 	public:
-		PrimServerComponent();
-		NdGameSdk_API bool IsCreated();
+		explicit PrimServerManager(DebugDrawCommon* pDebugDrawCommon);
+		void Init() override;
+#if defined(T1X)
 		void Create(PrimServer::InitParams* InitParams);
+#endif
+		PrimServer* s_PrimServer;
 	private:
-		void Awake() override;
-		void Initialize() override;
-
-		bool m_IsCreated{};
-
-		PrimServer* m_PrimServer;
-		
-		shared_ptr<Memory> m_Memory;
-
-		friend class NdGameSdk::common::CommonGame;
+		DebugDrawCommon* m_DebugDrawCommon{};
+#if defined(T1X)
 		MEMBER_FUNCTION_PTR(void, PrimServer_Create, PrimServer*, PrimServer::InitParams*);
+#endif
 	};
 
-	static_assert(sizeof(PrimServer) == 0x1370, "Size of PrimServer is not correct.");
+
+	static_assert(sizeof(PrimServer) == 0x1380, "Size of PrimServer is not correct.");
 	static_assert(sizeof(PrimServer::InitParams) == 0x4c, "Size of PrimServer::InitParams is not correct.");
 }
-#endif

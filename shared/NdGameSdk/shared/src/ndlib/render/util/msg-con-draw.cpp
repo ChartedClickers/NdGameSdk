@@ -11,8 +11,8 @@ using namespace NdGameSdk::gamelib::statescript;
 
 namespace NdGameSdk::ndlib::render::util {
 
-	MsgConDraw::MsgConDraw(DebugDrawCommon* pDebugDrawCommon, Memory* pMemory) : 
-		m_DebugDrawCommon(pDebugDrawCommon), m_Memory(pMemory) {
+	MsgConDraw::MsgConDraw(DebugDrawCommon* pDebugDrawCommon) : 
+		ISdkSubComponent(TOSTRING(MsgConDraw)), m_DebugDrawCommon(pDebugDrawCommon) {
 		s_Instance = this;
 	}
 
@@ -24,14 +24,14 @@ namespace NdGameSdk::ndlib::render::util {
 	uintptr_t StateScriptPrinterStrncpy_ReturnAddr = NULL;
 	void StateScriptPrinterStrncpy_CC();
 
-	void MsgConDraw::MsgConDrawBuffersPatch()
+	void MsgConDraw::Init()
 	{
 		Patterns::SdkPattern findpattern{};
 		auto module = Utility::memory::get_executable();
 
-
+		DebugDrawCommon* DebugDraw{ m_DebugDrawCommon };
 #if defined(T1X)
-		if (m_Memory->IsDebugMemoryAvailable()) {
+		if (DebugDraw->m_Memory->IsDebugMemoryAvailable()) {
 
 			/* It's a dirty and broken hack for MsgCon, unfortunately, in T1X specific handler for msgcon is stripped out. 
 			Yes, we can rollback this from T2R, but it is taking a long time rn. Thanks, illusion0001, for this method. 

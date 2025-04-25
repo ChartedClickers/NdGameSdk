@@ -15,7 +15,6 @@ type float 4 [[f32]]
 type double 8
 type StringId64 8 [[u64]]
    
-
 namespace regenny {
 
     struct process 0x100 {}
@@ -27,6 +26,13 @@ namespace regenny {
 
     // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src
     namespace shared {
+        
+        // Forward declared structures.
+        namespace ndlib {
+            namespace render {
+                struct WindowContext{};
+            }
+        }
 
         // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\corelib
         namespace corelib {
@@ -432,1025 +438,1018 @@ namespace regenny {
             }
         }
 
-    // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib
-    namespace ndlib {
-
-        struct EngineComponents {
-            enum Component : uint32_t {
-                NdGameInfo = 0x0,
-                NdFrameState = 0x1,
-                PhotoModeManager = 0x2,
-                FileSystem = 0x3,
-                PackageMgr = 0x4,
-                PrefetchMgr = 0x5,
-                LevelMgr = 0x6,
-                LevelStreamingMgr = 0x7,
-                NdMessageManager = 0x8,
-                PSNTelemetry = 0xA,
-                AudioManager = 0xB,
-                NdDialogManager = 0xE,
-                NavMeshMgr = 0xF,
-                musicManager = 0xd,
-                NpcManager = 0x10,
-                AnimMgr = 0x11,
-                FgDrawMgr = 0x12,
-                ProcessMgr = 0x13,
-                ScriptManager = 0x14,
-                AnimStreamManager = 0x15,
-                Gui2 = 0x17,
-                TextureMgrPub = 0x18,
-                ParticleDebug = 0x1D
-            }; // engine-components.hpp
-        }
-
-        struct NdConfig {
-            enum Config : uint32_t {
-                NetInfo = 0x0, // m_pNetInfo
-                DMENU = 0x1,
-                NdDevMenu = 0x2,
-                NameCache = 0x7, // m_pNameCache
-                BUILD_NUMBER = 0x1e,
-                GameTitle = 0x20,
-                IsGameConfigured = 0xd2
-            }; // (nd-config.hpp)
-        }
-
-        struct NdGameInfo 0x45c0 {
-            void* vftable;
-            uint64_t m_internalname @ 0x118 [[utf8*]];
-            StringId64 m_gametitlehash @ 0x120;
-            char m_SavePath[0x400] [[utf8*]]
-            char m_SavePath_unk[0x400] [[utf8*]]
-            char m_GamePath[0x400] [[utf8*]]
-            char m_GamePath_unk[0x400] [[utf8*]]
-            char m_NetUserPath[0x400] [[utf8*]]
-            char m_NetPath[0x400] [[utf8*]]
-            char m_GameDataPath[0x400] [[utf8*]]
-            char m_GameDataPath_unk[0x400] [[utf8*]]
-            char m_BinPath[0x400] [[utf8*]]
-            char m_BinPath_unk[0x400] [[utf8*]]
-            char m_BranchName[0x40] [[utf8*]]
-            char m_SrcPath[0x400] [[utf8*]]
-            char m_DbPath[0x400] [[utf8*]]
-            char m_GamePath_unk2[0x400] [[utf8*]]
-            char m_CfgPath[0x400] +0x402 [[utf8*]]
-            char m_CfgFolderName[0x80] [[utf8*]]
-            char m_CfgDefaultsPath[0x80] [[utf8*]]
-            uint16_t Unk_3ef0 +0x85
-            bool m_AssetView [[bool*]]
-            bool m_DevConfig [[bool*]]
-            bool m_onDisc [[bool*]]
-            bool m_onDiscUseManifest [[bool*]]
-            bool Unk_3ef5 [[bool*]]
-            bool Unk_3ef6 [[bool*]]
-            bool Unk_3ef7 [[bool*]]
-            bool Unk_3ef8 [[bool*]]
-            bool Unk_3ef9 [[bool*]]
-            bool Unk_3efa [[bool*]]
-            bool Unk_3efb [[bool*]]
-            bool Unk_3efc [[bool*]]
-            bool Unk_3efd [[bool*]]
-            bool Unk_3efe [[bool*]]
-            bool Unk_3eff [[bool*]]
-            bool Unk_3f00 [[bool*]]
-            bool Unk_3f01 [[bool*]]
-            bool Unk_3f02 [[bool*]]
-            bool Unk_3f03 [[bool*]]
-            bool Unk_3f04 [[bool*]]
-            bool Unk_3f05 [[bool*]]
-            bool Unk_3f06 [[bool*]]
-            bool Unk_3f07 [[bool*]]
-            bool Unk_3f08 [[bool*]]
-            bool Unk_3f09 [[bool*]]
-            bool Unk_3f0a [[bool*]]
-            bool Unk_3f0b [[bool*]]
-            bool Unk_3f0c [[bool*]]
-            bool Unk_3f0d [[bool*]]
-            bool Unk_3f0e [[bool*]]
-            bool Unk_3f0f [[bool*]]
-            bool Unk_3f10 [[bool*]]
-            bool Unk_3f11 [[bool*]]
-            bool Unk_3f12 [[bool*]]
-            bool Unk_3f13 [[bool*]]
-            bool Unk_3f14 [[bool*]]
-            bool Unk_3f15 [[bool*]]
-            bool Unk_3f16 [[bool*]]
-            bool Unk_3f17 [[bool*]]
-            bool Unk_3f18 [[bool*]]
-            bool Unk_3f19 [[bool*]]
-            bool Unk_3f1a [[bool*]]
-            bool Unk_3f1b [[bool*]]
-            bool m_IsMultiplayer [[bool*]]
-            bool Unk_3f1d [[bool*]]
-            bool Unk_3f1e [[bool*]]
-            bool Unk_3f1f [[bool*]]
-            bool Unk_3f20 [[bool*]]
-            bool Unk_3f21 [[bool*]]
-            bool Unk_3f22 [[bool*]]
-            bool Unk_3f23 [[bool*]]
-            bool Unk_3f24 [[bool*]]
-            bool Unk_3f25 [[bool*]]
-            bool Unk_3f26 [[bool*]]
-            bool Unk_3f27 [[bool*]]
-            bool Unk_3f28 [[bool*]]
-            bool Unk_3f29 [[bool*]]
-            bool Unk_3f2a [[bool*]]
-            bool Unk_3f2b [[bool*]]
-            bool Unk_3f2c [[bool*]]
-            bool Unk_3f2d [[bool*]]                          
-            bool Unk_3f2e [[bool*]]
-            bool m_DevMode [[bool*]]
-            bool Unk_3f30 [[bool*]]
-            bool Unk_3f31 [[bool*]]
-            bool Unk_3f32 [[bool*]]
-            bool Unk_3f33 [[bool*]]
-            bool Unk_3f34 [[bool*]]
-            bool Unk_3f35 [[bool*]]
-            bool Unk_3f36 [[bool*]]
-            bool Unk_3f37 [[bool*]]
-            bool Unk_3f38 [[bool*]]
-            bool Unk_3f39 [[bool*]]
-            bool Unk_3f3a [[bool*]]
-            bool Unk_3f3b [[bool*]]
-            bool Unk_3f3c [[bool*]]
-            bool m_DebugRendering [[bool*]]
-            bool Unk_3f3e [[bool*]]
-            bool Unk_3f3f [[bool*]]
-            bool Unk_3f40 [[bool*]]
-            bool Unk_3f41 [[bool*]]
-            bool Unk_3f42 [[bool*]]
-            bool Unk_3f43 [[bool*]]
-            bool Unk_3f44 [[bool*]]
-            bool Unk_3f45 [[bool*]]
-            bool Unk_3f46 [[bool*]]
-            bool Unk_3f47 [[bool*]]
-            bool Unk_3f48 [[bool*]]
-            bool Unk_3f49 [[bool*]]
-            bool Unk_3f4a [[bool*]]
-            bool Unk_3f4b [[bool*]]
-            bool Unk_3f4c [[bool*]]
-            bool Unk_3f4d [[bool*]]
-            bool Unk_3f4e [[bool*]]
-            bool Unk_3f4f [[bool*]]
-            bool Unk_3f50 [[bool*]]
-            bool Unk_3f51 [[bool*]]
-            bool Unk_3f52 [[bool*]]
-            bool Unk_3f53 [[bool*]]
-            bool Unk_3f54 [[bool*]]
-            bool Unk_3f55 [[bool*]]
-            bool Unk_3f56 [[bool*]]
-            bool Unk_3f57 [[bool*]]
-            uint32_t Unk_3f58
-            bool Unk_3f5c [[bool*]]
-            bool Unk_3f5d [[bool*]]
-            bool Unk_3f5e [[bool*]]
-            bool Unk_3f5f [[bool*]]
-            uint32_t Unk_3f60
-            bool m_DisableFpsStat [[bool*]]
-            bool Unk_3f65 [[bool*]]
-            bool Unk_3f66 [[bool*]]
-            bool Unk_3f67 [[bool*]]
-            bool Unk_3f68 [[bool*]]
-            bool Unk_3f69 [[bool*]]
-            bool Unk_3f6a [[bool*]]
-            bool Unk_3f6b [[bool*]]
-            bool Unk_3f6c [[bool*]]
-            bool Unk_3f6d [[bool*]]
-            bool Unk_3f6e [[bool*]]
-            bool Unk_3f6f [[bool*]]
-            bool Unk_3f70 [[bool*]]
-            bool Unk_3f71 [[bool*]]
-            bool Unk_3f72 [[bool*]]
-            bool m_showBuildInfo [[bool*]]
-            bool Unk_3f74 [[bool*]]
-            bool Unk_3f75 [[bool*]]
-            bool Unk_3f76 [[bool*]]
-            bool Unk_3f77 [[bool*]]
-            bool Unk_3f78 [[bool*]]
-            bool Unk_3f79 [[bool*]]
-            bool Unk_3f7a [[bool*]]
-            bool Unk_3f7b [[bool*]]
-            bool Unk_3f7c [[bool*]]
-            bool Unk_3f7d [[bool*]]
-            bool Unk_3f7e [[bool*]]
-            bool Unk_3f7f [[bool*]]
-            bool Unk_3f80 [[bool*]]
-            bool Unk_3f81 [[bool*]]
-            bool Unk_3f82 [[bool*]]
-            bool Unk_3f83 [[bool*]]
-            bool Unk_3f84 [[bool*]]
-            bool Unk_3f85 [[bool*]]
-            bool Unk_3f86 [[bool*]]
-            bool Unk_3f87 [[bool*]]
-            bool Unk_3f88 [[bool*]]
-            bool Unk_3f89 [[bool*]]
-            bool Unk_3f8a [[bool*]]
-            bool Unk_3f8b [[bool*]]
-            bool Unk_3f8c [[bool*]]
-            bool Unk_3f8d [[bool*]]
-            bool Unk_3f8e [[bool*]]
-            bool Unk_3f8f [[bool*]]
-            bool Unk_3f90 [[bool*]]
-            bool Unk_3f91 [[bool*]]
-            bool Unk_3f92 [[bool*]] // smoketest
-            bool Unk_3f93 [[bool*]]
-            bool Unk_3f94 [[bool*]]
-            bool Unk_3f95 [[bool*]]
-            bool Unk_3f96 [[bool*]]
-            bool Unk_3f97 [[bool*]]
-            bool Unk_3f98 [[bool*]]
-            bool Unk_3f99 [[bool*]]
-            bool Unk_3f9a [[bool*]]
-            bool Unk_3f9b [[bool*]]
-            bool Unk_3f9c [[bool*]]
-            bool Unk_3f9d [[bool*]]
-            bool Unk_3f9e [[bool*]]
-            bool Unk_3f9f [[bool*]]
-            uint32_t Unk_3fa0
-            bool Unk_3fa4 [[bool*]]
-            bool Unk_3fa5 [[bool*]]
-            bool Unk_3fa6 [[bool*]]
-            bool Unk_3fa7 [[bool*]]
-            bool Unk_3fa8 [[bool*]]
-            bool Unk_3fa9 [[bool*]]
-            bool Unk_3faa [[bool*]]
-            bool Unk_3fab [[bool*]]
-            bool Unk_3fac [[bool*]]
-            bool Unk_3fad [[bool*]]
-            bool Unk_3fae [[bool*]]
-            bool Unk_3faf [[bool*]]
-            bool Unk_3fb0 [[bool*]]
-            bool Unk_3fb1 [[bool*]]
-            bool Unk_3fb2 [[bool*]]
-            bool Unk_3fb3 [[bool*]]
-            bool Unk_3fb4 [[bool*]]
-            bool Unk_3fb5 [[bool*]]
-            bool Unk_3fb6 [[bool*]]
-            bool Unk_3fb7 [[bool*]]
-            bool Unk_3fb8 [[bool*]]
-            bool Unk_3fb9 [[bool*]]
-            bool Unk_3fba [[bool*]]
-            bool Unk_3fbb [[bool*]]
-            uint32_t Unk_3fbc
-            bool Unk_3fc0 [[bool*]]
-            bool Unk_3fc1 [[bool*]]
-            bool Unk_3fc2 [[bool*]]
-            bool Unk_3fc3 [[bool*]]
-            bool Unk_3fc4 [[bool*]]
-            bool Unk_3fc5 [[bool*]]
-            bool Unk_3fc6 [[bool*]]
-            bool Unk_3fc7 [[bool*]]
-            bool Unk_3fc8 [[bool*]]
-            bool Unk_3fc9 [[bool*]]
-            bool Unk_3fca [[bool*]]
-            bool Unk_3fcb [[bool*]]
-            bool Unk_3fcc [[bool*]]
-            bool Unk_3fcd [[bool*]]
-            bool Unk_3fce [[bool*]]
-            bool Unk_3fcf [[bool*]]
-            bool Unk_3fd0 [[bool*]]
-            bool Unk_3fd1 [[bool*]]
-            bool Unk_3fd2 [[bool*]]
-            bool Unk_3fd3 [[bool*]]
-            bool Unk_3fd4 [[bool*]]
-            bool Unk_3fd5 [[bool*]]
-            bool Unk_3fd6 [[bool*]]
-            bool Unk_3fd7 [[bool*]]
-            char m_DiscUser[0x18] +0x30 [[utf8*]]
-            StringId64 AudioStringId +0x160
-            char m_GameStudio[0x40] +0x2db [[utf8*]]
-        }
-
-        struct NdFrameState 0x288a0 {
-            void* vftable;
-            uint64_t m_gameFrameNumber @ 0x40
-            bool m_KeyboardDevMode @ 0x51a // Enable toggle devmode menu via the keyboard
-        }
-
-        struct FrameParams 0x1a3180 {
-            uint64_t m_frameNumber
-            void* m_DynamicRenderContext @ 0x6a80
-        }
-
-    /*
-        struct NetInfo 0x238 {
-            char NetUserId[0x400] + 0x3C [[utf8*]]
-        }
-    */
-
-    // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\debug
-    namespace debug {
-
-        struct DMENU 0x670 {
-
-            enum Message : uint32_t
-            {
-                OnOpen = 0x0,
-                OnClose = 0x1,
-                OnUpdate = 0x3,
-                OnExecute = 0x5,
-                OnReadConfig = 0x7,
-                OnSaveConfig = 0x8
-            };
-
-            // DMENU::Component (class_DMENU::Component_vfTable)
-            struct Component 0xb0 {
-                struct VTable 0xb0 {}
+        // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib
+        namespace ndlib {
+    
+            struct EngineComponents {
+                enum Component : uint32_t {
+                    NdGameInfo = 0x0,
+                    NdFrameState = 0x1,
+                    PhotoModeManager = 0x2,
+                    FileSystem = 0x3,
+                    PackageMgr = 0x4,
+                    PrefetchMgr = 0x5,
+                    LevelMgr = 0x6,
+                    LevelStreamingMgr = 0x7,
+                    NdMessageManager = 0x8,
+                    PSNTelemetry = 0xA,
+                    AudioManager = 0xB,
+                    NdDialogManager = 0xE,
+                    NavMeshMgr = 0xF,
+                    musicManager = 0xd,
+                    NpcManager = 0x10,
+                    AnimMgr = 0x11,
+                    FgDrawMgr = 0x12,
+                    ProcessMgr = 0x13,
+                    ScriptManager = 0x14,
+                    AnimStreamManager = 0x15,
+                    Gui2 = 0x17,
+                    TextureMgrPub = 0x18,
+                    ParticleDebug = 0x1D
+                }; // engine-components.hpp
+            }
+        
+            struct NdConfig {
+                enum Config : uint32_t {
+                    NetInfo = 0x0, // m_pNetInfo
+                    DMENU = 0x1,
+                    NdDevMenu = 0x2,
+                    NameCache = 0x7, // m_pNameCache
+                    BUILD_NUMBER = 0x1e,
+                    GameTitle = 0x20,
+                    IsGameConfigured = 0xd2
+                }; // (nd-config.hpp)
+            }
+        
+            struct NdGameInfo 0x45c0 {
                 void* vftable;
-                void* UnkString;
-                char m_name[0x20] [[utf8*]] // (Only if string length is less than 32 characters)
-                char* m_pname [[utf8*]];
-                Component* m_pSubMenu;
-                Component* m_NextDMenuComponent;
-                uint64_t Unk2[0x3];
-                uint64_t m_data; // For arguments or link variable
-                uint32_t m_color;
-                uint32_t m_selectcolor;
-                uint32_t m_editedcolor; // maybe
-                bool m_Islinked; // BY KEY ID
-                char* m_pDescription +0xb [[utf8*]];
-                bool m_atsign;
-                Component* m_MenuGroup + 0x7;
-                bool m_isfavorite + 0x1;
-                int m_PagePointer +0x6; // Only with menu component?
-                int m_MaxPagePointers;
-                uint64_t m_ExtraArg;
-            } 
+                uint64_t m_internalname @ 0x118 [[utf8*]];
+                StringId64 m_gametitlehash @ 0x120;
+                char m_SavePath[0x400] [[utf8*]]
+                char m_SavePath_unk[0x400] [[utf8*]]
+                char m_GamePath[0x400] [[utf8*]]
+                char m_GamePath_unk[0x400] [[utf8*]]
+                char m_NetUserPath[0x400] [[utf8*]]
+                char m_NetPath[0x400] [[utf8*]]
+                char m_GameDataPath[0x400] [[utf8*]]
+                char m_GameDataPath_unk[0x400] [[utf8*]]
+                char m_BinPath[0x400] [[utf8*]]
+                char m_BinPath_unk[0x400] [[utf8*]]
+                char m_BranchName[0x40] [[utf8*]]
+                char m_SrcPath[0x400] [[utf8*]]
+                char m_DbPath[0x400] [[utf8*]]
+                char m_GamePath_unk2[0x400] [[utf8*]]
+                char m_CfgPath[0x400] +0x402 [[utf8*]]
+                char m_CfgFolderName[0x80] [[utf8*]]
+                char m_CfgDefaultsPath[0x80] [[utf8*]]
+                uint16_t Unk_3ef0 +0x85
+                bool m_AssetView [[bool*]]
+                bool m_DevConfig [[bool*]]
+                bool m_onDisc [[bool*]]
+                bool m_onDiscUseManifest [[bool*]]
+                bool Unk_3ef5 [[bool*]]
+                bool Unk_3ef6 [[bool*]]
+                bool Unk_3ef7 [[bool*]]
+                bool Unk_3ef8 [[bool*]]
+                bool Unk_3ef9 [[bool*]]
+                bool Unk_3efa [[bool*]]
+                bool Unk_3efb [[bool*]]
+                bool Unk_3efc [[bool*]]
+                bool Unk_3efd [[bool*]]
+                bool Unk_3efe [[bool*]]
+                bool Unk_3eff [[bool*]]
+                bool Unk_3f00 [[bool*]]
+                bool Unk_3f01 [[bool*]]
+                bool Unk_3f02 [[bool*]]
+                bool Unk_3f03 [[bool*]]
+                bool Unk_3f04 [[bool*]]
+                bool Unk_3f05 [[bool*]]
+                bool Unk_3f06 [[bool*]]
+                bool Unk_3f07 [[bool*]]
+                bool Unk_3f08 [[bool*]]
+                bool Unk_3f09 [[bool*]]
+                bool Unk_3f0a [[bool*]]
+                bool Unk_3f0b [[bool*]]
+                bool Unk_3f0c [[bool*]]
+                bool Unk_3f0d [[bool*]]
+                bool Unk_3f0e [[bool*]]
+                bool Unk_3f0f [[bool*]]
+                bool Unk_3f10 [[bool*]]
+                bool Unk_3f11 [[bool*]]
+                bool Unk_3f12 [[bool*]]
+                bool Unk_3f13 [[bool*]]
+                bool Unk_3f14 [[bool*]]
+                bool Unk_3f15 [[bool*]]
+                bool Unk_3f16 [[bool*]]
+                bool Unk_3f17 [[bool*]]
+                bool Unk_3f18 [[bool*]]
+                bool Unk_3f19 [[bool*]]
+                bool Unk_3f1a [[bool*]]
+                bool Unk_3f1b [[bool*]]
+                bool m_IsMultiplayer [[bool*]]
+                bool Unk_3f1d [[bool*]]
+                bool Unk_3f1e [[bool*]]
+                bool Unk_3f1f [[bool*]]
+                bool Unk_3f20 [[bool*]]
+                bool Unk_3f21 [[bool*]]
+                bool Unk_3f22 [[bool*]]
+                bool Unk_3f23 [[bool*]]
+                bool Unk_3f24 [[bool*]]
+                bool Unk_3f25 [[bool*]]
+                bool Unk_3f26 [[bool*]]
+                bool Unk_3f27 [[bool*]]
+                bool Unk_3f28 [[bool*]]
+                bool Unk_3f29 [[bool*]]
+                bool Unk_3f2a [[bool*]]
+                bool Unk_3f2b [[bool*]]
+                bool Unk_3f2c [[bool*]]
+                bool Unk_3f2d [[bool*]]                          
+                bool Unk_3f2e [[bool*]]
+                bool m_DevMode [[bool*]]
+                bool Unk_3f30 [[bool*]]
+                bool Unk_3f31 [[bool*]]
+                bool Unk_3f32 [[bool*]]
+                bool Unk_3f33 [[bool*]]
+                bool Unk_3f34 [[bool*]]
+                bool Unk_3f35 [[bool*]]
+                bool Unk_3f36 [[bool*]]
+                bool Unk_3f37 [[bool*]]
+                bool Unk_3f38 [[bool*]]
+                bool Unk_3f39 [[bool*]]
+                bool Unk_3f3a [[bool*]]
+                bool Unk_3f3b [[bool*]]
+                bool Unk_3f3c [[bool*]]
+                bool m_DebugRendering [[bool*]]
+                bool Unk_3f3e [[bool*]]
+                bool Unk_3f3f [[bool*]]
+                bool Unk_3f40 [[bool*]]
+                bool Unk_3f41 [[bool*]]
+                bool Unk_3f42 [[bool*]]
+                bool Unk_3f43 [[bool*]]
+                bool Unk_3f44 [[bool*]]
+                bool Unk_3f45 [[bool*]]
+                bool Unk_3f46 [[bool*]]
+                bool Unk_3f47 [[bool*]]
+                bool Unk_3f48 [[bool*]]
+                bool Unk_3f49 [[bool*]]
+                bool Unk_3f4a [[bool*]]
+                bool Unk_3f4b [[bool*]]
+                bool Unk_3f4c [[bool*]]
+                bool Unk_3f4d [[bool*]]
+                bool Unk_3f4e [[bool*]]
+                bool Unk_3f4f [[bool*]]
+                bool Unk_3f50 [[bool*]]
+                bool Unk_3f51 [[bool*]]
+                bool Unk_3f52 [[bool*]]
+                bool Unk_3f53 [[bool*]]
+                bool Unk_3f54 [[bool*]]
+                bool Unk_3f55 [[bool*]]
+                bool Unk_3f56 [[bool*]]
+                bool Unk_3f57 [[bool*]]
+                uint32_t Unk_3f58
+                bool Unk_3f5c [[bool*]]
+                bool Unk_3f5d [[bool*]]
+                bool Unk_3f5e [[bool*]]
+                bool Unk_3f5f [[bool*]]
+                uint32_t Unk_3f60
+                bool m_DisableFpsStat [[bool*]]
+                bool Unk_3f65 [[bool*]]
+                bool Unk_3f66 [[bool*]]
+                bool Unk_3f67 [[bool*]]
+                bool Unk_3f68 [[bool*]]
+                bool Unk_3f69 [[bool*]]
+                bool Unk_3f6a [[bool*]]
+                bool Unk_3f6b [[bool*]]
+                bool Unk_3f6c [[bool*]]
+                bool Unk_3f6d [[bool*]]
+                bool Unk_3f6e [[bool*]]
+                bool Unk_3f6f [[bool*]]
+                bool Unk_3f70 [[bool*]]
+                bool Unk_3f71 [[bool*]]
+                bool Unk_3f72 [[bool*]]
+                bool m_showBuildInfo [[bool*]]
+                bool Unk_3f74 [[bool*]]
+                bool Unk_3f75 [[bool*]]
+                bool Unk_3f76 [[bool*]]
+                bool Unk_3f77 [[bool*]]
+                bool Unk_3f78 [[bool*]]
+                bool Unk_3f79 [[bool*]]
+                bool Unk_3f7a [[bool*]]
+                bool Unk_3f7b [[bool*]]
+                bool Unk_3f7c [[bool*]]
+                bool Unk_3f7d [[bool*]]
+                bool Unk_3f7e [[bool*]]
+                bool Unk_3f7f [[bool*]]
+                bool Unk_3f80 [[bool*]]
+                bool Unk_3f81 [[bool*]]
+                bool Unk_3f82 [[bool*]]
+                bool Unk_3f83 [[bool*]]
+                bool Unk_3f84 [[bool*]]
+                bool Unk_3f85 [[bool*]]
+                bool Unk_3f86 [[bool*]]
+                bool Unk_3f87 [[bool*]]
+                bool Unk_3f88 [[bool*]]
+                bool Unk_3f89 [[bool*]]
+                bool Unk_3f8a [[bool*]]
+                bool Unk_3f8b [[bool*]]
+                bool Unk_3f8c [[bool*]]
+                bool Unk_3f8d [[bool*]]
+                bool Unk_3f8e [[bool*]]
+                bool Unk_3f8f [[bool*]]
+                bool Unk_3f90 [[bool*]]
+                bool Unk_3f91 [[bool*]]
+                bool Unk_3f92 [[bool*]] // smoketest
+                bool Unk_3f93 [[bool*]]
+                bool Unk_3f94 [[bool*]]
+                bool Unk_3f95 [[bool*]]
+                bool Unk_3f96 [[bool*]]
+                bool Unk_3f97 [[bool*]]
+                bool Unk_3f98 [[bool*]]
+                bool Unk_3f99 [[bool*]]
+                bool Unk_3f9a [[bool*]]
+                bool Unk_3f9b [[bool*]]
+                bool Unk_3f9c [[bool*]]
+                bool Unk_3f9d [[bool*]]
+                bool Unk_3f9e [[bool*]]
+                bool Unk_3f9f [[bool*]]
+                uint32_t Unk_3fa0
+                bool Unk_3fa4 [[bool*]]
+                bool Unk_3fa5 [[bool*]]
+                bool Unk_3fa6 [[bool*]]
+                bool Unk_3fa7 [[bool*]]
+                bool Unk_3fa8 [[bool*]]
+                bool Unk_3fa9 [[bool*]]
+                bool Unk_3faa [[bool*]]
+                bool Unk_3fab [[bool*]]
+                bool Unk_3fac [[bool*]]
+                bool Unk_3fad [[bool*]]
+                bool Unk_3fae [[bool*]]
+                bool Unk_3faf [[bool*]]
+                bool Unk_3fb0 [[bool*]]
+                bool Unk_3fb1 [[bool*]]
+                bool Unk_3fb2 [[bool*]]
+                bool Unk_3fb3 [[bool*]]
+                bool Unk_3fb4 [[bool*]]
+                bool Unk_3fb5 [[bool*]]
+                bool Unk_3fb6 [[bool*]]
+                bool Unk_3fb7 [[bool*]]
+                bool Unk_3fb8 [[bool*]]
+                bool Unk_3fb9 [[bool*]]
+                bool Unk_3fba [[bool*]]
+                bool Unk_3fbb [[bool*]]
+                uint32_t Unk_3fbc
+                bool Unk_3fc0 [[bool*]]
+                bool Unk_3fc1 [[bool*]]
+                bool Unk_3fc2 [[bool*]]
+                bool Unk_3fc3 [[bool*]]
+                bool Unk_3fc4 [[bool*]]
+                bool Unk_3fc5 [[bool*]]
+                bool Unk_3fc6 [[bool*]]
+                bool Unk_3fc7 [[bool*]]
+                bool Unk_3fc8 [[bool*]]
+                bool Unk_3fc9 [[bool*]]
+                bool Unk_3fca [[bool*]]
+                bool Unk_3fcb [[bool*]]
+                bool Unk_3fcc [[bool*]]
+                bool Unk_3fcd [[bool*]]
+                bool Unk_3fce [[bool*]]
+                bool Unk_3fcf [[bool*]]
+                bool Unk_3fd0 [[bool*]]
+                bool Unk_3fd1 [[bool*]]
+                bool Unk_3fd2 [[bool*]]
+                bool Unk_3fd3 [[bool*]]
+                bool Unk_3fd4 [[bool*]]
+                bool Unk_3fd5 [[bool*]]
+                bool Unk_3fd6 [[bool*]]
+                bool Unk_3fd7 [[bool*]]
+                char m_DiscUser[0x18] +0x30 [[utf8*]]
+                StringId64 AudioStringId +0x160
+                char m_GameStudio[0x40] +0x2db [[utf8*]]
+            }
+        
+            struct NdFrameState 0x288a0 {
+                void* vftable;
+                uint64_t m_gameFrameNumber @ 0x40
+                bool m_KeyboardDevMode @ 0x51a // Enable toggle devmode menu via the keyboard
+            }
+        
+            struct FrameParams 0x1a3180 {
+                uint64_t m_frameNumber
+                void* m_DynamicRenderContext @ 0x6a80
+            }
+        
+            // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\debug
+            namespace debug {
 
-            // DMENU::Menu | DMENU::ItemSubmenu
-            struct Menu : Component 0x30 {
-                Component* m_Item;
-                bool m_isActive + 0x4;
-                uint64_t m_pad : 2;
-                int m_MaxDisplayItems +0x7;
-                uint64_t Unk[0x2];
-            } // 0x14041ec20
+            struct DMENU 0x670 {
 
-            // DMENU::MenuGroup
-            struct MenuGroup : Component 0x280 {
-                Menu* m_RootMenu;
-                bool m_IsDisplayed + 0x8;
-                bool m_Rendering;
-                uint16_t Unk[0x3];
-                uint64_t Unk2[0x4d];
-            } // 0x14041eca0
+                enum Message : uint32_t
+                {
+                    OnOpen = 0x0,
+                    OnClose = 0x1,
+                    OnUpdate = 0x3,
+                    OnExecute = 0x5,
+                    OnReadConfig = 0x7,
+                    OnSaveConfig = 0x8
+                };
 
-            // DMENU::Item (class_Dmenu::Item_vfTable)
-            struct Item : Component 0x8  {
-                struct VTable : DMENU.Component.VTable 0x48 {}
-                void* m_callbackFunct;
-            } // 0x14041e6b0
-
-            // DMENU::ItemSubmenu
-            struct ItemSubmenu : Item 0x10  {
-                Menu* m_pHeader; // Entry Pointer
-                uint64_t Unk[0x1];
-            } // 0x14041ea90
-
-            // DMENU::ItemBool
-            // Component.m_data - ValuePtr
-            struct ItemBool : Item 0x8  {
-               bool m_status;
-               bool m_pad[0x7];
-            } // 0x14041cd70
-            
-            // DMENU::ItemDecimal* 
-            // Component.m_data - ValuePtr
-            struct ItemDecimal : Item 0xb8  {
-                uint64_t* m_format; // format Printf %d 
-                void* m_HandlerFunc; // handler slider function 
-                uint64_t m_DisplayValue [[i64]];
-                uint64_t UnkDouble [[i64]];
-                uint64_t m_MinValue [[i64]];
-                uint64_t m_MaxValue [[i64]];
-                uint64_t m_StepValue [[i64]];
-                uint64_t m_DoubleStepValue [[i64]];
-                uint64_t Unk2[0x7];
-                char m_StringDisplayValue[0x20] [[utf8*]];
-                uint64_t Unk3[0x4];
-            } // 0x14041cd70
-
-            // DMENU::ItemFloat* 
-            // Component.m_data - ValuePtr
-            struct ItemFloat : Item 0x98  {
-                uint64_t* m_format; // format Printf %6.2f
-                void* m_HandlerFunc; // handler slider function 
-                float m_DisplayValue;
-                float UnkFloat;
-                float m_MinValue;
-                float m_MaxValue;
-                float m_StepValue;
-                float m_DoubleStepValue;
-                uint64_t Unk2[0x6];
-                char m_StringDisplayValue[0x20] [[utf8*]];
-                uint64_t Unk3[0x4];
-            } // 0x14041d960
-
-            // DMENU::ItemFunction 
-            struct ItemFunction : Item 0x10  {
-                void* unkData; // probably for link key->value
-                bool m_isActive @ 0xc1;
-                bool m_pad[0x6];
-            } // 0x14041dad0
-
-             // DMENU::ItemSelection* 
-            struct ItemSelection : Item 0x30  {
-                void* UnkData; // m_format probably
-                void* m_callbackFormat;
-                uint64_t Unk2[0x3];
-                void* m_SelectionStruct;
-            } // 0x14041d610
-
-            // DMENU::ItemSubText*
-            struct ItemSubText : Item {} // 0x14041e6b0;
-            
-            // DMENU::ItemPlaceHolder
-            struct ItemPlaceHolder : Component 0x400 {
-                char m_placeholder[0x400] [[utf8*]];
-            } // 0x14041e880;
-
-            // DMENU::ItemLine*
-            struct ItemLine : Component {} // 0x14041d490;
-
-            void* vftable;
-            bool m_Text2DropShadows +0x8
-            bool m_PauseDuringMenus
-            bool m_PauseDuringMenusMP 
-            bool m_Pauseonexit
-            bool m_ShowPausedIndicator
-            bool UnkBool;
-            bool m_SquareButtontoBackOutofMenus
-            bool m_ChordtoSave
-            bool m_AlignMenusRight
-            int  m_Rightmargin @0x1c
-            float m_MenuAlpha [[f32]]
-            float m_MenuScale [[f32]]
-            bool m_Pause @0x61
-            MenuGroup* m_CurrentMenu +0xe [[u64]]
-            MenuGroup* m_QuickMenu
-            MenuGroup* m_DevMenu [[u64]]
-            MenuGroup* m_FavoritesMenu [[u64]]
-            uint64_t Unk2[0xbc];
-        }  
-    }
-
-    // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\process
-    namespace process {
-        struct process 0x100 {}
-    }
-
-    // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\render
-    namespace render {
-
-        enum WindowContextType : uint32_t
-        {
-            Context0 = 0x0,
-            Context1 = 0x1,
-            Context2 = 0x2,
-            Context3 = 0x3,
-            Context4 = 0x4,
-            Context5 = 0x5,
-            Context6 = 0x6,
-            Context7 = 0x7,
-            Context8 = 0x8
-        };
-                
-        struct WindowContext 0x30 {
-            WindowContextType m_ContextType;
-            void* FrameParams;
-            uint64_t field_10;
-            uint64_t field_18;
-            uint64_t field_20;
-            uint64_t field_28;
-        }
-
-        // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\render\util
-        namespace util {
-
-            struct PrimServer 0x1370 {
-                
-                struct VTable 0x658 {
-                    virtual void Render(PrimServer* this_, void* WindowContext) @ 0x8
-                    virtual void Render2D(PrimServer* this_, void* WindowContext) @ 0x10
-                    virtual void Render3D(PrimServer* this_, void* WindowContext) @ 0x18
-                    virtual void InitFrameParams(PrimServer* this_, void* RenderFrameParams) @ 0x1b0
-                    virtual void ClearAll(PrimServer* this_) @ 0x1B8
-                    virtual void ReleaseMem(PrimServer* this_) @ 0x1C0
-                    virtual void ReleaseFrameHeap(PrimServer* this_) @ 0x1C8
-                    virtual void SetPaused(PrimServer* this_, bool arg2, bool arg3, int arg4) @ 0x1D0
-                    virtual void CullStale(PrimServer* this_) @ 0x1D8
+                // DMENU::Component (class_DMENU::Component_vfTable)
+                struct Component 0xb0 {
+                    struct VTable 0xb0 {}
+                    void* vftable;
+                    void* UnkString;
+                    char m_name[0x20] [[utf8*]] // (Only if string length is less than 32 characters)
+                    char* m_pname [[utf8*]];
+                    Component* m_pSubMenu;
+                    Component* m_NextDMenuComponent;
+                    uint64_t Unk2[0x3];
+                    uint64_t m_data; // For arguments or link variable
+                    uint32_t m_color;
+                    uint32_t m_selectcolor;
+                    uint32_t m_editedcolor; // maybe
+                    bool m_Islinked; // BY KEY ID
+                    char* m_pDescription +0xb [[utf8*]];
+                    bool m_atsign;
+                    Component* m_MenuGroup + 0x7;
+                    bool m_isfavorite + 0x1;
+                    int m_PagePointer +0x6; // Only with menu component?
+                    int m_MaxPagePointers;
+                    uint64_t m_ExtraArg;
                 } 
 
-                struct InitParams 0x4c {
-                    uint32_t m_memoryBufferSize[0x13];
-                }
+                // DMENU::Menu | DMENU::ItemSubmenu
+                struct Menu : Component 0x30 {
+                    Component* m_Item;
+                    bool m_isActive + 0x4;
+                    uint64_t m_pad : 2;
+                    int m_MaxDisplayItems +0x7;
+                    uint64_t Unk[0x2];
+                } // 0x14041ec20
 
-                VTable* vftable;
-                uint64_t Unk[0x26d];
+                // DMENU::MenuGroup
+                struct MenuGroup : Component 0x280 {
+                    Menu* m_RootMenu;
+                    bool m_IsDisplayed + 0x8;
+                    bool m_Rendering;
+                    uint16_t Unk[0x3];
+                    uint64_t Unk2[0x4d];
+                } // 0x14041eca0
+
+                // DMENU::Item (class_Dmenu::Item_vfTable)
+                struct Item : Component 0x8  {
+                    struct VTable : DMENU.Component.VTable 0x48 {}
+                    void* m_callbackFunct;
+                } // 0x14041e6b0
+
+                // DMENU::ItemSubmenu
+                struct ItemSubmenu : Item 0x10  {
+                    Menu* m_pHeader; // Entry Pointer
+                    uint64_t Unk[0x1];
+                } // 0x14041ea90
+
+                // DMENU::ItemBool
+                // Component.m_data - ValuePtr
+                struct ItemBool : Item 0x8  {
+                   bool m_status;
+                   bool m_pad[0x7];
+                } // 0x14041cd70
+
+                // DMENU::ItemDecimal* 
+                // Component.m_data - ValuePtr
+                struct ItemDecimal : Item 0xb8  {
+                    uint64_t* m_format; // format Printf %d 
+                    void* m_HandlerFunc; // handler slider function 
+                    uint64_t m_DisplayValue [[i64]];
+                    uint64_t UnkDouble [[i64]];
+                    uint64_t m_MinValue [[i64]];
+                    uint64_t m_MaxValue [[i64]];
+                    uint64_t m_StepValue [[i64]];
+                    uint64_t m_DoubleStepValue [[i64]];
+                    uint64_t Unk2[0x7];
+                    char m_StringDisplayValue[0x20] [[utf8*]];
+                    uint64_t Unk3[0x4];
+                } // 0x14041cd70
+
+                // DMENU::ItemFloat* 
+                // Component.m_data - ValuePtr
+                struct ItemFloat : Item 0x98  {
+                    uint64_t* m_format; // format Printf %6.2f
+                    void* m_HandlerFunc; // handler slider function 
+                    float m_DisplayValue;
+                    float UnkFloat;
+                    float m_MinValue;
+                    float m_MaxValue;
+                    float m_StepValue;
+                    float m_DoubleStepValue;
+                    uint64_t Unk2[0x6];
+                    char m_StringDisplayValue[0x20] [[utf8*]];
+                    uint64_t Unk3[0x4];
+                } // 0x14041d960
+
+                // DMENU::ItemFunction 
+                struct ItemFunction : Item 0x10  {
+                    void* unkData; // probably for link key->value
+                    bool m_isActive @ 0xc1;
+                    bool m_pad[0x6];
+                } // 0x14041dad0
+
+                 // DMENU::ItemSelection* 
+                struct ItemSelection : Item 0x30  {
+                    void* UnkData; // m_format probably
+                    void* m_callbackFormat;
+                    uint64_t Unk2[0x3];
+                    void* m_SelectionStruct;
+                } // 0x14041d610
+
+                // DMENU::ItemSubText*
+                struct ItemSubText : Item {} // 0x14041e6b0;
+
+                // DMENU::ItemPlaceHolder
+                struct ItemPlaceHolder : Component 0x400 {
+                    char m_placeholder[0x400] [[utf8*]];
+                } // 0x14041e880;
+
+                // DMENU::ItemLine*
+                struct ItemLine : Component {} // 0x14041d490;
+
+                void* vftable;
+                bool m_Text2DropShadows +0x8
+                bool m_PauseDuringMenus
+                bool m_PauseDuringMenusMP 
+                bool m_Pauseonexit
+                bool m_ShowPausedIndicator
+                bool UnkBool;
+                bool m_SquareButtontoBackOutofMenus
+                bool m_ChordtoSave
+                bool m_AlignMenusRight
+                int  m_Rightmargin @0x1c
+                float m_MenuAlpha [[f32]]
+                float m_MenuScale [[f32]]
+                bool m_Pause @0x61
+                MenuGroup* m_CurrentMenu +0xe [[u64]]
+                MenuGroup* m_QuickMenu
+                MenuGroup* m_DevMenu [[u64]]
+                MenuGroup* m_FavoritesMenu [[u64]]
+                uint64_t Unk2[0xbc];
+            }  
             }
+    
+            // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\process
+            namespace process {
+            struct process 0x100 {}
+            }
+    
+            // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\render
+            namespace render {
 
-        }
-    }
-
-    // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\util
-    namespace util {
-        // bit-reader.h
-        struct BitReader 0x18 {
-            uint64_t m_FixUpTable;
-            uint32_t m_bitIndex;
-            uint32_t m_byteIndex;
-            uint32_t m_size;
-            uint32_t field_14;
-        };
-    }
-
-
-    // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\script
-    namespace script {
-        
-        // #lang dc
-        namespace DC {
-
-             /* 
-            DC::ScriptId:
-                modules = 0x0B4B7080C994E5B8, // *modules*
-                persistent_command_list = 0x0D4214F3AB9F95C3, // *persistent-command-list*
-                mouse_default_settings = 0x153A061C977AB3B4, // *mouse-default-settings*
-                analog_stick_icon_paths = 0x6ECB9D5F76F9A2E7, // *analog-stick-icon-paths*
-                melee_override_ids = 0x7E555F8321D35D11, // *melee-override-ids*
-                weapon_cross_press_release_blacklist = 0xB8A76AAD46BA03C6, // *weapon-cross-press-release-blacklist*
-                joypad_additional_presets = 0xF1F762C8F706097D, // *joypad-additional-presets*
-                action_map = 0x939AA361BA96F916, // *action-map*
-            */
-
-            /* 
-            DC::TYPE:
-                Array = 0x4F9E14B634C6B026, // @ Array
-                _array = 0x104D3D9BAD9D2464, // @ array*
-                map = 0x080F5919176D2D91, // @ map
-                _float = 0xA00A62A942B20165, // @ float
-                symbol_array = 0xC8F749F92779D489, // @ symbol-array
-                module_info_array = 0xE442DCB00300FB28, // @ module-info-array
-                action_scheme = 0x9FF30B9A5C83CB5D, // @ action-scheme
-                command_list = 0xB18C294ADE7B782B, // @ B18C294ADE7B782B
-                mouse_settings = 0xD6BCF8E23269E80E, // @ D6BCF8E23269E80E
-                input_scheme = 0xAF5C458ED236456E, // @ AF5C458ED236456E
-            */
-
-            struct Entry 0x18 {
-                StringId64 m_scriptId;
-                StringId64 m_typeId;
-                void* m_entryPtr;
-            };   
-
-            struct Header 0x20 {
-                uint32_t m_magic;
-                uint32_t m_versionNumber;
-                uint32_t m_textSize;
-                uint32_t unk;
-                uint32_t unk1;
-                uint32_t m_numEntries;
-                Entry* m_pStartOfData;
+            enum WindowContextType : uint32_t
+            {
+                Context0 = 0x0,
+                Context1 = 0x1,
+                Context2 = 0x2,
+                Context3 = 0x3,
+                Context4 = 0x4,
+                Context5 = 0x5,
+                Context6 = 0x6,
+                Context7 = 0x7,
+                Context8 = 0x8
             };
 
-            // @ map
-            struct map {
-                uint64_t m_size;
-            };
-
-            // @ modules.bin
-            namespace modules {
-
-                /*
-                   @ file: modules.bin
-                   @ ScriptId: *modules*
-                   @ TYPE: module-info-array
-                   @ EntryPtr: ModuleInfoArray
-                */ 
-                struct modules {
-
-                    // @ symbol-array
-                    struct ModuleUnkCollection 0x10 {
-                        uint64_t m_num;
-                        StringId64* m_pArray; // @ Array
-                    };
-
-                    // @ symbol-array
-                    struct ModuleCollection 0x10 {
-                        uint64_t m_num;
-                        StringId64* m_modules; // @ Array
-                    }   
-                    // @ Array
-                    struct ModuleInfo 0x28 {
-                        char* m_name [[utf8*]];
-                        StringId64 m_hash;
-                        uint64_t m_size;
-                        ModuleCollection* m_pCollection;
-                        ModuleUnkCollection* m_unkCollection;
-                    }   
-                    // @ module-info-array
-                    struct ModuleInfoArray 0x10 {
-                        uint64_t m_numModules;
-                        ModuleInfo* m_modules;
-                    };   
-                }
+            struct WindowContext 0x30 {
+                WindowContextType m_ContextType;
+                void* FrameParams;
+                uint64_t field_10;
+                uint64_t field_18;
+                uint64_t field_20;
+                uint64_t field_28;
             }
 
-            // @ joypad.bin
-            namespace joypad {
+            // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\render\util
+            namespace util {
 
-                /*
-                    @ ScriptIds: *joypad-???*
-                    @ TYPE: action-scheme
-                    @ EntryPtr: ActionScheme 
-                */
-                struct actionscheme { 
+                struct PrimServer 0x1380 {
 
-                    // @ Array
-                    struct inputKeyboard 0x10 {
-                        uint64_t m_flag;
-                        uint64_t m_keycode;
-                    };
+                    struct VTable 0x318 {
+                        virtual void Render(PrimServer* this_, ndlib.render.WindowContext* WindowContext) @ 0x8
+                        virtual void Render2D(PrimServer* this_, ndlib.render.WindowContext* WindowContext) @ 0x10
+                        virtual void Render3D(PrimServer* this_, ndlib.render.WindowContext* WindowContext) @ 0x18
+                        virtual uint64_t RenderString(PrimServer* this_, uint64_t* position, char* text, void* flags) @ 0xC8
+                        virtual void InitFrameParams(PrimServer* this_, void* RenderFrameParams) @ 0x1b0
+                        virtual void ClearAll(PrimServer* this_) @ 0x1B8
+                        virtual void ReleaseMem(PrimServer* this_) @ 0x1C0
+                        virtual void ReleaseFrameHeap(PrimServer* this_) @ 0x1C8
+                        virtual void SetPaused(PrimServer* this_, bool arg2, bool arg3, int arg4) @ 0x1D0
+                        virtual void CullStale(PrimServer* this_) @ 0x1D8
+                    } 
 
-                    // @ Array
-                    struct inputJoypad 0x10 {
-                        uint64_t m_flag;
-                        uint64_t m_iBtn;
-                    };
+                    struct InitParams 0x4c {
+                        uint32_t m_memoryBufferSize[0x13];
+                    }
 
-                    // @ Array
-                    struct inputMouse 0x18 {
-                        uint64_t m_flag;
-                        uint64_t m_keycode;
-                        uint64_t m_keycode2;
-                    };
-
-                    // @ Array
-                    struct Input 0x10 {
-                        uint64_t m_flag;
-                        StringId64 m_hash;
-                    };
-
-                    // @ symbol-array
-                    struct InputCollection 0x10 {
-                        uint64_t m_numInputs;
-                        StringId64* m_pArray;
-                    };   
-
-                    // @ #793D1D63A0498239
-                    struct inputKeyboardScheme 0x10 {
-                        uint64_t m_count;
-                        inputKeyboard* m_scheme;
-                    };
-
-                    // @ #674A8555C679C8ED
-                    struct inputJoypadScheme 0x10 {
-                        uint64_t m_count;
-                        inputJoypad* m_scheme;
-                    };
-
-                    // @ #66D642190729CBE3
-                    struct inputMouseScheme 0x10 {
-                        uint64_t m_count; // always 2?
-                        inputMouse* m_scheme;
-                    };
-
-                    // @ #5688596AABA88521
-                    struct inputScheme 0x10 {
-                        uint64_t m_count;
-                        Input* m_scheme;
-                    };
-
-                    // @ #FD17AE86396612F7
-                    struct inputCommand 0x90 {            
-                        inputJoypadScheme* m_Joypadinputs;
-                        inputKeyboardScheme* m_Keyboardinputs;
-                        inputKeyboardScheme* inputKeyboardButtons; // always nullptr in raw module
-                        inputMouseScheme* m_Mouseinputs;
-                        inputMouseScheme* inputMouseButtons; // always nullptr in raw module
-                        bool field_28;
-                        inputScheme* m_inputs @ 0x30; // Common for inputKeyboardButtons & inputMouseButtons & m_inputButtons?
-                        inputJoypadScheme* m_inputButtons; // always nullptr in raw module
-                        uint32_t field_40;
-                        uint32_t field_44;
-                        uint64_t field_48; // always 000000003DCCCCCD?
-                        StringId64 m_InputHash; // Example: *gesture-tap-left-stick-up-wide* (Manually allocated in the game)
-                        uint64_t field_58;
-                        InputCollection*  m_InputCollection; // i guess 
-                        uint64_t field_68;
-                        bool field_70; // something for field_68
-                        bool field_80 @ 0x80;
-                        bool field_81; // inputs allocated??
-                        char* field_88 @ 0x88 [[utf8*]];
-                    };
-
-                    // @ action-scheme
-                    struct ActionScheme 0x10 {
-                        struct Scheme : map {
-                            StringId64* m_key;
-                            inputCommand* m_value;
-                        }
-
-                        Scheme *m_scheme @ 0x8;
-                    };   
+                    VTable* vftable;
                 }
 
-                /*
-                    @ ScriptId: *persistent-command-list*
-                    @ TYPE: #B18C294ADE7B782B
-                    @ EntryPtr: CommandList 
-                */
-                struct CommandList 0x10 {
-                   uint64_t m_size;
-                   StringId64* m_commands;
-                };
-
-                 /*
-                    @ ScriptId: *mouse-default-settings*
-                    @ TYPE: #D6BCF8E23269E80E
-                    @ EntryPtr: MouseSettings 
-                */
-                struct MouseSettings 0x40 {
-                    uint32_t global_sensitivity;
-                    uint32_t aim_sensitivity_x;
-                    uint32_t aim_sensitivity_y;
-                    uint32_t look_sensitivity_x;
-                    uint32_t look_sensitivity_y;
-                    uint32_t snipe_sensitivity_x;
-                    uint32_t snipe_sensitivity_y;
-                    uint32_t acceleration_x;
-                    uint32_t acceleration_y;
-                    bool invert_x;
-                    bool invert_y;
-                    bool field_26;
-                    bool use_raw_input;
-                };
-
-                /*
-                    @ ScriptId: *analog-stick-icon-paths*
-                    @ TYPE: Array
-                    @ EntryPtr: AnalogStickIconPath
-                */
-                struct AnalogStickIconPath 0x18 {
-                    char* m_Path [[utf8*]];
-                    char* m_Path2 [[utf8*]];
-                    StringId64 m_hash;
-                };
-
-                /*
-                    @ ScriptId: *analog-stick-icon-paths*
-                    @ TYPE: Array
-                    @ EntryPtr: AnalogStickIconPath
-                */
-                struct actionmap {
-
-                     // @ Array
-                    struct ActionDefinition 0x18 {
-                        uint64_t field_0;
-                        uint64_t field_8;
-                        uint64_t field_10;
-                    };
-
-                    // @ #11AE032C43498287
-                    struct kActionDefinition 0x10 {
-                        uint64_t m_size;
-                        ActionDefinition* field_8;
-                    };
-
-                    // @ #78A4C32D131A03BD
-                    struct InputDefinition 0x40 {
-                        uint64_t field_0;
-                        uint64_t field_8;
-                        uint64_t field_10;
-                        uint64_t field_18;
-                        StringId64 field_20;
-                        StringId64 field_28;
-                        uint64_t field_30;
-                        StringId64 field_38;
-                    };
-
-                    // @ #AF5C458ED236456E
-                    struct ActionSet 0x18 {
-
-                        struct InputDefScheme : map {
-                            StringId64* m_key;
-                            InputDefinition* m_value;
-                        }
-
-                        InputDefScheme* m_InputDef;
-                        StringId64* field_8;
-                        kActionDefinition* field_10;
-                    };   
-                };
-
-                 /*
-                    @ ScriptId: *joypad-additional-presets*
-                    @ TYPE: array*
-                    @ EntryPtr: FixedSizeArray<Array<AdditionalPresets>>
-                */
-                struct presets {
-                    
-                    // @ #??????????????????
-                    struct Preset 0x20 { 
-                        StringId64 field_0;
-                        uint64_t field_8;
-                        uint32_t field_10;
-                        uint32_t field_14;
-                        uint16_t field_18;
-                        uint32_t field_1a;
-                    };
-
-                    // @ #6043A6D761AA41FF
-                    struct AdditionalPresets 0x38 {
-                        uint64_t field_0;
-                        StringId64 field_8;
-                        StringId64 field_10;
-                        uint64_t field_18;
-                        Preset* m_presets;
-                        uint32_t m_count;
-                        uint64_t field_30;
-                    };
-                };
             }
-        }
-
-        struct ScriptValue {
-            uint64_t val[0x10];
-        };
-
-        struct ScriptCFunc {
-            void** c_func_caller;
-            void* c_script_func; 
-        };
-
-        // script-module-loader.cpp
-        // List<ModuleRequest>
-        struct ModuleRequest 0x3e {
-
-            struct ModuleRequestList 0x10 {
-                ModuleRequest* m_head;
-                ModuleRequest* m_tail;
             }
-
-            ModuleRequest* m_NextModuleRequest;
-            ModuleRequest* m_PrevModuleRequest;
-            StringId64 hash;
-            uint64_t field_18;
-            corelib.memory.Context MemContext;
-            uint32_t field_24;
-            size_t size;
-            uint64_t field_30;
-            bool field_38; // DEBUG AssetView?
-            bool field_39;
-            bool field_3a;
-            uint16_t field_3b;
-            bool m_requested;
-        }
-
-        struct ScriptModule 0x70 {
-            void* vfTable;
-            uint64_t field_8;
-            uint64_t field_10;
-            uint64_t field_18;
-            uint64_t field_20;
-            StringId64 m_modulehash;
-            StringId64 field_30;
-            uint32_t m_numEntries;
-            struct DC.Entry* m_Data @ 0x40;
-            uint64_t field_48;
-            struct DC.Header* m_header;
-            uint64_t field_58;
-            uint32_t field_60;
-            uint32_t field_64;
-            uint32_t field_68;
-            uint32_t m_size;
-        };
-
-        // ScriptManager::ModuleInfo::Constructor (0x141e71328)
-        struct ModuleInfo 0x60 { 
-             uint64_t field_0;
-             uint64_t field_8;
-             char* m_name [[utf8*]];
-             StringId64 hash;
-             size_t m_size;
-             uint64_t m_pCollection;
-             uint32_t m_pNumModules;
-             uint64_t m_pUnkCollection @ 0x38;
-             uint32_t m_pUnkNumModules;
-             ScriptModule* m_ScriptModule @ 0x48;
-             uint64_t field_50;
-             uint32_t field_58;
-             bool field_5c;
-             bool field_5d;
-             bool field_5e;
-             bool m_isLoaded;
-        }
-
-        struct relocatableModule 0x22 {
-            void* vfTable;
-            uint64_t m_pRecord;
-            uint64_t field_10;
-            uint64_t field_18;
-            uint16_t field_20;
-        };
-
-        struct ScriptModuleLoader 0x30d0 {
-            ModuleInfo* m_moduleinfo @ 0x3018;
-            uint64_t m_moduleName;
-            corelib.memory.Context m_moduleMemContext;
-            uint32_t field_302c;
-            uint64_t field_3030;
-            uint64_t field_3090 @ 0x3090;
-            uint64_t field_3098;
-            bool field_30c8 @ 0x30c8;
-            bool field_30c9;
-            bool field_30ca;
-            uint16_t field_30cb;
-            uint8_t field_30cd;
-            bool field_30ce;
-        };
-
-        // script-manager.cpp
-        struct ScriptManagerGlobals 0x33b0 {
-            uint64_t field_0;
-            uint64_t field_10 @ 0x10;
-            uint32_t field_18;
-            uint64_t field_20 @ 0x20;
-            uint64_t field_30 @ 0x30;
-            bool field_40 @ 0x40;
-            bool m_DisplayRequestedModules @ 0x43;
-            uint32_t field_44;
-            uint32_t field_4a @ 0x4a;
-            uint16_t field_4e;
-            uint32_t field_51 @ 0x51;
-            bool m_DisplayGlobalSymbols;
-            bool field_56;
-            uint32_t field_58 @ 0x58;
-            uint16_t field_5c;
-            char field_5e;
-            uint32_t field_60 @ 0x60;
-            uint64_t field_68 @ 0x68;
-            ModuleRequest.ModuleRequestList* m_moduleRequestListActual; // list
-            uint64_t field_78;
-            uint64_t field_e8  @ 0xe8;
-            uint64_t field_100 @ 0x100;
-            uint32_t field_108;
-            uint32_t field_10c;
-            uint64_t field_110;
-            uint64_t field_118;
-            uint64_t field_120;
-            uint32_t field_1b0 @ 0x1b0;
-            uint32_t field_1b8 @ 0x1b8;
-            uint64_t field_1c0 @ 0x1c0;
-            uint64_t field_1c8;
-            uint64_t field_1d0;
-            uint32_t field_260 @ 0x260;
-            uint32_t field_264;
-            uint64_t field_288 @ 0x288;
-            uint64_t field_290;
-            uint64_t m_pNativeMap;
-            ScriptModuleLoader s_SLoadM;
-            uint64_t field_2e80 @ 0x2e80;
-            uint64_t field_3338 @ 0x3338;
-            bool field_3340;
-            bool m_moduleLoader @ 0x336b;
-            bool field_336c;
-            bool field_336d;
-            bool field_3371 @ 0x3371;
-            uint32_t field_3380 @ 0x3380;
-            uint64_t field_3388 @ 0x3388;
-            uint64_t field_3390;
-            uint64_t field_3398;
-            uint32_t field_33a0;
-            uint64_t field_33a8 @ 0x33a8;
-        }; // g_scriptGlobals (0x146430e70)
-        
-    }
-
-    // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\io
-    namespace io {
-
-    }
-
-    }
-
-    // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\gamelib
-    namespace gamelib {
-        
-        // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\gamelib\state-script
-        namespace statescript {
+    
+            // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\util
+            namespace util {
+                struct BitReader 0x18 {
+                    uint64_t m_FixUpTable;
+                    uint32_t m_bitIndex;
+                    uint32_t m_byteIndex;
+                    uint32_t m_size;
+                    uint32_t field_14;
+                }; // bit-reader.h
+            }
+    
+    
+            // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\script
+            namespace script {
             
-            struct StateScriptConsoleInfo {
-                uint32_t pos_x;
-                uint32_t size_x;
-                uint32_t pos_y;
-                uint32_t size_y;
-                float font_size_x;
-                float font_size_y;
-                bool line_warp;
-            };
+                // #lang dc
+                namespace DC {
+    
+                 /* 
+                DC::ScriptId:
+                    modules = 0x0B4B7080C994E5B8, // *modules*
+                    persistent_command_list = 0x0D4214F3AB9F95C3, // *persistent-command-list*
+                    mouse_default_settings = 0x153A061C977AB3B4, // *mouse-default-settings*
+                    analog_stick_icon_paths = 0x6ECB9D5F76F9A2E7, // *analog-stick-icon-paths*
+                    melee_override_ids = 0x7E555F8321D35D11, // *melee-override-ids*
+                    weapon_cross_press_release_blacklist = 0xB8A76AAD46BA03C6, // *weapon-cross-press-release-blacklist*
+                    joypad_additional_presets = 0xF1F762C8F706097D, // *joypad-additional-presets*
+                    action_map = 0x939AA361BA96F916, // *action-map*
+                */
+    
+                /* 
+                DC::TYPE:
+                    Array = 0x4F9E14B634C6B026, // @ Array
+                    _array = 0x104D3D9BAD9D2464, // @ array*
+                    map = 0x080F5919176D2D91, // @ map
+                    _float = 0xA00A62A942B20165, // @ float
+                    symbol_array = 0xC8F749F92779D489, // @ symbol-array
+                    module_info_array = 0xE442DCB00300FB28, // @ module-info-array
+                    action_scheme = 0x9FF30B9A5C83CB5D, // @ action-scheme
+                    command_list = 0xB18C294ADE7B782B, // @ B18C294ADE7B782B
+                    mouse_settings = 0xD6BCF8E23269E80E, // @ D6BCF8E23269E80E
+                    input_scheme = 0xAF5C458ED236456E, // @ AF5C458ED236456E
+                */
+    
+                    struct Entry 0x18 {
+                        StringId64 m_scriptId;
+                        StringId64 m_typeId;
+                        void* m_entryPtr;
+                    };   
+                
+                    struct Header 0x20 {
+                        uint32_t m_magic;
+                        uint32_t m_versionNumber;
+                        uint32_t m_textSize;
+                        uint32_t unk;
+                        uint32_t unk1;
+                        uint32_t m_numEntries;
+                        Entry* m_pStartOfData;
+                    };
+                
+                    // @ map
+                    struct map {
+                        uint64_t m_size;
+                    };
+    
+                    // @ modules.bin
+                    namespace modules {
+                    
+                        /*
+                           @ file: modules.bin
+                           @ ScriptId: *modules*
+                           @ TYPE: module-info-array
+                           @ EntryPtr: ModuleInfoArray
+                        */ 
+                        struct modules {
+                        
+                            // @ symbol-array
+                            struct ModuleUnkCollection 0x10 {
+                                uint64_t m_num;
+                                StringId64* m_pArray; // @ Array
+                            };
+                        
+                            // @ symbol-array
+                            struct ModuleCollection 0x10 {
+                                uint64_t m_num;
+                                StringId64* m_modules; // @ Array
+                            }   
+                            // @ Array
+                            struct ModuleInfo 0x28 {
+                                char* m_name [[utf8*]];
+                                StringId64 m_hash;
+                                uint64_t m_size;
+                                ModuleCollection* m_pCollection;
+                                ModuleUnkCollection* m_unkCollection;
+                            }   
+                            // @ module-info-array
+                            struct ModuleInfoArray 0x10 {
+                                uint64_t m_numModules;
+                                ModuleInfo* m_modules;
+                            };   
+                        }
+                    }
+    
+                    // @ joypad.bin
+                    namespace joypad {
+                    
+                        /*
+                            @ ScriptIds: *joypad-???*
+                            @ TYPE: action-scheme
+                            @ EntryPtr: ActionScheme 
+                        */
+                        struct actionscheme { 
+                        
+                            // @ Array
+                            struct inputKeyboard 0x10 {
+                                uint64_t m_flag;
+                                uint64_t m_keycode;
+                            };
+                        
+                            // @ Array
+                            struct inputJoypad 0x10 {
+                                uint64_t m_flag;
+                                uint64_t m_iBtn;
+                            };
+                        
+                            // @ Array
+                            struct inputMouse 0x18 {
+                                uint64_t m_flag;
+                                uint64_t m_keycode;
+                                uint64_t m_keycode2;
+                            };
+                        
+                            // @ Array
+                            struct Input 0x10 {
+                                uint64_t m_flag;
+                                StringId64 m_hash;
+                            };
+                        
+                            // @ symbol-array
+                            struct InputCollection 0x10 {
+                                uint64_t m_numInputs;
+                                StringId64* m_pArray;
+                            };   
+                        
+                            // @ #793D1D63A0498239
+                            struct inputKeyboardScheme 0x10 {
+                                uint64_t m_count;
+                                inputKeyboard* m_scheme;
+                            };
+                        
+                            // @ #674A8555C679C8ED
+                            struct inputJoypadScheme 0x10 {
+                                uint64_t m_count;
+                                inputJoypad* m_scheme;
+                            };
+                        
+                            // @ #66D642190729CBE3
+                            struct inputMouseScheme 0x10 {
+                                uint64_t m_count; // always 2?
+                                inputMouse* m_scheme;
+                            };
+                        
+                            // @ #5688596AABA88521
+                            struct inputScheme 0x10 {
+                                uint64_t m_count;
+                                Input* m_scheme;
+                            };
+                        
+                            // @ #FD17AE86396612F7
+                            struct inputCommand 0x90 {            
+                                inputJoypadScheme* m_Joypadinputs;
+                                inputKeyboardScheme* m_Keyboardinputs;
+                                inputKeyboardScheme* inputKeyboardButtons; // always nullptr in raw module
+                                inputMouseScheme* m_Mouseinputs;
+                                inputMouseScheme* inputMouseButtons; // always nullptr in raw module
+                                bool field_28;
+                                inputScheme* m_inputs @ 0x30; // Common for inputKeyboardButtons & inputMouseButtons & m_inputButtons?
+                                inputJoypadScheme* m_inputButtons; // always nullptr in raw module
+                                uint32_t field_40;
+                                uint32_t field_44;
+                                uint64_t field_48; // always 000000003DCCCCCD?
+                                StringId64 m_InputHash; // Example: *gesture-tap-left-stick-up-wide* (Manually allocated in the game)
+                                uint64_t field_58;
+                                InputCollection*  m_InputCollection; // i guess 
+                                uint64_t field_68;
+                                bool field_70; // something for field_68
+                                bool field_80 @ 0x80;
+                                bool field_81; // inputs allocated??
+                                char* field_88 @ 0x88 [[utf8*]];
+                            };
+                        
+                            // @ action-scheme
+                            struct ActionScheme 0x10 {
+                                struct Scheme : map {
+                                    StringId64* m_key;
+                                    inputCommand* m_value;
+                                }
+                            
+                                Scheme *m_scheme @ 0x8;
+                            };   
+                        }
+                    
+                        /*
+                            @ ScriptId: *persistent-command-list*
+                            @ TYPE: #B18C294ADE7B782B
+                            @ EntryPtr: CommandList 
+                        */
+                        struct CommandList 0x10 {
+                           uint64_t m_size;
+                           StringId64* m_commands;
+                        };
+                    
+                         /*
+                            @ ScriptId: *mouse-default-settings*
+                            @ TYPE: #D6BCF8E23269E80E
+                            @ EntryPtr: MouseSettings 
+                        */
+                        struct MouseSettings 0x40 {
+                            uint32_t global_sensitivity;
+                            uint32_t aim_sensitivity_x;
+                            uint32_t aim_sensitivity_y;
+                            uint32_t look_sensitivity_x;
+                            uint32_t look_sensitivity_y;
+                            uint32_t snipe_sensitivity_x;
+                            uint32_t snipe_sensitivity_y;
+                            uint32_t acceleration_x;
+                            uint32_t acceleration_y;
+                            bool invert_x;
+                            bool invert_y;
+                            bool field_26;
+                            bool use_raw_input;
+                        };
+                    
+                        /*
+                            @ ScriptId: *analog-stick-icon-paths*
+                            @ TYPE: Array
+                            @ EntryPtr: AnalogStickIconPath
+                        */
+                        struct AnalogStickIconPath 0x18 {
+                            char* m_Path [[utf8*]];
+                            char* m_Path2 [[utf8*]];
+                            StringId64 m_hash;
+                        };
+                    
+                        /*
+                            @ ScriptId: *analog-stick-icon-paths*
+                            @ TYPE: Array
+                            @ EntryPtr: AnalogStickIconPath
+                        */
+                        struct actionmap {
+                        
+                             // @ Array
+                            struct ActionDefinition 0x18 {
+                                uint64_t field_0;
+                                uint64_t field_8;
+                                uint64_t field_10;
+                            };
+                        
+                            // @ #11AE032C43498287
+                            struct kActionDefinition 0x10 {
+                                uint64_t m_size;
+                                ActionDefinition* field_8;
+                            };
+                        
+                            // @ #78A4C32D131A03BD
+                            struct InputDefinition 0x40 {
+                                uint64_t field_0;
+                                uint64_t field_8;
+                                uint64_t field_10;
+                                uint64_t field_18;
+                                StringId64 field_20;
+                                StringId64 field_28;
+                                uint64_t field_30;
+                                StringId64 field_38;
+                            };
+                        
+                            // @ #AF5C458ED236456E
+                            struct ActionSet 0x18 {
+                            
+                                struct InputDefScheme : map {
+                                    StringId64* m_key;
+                                    InputDefinition* m_value;
+                                }
+                            
+                                InputDefScheme* m_InputDef;
+                                StringId64* field_8;
+                                kActionDefinition* field_10;
+                            };   
+                        };
+                    
+                         /*
+                            @ ScriptId: *joypad-additional-presets*
+                            @ TYPE: array*
+                            @ EntryPtr: FixedSizeArray<Array<AdditionalPresets>>
+                        */
+                        struct presets {
+
+                            // @ #??????????????????
+                            struct Preset 0x20 { 
+                                StringId64 field_0;
+                                uint64_t field_8;
+                                uint32_t field_10;
+                                uint32_t field_14;
+                                uint16_t field_18;
+                                uint32_t field_1a;
+                            };
+                        
+                            // @ #6043A6D761AA41FF
+                            struct AdditionalPresets 0x38 {
+                                uint64_t field_0;
+                                StringId64 field_8;
+                                StringId64 field_10;
+                                uint64_t field_18;
+                                Preset* m_presets;
+                                uint32_t m_count;
+                                uint64_t field_30;
+                            };
+                        };
+                    }
+                }
+            
+                struct ScriptValue {
+                    uint64_t val[0x10];
+                };
+            
+                struct ScriptCFunc {
+                    void** c_func_caller;
+                    void* c_script_func; 
+                };
+            
+                // script-module-loader.cpp
+                // List<ModuleRequest>
+                struct ModuleRequest 0x3e {
+                
+                    struct ModuleRequestList 0x10 {
+                        ModuleRequest* m_head;
+                        ModuleRequest* m_tail;
+                    }
+                
+                    ModuleRequest* m_NextModuleRequest;
+                    ModuleRequest* m_PrevModuleRequest;
+                    StringId64 hash;
+                    uint64_t field_18;
+                    regenny.shared.corelib.memory.Context MemContext;
+                    uint32_t field_24;
+                    size_t size;
+                    uint64_t field_30;
+                    bool field_38; // DEBUG AssetView?
+                    bool field_39;
+                    bool field_3a;
+                    uint16_t field_3b;
+                    bool m_requested;
+                }
+            
+                struct ScriptModule 0x70 {
+                    void* vfTable;
+                    uint64_t field_8;
+                    uint64_t field_10;
+                    uint64_t field_18;
+                    uint64_t field_20;
+                    StringId64 m_modulehash;
+                    StringId64 field_30;
+                    uint32_t m_numEntries;
+                    struct DC.Entry* m_Data @ 0x40;
+                    uint64_t field_48;
+                    struct DC.Header* m_header;
+                    uint64_t field_58;
+                    uint32_t field_60;
+                    uint32_t field_64;
+                    uint32_t field_68;
+                    uint32_t m_size;
+                };
+            
+                // ScriptManager::ModuleInfo::Constructor (0x141e71328)
+                struct ModuleInfo 0x60 { 
+                     uint64_t field_0;
+                     uint64_t field_8;
+                     char* m_name [[utf8*]];
+                     StringId64 hash;
+                     size_t m_size;
+                     uint64_t m_pCollection;
+                     uint32_t m_pNumModules;
+                     uint64_t m_pUnkCollection @ 0x38;
+                     uint32_t m_pUnkNumModules;
+                     ScriptModule* m_ScriptModule @ 0x48;
+                     uint64_t field_50;
+                     uint32_t field_58;
+                     bool field_5c;
+                     bool field_5d;
+                     bool field_5e;
+                     bool m_isLoaded;
+                }
+            
+                struct relocatableModule 0x22 {
+                    void* vfTable;
+                    uint64_t m_pRecord;
+                    uint64_t field_10;
+                    uint64_t field_18;
+                    uint16_t field_20;
+                };
+            
+                struct ScriptModuleLoader 0x30d0 {
+                    ModuleInfo* m_moduleinfo @ 0x3018;
+                    uint64_t m_moduleName;
+                    corelib.memory.Context m_moduleMemContext;
+                    uint32_t field_302c;
+                    uint64_t field_3030;
+                    uint64_t field_3090 @ 0x3090;
+                    uint64_t field_3098;
+                    bool field_30c8 @ 0x30c8;
+                    bool field_30c9;
+                    bool field_30ca;
+                    uint16_t field_30cb;
+                    uint8_t field_30cd;
+                    bool field_30ce;
+                };
+            
+                // script-manager.cpp
+                struct ScriptManagerGlobals 0x33b0 {
+                    uint64_t field_0;
+                    uint64_t field_10 @ 0x10;
+                    uint32_t field_18;
+                    uint64_t field_20 @ 0x20;
+                    uint64_t field_30 @ 0x30;
+                    bool field_40 @ 0x40;
+                    bool m_DisplayRequestedModules @ 0x43;
+                    uint32_t field_44;
+                    uint32_t field_4a @ 0x4a;
+                    uint16_t field_4e;
+                    uint32_t field_51 @ 0x51;
+                    bool m_DisplayGlobalSymbols;
+                    bool field_56;
+                    uint32_t field_58 @ 0x58;
+                    uint16_t field_5c;
+                    char field_5e;
+                    uint32_t field_60 @ 0x60;
+                    uint64_t field_68 @ 0x68;
+                    ModuleRequest.ModuleRequestList* m_moduleRequestListActual; // list
+                    uint64_t field_78;
+                    uint64_t field_e8  @ 0xe8;
+                    uint64_t field_100 @ 0x100;
+                    uint32_t field_108;
+                    uint32_t field_10c;
+                    uint64_t field_110;
+                    uint64_t field_118;
+                    uint64_t field_120;
+                    uint32_t field_1b0 @ 0x1b0;
+                    uint32_t field_1b8 @ 0x1b8;
+                    uint64_t field_1c0 @ 0x1c0;
+                    uint64_t field_1c8;
+                    uint64_t field_1d0;
+                    uint32_t field_260 @ 0x260;
+                    uint32_t field_264;
+                    uint64_t field_288 @ 0x288;
+                    uint64_t field_290;
+                    uint64_t m_pNativeMap;
+                    ScriptModuleLoader s_SLoadM;
+                    uint64_t field_2e80 @ 0x2e80;
+                    uint64_t field_3338 @ 0x3338;
+                    bool field_3340;
+                    bool m_moduleLoader @ 0x336b;
+                    bool field_336c;
+                    bool field_336d;
+                    bool field_3371 @ 0x3371;
+                    uint32_t field_3380 @ 0x3380;
+                    uint64_t field_3388 @ 0x3388;
+                    uint64_t field_3390;
+                    uint64_t field_3398;
+                    uint32_t field_33a0;
+                    uint64_t field_33a8 @ 0x33a8;
+                }; // g_scriptGlobals (0x146430e70)
+
+            }
+    
+        // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\io
+        namespace io {
+        
         }
-    }
+    
+        }
+
+        // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\gamelib
+        namespace gamelib {
+
+            // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\gamelib\state-script
+            namespace statescript {
+
+                struct StateScriptConsoleInfo {
+                    uint32_t pos_x;
+                    uint32_t size_x;
+                    uint32_t pos_y;
+                    uint32_t size_y;
+                    float font_size_x;
+                    float font_size_y;
+                    bool line_warp;
+                };
+            }
+        }
 
     // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\common
     namespace common {}

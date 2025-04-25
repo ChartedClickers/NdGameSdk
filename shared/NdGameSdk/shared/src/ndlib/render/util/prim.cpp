@@ -1,8 +1,6 @@
-#if defined(T1X)
-
-
 #include "prim.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
+#include "../dev/debugdraw-common.hpp"
 
 #include <iostream>
 #include <cstdint>
@@ -34,57 +32,44 @@ namespace NdGameSdk::ndlib::render::util {
 		return memoryBufferSizeArray;
 	}
 
-	PrimServerComponent::PrimServerComponent() : ISdkComponent("PrimServer") {}
-	
-	bool PrimServerComponent::IsCreated() {
-		return m_IsCreated;
-	}
+	PrimServerManager::PrimServerManager(DebugDrawCommon* pDebugDrawCommon) : 
+		ISdkSubComponent("PrimServer"), m_DebugDrawCommon(pDebugDrawCommon) {}
 
-	void PrimServerComponent::Create(PrimServer::InitParams* InitParams) {
+#if defined(T1X)
+	void PrimServerManager::Create(PrimServer::InitParams* InitParams) {
 		always_assert(PrimServer_Create == nullptr, "Function pointer was not set!");
-		if (!m_IsCreated) {
-			PrimServer_Create(m_PrimServer, InitParams);
-			m_IsCreated = true;
-		}
+		static std::once_flag IsCreated;
+		std::call_once(IsCreated, [this, InitParams] {
+			PrimServer_Create(s_PrimServer, InitParams);
+		});
 	}
+#endif
 
-	void PrimServerComponent::Awake() {
-		auto SharedComponents = ISdkComponent::GetSharedComponents();
-		m_Memory = SharedComponents->GetComponent<Memory>();
-	}
-
-	void PrimServerComponent::Initialize() {
+	void PrimServerManager::Init() {
 
 		static std::once_flag Initialized;
 		
 		std::call_once(Initialized, [this] {
 
 			spdlog::info("Initializing {} patterns...", GetName());
+			DebugDrawCommon* DebugDraw{ m_DebugDrawCommon };
 
-			auto MissingDependencies = CheckSdkComponents
-				<Memory>({ m_Memory.get() });
-
-			if (MissingDependencies.has_value()) {
-				throw SdkComponentEx
-				{ std::format("Missing necessary dependencies: {:s}", MissingDependencies.value()),
-					SdkComponentEx::ErrorCode::DependenciesFailed };
-			}
-
-			if (m_Memory->IsDebugMemoryAvailable()) {
+			if (DebugDraw->m_Memory->IsDebugMemoryAvailable()) {
 
 				Patterns::SdkPattern findpattern{};
 				auto module = Utility::memory::get_executable();
 
 				findpattern = Patterns::PrimServer_PrimServer;
-				m_PrimServer = (PrimServer*)Utility::ReadLEA32(module,
+				s_PrimServer = (PrimServer*)Utility::ReadLEA32(module,
 					findpattern.pattern, wstr(Patterns::PrimServer_PrimServer), findpattern.offset, 3, 7);
 
-				if (!m_PrimServer) {
+				if (!s_PrimServer) {
 					throw SdkComponentEx
 					{ std::format("Failed to find addresses!"),
 						SdkComponentEx::ErrorCode::PatternFailed };
 				}
 
+	#if defined(T1X)
 				findpattern = Patterns::PrimServer_Create;
 				PrimServer_Create = (PrimServer_Create_ptr)Utility::FindAndPrintPattern(module,
 					findpattern.pattern, wstr(Patterns::PrimServer_Create), findpattern.offset);
@@ -93,10 +78,10 @@ namespace NdGameSdk::ndlib::render::util {
 					throw SdkComponentEx{ "Failed to find PrimServer:: game functions!", SdkComponentEx::ErrorCode::PatternFailed };
 				}
 
-				m_Memory->IncreaseMemoryMap(MemoryMapId::ALLOCATION_CPU_MEMORY, MemSize(2560, SizeUnit::Megabytes));
+				DebugDraw->m_Memory->IncreaseMemoryMap(MemoryMapId::ALLOCATION_CPU_MEMORY, MemSize(2560, SizeUnit::Megabytes));
+	#endif
 			}
 
 		});
 	}
 }
-#endif

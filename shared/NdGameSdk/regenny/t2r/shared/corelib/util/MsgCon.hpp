@@ -7,10 +7,10 @@ struct MsgCon {
     void* vftable; // 0x0
     private: char pad_8[0x8]; public:
     float m_MsgConScale; // 0x10
-    int m_MsgConLeftPad; // 0x14
-    int m_MsgConHorizontalSize; // 0x18
-    int m_MsgConVerticalSize; // 0x1c
-    int m_MsgConTopPad; // 0x20
+    uint32_t m_MsgConLeftPad; // 0x14
+    uint32_t m_MsgConHorizontalSize; // 0x18
+    uint32_t m_MsgConVerticalSize; // 0x1c
+    uint32_t m_MsgConTopPad; // 0x20
     private: char pad_24[0xe]; public:
     bool m_DrawRedisTTYTimes; // 0x32
     bool m_DrawRedisTTYStatus; // 0x33

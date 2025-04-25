@@ -4,11 +4,14 @@
 namespace regenny::shared::ndlib::render {
 struct WindowContext;
 }
+namespace regenny::shared::ndlib {
+struct FrameParams;
+}
 namespace regenny::shared::ndlib::render::util {
 #pragma pack(push, 1)
 struct PrimServer {
     struct VTable {
-        private: char pad_8[0x310]; public:
+        private: char pad_8[0x208]; public:
         virtual ~VTable() = default;
         private: virtual void virtual_function_1() = 0; public:
         private: virtual void virtual_function_2() = 0; public:
@@ -441,7 +444,7 @@ struct PrimServer {
         private: virtual void virtual_function_429() = 0; public:
         private: virtual void virtual_function_430() = 0; public:
         private: virtual void virtual_function_431() = 0; public:
-        virtual void InitFrameParams(regenny::shared::ndlib::render::util::PrimServer* this_, void* RenderFrameParams) = 0;
+        virtual void InitFrameParams(regenny::shared::ndlib::render::util::PrimServer* this_, regenny::shared::ndlib::FrameParams* RenderFrameParams) = 0;
         private: virtual void virtual_function_433() = 0; public:
         private: virtual void virtual_function_434() = 0; public:
         private: virtual void virtual_function_435() = 0; public:
@@ -482,7 +485,7 @@ struct PrimServer {
         private: virtual void virtual_function_470() = 0; public:
         private: virtual void virtual_function_471() = 0; public:
         virtual void CullStale(regenny::shared::ndlib::render::util::PrimServer* this_) = 0;
-    }; // Size: 0x318
+    }; // Size: 0x210
 
     struct InitParams {
         uint32_t m_memoryBufferSize[19]; // 0x0

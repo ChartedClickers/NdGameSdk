@@ -1,4 +1,4 @@
-#include "heaparena.hpp"
+#include "allocator-heap.hpp"
 
 namespace NdGameSdk::corelib::memory
 {

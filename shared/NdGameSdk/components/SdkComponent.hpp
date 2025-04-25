@@ -150,6 +150,17 @@ namespace NdGameSdk {
             return sub;
         }
 
+        template<typename CompT>
+        static CompT* Instance()
+        {
+            static CompT* p =
+                ISdkComponent::GetSharedComponents()
+                ->GetComponent<CompT>()
+                .get();
+            return p;
+        }
+
+
     private:
         virtual void Awake() {};
         virtual void Initialize() = 0;

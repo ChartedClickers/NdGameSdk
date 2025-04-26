@@ -1,6 +1,6 @@
 #pragma once
+#include <NdGameSdk/components/SdkRegenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
-#include <cstdint>
 #include "WindowContextType.hpp"
 namespace regenny::shared::ndlib::render {
 #pragma pack(push, 1)

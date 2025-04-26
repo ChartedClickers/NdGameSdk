@@ -36,29 +36,29 @@ public:
         : a(255)
     {
         switch (color) {
-        case BasicColors::Red:        r = 255; g = 0;   b = 0;   break;
-        case BasicColors::Green:      r = 0;   g = 255; b = 0;   break;
-        case BasicColors::Blue:       r = 0;   g = 0;   b = 255; break;
-        case BasicColors::Yellow:     r = 255; g = 255; b = 0;   break;
-        case BasicColors::Black:      r = 0;   g = 0;   b = 0;   break;
-        case BasicColors::White:      r = 255; g = 255; b = 255; break;
-        case BasicColors::Pink:       r = 255; g = 192; b = 203; break;
-        case BasicColors::Cyan:       r = 0;   g = 255; b = 255; break;
-        case BasicColors::Magenta:    r = 255; g = 0;   b = 255; break;
-        case BasicColors::Orange:     r = 255; g = 165; b = 0;   break;
-        case BasicColors::Purple:     r = 128; g = 0;   b = 128; break;
-        case BasicColors::Brown:      r = 165; g = 42;  b = 42;  break;
-        case BasicColors::Gray:       r = 128; g = 128; b = 128; break;
-        case BasicColors::LightGray:  r = 211; g = 211; b = 211; break;
-        case BasicColors::DarkGray:   r = 169; g = 169; b = 169; break;
-        case BasicColors::LightBlue:  r = 173; g = 216; b = 230; break;
-        case BasicColors::LightGreen: r = 144; g = 238; b = 144; break;
-        case BasicColors::LightYellow:r = 255; g = 255; b = 224; break;
-        case BasicColors::LightPink:  r = 255; g = 182; b = 193; break;
-        case BasicColors::DarkBlue:   r = 0;   g = 0;   b = 139; break;
-        case BasicColors::DarkGreen:  r = 0;   g = 100; b = 0;   break;
-        case BasicColors::DarkRed:    r = 139; g = 0;   b = 0;   break;
-        default:                      r = 0;   g = 0;   b = 0;   break;
+        case BasicColors::Black:        r = 0; g = 0; b = 0; break;
+        case BasicColors::Red:          r = 255; g = 0; b = 0; break;
+        case BasicColors::Green:        r = 0; g = 255; b = 0; break;
+        case BasicColors::Yellow:       r = 0; g = 255; b = 255; break;
+        case BasicColors::Blue:         r = 0; g = 0; b = 255; break;
+        case BasicColors::Magenta:      r = 255; g = 0; b = 255; break;
+        case BasicColors::Cyan:         r = 255; g = 255; b = 0; break;
+        case BasicColors::White:        r = 255; g = 255; b = 255; break;
+        case BasicColors::DarkGray:     r = 85; g = 85; b = 85; break;
+        case BasicColors::LightBlue:    r = 85; g = 85; b = 255; break; 
+        case BasicColors::LightGreen:   r = 85; g = 255; b = 85; break; 
+        case BasicColors::LightYellow:  r = 255; g = 255; b = 85; break;
+        case BasicColors::Pink:         r = 255; g = 192; b = 203; break;
+        case BasicColors::Orange:       r = 255; g = 165; b = 0; break;
+        case BasicColors::Purple:       r = 128; g = 0; b = 128; break;
+        case BasicColors::Brown:        r = 165; g = 42; b = 42; break;
+        case BasicColors::Gray:         r = 128; g = 128; b = 128; break;
+        case BasicColors::LightGray:    r = 211; g = 211; b = 211; break;
+        case BasicColors::LightPink:    r = 255; g = 182; b = 193; break;
+        case BasicColors::DarkBlue:     r = 0; g = 0; b = 139; break;
+        case BasicColors::DarkGreen:    r = 0; g = 100; b = 0; break;
+        case BasicColors::DarkRed:      r = 139; g = 0; b = 0; break;
+        default:                        r = 0; g = 0; b = 0; break;
         }
     }
 

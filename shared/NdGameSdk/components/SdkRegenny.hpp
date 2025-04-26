@@ -1,5 +1,8 @@
 #pragma once
 #include <cstdint>
+#include <glm/vec4.hpp>
+
+using namespace glm;
 
 namespace NdGameSdk {
 

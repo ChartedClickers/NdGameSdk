@@ -1,6 +1,6 @@
 #pragma once
+#include <NdGameSdk/components/SdkRegenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
-#include <cstdint>
 namespace regenny::shared::corelib::memory {
 #pragma pack(push, 1)
 enum Context : uint32_t {

@@ -1,6 +1,6 @@
 #pragma once
+#include <NdGameSdk/components/SdkRegenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
-#include <cstdint>
 #include "Context.hpp"
 #include "MapId.hpp"
 namespace regenny::shared::corelib::memory {

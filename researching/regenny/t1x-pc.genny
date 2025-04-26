@@ -1,9 +1,11 @@
-#include <cstdint>
+#include <NdGameSdk/components/SdkRegenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
 
 type int 4 [[i32]]
 type uint64_t 8 [[u64]]
 type uintptr_t 8 [[u64]]
+type uint128_t 16 [[u128]]
+type vec4 16 [[u128]]
 type uint32_t 4 [[u32]]
 type size_t 8 [[u32]]
 type uint16_t 2 [[u16]]
@@ -924,23 +926,40 @@ namespace regenny {
                 uint64_t field_28;
             }
 
+
+            // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\render\text
+            namespace text {
+                struct DebugStringBase 0x48 {
+                    void* vftable;
+                    uint64_t unk08;
+                    vec4 vec;
+                    uint32_t color;
+                    float scale;
+                    uint8_t fade;
+                    uint64_t reserved @ 0x2c;
+                    uint32_t field_34;
+                    uint64_t field_38;
+                    char* pText  @ 0x40 [[utf8*]];
+                }
+            }
+
             // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\render\util
             namespace util {
 
                 struct PrimServer 0x1380 {
 
                     struct VTable 0x318 {
-                        virtual void Render(PrimServer* this_, ndlib.render.WindowContext* WindowContext) @ 1
-                        virtual void Render2D(PrimServer* this_, ndlib.render.WindowContext* WindowContext) @ 2
-                        virtual void Render3D(PrimServer* this_, ndlib.render.WindowContext* WindowContext) @ 3
-                        // virtual void RenderLine(PrimServer* this_, _, _, _) @ 20
-                        virtual uint64_t RenderString(PrimServer* this_, void* arg2, char* sptr, void* header) @ 25
-                        virtual void InitFrameParams(PrimServer* this_, ndlib.FrameParams* RenderFrameParams) @ 55
-                        virtual void ClearAll(PrimServer* this_) @ 56
-                        virtual void ReleaseMem(PrimServer* this_) @ 57
-                        virtual void ReleaseFrameHeap(PrimServer* this_) @ 58
-                        virtual void SetPaused(PrimServer* this_, bool arg2, bool arg3, int arg4) @ 59
-                        virtual void CullStale(PrimServer* this_) @ 60
+                        virtual void Render(ndlib.render.WindowContext* WindowContext) @ 1
+                        virtual void Render2D(ndlib.render.WindowContext* WindowContext) @ 2
+                        virtual void Render3D(ndlib.render.WindowContext* WindowContext) @ 3
+                        // virtual void RenderLine(_, _, _) @ 20
+                        virtual uint64_t RenderString(text.DebugStringBase* header, void* DebugPrimParams, void* BoundFrame) @ 25
+                        virtual void InitFrameParams(ndlib.FrameParams* RenderFrameParams) @ 55
+                        virtual void ClearAll() @ 56
+                        virtual void ReleaseMem() @ 57
+                        virtual void ReleaseFrameHeap() @ 58
+                        virtual void SetPaused(bool arg2, bool arg3, int arg4) @ 59
+                        virtual void CullStale() @ 60
                     } 
 
                     struct InitParams 0x4c {

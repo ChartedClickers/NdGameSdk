@@ -1,6 +1,6 @@
 #pragma once
+#include <NdGameSdk/components/SdkRegenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
-#include <cstdint>
 #include "..\..\shared\ndlib\NdGameInfo.hpp"
 namespace regenny::ndgame::game {
 #pragma pack(push, 1)

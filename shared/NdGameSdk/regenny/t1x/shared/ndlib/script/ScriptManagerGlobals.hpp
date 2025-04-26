@@ -1,6 +1,6 @@
 #pragma once
+#include <NdGameSdk/components/SdkRegenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
-#include <cstdint>
 #include "ModuleRequest.hpp"
 #include "ScriptModuleLoader.hpp"
 namespace regenny::shared::ndlib::script {

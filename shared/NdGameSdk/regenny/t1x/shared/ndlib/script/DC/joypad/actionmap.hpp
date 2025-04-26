@@ -1,6 +1,6 @@
 #pragma once
+#include <NdGameSdk/components/SdkRegenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
-#include <cstdint>
 #include "..\map.hpp"
 namespace regenny::shared::ndlib::script::DC::joypad {
 #pragma pack(push, 1)

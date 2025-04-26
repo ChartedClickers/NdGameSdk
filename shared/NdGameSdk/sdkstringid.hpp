@@ -85,4 +85,3 @@ constexpr NdGameSdk_API StringId64 ToStringId64(const char* str)
 #else
 #define SID(str) ToStringId64(str)
 #endif
-

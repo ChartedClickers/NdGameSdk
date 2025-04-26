@@ -1,6 +1,6 @@
 #pragma once
+#include <NdGameSdk/components/SdkRegenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
-#include <cstdint>
 namespace regenny::shared::ndlib {
 #pragma pack(push, 1)
 struct NdConfig {

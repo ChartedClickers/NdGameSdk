@@ -1,6 +1,6 @@
 #pragma once
+#include <NdGameSdk/components/SdkRegenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
-#include <cstdint>
 #include "..\..\corelib\memory\Context.hpp"
 namespace regenny::shared::ndlib::script {
 struct ModuleInfo;

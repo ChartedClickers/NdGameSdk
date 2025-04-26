@@ -32,8 +32,8 @@ namespace NdGameSdk::ndlib::render::dev {
 		m_EngineComponents = SharedComponents->GetComponent<EngineComponents>();
 		m_Memory = SharedComponents->GetComponent<Memory>();
 
-		AddSubComponent<MsgConDraw>(this);
-		AddSubComponent<PrimServerManager>(this);
+		m_MsgConDraw = AddSubComponent<MsgConDraw>(this);
+		m_PrimServerMgr = AddSubComponent<PrimServerManager>(this);
 	}
 
 	void DebugDrawCommon::Initialize()
@@ -97,8 +97,6 @@ namespace NdGameSdk::ndlib::render::dev {
 
 			this->InitSubComponents();
 
-			s_Instance = this;
-
 			findpattern = Patterns::GameDebugDraw_StaticContextHook;
 			auto GameDebugDrawJMP = (void*)Utility::FindAndPrintPattern(module
 				, findpattern.pattern, wstr(Patterns::GameDebugDraw_StaticContextHook), findpattern.offset);
@@ -110,10 +108,11 @@ namespace NdGameSdk::ndlib::render::dev {
 	}
 
 	void DebugDrawCommon::DebugDraw(SafetyHookContext& ctx) {
-		if (!s_Instance) return;
-		DebugDrawCommon* DebugDraw{ s_Instance };
 
-		auto* frame = s_Instance->m_RenderFrameParams.GetRenderFrameParams();
+		DebugDrawCommon* DebugDraw = DebugDrawCommon::Instance<DebugDrawCommon>();
+		if (!DebugDraw) return;
+
+		auto* frame = DebugDraw->m_RenderFrameParams.GetRenderFrameParams();
 		if (frame) {
 
 			if (DebugDraw->m_DebugTextPrintV) {
@@ -133,18 +132,29 @@ namespace NdGameSdk::ndlib::render::dev {
 				DebugDraw->TextPrintV(&ctx, { 50., 150., 0.6, 0.6 }, ANSI_RED "The" " " ANSI_GRN "quick" " " ANSI_YEL "brown" " " ANSI_BLU  "fox\n\n\n" ANSI_MAG "jumps" " " ANSI_CYN "over" " " ANSI_WHT "the\n" ANSI_RED "lazy" " " ANSI_WHT "dog");
 			}
 
+			if (DebugDraw->m_DebugPrimTextPrint) {
+
+				char debug_text[0x65]{};
+				_snprintf_s(debug_text, sizeof(debug_text), "I am primitive, beautiful, and in full bloom within DebugMem");
+				
+				DebugDraw->m_DebugStringBase.setText(debug_text);
+				DebugDraw->m_PrimServerMgr->TextPrint(DebugDraw->m_DebugStringBase);
+			}
+
 			auto pSdkModules = ISdkModule::GetSdkModules();
 			for (auto& [hmod, module] : *pSdkModules) {
 				if (module && module->IsRegistered()) {
-					module->DebugDraw(frame);
+					module->DebugDraw(frame); 
 				}
 			}
 		}
 	}
 
-
 	DMENU::ItemSubmenu* DebugDrawCommon::CreateDebugDrawMenu(NdDevMenu* pdmenu, DMENU::Menu* pMenu) {
-		if (s_Instance) {
+
+		DebugDrawCommon* DebugDraw = DebugDrawCommon::Instance<DebugDrawCommon>();
+
+		if (DebugDraw) {
 			DMENU::Menu* DebugDrawMenu = pdmenu->Create_DMENU_Menu("DebugDraw", HeapArena_Source);
 
 			if (DebugDrawMenu) {
@@ -153,11 +163,43 @@ namespace NdGameSdk::ndlib::render::dev {
 				DMENU::ItemFloat::ValueParams positionRange{ 0.0f, 2000.0f };
 				DMENU::ItemFloat::StepParams steps{ 0.1f, 1.0f };
 
-				pdmenu->Create_DMENU_ItemBool("Debug TextPrintV", DebugDrawMenu, &s_Instance->m_DebugTextPrintV, nullptr, HeapArena_Source);
-				pdmenu->Create_DMENU_ItemFloat("Font Scale X", DebugDrawMenu, &s_Instance->m_DebugTextLayout.font_scale_x, scaleRange, steps, "Scale X", HeapArena_Source);
-				pdmenu->Create_DMENU_ItemFloat("Font Scale Y", DebugDrawMenu, &s_Instance->m_DebugTextLayout.font_scale_y, scaleRange, steps, "Scale Y", HeapArena_Source);
-				pdmenu->Create_DMENU_ItemFloat("Font Pos X", DebugDrawMenu, &s_Instance->m_DebugTextLayout.font_x, positionRange, steps, "Position X", HeapArena_Source);
-				pdmenu->Create_DMENU_ItemFloat("Font Pos Y", DebugDrawMenu, &s_Instance->m_DebugTextLayout.font_y, positionRange, steps, "Position Y", HeapArena_Source);
+				pdmenu->Create_DMENU_ItemBool("Debug TextPrintV", DebugDrawMenu, &DebugDraw->m_DebugTextPrintV, nullptr, HeapArena_Source);
+				pdmenu->Create_DMENU_ItemFloat("Font Scale X", DebugDrawMenu, &DebugDraw->m_DebugTextLayout.font_scale_x, scaleRange, steps, "Scale X", HeapArena_Source);
+				pdmenu->Create_DMENU_ItemFloat("Font Scale Y", DebugDrawMenu, &DebugDraw->m_DebugTextLayout.font_scale_y, scaleRange, steps, "Scale Y", HeapArena_Source);
+				pdmenu->Create_DMENU_ItemFloat("Font Pos X", DebugDrawMenu, &DebugDraw->m_DebugTextLayout.font_x, positionRange, steps, "Position X", HeapArena_Source);
+				pdmenu->Create_DMENU_ItemFloat("Font Pos Y", DebugDrawMenu, &DebugDraw->m_DebugTextLayout.font_y, positionRange, steps, "Position Y", HeapArena_Source);
+
+				pdmenu->Create_DMENU_TextLineWrapper("PrimServer Manager", DebugDrawMenu, HeapArena_Source);
+				pdmenu->Create_DMENU_ItemBool("Debug PrimTextPrint", DebugDrawMenu, &DebugDraw->m_DebugPrimTextPrint, nullptr, HeapArena_Source);
+
+				DMENU::ItemFloat::ValueParams primScaleRange{ 0.0f,  2.0f };
+				DMENU::ItemFloat::ValueParams primPosRange{ 0.0f, 2000.0f };
+				DMENU::ItemFloat::StepParams  primSteps{ 0.1f,  1.0f };
+
+				pdmenu->Create_DMENU_ItemFloat("Prim Pos X",
+					DebugDrawMenu,
+					&DebugDraw->m_DebugStringBase->vec.x,
+					primPosRange, primSteps, "Position X",
+					HeapArena_Source);
+
+				pdmenu->Create_DMENU_ItemFloat("Prim Pos Y",
+					DebugDrawMenu,
+					&DebugDraw->m_DebugStringBase->vec.y,
+					primPosRange, primSteps, "Position Y",
+					HeapArena_Source);
+
+				pdmenu->Create_DMENU_ItemFloat("Prim Scale",
+					DebugDrawMenu,
+					&DebugDraw->m_DebugStringBase->scale,
+					primScaleRange, primSteps, "Scale",
+					HeapArena_Source);
+
+				pdmenu->Create_DMENU_TextLineWrapper("Prim Color Presets", DebugDrawMenu, HeapArena_Source);
+
+				pdmenu->Create_DMENU_ItemFunction("Green", DebugDrawMenu, PrimColourPresetCB, Color(BasicColors::Green).toUint64(), false, HeapArena_Source);
+				pdmenu->Create_DMENU_ItemFunction("White", DebugDrawMenu, PrimColourPresetCB, Color(BasicColors::White).toUint64(), false, HeapArena_Source);
+				pdmenu->Create_DMENU_ItemFunction("Cyan", DebugDrawMenu, PrimColourPresetCB, Color(BasicColors::Cyan).toUint64(), false, HeapArena_Source);
+
 
 				return pdmenu->Create_DMENU_ItemSubmenu(DebugDrawMenu->Name(),
 					pMenu, DebugDrawMenu, NULL, NULL, nullptr, HeapArena_Source);
@@ -168,6 +210,23 @@ namespace NdGameSdk::ndlib::render::dev {
 		return nullptr;
 	}
 
-	DebugDrawCommon* DebugDrawCommon::s_Instance = nullptr;
+	bool DebugDrawCommon::PrimColourPresetCB(DMENU::ItemFunction& item, DMENU::Message msg)
+	{
+		if (msg == DMENU::Message::OnExecute) 
+		{
+			DebugDrawCommon* DebugDraw = DebugDrawCommon::Instance<DebugDrawCommon>();
+
+			if (DebugDraw) {
+				const std::uint32_t abgr =
+					static_cast<std::uint32_t>(item.Data());
+				DebugDraw->m_DebugStringBase.setColor(abgr);
+				return true;
+			}
+
+			return false;
+		}
+
+		return true; 
+	}
 
 }

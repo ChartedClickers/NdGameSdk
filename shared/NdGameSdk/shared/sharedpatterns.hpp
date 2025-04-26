@@ -57,6 +57,10 @@ namespace NdGameSdk::Patterns
 	static inline const SdkPattern Msg_PrintToActiveMsgOutput = { L"48 89 4c 24 08 48 89 54 24 10 4c 89 44 24 18 4c 89 4c 24 20 48 83 ec 38 48 85 c9 75 ?? 48 89 5c 24 30 e8 ?? ?? ?? ?? 48 8b d8 48 85 c0 74 ?? b1 01 ff d3 e8 ?? ?? ?? ?? 48 85 c0 74 ?? ff d0 e8 ?? ?? ?? ?? 48 85 c0 74" };
 
 	static inline const SdkPattern PrimServer_PrimServer = { L"48 89 8d 80 00 00 00 48 89 75 18 c7 44 24 40 01 00 00 00 48 c7 44 24 38 ff ff ff ff c6 44 24 30 03 4c 89 74 24 28 c7 44 24 20 df 0e 00 00 4c 8d 0d", 0x5b };
+	static inline const SdkPattern PrimServer_TextPrintPosition = { L"4c 89 44 24 18 4c 89 4c 24 20 53 55 56 57 48 81 ec a8 02 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 90 02 00 00 49 8b f8 48 8d ac 24 e8 02 00 00 8b da 48 8b f1" };
+	static inline const SdkPattern PrimServer_GetDefaultPrimParams = { L"48 89 5c 24 08 57 48 83 ec 20 48 8b d9 e8 ?? ?? ?? ?? 88 43 01 40 b7 01 66 c7 43 02 00 01 48 c7 43 08 00 00 00 00 e8 ?? ?? ?? ?? 48 85 c0 74 08" };
+	static inline const SdkPattern PrimServer_DebugStringBaseHandler = { L"48 89 6c 24 28 48 8d 94 24 90 00 00 00 4c 8b cf 48 c7 44 24 20 00 00 00 00 41 b8 00 02 00 00 48 8b 08 48 83 c9 01 e8 ?? ?? ?? ?? 48 8b 05 ?? ?? ?? ?? 48 8b 08 48 8b a9 c8 00 00 00 e8 ?? ?? ?? ?? 88 44 24 31 40 b7 01 66 c7 44 24 32 00 01 e8 ?? ?? ?? ?? 48 85 c0 74 08 0f b6 78 09 40 c0 ef 07 48 8b 05 ?? ?? ?? ?? 4c 8d 44 24 30 c5 f8 10 06 c5 fa 10 0d bb 0d 79 01 48 8b 0d", +0x8D };
+
 
 #elif defined(T1X)
 	static inline const SdkPattern EngineComponents_s_table = { L"48 89 6c 24 18 56 41 56 41 57 48 83 ec 30 8b f1 45 8b", +0x13 };
@@ -126,6 +130,9 @@ namespace NdGameSdk::Patterns
 
 	static inline const SdkPattern PrimServer_PrimServer = { L"48 8b ?? ?? ?? ?? ?? 48 8b d3 4c 8b 01 41 ff 90 b0 01 00 00 48 83 65 08" };
 	static inline const SdkPattern PrimServer_Create = { L"40 53 48 83 ec 30 48 8d 0d ?? ?? ?? ?? 48 8b da 48 8d 05 ?? ?? ?? ?? 48 8b d1 41 b9 60 0d 00 00" };
+	static inline const SdkPattern PrimServer_TextPrintPosition = { L"4c 89 44 24 18 4c 89 4c 24 20 55 53 56 57 48 8d ac 24 48 fe ff ff 48 81 ec b8 02 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 85 ?? ?? ?? ?? 8b da 48 8d 85" };
+	static inline const SdkPattern PrimServer_GetDefaultPrimParams = { L"40 53 48 83 ec 20 48 8b d9 e8 ?? ?? ?? ?? 48 83 63 08 00 88 43 01 66 c7 43 02 00 01 e8 ?? ?? ?? ?? 48 83 63 08 00 88 03 48 8b c3 48 83 c4 20" };
+	static inline const SdkPattern PrimServer_DebugStringBaseHandler = { L"48 8b 05 ?? ?? ?? ?? 48 8d 4d 90 48 8b 10 48 8b b2 c8 00 00 00 48 8d 54 24 30 e8 ?? ?? ?? ?? c5 f8 10 07 c5 fa 10 0d ?? ?? ?? ?? 33 c9 89 5c 24 60 88 4c 24 68 48 8d 54 24 40 48 89 4c 24 6c 45 33 c9 48 8d 0d ?? ?? ?? ??", +0x42 };
 
 	static inline const SdkPattern SsManager_StateScriptConsolePrinter = { L"48 89 5c 24 ?? 55 56 57 41 54 41 55 41 56 41 57 48 8d ac 24 ?? ?? ?? ?? b8 d0 11 00 00 e8 ?? ?? ?? ?? 48 2b e0 c5 f8 29 b4 24 ?? ?? ?? ?? c5 f8 29 bc 24 ?? ?? ?? ?? c5 78 29 84 24 ?? ?? ?? ?? c5 78 29 8c 24 ?? ?? ?? ?? c5 78 29 94 24 ?? ?? ?? ?? 48 8b 05 ?? ?? ?? ??" };
 

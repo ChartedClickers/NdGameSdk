@@ -1,4 +1,4 @@
-#include "prim.hpp"
+﻿#include "prim.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 #include "../dev/debugdraw-common.hpp"
 
@@ -32,6 +32,11 @@ namespace NdGameSdk::ndlib::render::util {
 		return memoryBufferSizeArray;
 	}
 
+	void PrimServer::RenderString(DebugStringBase header, void* DebugPrimParams, void* BoundFrame) {
+		auto* primSrv = this->Get();
+		primSrv->vftable->RenderString(header.Get(), DebugPrimParams, BoundFrame);
+	}
+
 	PrimServerManager::PrimServerManager(DebugDrawCommon* pDebugDrawCommon) : 
 		ISdkSubComponent("PrimServer"), m_DebugDrawCommon(pDebugDrawCommon) {}
 
@@ -44,6 +49,24 @@ namespace NdGameSdk::ndlib::render::util {
 		});
 	}
 #endif
+
+	void PrimServerManager::TextPrintPosition(glm::vec4* position, int32_t color, const char* text, uint64_t arg4) {
+		always_assert(PrimServer_TextPrintPosition == nullptr, "Function pointer was not set!");
+		PrimServer_TextPrintPosition(position, color, text, arg4);
+	}
+
+	void PrimServerManager::TextPrint(DebugStringBase& DebugString) {
+		always_assert(s_PrimServer->Get() == nullptr, "PrimServer pointer was not set!");
+		uint64_t primParams[0x10]{};
+		PrimServer_GetDefaultPrimParams(primParams);
+		DebugString->vftable = s_DebugStringBaseHandler;
+		s_PrimServer->RenderString(DebugString, &primParams, nullptr);
+	} 
+
+	void* PrimServerManager::GetDefaultPrimParams(void* storage) {
+		always_assert(PrimServer_GetDefaultPrimParams == nullptr, "Function pointer was not set!");
+		PrimServer_GetDefaultPrimParams(storage);
+	}
 
 	void PrimServerManager::Init() {
 
@@ -63,7 +86,12 @@ namespace NdGameSdk::ndlib::render::util {
 				s_PrimServer = (PrimServer*)Utility::ReadLEA32(module,
 					findpattern.pattern, wstr(Patterns::PrimServer_PrimServer), findpattern.offset, 3, 7);
 
-				if (!s_PrimServer) {
+				findpattern = Patterns::PrimServer_DebugStringBaseHandler;
+				s_DebugStringBaseHandler = (MsgCon*)Utility::ReadLEA32(module,
+					findpattern.pattern, wstr(Patterns::PrimServer_DebugStringBaseHandler), findpattern.offset, 3, 7);
+
+				if (!s_PrimServer ||
+					!s_DebugStringBaseHandler) {
 					throw SdkComponentEx
 					{ std::format("Failed to find addresses!"),
 						SdkComponentEx::ErrorCode::PatternFailed };
@@ -75,11 +103,25 @@ namespace NdGameSdk::ndlib::render::util {
 					findpattern.pattern, wstr(Patterns::PrimServer_Create), findpattern.offset);
 
 				if (!PrimServer_Create) {
-					throw SdkComponentEx{ "Failed to find PrimServer:: game functions!", SdkComponentEx::ErrorCode::PatternFailed };
+					throw SdkComponentEx{ "Failed to find PrimServer:: game functions for T1X!", SdkComponentEx::ErrorCode::PatternFailed };
 				}
 
 				DebugDraw->m_Memory->IncreaseMemoryMap(MemoryMapId::ALLOCATION_CPU_MEMORY, MemSize(2560, SizeUnit::Megabytes));
 	#endif
+
+				findpattern = Patterns::PrimServer_TextPrintPosition;
+				PrimServer_TextPrintPosition = (PrimServer_TextPrintPosition_ptr)Utility::FindAndPrintPattern(module,
+					findpattern.pattern, wstr(Patterns::PrimServer_TextPrintPosition), findpattern.offset);
+
+				findpattern = Patterns::PrimServer_GetDefaultPrimParams;
+				PrimServer_GetDefaultPrimParams = (PrimServer_GetDefaultPrimParams_ptr)Utility::FindAndPrintPattern(module,
+					findpattern.pattern, wstr(Patterns::PrimServer_GetDefaultPrimParams), findpattern.offset);
+
+				if (!PrimServer_TextPrintPosition || 
+					!PrimServer_GetDefaultPrimParams) {
+					throw SdkComponentEx{ "Failed to find PrimServer:: game functions!", SdkComponentEx::ErrorCode::PatternFailed };
+				}
+
 			}
 
 		});

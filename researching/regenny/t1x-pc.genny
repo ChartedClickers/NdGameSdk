@@ -930,16 +930,17 @@ namespace regenny {
                 struct PrimServer 0x1380 {
 
                     struct VTable 0x318 {
-                        virtual void Render(PrimServer* this_, ndlib.render.WindowContext* WindowContext) @ 0x8
-                        virtual void Render2D(PrimServer* this_, ndlib.render.WindowContext* WindowContext) @ 0x10
-                        virtual void Render3D(PrimServer* this_, ndlib.render.WindowContext* WindowContext) @ 0x18
-                        virtual uint64_t RenderString(PrimServer* this_, uint64_t* position, char* text, void* flags) @ 0xC8
-                        virtual void InitFrameParams(PrimServer* this_, void* RenderFrameParams) @ 0x1b0
-                        virtual void ClearAll(PrimServer* this_) @ 0x1B8
-                        virtual void ReleaseMem(PrimServer* this_) @ 0x1C0
-                        virtual void ReleaseFrameHeap(PrimServer* this_) @ 0x1C8
-                        virtual void SetPaused(PrimServer* this_, bool arg2, bool arg3, int arg4) @ 0x1D0
-                        virtual void CullStale(PrimServer* this_) @ 0x1D8
+                        virtual void Render(PrimServer* this_, ndlib.render.WindowContext* WindowContext) @ 1
+                        virtual void Render2D(PrimServer* this_, ndlib.render.WindowContext* WindowContext) @ 2
+                        virtual void Render3D(PrimServer* this_, ndlib.render.WindowContext* WindowContext) @ 3
+                        // virtual void RenderLine(PrimServer* this_, _, _, _) @ 20
+                        virtual uint64_t RenderString(PrimServer* this_, void* arg2, char* sptr, void* header) @ 25
+                        virtual void InitFrameParams(PrimServer* this_, ndlib.FrameParams* RenderFrameParams) @ 55
+                        virtual void ClearAll(PrimServer* this_) @ 56
+                        virtual void ReleaseMem(PrimServer* this_) @ 57
+                        virtual void ReleaseFrameHeap(PrimServer* this_) @ 58
+                        virtual void SetPaused(PrimServer* this_, bool arg2, bool arg3, int arg4) @ 59
+                        virtual void CullStale(PrimServer* this_) @ 60
                     } 
 
                     struct InitParams 0x4c {

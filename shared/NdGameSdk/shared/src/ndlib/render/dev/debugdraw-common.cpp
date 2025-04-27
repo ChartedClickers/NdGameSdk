@@ -166,7 +166,7 @@ namespace NdGameSdk::ndlib::render::dev {
 	}
 
 	void DebugDrawCommon::DebugDrawSid(SafetyHookContext& ctx) {
-		static char SdkModuleInfo[0x80]{ "<UNKNOWN SdkModule>" };
+		static const char* SdkModuleInfo = "<UNKNOWN SdkModule>";
 	/*	auto pSdkModule = ISdkModule::GetSdkModules()->begin()->second;
 		strcpy(SdkModuleInfo, pSdkModule->GetBuildInfoString().c_str());*/
 		ctx.r9 = reinterpret_cast<uintptr_t>(SdkModuleInfo);

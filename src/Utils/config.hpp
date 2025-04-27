@@ -8,8 +8,15 @@
 #define PROJECT_SDK ND_GAME_NAME "SDK"
 #define PROJECT_LOG_PATH PROJECT_NAME ".log"
 #define PROJECT_INI_PATH PROJECT_NAME ".ini"
-#define BUILD_STAMP "Built: " __DATE__ " @ " __TIME__
+#define BUILD_STAMP "Built: @" __DATE__ " " __TIME__
 #define BUILD_TIME PROJECT_NAME " " BUILD_STAMP
+#define BUILD_VERSION ND_MODCLIENT_VERSION
+
+#ifndef NDEBUG
+#define BUILD_MODE "Debug"
+#else
+#define BUILD_MODE "Release"
+#endif
 
 #if defined(T1X)
 #define GAME_MODULE_NAME "tlou-i.exe"

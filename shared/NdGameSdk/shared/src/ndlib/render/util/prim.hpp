@@ -42,7 +42,7 @@ namespace NdGameSdk::ndlib::render::util {
 
 	class PrimServerManager : public ISdkSubComponent {
 	public:
-		explicit PrimServerManager(DebugDrawCommon* pDebugDrawCommon);
+		explicit PrimServerManager();
 		void Init() override;
 #if defined(T1X)
 		void Create(PrimServer::InitParams* InitParams);
@@ -53,7 +53,6 @@ namespace NdGameSdk::ndlib::render::util {
 
 		PrimServer* s_PrimServer;
 	private:
-		DebugDrawCommon* m_DebugDrawCommon{};
 		MEMBER_FUNCTION_PTR(uint64_t,PrimServer_TextPrintPosition, glm::vec4* position, int32_t color, const char* text, uint64_t arg4);
 		MEMBER_FUNCTION_PTR(void*, PrimServer_GetDefaultPrimParams, void* storage);
 #if defined(T1X)

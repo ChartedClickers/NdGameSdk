@@ -524,8 +524,10 @@ namespace regenny {
                 bool m_DisableFpsStat @ 0x3f88 [[bool*]];
                 bool m_MsgConDrawBuffers @ 0x3fa8 [[bool*]];
                 bool m_showBuildInfo @ 0x3f9a [[bool*]];
-                char m_DiscUser[0x18] @ 0x4030 [[utf8*]];
+                char m_DiscUser[0x20] @ 0x4030 [[utf8*]];
+                char m_StatsBuild[0x20] @ 0x40a4 [[utf8*]];
                 StringId64 AudioStringId @ 0x41B0;
+                bool m_ShowStats @ 0x442f [[bool*]];
                 char m_GameStudio[0x40] @ 0x44E3 [[utf8*]];
                 uint64_t Unk_4658 @ 0x4658;
             }
@@ -553,7 +555,8 @@ namespace regenny {
                         OnUpdate = 0x3,
                         OnExecute = 0x5,
                         OnReadConfig = 0x7,
-                        OnSaveConfig = 0x8
+                        OnSaveConfig = 0x8,
+                        OnFocusOut = 0x10
                     };
                 
                     // DMENU::Component (class_DMENU::Component_vfTable)

@@ -109,6 +109,10 @@ namespace NdGameSdk::ndlib::debug {
 		return this->Get()->m_isActive;
 	}
 
+	void DMENU::ItemFunction::SetActive(bool status) {
+		this->Get()->m_isActive = status;
+	}
+
 	DMENU::ItemSelection::Item_selection& DMENU::ItemSelection::ItemSelections() {
 		return *reinterpret_cast<DMENU::ItemSelection::Item_selection*>(this->Get()->m_SelectionStruct);
 	}

@@ -724,9 +724,11 @@ namespace regenny {
                 bool Unk_3fd5 [[bool*]]
                 bool Unk_3fd6 [[bool*]]
                 bool Unk_3fd7 [[bool*]]
-                char m_DiscUser[0x18] +0x30 [[utf8*]]
-                StringId64 AudioStringId +0x160
-                char m_GameStudio[0x40] +0x2db [[utf8*]]
+                char m_DiscUser[0x20] +0x30 [[utf8*]]
+                char m_StatsBuild[0x20] @ 0x407c [[utf8*]];
+                StringId64 AudioStringId @ 0x4180
+                bool m_ShowStats @ 0x43af [[bool*]];
+                char m_GameStudio[0x40] @ 0x4463 [[utf8*]]
             }
         
             struct NdFrameState 0x288a0 {
@@ -752,7 +754,8 @@ namespace regenny {
                     OnUpdate = 0x3,
                     OnExecute = 0x5,
                     OnReadConfig = 0x7,
-                    OnSaveConfig = 0x8
+                    OnSaveConfig = 0x8,
+                    OnFocusOut = 0x10
                 };
 
                 // DMENU::Component (class_DMENU::Component_vfTable)

@@ -37,8 +37,7 @@ namespace NdGameSdk::ndlib::render::util {
 		primSrv->vftable->RenderString(header.Get(), DebugPrimParams, BoundFrame);
 	}
 
-	PrimServerManager::PrimServerManager(DebugDrawCommon* pDebugDrawCommon) : 
-		ISdkSubComponent("PrimServer"), m_DebugDrawCommon(pDebugDrawCommon) {}
+	PrimServerManager::PrimServerManager() : ISdkSubComponent("PrimServer") {}
 
 #if defined(T1X)
 	void PrimServerManager::Create(PrimServer::InitParams* InitParams) {
@@ -75,7 +74,7 @@ namespace NdGameSdk::ndlib::render::util {
 		std::call_once(Initialized, [this] {
 
 			spdlog::info("Initializing {} patterns...", GetName());
-			DebugDrawCommon* DebugDraw{ m_DebugDrawCommon };
+			DebugDrawCommon* DebugDraw{ GetParentComponent<DebugDrawCommon>() };
 
 			if (DebugDraw->m_Memory->IsDebugMemoryAvailable()) {
 

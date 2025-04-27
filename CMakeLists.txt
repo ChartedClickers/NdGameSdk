@@ -418,6 +418,7 @@ target_compile_definitions(T1X PUBLIC
 	${CMKR_TARGET}
 	"ND_GAME_NAME=\"${CMKR_TARGET}\""
 	ND_ModClient_EXPORTS
+	"ND_MODCLIENT_VERSION=\"${PROJECT_VERSION}\""
 )
 
 target_compile_features(T1X PUBLIC
@@ -648,6 +649,7 @@ target_compile_definitions(T2R PUBLIC
 	${CMKR_TARGET}
 	"ND_GAME_NAME=\"${CMKR_TARGET}\""
 	ND_ModClient_EXPORTS
+	"ND_MODCLIENT_VERSION=\"${PROJECT_VERSION}\""
 )
 
 target_compile_features(T2R PUBLIC

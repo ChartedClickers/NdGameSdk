@@ -11,6 +11,7 @@ struct DMENU {
         OnExecute = 5,
         OnReadConfig = 7,
         OnSaveConfig = 8,
+        OnFocusOut = 16,
     };
 
     struct Component {

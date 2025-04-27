@@ -4,7 +4,31 @@ namespace NdGameSdk {
 
 	class ISdkModule;
 
-	ISdkModule::ISdkModule(std::string name, HMODULE module) : m_name{ name }, m_module { module } {}
+	uint32_t ISdkModule::BuildInfo::toUInt() const noexcept {
+		return (uint32_t(major) << 24)
+			| (uint32_t(minor) << 16)
+			| (uint32_t(patch) << 8);
+	}
+
+	std::string ISdkModule::BuildInfo::versionString() const {
+		return std::to_string(major) + "."
+			+ std::to_string(minor) + "."
+			+ std::to_string(patch);
+	}
+
+	std::string ISdkModule::BuildInfo::toString() const {
+		std::ostringstream ss;
+		ss << versionString();
+
+		if (gitBranch != "main" && !gitBranch.empty()) {
+			ss << " @" << gitBranch;
+		}
+
+		ss << " [" << buildMode << "]" << " (" << buildStamp << ")";
+		return ss.str();
+	}
+
+	ISdkModule::ISdkModule(std::string name, BuildInfo buildinfo, HMODULE module) : m_name{ name }, m_build{ buildinfo }, m_module { module } {}
 
 	ISdkModule::~ISdkModule() {
 		e_OnUnregister.Invoke(this);
@@ -12,6 +36,12 @@ namespace NdGameSdk {
 
 	std::string ISdkModule::GetModuleName() {
 		return m_name;
+	}
+
+	std::string ISdkModule::GetBuildInfoString() const {
+		std::ostringstream oss;
+		oss << m_name << " " << m_build.toString();
+		return oss.str();
 	}
 
 	HMODULE ISdkModule::GetModule() {

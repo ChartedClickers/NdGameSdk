@@ -113,7 +113,7 @@ sources = ["src/**.cpp", "src/**.c"]
 headers = ["src/**.hpp", "src/**.h"]
 compile-features = ["cxx_std_23"]
 include-directories = ["shared/", "src/"]
-compile-definitions = ["${CMKR_TARGET}", "ND_GAME_NAME=\"${CMKR_TARGET}\"", "ND_ModClient_EXPORTS"]
+compile-definitions = [ "${CMKR_TARGET}", "ND_GAME_NAME=\"${CMKR_TARGET}\"", "ND_ModClient_EXPORTS", "ND_MODCLIENT_VERSION=\"${PROJECT_VERSION}\""]
 link-libraries = [
     "${CMKR_TARGET}SDK",
     "Utility",

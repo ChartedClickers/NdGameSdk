@@ -146,6 +146,7 @@ namespace NdGameSdk {
         {
             static_assert(SdkDerived::is_derived_from_ISdkSubComponent<SubT>::value, "SubT must derive from ISdkSubComponent");
             auto sub = std::make_shared<SubT>(std::forward<Args>(a)...);
+            sub->AttachOwnerComponent(this);
             m_subcomponents[typeid(SubT)] = sub;
             return sub;
         }
@@ -159,7 +160,6 @@ namespace NdGameSdk {
                 .get();
             return p;
         }
-
 
     private:
         virtual void Awake() {};
@@ -178,6 +178,7 @@ namespace NdGameSdk {
 
         friend class SdkComponentFactory;
         friend class ISdkModule;
+        friend class ISdkSubComponent;
         friend class ndlib::render::dev::DebugDrawCommon;
 
         friend void InitializeSdk(const SdkConfig* cfg);

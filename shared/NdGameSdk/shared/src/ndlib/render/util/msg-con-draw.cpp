@@ -11,10 +11,7 @@ using namespace NdGameSdk::gamelib::statescript;
 
 namespace NdGameSdk::ndlib::render::util {
 
-	MsgConDraw::MsgConDraw(DebugDrawCommon* pDebugDrawCommon) : 
-		ISdkSubComponent(TOSTRING(MsgConDraw)), m_DebugDrawCommon(pDebugDrawCommon) {
-		s_Instance = this;
-	}
+	MsgConDraw::MsgConDraw() : ISdkSubComponent(TOSTRING(MsgConDraw)) {}
 
 	using MsgConDrawBuffersFn = void (*)(const char*);
 	uintptr_t MsgConDrawBuffersAddr = NULL;
@@ -29,7 +26,7 @@ namespace NdGameSdk::ndlib::render::util {
 		Patterns::SdkPattern findpattern{};
 		auto module = Utility::memory::get_executable();
 
-		DebugDrawCommon* DebugDraw{ m_DebugDrawCommon };
+		DebugDrawCommon* DebugDraw{ GetParentComponent<DebugDrawCommon>() };
 #if defined(T1X)
 		if (DebugDraw->m_Memory->IsDebugMemoryAvailable()) {
 
@@ -70,7 +67,7 @@ namespace NdGameSdk::ndlib::render::util {
 #if defined(T1X)
 	void MsgConDraw::MsgConDrawBuffers(const char* msgcon_buffer)
 	{
-		DebugDrawCommon* DebugDraw{ s_Instance->m_DebugDrawCommon };
+		auto DebugDraw = GetSharedComponents()->GetComponent<DebugDrawCommon>();
 		WindowContext ctx{};
 		WindowContext::GetWindowContext(&ctx, WindowContext::ContextType::Context4,
 			DebugDraw->m_RenderFrameParams.GetRenderFrameParams()->m_DynamicRenderContext);

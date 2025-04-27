@@ -23,6 +23,15 @@ namespace NdGameSdk::ndlib::render::dev {
 		m_Msg.PrintToActiveMsgOutput(pStr);
 	}
 
+	void DebugDrawCommon::PrimTextPrint(DebugStringBase& DebugString) {
+		m_PrimServerMgr->TextPrint(DebugString);
+	}
+
+	void DebugDrawCommon::PrimTextPrint(glm::vec4 pos, Color color, float scale, const char* pStr) {
+		DebugStringBase hdr { pos, color, scale, 0, const_cast<char*>(pStr) };
+		PrimTextPrint(hdr);
+	}
+
 	MsgCon* DebugDrawCommon::GetMsgCon() {
 		return m_Msg.s_MsgCon;
 	}
@@ -32,8 +41,8 @@ namespace NdGameSdk::ndlib::render::dev {
 		m_EngineComponents = SharedComponents->GetComponent<EngineComponents>();
 		m_Memory = SharedComponents->GetComponent<Memory>();
 
-		m_MsgConDraw = AddSubComponent<MsgConDraw>(this);
-		m_PrimServerMgr = AddSubComponent<PrimServerManager>(this);
+		m_MsgConDraw = AddSubComponent<MsgConDraw>();
+		m_PrimServerMgr = AddSubComponent<PrimServerManager>();
 	}
 
 	void DebugDrawCommon::Initialize()
@@ -101,8 +110,15 @@ namespace NdGameSdk::ndlib::render::dev {
 			auto GameDebugDrawJMP = (void*)Utility::FindAndPrintPattern(module
 				, findpattern.pattern, wstr(Patterns::GameDebugDraw_StaticContextHook), findpattern.offset);
 
+			findpattern = Patterns::GameDebugDraw_DebugDrawSid;
+			auto DebugDrawSidJMP = (void*)Utility::FindAndPrintPattern(module
+				, findpattern.pattern, wstr(Patterns::GameDebugDraw_DebugDrawSid), findpattern.offset);
+
 			m_DebugDrawHook = Utility::MakeMidHook(GameDebugDrawJMP,
 				DebugDraw, wstr(Patterns::GameDebugDraw_StaticContextHook), wstr(GameDebugDrawJMP));
+
+			m_DebugDrawSidHook = Utility::MakeMidHook(DebugDrawSidJMP,
+				DebugDrawSid, wstr(Patterns::GameDebugDraw_DebugDrawSid), wstr(GameDeDebugDrawSidJMPbugDrawJMP));
 
 		});
 	}
@@ -135,10 +151,9 @@ namespace NdGameSdk::ndlib::render::dev {
 			if (DebugDraw->m_DebugPrimTextPrint) {
 
 				char debug_text[0x65]{};
-				_snprintf_s(debug_text, sizeof(debug_text), "I am primitive, beautiful, and in full bloom within DebugMem");
-				
+				_snprintf_s(debug_text, sizeof(debug_text), "I'm primitive, beautiful, and in full bloom within DebugMem.");
 				DebugDraw->m_DebugStringBase.setText(debug_text);
-				DebugDraw->m_PrimServerMgr->TextPrint(DebugDraw->m_DebugStringBase);
+				DebugDraw->PrimTextPrint(DebugDraw->m_DebugStringBase);
 			}
 
 			auto pSdkModules = ISdkModule::GetSdkModules();
@@ -148,6 +163,13 @@ namespace NdGameSdk::ndlib::render::dev {
 				}
 			}
 		}
+	}
+
+	void DebugDrawCommon::DebugDrawSid(SafetyHookContext& ctx) {
+		static char SdkModuleInfo[0x80]{ "<UNKNOWN SdkModule>" };
+	/*	auto pSdkModule = ISdkModule::GetSdkModules()->begin()->second;
+		strcpy(SdkModuleInfo, pSdkModule->GetBuildInfoString().c_str());*/
+		ctx.r9 = reinterpret_cast<uintptr_t>(SdkModuleInfo);
 	}
 
 	DMENU::ItemSubmenu* DebugDrawCommon::CreateDebugDrawMenu(NdDevMenu* pdmenu, DMENU::Menu* pMenu) {
@@ -209,21 +231,22 @@ namespace NdGameSdk::ndlib::render::dev {
 
 		return nullptr;
 	}
-
+	 
 	bool DebugDrawCommon::PrimColourPresetCB(DMENU::ItemFunction& item, DMENU::Message msg)
 	{
-		if (msg == DMENU::Message::OnExecute) 
-		{
-			DebugDrawCommon* DebugDraw = DebugDrawCommon::Instance<DebugDrawCommon>();
+		DebugDrawCommon* DebugDraw = DebugDrawCommon::Instance<DebugDrawCommon>();
 
+		switch (msg)
+		{
+		case DMENU::Message::OnExecute: {
 			if (DebugDraw) {
-				const std::uint32_t abgr =
-					static_cast<std::uint32_t>(item.Data());
+				const std::uint32_t abgr = static_cast<std::uint32_t>(item.Data());
 				DebugDraw->m_DebugStringBase.setColor(abgr);
 				return true;
 			}
 
 			return false;
+		}
 		}
 
 		return true; 

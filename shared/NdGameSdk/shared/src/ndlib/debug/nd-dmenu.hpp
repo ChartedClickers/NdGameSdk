@@ -158,6 +158,7 @@ namespace NdGameSdk::ndlib::debug {
 			using FunctionCallback = boost::function<std::remove_pointer<FunctionCallbackPtr>::type>;
 
 			bool IsActive();
+			void SetActive(bool status);
 		private:
 			static regenny::shared::ndlib::debug::DMENU::ItemFunction::VTable0* VTable;
 			friend class NdGameSdk::gamelib::debug::NdDevMenu;

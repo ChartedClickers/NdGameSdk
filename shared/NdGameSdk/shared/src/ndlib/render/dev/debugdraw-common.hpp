@@ -42,6 +42,9 @@ namespace NdGameSdk::ndlib::render::dev {
 		void TextPrintV(WindowContext* ctx, const TextLayout& layout, const char* fmt, ...);
 		void PrintToActiveMsgOutput(const char* pStr);
 
+		void PrimTextPrint(DebugStringBase& DebugString);
+		void PrimTextPrint(glm::vec4 pos, Color color, float scale, const char* pStr);
+
 		RenderFrameParams m_RenderFrameParams{};
 	private:
 		void Awake() override;
@@ -50,6 +53,7 @@ namespace NdGameSdk::ndlib::render::dev {
 		static DMENU::ItemSubmenu* CreateDebugDrawMenu(NdDevMenu* pdmenu, DMENU::Menu* pMenu);
 		static bool PrimColourPresetCB(DMENU::ItemFunction& item, DMENU::Message msg);
 		static void DebugDraw(SafetyHookContext& ctx);
+		static void DebugDrawSid(SafetyHookContext& ctx);
 
 		bool m_DebugTextPrintV{};
 		bool m_DebugPrimTextPrint{};
@@ -64,6 +68,7 @@ namespace NdGameSdk::ndlib::render::dev {
 		Msg m_Msg{};
 
 		MidHook m_DebugDrawHook{};
+		MidHook m_DebugDrawSidHook{};
 
 		shared_ptr<EngineComponents> m_EngineComponents;
 		shared_ptr<Memory> m_Memory;

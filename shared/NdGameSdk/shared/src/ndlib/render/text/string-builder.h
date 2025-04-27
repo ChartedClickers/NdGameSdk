@@ -12,7 +12,7 @@
 
 namespace NdGameSdk::ndlib::render::text
 {
-	class DebugStringBase : public ISdkRegenny<::regenny::shared::ndlib::render::text::DebugStringBase> 
+	class NdGameSdk_API DebugStringBase : public ISdkRegenny<::regenny::shared::ndlib::render::text::DebugStringBase>
 	{
 
     public:

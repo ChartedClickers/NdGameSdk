@@ -11,7 +11,7 @@ using namespace Utils;
 std::unique_ptr<NdModClient> g_ndmodclient{};
 
 NdModClient::NdModClient(HMODULE ndgame_module) :
-	m_ndgame_module{ ndgame_module }, ISdkModule(PROJECT_NAME, get_this_dll_handle()) {
+	m_ndgame_module{ ndgame_module }, ISdkModule(PROJECT_NAME, BuildInfo { BUILD_VERSION, BUILD_STAMP, "main", BUILD_MODE }, get_this_dll_handle()) {
 
 	auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 	auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(PROJECT_LOG_PATH, false);
@@ -83,5 +83,6 @@ void NdModClient::DebugDraw(FrameParams* frame) {
 	char print_text[256]{};
 	_snprintf_s(print_text, sizeof(print_text), PROJECT_NAME);
 	m_DebugDraw->TextPrintV(&ctx, { 50., 180., 0.8, 0.8 }, print_text);
+	m_DebugDraw->PrimTextPrint({ 0.0f, 2.0f, 0.0f, 0.0f },Color(BasicColors::White), 1.0f, PROJECT_NAME);
 	*/
 }

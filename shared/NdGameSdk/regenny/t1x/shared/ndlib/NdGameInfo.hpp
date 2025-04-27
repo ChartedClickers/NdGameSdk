@@ -482,10 +482,16 @@ struct NdGameInfo {
     bool Unk_3fd7; // 0x3fd7
     private: char pad_3fd8[0x30]; public:
     // Metadata: utf8*
-    char m_DiscUser[24]; // 0x4008
-    private: char pad_4020[0x160]; public:
+    char m_DiscUser[32]; // 0x4008
+    private: char pad_4028[0x54]; public:
+    // Metadata: utf8*
+    char m_StatsBuild[32]; // 0x407c
+    private: char pad_409c[0xe4]; public:
     StringId64 AudioStringId; // 0x4180
-    private: char pad_4188[0x2db]; public:
+    private: char pad_4188[0x227]; public:
+    // Metadata: bool*
+    bool m_ShowStats; // 0x43af
+    private: char pad_43b0[0xb3]; public:
     // Metadata: utf8*
     char m_GameStudio[64]; // 0x4463
     private: char pad_44a3[0x11d]; public:

@@ -17,16 +17,13 @@ namespace NdGameSdk::ndlib::render::util {
 
 	class MsgConDraw : public ISdkSubComponent {
 	public:
-		explicit MsgConDraw(DebugDrawCommon* pDebugDrawCommon);
+		explicit MsgConDraw();
 		void Init() override;
 	private:
 		static void MsgConDrawBuffers(const char* msgcon_buffer);
-		DebugDrawCommon* m_DebugDrawCommon{};
-
 #if defined(T1X)
 		Utility::memory::FunctionHook::Ptr m_StateScriptPrinterStrncpyHook{};
 		Utility::memory::FunctionHook::Ptr m_Msg_MsgConDrawBuffersHook{};
 #endif
-		inline static MsgConDraw* s_Instance = nullptr;
 	};
 }

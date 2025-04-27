@@ -74,10 +74,16 @@ struct NdGameInfo {
     bool m_MsgConDrawBuffers; // 0x3fa8
     private: char pad_3fa9[0x87]; public:
     // Metadata: utf8*
-    char m_DiscUser[24]; // 0x4030
-    private: char pad_4048[0x168]; public:
+    char m_DiscUser[32]; // 0x4030
+    private: char pad_4050[0x54]; public:
+    // Metadata: utf8*
+    char m_StatsBuild[32]; // 0x40a4
+    private: char pad_40c4[0xec]; public:
     StringId64 AudioStringId; // 0x41b0
-    private: char pad_41b8[0x32b]; public:
+    private: char pad_41b8[0x277]; public:
+    // Metadata: bool*
+    bool m_ShowStats; // 0x442f
+    private: char pad_4430[0xb3]; public:
     // Metadata: utf8*
     char m_GameStudio[64]; // 0x44e3
     private: char pad_4523[0x135]; public:

@@ -41,14 +41,16 @@ namespace NdGameSdk::common {
 		MidHook m_GameInitHook{};
 		MidHook m_GameInitReturnHook{};
 
+		shared_ptr<IAllocator> m_IAllocator;
+
 		shared_ptr<Memory> m_Memory;
 		shared_ptr<EngineComponents> m_EngineComponents;
 		shared_ptr<PrimServerManager> m_PrimServer;
-		optional<IAllocator> m_IAllocator;
 #if defined(T2R)
 		NxAppHooks m_NxAppHooks{};
 #elif defined(T1X)
 		MidHook m_PrimServer_CreateHook{};
 #endif
+		friend class IAllocator;
 	};
 }

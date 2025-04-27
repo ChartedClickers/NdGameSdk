@@ -20,7 +20,7 @@ namespace NdGameSdk::common {
 		m_Memory = SharedComponents->GetComponent<Memory>();
 		m_EngineComponents = SharedComponents->GetComponent<ndlib::EngineComponents>();
 		m_PrimServer = SharedComponents->GetComponent<ndlib::render::dev::DebugDrawCommon>()->GetSubComponent<PrimServerManager>();
-		m_IAllocator.emplace(this, m_Memory.get());
+		m_IAllocator = AddSubComponent<IAllocator>();
 	}
 
 	void CommonGame::Initialize() {
@@ -90,6 +90,7 @@ namespace NdGameSdk::common {
 					if (pCommonGame->m_EngineComponents) {
 						auto& ndgameinfo = pCommonGame->m_EngineComponents->GetNdGameInfo();
 						strcpy(ndgameinfo->m_DiscUser, SDK_NAME);
+						strcpy(ndgameinfo->m_StatsBuild, SDK_NAME);
 					}
 
 					pCommonGame->InvokeSdkEvent(pCommonGame->e_GameInitialized, successful);

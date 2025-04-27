@@ -17,15 +17,12 @@ namespace NdGameSdk::common {
 
 	class CommonGame;
 
-	class IAllocator {
+	class IAllocator : public ISdkSubComponent {
 	public:
-		explicit IAllocator(CommonGame* pCommonGame, Memory* pMemory);
-		void Init();
+		explicit IAllocator();
+		void Init() override;
 	private:
-		CommonGame* m_CommonGame{};
-		Memory* m_Memory{};
 		MidHook m_IAllocator_InitTaggedHeapsHook{};
-		inline static IAllocator* s_Instance = nullptr;
 
 		/*Extern variables*/
 		static TaggedHeap* s_TaggedGpuDevHeap;

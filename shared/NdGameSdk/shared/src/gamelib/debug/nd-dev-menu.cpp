@@ -218,6 +218,11 @@ namespace NdGameSdk::gamelib::debug {
 		return DmenuComponentType::Unknown;
 	}
 
+	void NdDevMenu::DMENU_Menu_Update(DMENU* DMENU) {
+		always_assert(DMENU_Menu_UpdateKeyboard == nullptr, "Function pointer was not set!");
+		DMENU_Menu_UpdateKeyboard(DMENU);
+	}
+
 	DMENU::Menu* NdDevMenu::CreateNdGameSdkMenu() {
 		// Create main menu for NdGameSdk
 		DMENU::Menu* NdGameSdkMenu = Create_DMENU_Menu(SDK_NAME, HeapArena_Source);
@@ -374,6 +379,10 @@ namespace NdGameSdk::gamelib::debug {
 			DMENU_Menu_DecimalCallBack = (DMENU_Menu_DecimalCallBack_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_DecimalCallBack), findpattern.offset);
 
+			findpattern = Patterns::NdDevMenu_DMENU_Menu_UpdateKeyboard;
+			DMENU_Menu_UpdateKeyboard = (DMENU_Menu_UpdateKeyboard_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_Menu_UpdateKeyboard), findpattern.offset);
+
 			if (!SetRootMenuJMP ||
 				!DMENU_Menu ||
 				!DMENU_ItemLine ||
@@ -385,7 +394,8 @@ namespace NdGameSdk::gamelib::debug {
 				!DMENU_ItemFunction ||
 				!DMENU_ItemSelection ||
 				!DMENU_Menu_AppendComponent ||
-				!DMENU_Menu_DecimalCallBack) {
+				!DMENU_Menu_DecimalCallBack ||
+				!DMENU_Menu_UpdateKeyboard) {
 				throw SdkComponentEx{ std::format("Failed to find {}:: game functions!", GetName()), SdkComponentEx::ErrorCode::PatternFailed };
 			}
 

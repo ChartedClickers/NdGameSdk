@@ -7,6 +7,7 @@
 
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
 #include <NdGameSdk/shared/src/common/common-game-init.hpp>
+#include <NdGameSdk/shared/src/common/common-game-loop.hpp>
 #include <NdGameSdk/shared/src/ndlib/engine-components.hpp>
 #include <NdGameSdk/shared/src/ndlib/debug/nd-dmenu.hpp>
 
@@ -20,8 +21,11 @@ using namespace NdGameSdk::common;
 using namespace NdGameSdk::ndlib;
 using namespace NdGameSdk::ndlib::debug;
 
-namespace NdGameSdk::gamelib::debug {
+namespace NdGameSdk::common {
+	class CommonGame;
+}
 
+namespace NdGameSdk::gamelib::debug {
 
 	class NdDevMenu : public ISdkComponent {
 	public:
@@ -67,10 +71,9 @@ namespace NdGameSdk::gamelib::debug {
 			return component;
 		}
 
+		void DMENU_Menu_Update(DMENU* DMENU);
 		DMENU::Menu* CreateNdGameSdkMenu();
-
 		void AppendSdkSubMenus(DMENU::Menu* RootMenu, AppendSdkSubMenus_Args);
-
 		void OnGameInitialized(bool successful);
 
 		NdDevMenuCfg m_cfg{};
@@ -112,7 +115,9 @@ namespace NdGameSdk::gamelib::debug {
 
 		MEMBER_FUNCTION_PTR(void*, DMENU_Menu_AppendComponent, DMENU::Menu* RootMenu, DMENU::Component* Component);
 		MEMBER_FUNCTION_PTR(bool*, DMENU_Menu_DecimalCallBack, DMENU::Menu* Menu, DMENU::Message message, int32_t format);
+		MEMBER_FUNCTION_PTR(void*, DMENU_Menu_UpdateKeyboard, DMENU* DMENU);
 
+		friend CommonGameLoop;
 	};
 
 }

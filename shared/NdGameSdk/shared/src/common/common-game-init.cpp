@@ -20,7 +20,10 @@ namespace NdGameSdk::common {
 		m_Memory = SharedComponents->GetComponent<Memory>();
 		m_EngineComponents = SharedComponents->GetComponent<ndlib::EngineComponents>();
 		m_PrimServer = SharedComponents->GetComponent<ndlib::render::dev::DebugDrawCommon>()->GetSubComponent<PrimServerManager>();
+		m_NdDevMenu = SharedComponents->GetComponent<NdDevMenu>();
+
 		m_IAllocator = AddSubComponent<IAllocator>();
+		m_CommonGameLoop = AddSubComponent<CommonGameLoop>(m_EngineComponents.get(), m_NdDevMenu.get());
 	}
 
 	void CommonGame::Initialize() {
@@ -49,11 +52,11 @@ namespace NdGameSdk::common {
 			constexpr size_t GameInitReturnHook_Offset = 0x4c;
 #endif
 
-			findpattern = Patterns::GameInit;
+			findpattern = Patterns::CommonGame_GameInit;
 			auto GameInitJMP = (void*)Utility::FindAndPrintPattern(module
-				, findpattern.pattern, wstr(Patterns::GameInit), findpattern.offset);
+				, findpattern.pattern, wstr(Patterns::CommonGame_GameInit), findpattern.offset);
 			auto GameInitReturnJMP = (void*)Utility::FindAndPrintPattern(module
-				, findpattern.pattern, wstr(Patterns::GameInit), findpattern.offset + GameInitReturnHook_Offset);
+				, findpattern.pattern, wstr(Patterns::CommonGame_GameInit), findpattern.offset + GameInitReturnHook_Offset);
 
 			if (!GameInitJMP ||
 				!GameInitReturnJMP) {
@@ -77,7 +80,7 @@ namespace NdGameSdk::common {
 						ndgameinfo->m_DevConfig = true;
 					}
 
-				}, wstr(Patterns::GameInit), wstr(GameInitJMP));
+				}, wstr(Patterns::CommonGame_GameInit), wstr(GameInitJMP));
 
 
 			m_GameInitReturnHook = Utility::MakeMidHook(GameInitReturnJMP,
@@ -95,7 +98,7 @@ namespace NdGameSdk::common {
 
 					pCommonGame->InvokeSdkEvent(pCommonGame->e_GameInitialized, successful);
 
-				}, wstr(Patterns::GameInit), wstr(GameInitReturnJMP));
+				}, wstr(Patterns::CommonGame_GameInit), wstr(GameInitReturnJMP));
 
 	#if defined(T2R)
 			findpattern = Patterns::NIXXES_StdHandle;
@@ -112,9 +115,9 @@ namespace NdGameSdk::common {
 			if (m_Memory->IsDebugMemoryAvailable()) {
 				if (m_PrimServer.get() && m_PrimServer->IsInitialized()) {
 
-					findpattern = Patterns::GameInit_PrimServer_Create;
+					findpattern = Patterns::CommonGame_PrimServer_Create;
 					auto PrimServerCreateJMP = (void*)Utility::FindAndPrintPattern(module
-						, findpattern.pattern, wstr(Patterns::GameInit_PrimServer_Create), findpattern.offset);
+						, findpattern.pattern, wstr(Patterns::CommonGame_PrimServer_Create), findpattern.offset);
 
 					m_PrimServer_CreateHook = Utility::MakeMidHook(PrimServerCreateJMP,
 						[](SafetyHookContext& ctx)
@@ -124,7 +127,7 @@ namespace NdGameSdk::common {
 							PrimServer::InitParams pParams{ DebugDrawing->Size() };
 							gameinit->m_PrimServer->Create(&pParams);
 
-						}, wstr(Patterns::GameInit_PrimServer_Create), wstr(PrimServerCreateJMP));
+						}, wstr(Patterns::CommonGame_PrimServer_Create), wstr(PrimServerCreateJMP));
 
 					if (!m_PrimServer_CreateHook) {
 						throw SdkComponentEx{ std::format("Failed to create hook {:s} in {:s}!", TOSTRING(m_PrimServer_CreateHook),GetName()),
@@ -133,6 +136,7 @@ namespace NdGameSdk::common {
 				}
 			}
 	#endif
+			m_CommonGameLoop->Init();
 
 			if (!m_GameInitHook ||
 				!m_GameInitReturnHook) {

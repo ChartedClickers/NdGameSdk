@@ -13,14 +13,19 @@ using namespace NdGameSdk::common::win;
 #include <NdGameSdk/shared/src/ndlib/engine-components.hpp>
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
 #include <NdGameSdk/shared/src/ndlib/render/util/prim.hpp>
+#include <NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp>
 
 #include "common-allocator.hpp"
+#include "common-game-loop.hpp"
 
 using namespace NdGameSdk::corelib::memory;
+using namespace NdGameSdk::gamelib::debug;
 using namespace NdGameSdk::ndlib;
 using namespace NdGameSdk::ndlib::render::util;
 
 namespace NdGameSdk::common {
+
+	class CommonGameLoop;
 
 	class CommonGame : public ISdkComponent
 	{
@@ -42,9 +47,11 @@ namespace NdGameSdk::common {
 		MidHook m_GameInitReturnHook{};
 
 		shared_ptr<IAllocator> m_IAllocator;
+		shared_ptr<CommonGameLoop> m_CommonGameLoop;
 
 		shared_ptr<Memory> m_Memory;
 		shared_ptr<EngineComponents> m_EngineComponents;
+		shared_ptr<NdDevMenu> m_NdDevMenu;
 		shared_ptr<PrimServerManager> m_PrimServer;
 #if defined(T2R)
 		NxAppHooks m_NxAppHooks{};

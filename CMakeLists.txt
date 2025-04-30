@@ -36,7 +36,7 @@ project(ND.ModClient
 		C
 		CXX
 	VERSION
-		1.0.0
+		1.1.0
 )
 
 add_compile_options(

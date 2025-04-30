@@ -1,7 +1,7 @@
 # Reference: https://build-cpp.github.io/cmkr/cmake-toml
 [project]
 name = "ND.ModClient"
-version = "1.0.0"
+version = "1.1.0"
 languages = ["C", "CXX"]
 cmake-after = """
 add_compile_options(

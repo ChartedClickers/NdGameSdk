@@ -33,7 +33,7 @@ namespace NdGameSdk::gamelib::debug {
 		#define AppendSdkSubMenus_Args DMENU::Menu* CustomMenu, const char* Description, DMENU::ItemSubmenu::SubmenuCallback SubmenuCallback, uint64_t Data
 		using AppendSdkSubMenusCallback = boost::function<void(AppendSdkSubMenus_Args)>;
 
-		enum DmenuComponentType { Unknown, MenuGroup, Menu, ItemLine, ItemSubmenu, 
+		enum DmenuComponentType { Unknown, MenuGroup, Menu, KeyBoard, ItemLine, ItemSubmenu,
 			ItemBool, ItemDecimal, ItemFloat, ItemFunction, ItemSelection, ItemSubText
 		};
 
@@ -46,6 +46,7 @@ namespace NdGameSdk::gamelib::debug {
 		NdGameSdk_API bool IsGameDebugMenu();
 
 		NdGameSdk_API DMENU::Menu* Create_DMENU_Menu(std::string pName, HeapArena_Args);
+		NdGameSdk_API DMENU::KeyBoard* Create_DMENU_KeyBoard(std::string pName, DMENU::Menu* pMenu, const char* inputBufferPtr, uint64_t maxInputLength, const char* pDescription, HeapArena_Args);
 		NdGameSdk_API DMENU::ItemLine* Create_DMENU_ItemLine(DMENU::Menu* pMenu, HeapArena_Args);
 		NdGameSdk_API DMENU::ItemSubText* Create_DMENU_ItemSubText(std::string pName, DMENU::Menu* pMenu, HeapArena_Args);
 		NdGameSdk_API DMENU::ItemSubmenu* Create_DMENU_ItemSubmenu(std::string pName, DMENU::Menu* pRootMenu, DMENU::Menu* pSubmenu, DMENU::ItemSubmenu::SubmenuCallback pCallbackFunct, uint64_t pData, const char* pDescription, HeapArena_Args);
@@ -64,11 +65,13 @@ namespace NdGameSdk::gamelib::debug {
 
 		template <typename Component = DMENU::Component>
 		Component* DMENU_AppendComponent(DMENU::Menu* pMenu, DMENU::Component* pComponent) {
-			always_assert(DMENU_Menu_AppendComponent == nullptr, "Function pointer was not set!");
-			Component* component = (Component*)DMENU_Menu_AppendComponent(pMenu, pComponent);
-			spdlog::debug("DMENU_Menu_AppendComponent(RootMenu: 'DMENU::Component::Menu('{:s}')', SubMenu: 'DMENU::Component('{:s}')')",
-				pMenu->Name(), component->Name());
-			return component;
+			if (pMenu) {
+				always_assert(DMENU_Menu_AppendComponent == nullptr, "Function pointer was not set!");
+				Component* component = (Component*)DMENU_Menu_AppendComponent(pMenu, pComponent);
+				spdlog::debug("DMENU_Menu_AppendComponent(RootMenu: 'DMENU::Component::Menu('{:s}')', ParentComponent: 'DMENU::Component('{:s}')')",
+					pMenu->Name(), component->Name());
+				return component;
+			}
 		}
 
 		void DMENU_Menu_Update(DMENU* DMENU);
@@ -97,11 +100,14 @@ namespace NdGameSdk::gamelib::debug {
 
 		MEMBER_FUNCTION_PTR(DMENU::Menu*, DMENU_Menu, DMENU::Menu* Heap, const char* name);
 		MEMBER_FUNCTION_PTR(DMENU::ItemLine*, DMENU_ItemLine, DMENU::ItemLine* Heap);
-
+#if defined(T2R)
+		MEMBER_FUNCTION_PTR(DMENU::KeyBoard*, DMENU_KeyBoard, DMENU::KeyBoard* Heap, uint64_t ExtraArg, const char* name, uint64_t* pdata, int32_t pPagePointer, const char* pDescription);
+#else
+		MEMBER_FUNCTION_PTR(DMENU::KeyBoard*, DMENU_KeyBoard, DMENU::KeyBoard* Heap, const char* name, uint64_t* pInputBuffer, uint64_t MaxInputLength, const char* pDescription);
+#endif
 		MEMBER_FUNCTION_PTR(DMENU::ItemSubText*, DMENU_ItemSubText, DMENU::ItemSubText* Heap, const char* name);
 		MEMBER_FUNCTION_PTR(DMENU::ItemSubmenu*, DMENU_ItemSubmenu, DMENU::ItemSubmenu* Heap, const char* name, DMENU::Menu* pHeader, void* callbackFunct, uint64_t data, const char* pDescription);
 		MEMBER_FUNCTION_PTR(DMENU::ItemBool*, DMENU_ItemBool, DMENU::ItemBool* Heap, const char* name, bool* data, const char* pDescription);
-		
 #if defined(T2R)
 		MEMBER_FUNCTION_PTR(DMENU::ItemDecimal*, DMENU_ItemDecimal, DMENU::ItemDecimal* Heap, const char* name, uint64_t* data, DMENU::ItemDecimal::ValueParams* Value, DMENU::ItemDecimal::StepParams* Step, const char* pDescription, bool handle);
 		MEMBER_FUNCTION_PTR(DMENU::ItemFloat*, DMENU_ItemFloat, DMENU::ItemFloat* Heap, const char* name, uint64_t* data, DMENU::ItemFloat::ValueParams* Value, DMENU::ItemFloat::StepParams* Step, const char* pDescription, uint64_t arg7, bool handle);
@@ -117,6 +123,7 @@ namespace NdGameSdk::gamelib::debug {
 		MEMBER_FUNCTION_PTR(bool*, DMENU_Menu_DecimalCallBack, DMENU::Menu* Menu, DMENU::Message message, int32_t format);
 		MEMBER_FUNCTION_PTR(void*, DMENU_Menu_UpdateKeyboard, DMENU* DMENU);
 
+		friend DMENU;
 		friend CommonGameLoop;
 	};
 

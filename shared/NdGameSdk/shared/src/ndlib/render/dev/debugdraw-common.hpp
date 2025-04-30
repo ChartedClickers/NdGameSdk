@@ -58,6 +58,7 @@ namespace NdGameSdk::ndlib::render::dev {
 		bool m_DebugTextPrintV{};
 		bool m_DebugPrimTextPrint{};
 
+		char debug_primtext[0x65];
 		TextLayout m_DebugTextLayout{ 50., 100., 0.8, 0.8 };
 		DebugStringBase m_DebugStringBase {
 			{0.0f, 0.0f, 0.0f, 0.0f},

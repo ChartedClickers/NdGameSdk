@@ -49,7 +49,7 @@ namespace NdGameSdk::ndlib::debug {
 
 			uint64_t Data();
 
-			Menu* SubMenu();
+			Menu* ParentComponent();
 			MenuGroup* MenuGroup();
 
 			template <typename ComponentType = Component>
@@ -59,13 +59,13 @@ namespace NdGameSdk::ndlib::debug {
 
 		protected:
 			static regenny::shared::ndlib::debug::DMENU::Component::VTable* VTable;
-			friend class NdGameSdk::gamelib::debug::NdDevMenu;
+			friend class gamelib::debug::NdDevMenu;
 		};
 
 		class ItemLine : public Component {
 		private:
 			static regenny::shared::ndlib::debug::DMENU::ItemLine::VTable* VTable;
-			friend class NdGameSdk::gamelib::debug::NdDevMenu;
+			friend class gamelib::debug::NdDevMenu;
 		};
 
 		class MenuGroup : public ISdkRegenny<regenny::shared::ndlib::debug::DMENU::MenuGroup, Component> {
@@ -73,14 +73,39 @@ namespace NdGameSdk::ndlib::debug {
 			Menu* RootMenu();
 		private:
 			static regenny::shared::ndlib::debug::DMENU::MenuGroup::VTable* VTable;
-			friend class NdGameSdk::gamelib::debug::NdDevMenu;
+			friend class gamelib::debug::NdDevMenu;
 		};
 
 		class Menu : public ISdkRegenny<regenny::shared::ndlib::debug::DMENU::Menu, Component> {
+		public:
+			DMENU::Component* PushBackItem(DMENU::Component* pComponent);
 		private:
 			static regenny::shared::ndlib::debug::DMENU::Menu::VTable* VTable;
-			friend class NdGameSdk::gamelib::debug::NdDevMenu;
+			friend class gamelib::debug::NdDevMenu;
 		};
+
+		class KeyBoard : public ISdkRegenny<regenny::shared::ndlib::debug::DMENU::KeyBoard, Component> {
+		public:
+			struct State {
+				bool isEditing;
+				bool NeedsUpdate;
+				bool isDirty;
+				uint64_t cursorIndex;
+			};
+
+			State GetState();
+			uint64_t GetActiveKey();
+			uint64_t GetMaxInputLength();
+			char* GetInputBuffer();
+			char* GetDisplayBuffer();
+
+			uint64_t SetMaxInputLength(uint64_t length);
+			uint64_t SetBufferPtr(const char* pStr);
+		private:
+			static regenny::shared::ndlib::debug::DMENU::KeyBoard::VTable* VTable;
+			friend class gamelib::debug::NdDevMenu;
+		};
+
 
 		class Item : public ISdkRegenny<regenny::shared::ndlib::debug::DMENU::Item, Component> {
 		public:
@@ -90,7 +115,7 @@ namespace NdGameSdk::ndlib::debug {
 		class ItemSubText : public Item {
 		private:
 			static regenny::shared::ndlib::debug::DMENU::ItemSubText::VTable0* VTable;
-			friend class NdGameSdk::gamelib::debug::NdDevMenu;
+			friend class gamelib::debug::NdDevMenu;
 		};
 
 		class ItemSubmenu : public ISdkRegenny<regenny::shared::ndlib::debug::DMENU::ItemSubmenu, Item> {
@@ -98,10 +123,10 @@ namespace NdGameSdk::ndlib::debug {
 			using SubmenuCallbackPtr = bool(*)(DMENU::ItemSubmenu&, DMENU::Message);
 			using SubmenuCallback = boost::function<std::remove_pointer<SubmenuCallbackPtr>::type>;
 
-			Menu* SubMenu();
+			Menu* ParentComponent();
 		private:
 			static regenny::shared::ndlib::debug::DMENU::ItemSubmenu::VTable0* VTable;
-			friend class NdGameSdk::gamelib::debug::NdDevMenu;	
+			friend class gamelib::debug::NdDevMenu;	
 		};
 
 		class ItemBool : public ISdkRegenny<regenny::shared::ndlib::debug::DMENU::ItemBool, Item> {
@@ -109,7 +134,7 @@ namespace NdGameSdk::ndlib::debug {
 			bool IsActive();
 		private:
 			static regenny::shared::ndlib::debug::DMENU::ItemBool::VTable0* VTable;
-			friend class NdGameSdk::gamelib::debug::NdDevMenu;
+			friend class gamelib::debug::NdDevMenu;
 		};
 
 		class ItemDecimal : public ISdkRegenny<regenny::shared::ndlib::debug::DMENU::ItemDecimal, Item> {
@@ -129,7 +154,7 @@ namespace NdGameSdk::ndlib::debug {
 
 		private:
 			static regenny::shared::ndlib::debug::DMENU::ItemDecimal::VTable0* VTable;
-			friend class NdGameSdk::gamelib::debug::NdDevMenu;
+			friend class gamelib::debug::NdDevMenu;
 		};
 
 		class ItemFloat : public ISdkRegenny<regenny::shared::ndlib::debug::DMENU::ItemFloat, Item> {
@@ -149,7 +174,7 @@ namespace NdGameSdk::ndlib::debug {
 
 		private:
 			static regenny::shared::ndlib::debug::DMENU::ItemFloat::VTable0* VTable;
-			friend class NdGameSdk::gamelib::debug::NdDevMenu;
+			friend class gamelib::debug::NdDevMenu;
 		};
 
 		class ItemFunction : public ISdkRegenny<regenny::shared::ndlib::debug::DMENU::ItemFunction, Item> {
@@ -161,7 +186,7 @@ namespace NdGameSdk::ndlib::debug {
 			void SetActive(bool status);
 		private:
 			static regenny::shared::ndlib::debug::DMENU::ItemFunction::VTable0* VTable;
-			friend class NdGameSdk::gamelib::debug::NdDevMenu;
+			friend class gamelib::debug::NdDevMenu;
 		};
 
 		class ItemSelection : public ISdkRegenny<regenny::shared::ndlib::debug::DMENU::ItemSelection, Item> {
@@ -175,12 +200,16 @@ namespace NdGameSdk::ndlib::debug {
 
 		private:
 			static regenny::shared::ndlib::debug::DMENU::ItemSelection::VTable0* VTable;
-			friend class NdGameSdk::gamelib::debug::NdDevMenu;
+			friend class gamelib::debug::NdDevMenu;
 		};
 
 		MenuGroup* DevMenu();
 		MenuGroup* QuickMenu();
 		MenuGroup* FavoritesMenu();
+
+	private:
+		static gamelib::debug::NdDevMenu* s_NdDevMenu;
+		friend class gamelib::debug::NdDevMenu;
 	};
 
 #define ASSERT_DMENU_ITEM_SIZE(type, base_offset) \

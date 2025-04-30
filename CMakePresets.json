@@ -23,6 +23,13 @@
       "configurePreset": "vs2022"
     },
     {
+      "name": "RelWithDebInfo 2022",
+      "description": "",
+      "displayName": "RelWithDebInfo",
+      "configuration": "RelWithDebInfo",
+      "configurePreset": "vs2022"
+    },
+    {
       "name": "Debug 2022",
       "description": "",
       "displayName": "Debug",

@@ -34,7 +34,7 @@ namespace NdGameSdk::common {
 			spdlog::info("Initializing {} patterns...", GetName());
 
 			auto MissingDependencies = CheckSdkComponents
-				<Memory>({ m_Memory.get() });
+				<Memory, EngineComponents>({ m_Memory.get(), m_EngineComponents.get() });
 
 			if (MissingDependencies.has_value()) {
 				throw SdkComponentEx

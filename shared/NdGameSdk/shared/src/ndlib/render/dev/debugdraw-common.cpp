@@ -120,6 +120,8 @@ namespace NdGameSdk::ndlib::render::dev {
 			m_DebugDrawSidHook = Utility::MakeMidHook(DebugDrawSidJMP,
 				DebugDrawSid, wstr(Patterns::GameDebugDraw_DebugDrawSid), wstr(GameDeDebugDrawSidJMPbugDrawJMP));
 
+			_snprintf_s(this->debug_primtext, sizeof(this->debug_primtext), "I'm primitive, beautiful, and in full bloom within DebugMem.");
+
 		});
 	}
 
@@ -149,10 +151,7 @@ namespace NdGameSdk::ndlib::render::dev {
 			}
 
 			if (DebugDraw->m_DebugPrimTextPrint) {
-
-				char debug_text[0x65]{};
-				_snprintf_s(debug_text, sizeof(debug_text), "I'm primitive, beautiful, and in full bloom within DebugMem.");
-				DebugDraw->m_DebugStringBase.setText(debug_text);
+				DebugDraw->m_DebugStringBase.setText(DebugDraw->debug_primtext);
 				DebugDraw->PrimTextPrint(DebugDraw->m_DebugStringBase);
 			}
 
@@ -174,7 +173,7 @@ namespace NdGameSdk::ndlib::render::dev {
 
 	DMENU::ItemSubmenu* DebugDrawCommon::CreateDebugDrawMenu(NdDevMenu* pdmenu, DMENU::Menu* pMenu) {
 
-		DebugDrawCommon* DebugDraw = DebugDrawCommon::Instance<DebugDrawCommon>();
+		DebugDrawCommon* DebugDraw = Instance<DebugDrawCommon>();
 
 		if (DebugDraw) {
 			DMENU::Menu* DebugDrawMenu = pdmenu->Create_DMENU_Menu("DebugDraw", HeapArena_Source);
@@ -214,6 +213,12 @@ namespace NdGameSdk::ndlib::render::dev {
 					DebugDrawMenu,
 					&DebugDraw->m_DebugStringBase->scale,
 					primScaleRange, primSteps, "Scale",
+					HeapArena_Source);
+
+				pdmenu->Create_DMENU_KeyBoard("Prim Text",
+					DebugDrawMenu,
+					DebugDraw->debug_primtext,
+					sizeof(DebugDraw->debug_primtext), "Prim Text",
 					HeapArena_Source);
 
 				pdmenu->Create_DMENU_TextLineWrapper("Prim Color Presets", DebugDrawMenu, HeapArena_Source);

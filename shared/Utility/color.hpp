@@ -37,10 +37,10 @@ public:
     {
         switch (color) {
         case BasicColors::Black:        r = 0; g = 0; b = 0; break;
-        case BasicColors::Red:          r = 255; g = 0; b = 0; break;
+        case BasicColors::Red:          r = 0; g = 0; b = 255; break;
         case BasicColors::Green:        r = 0; g = 255; b = 0; break;
         case BasicColors::Yellow:       r = 0; g = 255; b = 255; break;
-        case BasicColors::Blue:         r = 0; g = 0; b = 255; break;
+        case BasicColors::Blue:         r = 255; g = 0; b = 0; break;
         case BasicColors::Magenta:      r = 255; g = 0; b = 255; break;
         case BasicColors::Cyan:         r = 255; g = 255; b = 0; break;
         case BasicColors::White:        r = 255; g = 255; b = 255; break;

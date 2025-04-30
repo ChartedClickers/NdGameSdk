@@ -1,4 +1,5 @@
 #include "nd-dmenu.hpp"
+#include <NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp>
 
 namespace NdGameSdk::ndlib::debug {
 
@@ -6,6 +7,7 @@ namespace NdGameSdk::ndlib::debug {
 	regenny::shared::ndlib::debug::DMENU::ItemLine::VTable* DMENU::ItemLine::VTable{};
 	regenny::shared::ndlib::debug::DMENU::Menu::VTable* DMENU::Menu::VTable{};
 	regenny::shared::ndlib::debug::DMENU::MenuGroup::VTable* DMENU::MenuGroup::VTable{};
+	regenny::shared::ndlib::debug::DMENU::KeyBoard::VTable* DMENU::KeyBoard::VTable{};
 
 	regenny::shared::ndlib::debug::DMENU::ItemSubText::VTable0* DMENU::ItemSubText::VTable{};
 	regenny::shared::ndlib::debug::DMENU::ItemSubmenu::VTable0* DMENU::ItemSubmenu::VTable{};
@@ -65,8 +67,8 @@ namespace NdGameSdk::ndlib::debug {
 		return this->Get()->m_data;
 	}
 
-	DMENU::Menu* DMENU::Component::SubMenu() {
-		return reinterpret_cast<DMENU::Menu*>(this->Get()->m_pSubMenu);
+	DMENU::Menu* DMENU::Component::ParentComponent() {
+		return reinterpret_cast<DMENU::Menu*>(this->Get()->m_ParentComponent);
 	}
 
 	DMENU::MenuGroup* DMENU::Component::MenuGroup() {
@@ -77,11 +79,53 @@ namespace NdGameSdk::ndlib::debug {
 		return reinterpret_cast<DMENU::Menu*>(this->Get()->m_RootMenu);
 	}
 
+	DMENU::Component* DMENU::Menu::PushBackItem(DMENU::Component* pComponent) {
+		return DMENU::s_NdDevMenu->DMENU_AppendComponent(this, pComponent);
+	}
+
+	DMENU::KeyBoard::State DMENU::KeyBoard::GetState()
+	{
+		auto keyboard_view = this->Get();
+		return DMENU::KeyBoard::State
+		{
+			keyboard_view->m_isEditing,
+			keyboard_view->m_needsUpdate,
+			keyboard_view->m_isDirty,
+			keyboard_view->m_cursorIndex
+		};
+	}
+
+	uint64_t DMENU::KeyBoard::GetActiveKey() {
+		return this->Get()->m_lastKey;
+	}
+
+	uint64_t DMENU::KeyBoard::GetMaxInputLength() {
+		return this->Get()->m_maxInputLength;
+	}
+
+	uint64_t DMENU::KeyBoard::SetMaxInputLength(uint64_t length) {
+		return this->Get()->m_maxInputLength = length;
+	}
+
+	uint64_t DMENU::KeyBoard::SetBufferPtr(const char* pStr) {
+		// guarantee that `pStr` will remain valid for as long as the component lives
+		this->Get()->m_inputBufferPtr = const_cast<char*>(pStr);
+		return reinterpret_cast<uint64_t>(this->Get()->m_inputBufferPtr);
+	}
+
+	char* DMENU::KeyBoard::GetInputBuffer() {
+		return this->Get()->m_inputBuffer;
+	}
+
+	char* DMENU::KeyBoard::GetDisplayBuffer() {
+		return this->Get()->m_displayBuffer;
+	}
+
 	void* DMENU::Item::CallBackFunct() {
 		return this->Get()->m_callbackFunct;
 	}
 
-	DMENU::Menu* DMENU::ItemSubmenu::SubMenu() {
+	DMENU::Menu* DMENU::ItemSubmenu::ParentComponent() {
 		return reinterpret_cast<DMENU::Menu*>(this->Get()->m_pHeader);
 	}
 
@@ -116,5 +160,7 @@ namespace NdGameSdk::ndlib::debug {
 	DMENU::ItemSelection::Item_selection& DMENU::ItemSelection::ItemSelections() {
 		return *reinterpret_cast<DMENU::ItemSelection::Item_selection*>(this->Get()->m_SelectionStruct);
 	}
+
+	gamelib::debug::NdDevMenu* DMENU::s_NdDevMenu = nullptr;
 
 }

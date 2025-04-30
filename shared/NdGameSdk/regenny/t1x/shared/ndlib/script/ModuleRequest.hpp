@@ -23,6 +23,7 @@ struct ModuleRequest {
     bool field_3a; // 0x3a
     uint16_t field_3b; // 0x3b
     bool m_requested; // 0x3d
-}; // Size: 0x3e
+    private: char pad_3e[0x2]; public:
+}; // Size: 0x40
 #pragma pack(pop)
 }

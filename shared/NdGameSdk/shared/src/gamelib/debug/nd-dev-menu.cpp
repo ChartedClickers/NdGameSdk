@@ -8,7 +8,9 @@ using namespace NdGameSdk::ndlib::render::dev;
 
 namespace NdGameSdk::gamelib::debug {
 
-	NdDevMenu::NdDevMenu(NdDevMenuCfg& cfg) : m_cfg{ std::move(cfg) }, ISdkComponent("DMENU") {}
+	NdDevMenu::NdDevMenu(NdDevMenuCfg& cfg) : m_cfg{ std::move(cfg) }, ISdkComponent("DMENU") {
+		DMENU::s_NdDevMenu = this;
+	}
 	
 	NdDevMenu::~NdDevMenu() {
 		if (IsInitialized()) {
@@ -40,6 +42,27 @@ namespace NdGameSdk::gamelib::debug {
 		return nullptr;
 	}
 
+	DMENU::KeyBoard* NdDevMenu::Create_DMENU_KeyBoard(std::string pName, DMENU::Menu* pMenu, const char* inputBufferPtr, uint64_t maxInputLength, const char* pDescription, HeapArena_Args) {
+		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::KeyBoard>
+			(sizeof(DMENU::KeyBoard), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
+		DMENU::KeyBoard* KeyBoardPtr{};
+		if (HeapAllocator) {
+			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::KeyBoard));
+			always_assert(DMENU_KeyBoard == nullptr, "Function pointer was not set!");
+#if defined(T2R)
+			KeyBoardPtr = DMENU_KeyBoard(HeapAllocator, 0x6, pName.c_str(), 0x0, 0x0, pDescription);
+			*reinterpret_cast<uint64_t*>(KeyBoardPtr->Get()) = reinterpret_cast<uint64_t>(DMENU::KeyBoard::VTable);
+			KeyBoardPtr->SetBufferPtr(inputBufferPtr);
+			KeyBoardPtr->SetMaxInputLength(maxInputLength);
+#else
+			KeyBoardPtr = DMENU_KeyBoard(HeapAllocator, pName.c_str(), (uint64_t*)inputBufferPtr, maxInputLength, pDescription);
+#endif
+			DMENU_AppendComponent(pMenu, KeyBoardPtr);
+			return KeyBoardPtr;
+		}
+		return nullptr;
+	}
+
 	DMENU::ItemLine* NdDevMenu::Create_DMENU_ItemLine(DMENU::Menu* pMenu, HeapArena_Args) {
 		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::ItemLine>
 			(sizeof(DMENU::ItemLine), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
@@ -48,7 +71,7 @@ namespace NdGameSdk::gamelib::debug {
 			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::ItemLine));
 			always_assert(DMENU_ItemLine == nullptr, "Function pointer was not set!");
 			LinePtr = DMENU_ItemLine(HeapAllocator);
-			spdlog::debug("Created DMENU::Component::ItemLine() -> {:#x}", reinterpret_cast<uintptr_t>(LinePtr));
+			spdlog::debug("Created DMENU::Component::ItemLine() -> {:#x}", reinterpret_cast<uintptr_t>(LinePtr));\
 			DMENU_AppendComponent(pMenu, LinePtr);
 			return LinePtr;
 		}
@@ -232,7 +255,7 @@ namespace NdGameSdk::gamelib::debug {
 			DMENU::ItemDecimal::ValueParams{ 1, 10 }, DMENU::ItemDecimal::StepParams{ 1, 2 }, "Test component", HeapArena_Source);
 
 		itemdecimal->SetColor(Color(0xFF00FF00));
-		
+
 		DebugDrawCommon::CreateDebugDrawMenu(this, NdGameSdkMenu);
 		//ScriptManager::CreateScriptManagerMenu(this,NdGameSdkMenu);
 		
@@ -339,6 +362,10 @@ namespace NdGameSdk::gamelib::debug {
 			DMENU_Menu = (DMENU_Menu_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_Menu), findpattern.offset);
 
+			findpattern = Patterns::NdDevMenu_DMENU_KeyBoard;
+			DMENU_KeyBoard = (DMENU_KeyBoard_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_KeyBoard), findpattern.offset);
+
 			findpattern = Patterns::NdDevMenu_DMENU_ItemLine;
 			DMENU_ItemLine = (DMENU_ItemLine_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemLine), findpattern.offset);
@@ -385,6 +412,7 @@ namespace NdGameSdk::gamelib::debug {
 
 			if (!SetRootMenuJMP ||
 				!DMENU_Menu ||
+				!DMENU_KeyBoard ||
 				!DMENU_ItemLine ||
 				!DMENU_ItemSubText ||
 				!DMENU_ItemSubmenu ||
@@ -406,12 +434,14 @@ namespace NdGameSdk::gamelib::debug {
 			constexpr size_t DMENU_ItemBool_VTableOffset = 0x2b;
 			constexpr size_t DMENU_ItemSubText_VTableOffset = 0x35;
 #if defined(T2R)
+			constexpr size_t DMENU_KeyBoard_VTableOffset = 0x1f;
 			constexpr size_t DMENU_ItemLine_VTableOffset = 0x56;
 			constexpr size_t DMENU_ItemDecimal_VTableOffset = 0x5c;
 			constexpr size_t DMENU_ItemFloat_VTableOffset = 0x5c;
 			constexpr size_t DMENU_ItemFunction_VTableOffset = 0x28;
 			constexpr size_t DMENU_ItemSelection_VTableOffset = 0x4a;
 #elif defined(T1X)
+			constexpr size_t DMENU_KeyBoard_VTableOffset = 0x36;
 			constexpr size_t DMENU_ItemLine_VTableOffset = 0x5A;
 			constexpr size_t DMENU_ItemDecimal_VTableOffset = 0x50;
 			constexpr size_t DMENU_ItemFloat_VTableOffset = 0x61;
@@ -430,6 +460,10 @@ namespace NdGameSdk::gamelib::debug {
 			findpattern = Patterns::NdDevMenu_DMENU_Menu;
 			DMENU::Menu::VTable = (regenny::shared::ndlib::debug::DMENU::Menu::VTable*)Utility::ReadLEA32(module,
 				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_Menu), findpattern.offset + DMENU_Menu_VTableOffset, 3, 7);
+
+			findpattern = Patterns::NdDevMenu_DMENU_KeyBoard;
+			DMENU::KeyBoard::VTable = (regenny::shared::ndlib::debug::DMENU::KeyBoard::VTable*)Utility::ReadLEA32(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_KeyBoard), findpattern.offset + DMENU_KeyBoard_VTableOffset, 3, 7);
 
 			findpattern = Patterns::NdDevMenu_DMENU_ItemLine;
 			DMENU::ItemLine::VTable = (regenny::shared::ndlib::debug::DMENU::ItemLine::VTable*)Utility::ReadLEA32(module,
@@ -463,9 +497,17 @@ namespace NdGameSdk::gamelib::debug {
 			DMENU::ItemSubText::VTable = (regenny::shared::ndlib::debug::DMENU::ItemSubText::VTable0*)Utility::ReadLEA32(module,
 				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_ItemSubText), findpattern.offset + DMENU_ItemSubText_VTableOffset, 3, 7);
 
+#if defined(T2R)
+			// Fix Vtable offsets
+			DMENU::KeyBoard::VTable = reinterpret_cast<decltype(DMENU::KeyBoard::VTable)>(
+				reinterpret_cast<uint8_t*>(DMENU::KeyBoard::VTable) + (0x25a * 0x8));
+#endif
+		
+
 			if (!DMENU::Component::VTable ||
 				!DMENU::MenuGroup::VTable ||
 				!DMENU::Menu::VTable ||
+				!DMENU::KeyBoard::VTable ||
 				!DMENU::ItemLine::VTable ||
 				!DMENU::ItemSubmenu::VTable ||
 				!DMENU::ItemBool::VTable ||
@@ -482,6 +524,7 @@ namespace NdGameSdk::gamelib::debug {
 			m_DmenuComponentTypeMap = {
 				{ reinterpret_cast<uintptr_t>(DMENU::MenuGroup::VTable), DmenuComponentType::MenuGroup },
 				{ reinterpret_cast<uintptr_t>(DMENU::Menu::VTable), DmenuComponentType::Menu },
+				{ reinterpret_cast<uintptr_t>(DMENU::KeyBoard::VTable), DmenuComponentType::KeyBoard },
 				{ reinterpret_cast<uintptr_t>(DMENU::ItemLine::VTable), DmenuComponentType::ItemLine },
 				{ reinterpret_cast<uintptr_t>(DMENU::ItemSubmenu::VTable), DmenuComponentType::ItemSubmenu },
 				{ reinterpret_cast<uintptr_t>(DMENU::ItemBool::VTable), DmenuComponentType::ItemBool },
@@ -506,7 +549,7 @@ namespace NdGameSdk::gamelib::debug {
 					if (MenuGroup == NdDevMenu) {
 						DMENU::Menu* NdGameSdkMenu = NdDevMenuComponent->CreateNdGameSdkMenu();
 						NdDevMenuComponent->m_NdGameSdkMenu = NdDevMenuComponent->Create_DMENU_ItemSubmenu(NdGameSdkMenu->Name(), MenuGroup->RootMenu(),
-							NdGameSdkMenu, NULL, NULL, nullptr, HeapArena_Source)->SubMenu();
+							NdGameSdkMenu, NULL, NULL, nullptr, HeapArena_Source)->ParentComponent();
 					}
 
 					NdDevMenuComponent->InvokeSdkEvent(NdDevMenuComponent->e_AppendMenuGroup, NdDevMenuComponent.get(), MenuGroup);

@@ -25,9 +25,11 @@ struct DMENU {
         char m_name[32]; // 0x10
         // Metadata: utf8*
         char* m_pname; // 0x30
-        regenny::shared::ndlib::debug::DMENU::Component* m_pSubMenu; // 0x38
+        regenny::shared::ndlib::debug::DMENU::Component* m_ParentComponent; // 0x38
         regenny::shared::ndlib::debug::DMENU::Component* m_NextDMenuComponent; // 0x40
-        uint64_t Unk2[3]; // 0x48
+        private: char pad_48[0x8]; public:
+        uint64_t m_LeftPad; // 0x50
+        uint64_t Unk2; // 0x58
         uint64_t m_data; // 0x60
         uint32_t m_color; // 0x68
         uint32_t m_selectcolor; // 0x6c
@@ -144,6 +146,24 @@ struct DMENU {
         // Metadata: utf8*
         char m_placeholder[1024]; // 0xb0
     }; // Size: 0x4b0
+
+    struct KeyBoard : public Component {
+        bool m_isEditing; // 0xb0
+        bool m_needsUpdate; // 0xb1
+        bool m_isDirty; // 0xb2
+        bool m_isFrameActive; // 0xb3
+        private: char pad_b4[0x4]; public:
+        uint64_t m_cursorIndex; // 0xb8
+        uint64_t m_lastKey; // 0xc0
+        private: char pad_c8[0x10]; public:
+        // Metadata: utf8*
+        char m_inputBuffer[1024]; // 0xd8
+        // Metadata: utf8*
+        char m_displayBuffer[1024]; // 0x4d8
+        // Metadata: utf8*
+        char* m_inputBufferPtr; // 0x8d8
+        uint64_t m_maxInputLength; // 0x8e0
+    }; // Size: 0x8e8
 
     struct ItemLine : public Component {
     }; // Size: 0xb0

@@ -25,7 +25,6 @@ namespace regenny {
         // Forward declared structures.
         namespace ndlib {
             struct FrameParams{};
-
             namespace render {
                 struct WindowContext{};
             }
@@ -566,9 +565,10 @@ namespace regenny {
                         void* UnkString;
                         char m_name[0x20] [[utf8*]] // (Only if string length is less than 32 characters)
                         char* m_pname [[utf8*]];
-                        Component* m_pSubMenu;
+                        Component* m_ParentComponent;
                         Component* m_NextDMenuComponent;
-                        uint64_t Unk2[0x3];
+                        uint64_t m_LeftPad @ 0x50
+                        uint64_t Unk2;
                         uint64_t m_data; // For arguments or link variable
                         uint32_t m_color;
                         uint32_t m_selectcolor;
@@ -599,6 +599,20 @@ namespace regenny {
                         bool m_Rendering;
                         uint16_t Unk[0x3];
                         uint64_t Unk2[0x4d];
+                    }
+
+                    // DMENU::KeyBoard*
+                    struct KeyBoard : Component 0x838 {
+                        bool m_isEditing;
+                        bool m_needsUpdate;
+                        bool m_isDirty;
+                        bool m_isFrameActive;
+                        uint64_t m_cursorIndex @ 0xb8;
+                        uint64_t m_lastKey;
+                        char m_inputBuffer[0x400] @ 0xd8 [[utf8*]]
+                        char m_displayBuffer[0x400] [[utf8*]]
+                        char* m_inputBufferPtr [[utf8*]];
+                        uint64_t m_maxInputLength;
                     }
                 
                     // DMENU::Item (class_Dmenu::Item_vfTable)
@@ -635,7 +649,7 @@ namespace regenny {
                         uint64_t Unk[0x4];
                     } 
 
-                    // DMENU::ItemFloat* 
+                    // DMENU::ItemFloat
                     // Component.m_data - ValuePtr
                     struct ItemFloat : Item 0xa8  {
                         uint64_t* m_format; // format Printf %6.2f

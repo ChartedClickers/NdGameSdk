@@ -22,7 +22,7 @@ namespace NdGameSdk::common {
 			m_GameDebugUpdate_DMENU_KeyboardDevMode = Utility::MakeMidHook(GameDebugUpdateJMP,
 				[](SafetyHookContext& ctx) {
 
-					auto pCommonGameLoop = GetSharedComponents()->
+					static shared_ptr<CommonGameLoop> pCommonGameLoop = GetSharedComponents()->
 						GetComponent<CommonGame>()->GetSubComponent<CommonGameLoop>();
 
 					if (pCommonGameLoop->m_NdDevMenu) {

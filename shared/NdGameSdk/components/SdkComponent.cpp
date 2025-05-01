@@ -108,26 +108,17 @@ namespace NdGameSdk {
 			}
 			catch (SdkComponentEx ComponentEx) {
 				spdlog::error("Error initialize {:s}: {:s}", sub->GetName().data(), ComponentEx.what());
-
-				if (ComponentEx.IsCritical())
-					throw ComponentEx;
+				throw;
 			}
-			catch (const std::exception& ex)
-			{
+			catch (const std::exception& ex) {
 				spdlog::error("Error initialize {}: {}", sub->GetName(), ex.what());
 				throw;
 			}
-			catch (...)
-			{
+			catch (...) {
 				spdlog::error("Error initialize: {}", sub->GetName());
 				throw;
 			}
 		}
-
-		std::erase_if(m_subcomponents, [](const std::pair<const std::type_index, std::shared_ptr<ISdkSubComponent>>& pair)
-			{
-				return !pair.second || !pair.second->IsInitialized();
-			});
 	}
 
 	const std::unordered_map<std::type_index, std::shared_ptr<ISdkComponent>>& SdkComponentFactory::GetSdkComponents() const {

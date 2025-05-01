@@ -69,6 +69,24 @@ struct DMENU {
         uint64_t Unk20[77]; // 0xc8
     }; // Size: 0x330
 
+    struct KeyBoard : public Component {
+        bool m_isEditing; // 0xb0
+        bool m_needsUpdate; // 0xb1
+        bool m_isDirty; // 0xb2
+        bool m_isFrameActive; // 0xb3
+        private: char pad_b4[0x4]; public:
+        uint32_t m_cursorIndex; // 0xb8
+        uint32_t m_lastKey; // 0xbc
+        private: char pad_c0[0x10]; public:
+        // Metadata: utf8*
+        char m_inputBuffer[1024]; // 0xd0
+        // Metadata: utf8*
+        char m_displayBuffer[1024]; // 0x4d0
+        // Metadata: utf8*
+        char* m_inputBufferPtr; // 0x8d0
+        uint64_t m_maxInputLength; // 0x8d8
+    }; // Size: 0x8e0
+
     struct Item : public Component {
         struct VTable0 : public regenny::shared::ndlib::debug::DMENU::Component::VTable {
         }; // Size: 0xb0
@@ -143,24 +161,6 @@ struct DMENU {
         // Metadata: utf8*
         char m_placeholder[1024]; // 0xb0
     }; // Size: 0x4b0
-
-    struct KeyBoard : public Component {
-        bool m_isEditing; // 0xb0
-        bool m_needsUpdate; // 0xb1
-        bool m_isDirty; // 0xb2
-        bool m_isFrameActive; // 0xb3
-        private: char pad_b4[0x4]; public:
-        uint32_t m_cursorIndex; // 0xb8
-        uint32_t m_lastKey; // 0xbc
-        private: char pad_c0[0x10]; public:
-        // Metadata: utf8*
-        char m_inputBuffer[1024]; // 0xd0
-        // Metadata: utf8*
-        char m_displayBuffer[1024]; // 0x4d0
-        // Metadata: utf8*
-        char* m_inputBufferPtr; // 0x8d0
-        uint64_t m_maxInputLength; // 0x8d8
-    }; // Size: 0x8e0
 
     struct ItemLine : public Component {
     }; // Size: 0xb0

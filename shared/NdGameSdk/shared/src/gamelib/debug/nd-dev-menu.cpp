@@ -58,6 +58,14 @@ namespace NdGameSdk::gamelib::debug {
 			KeyBoardPtr = DMENU_KeyBoard(HeapAllocator, pName.c_str(), (uint64_t*)inputBufferPtr, maxInputLength, pDescription);
 #endif
 			DMENU_AppendComponent(pMenu, KeyBoardPtr);
+			spdlog::debug("Created DMENU::Component::KeyBoard('{:s}', parent='{:s}', buffer_ptr={:#x}, max_len={:#x}, '{:s}') -> {:#x}",
+				KeyBoardPtr->Name(),
+				pMenu->Name(),
+				reinterpret_cast<uintptr_t>(inputBufferPtr),
+				maxInputLength,
+				KeyBoardPtr->Description(),
+				reinterpret_cast<uintptr_t>(KeyBoardPtr)
+			);
 			return KeyBoardPtr;
 		}
 		return nullptr;

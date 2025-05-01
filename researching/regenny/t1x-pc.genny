@@ -36,6 +36,10 @@ namespace regenny {
             namespace render {
                 struct WindowContext{};
             }
+
+            namespace script {
+                struct ScriptModule{};
+             }
         }
 
         // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\corelib
@@ -1346,25 +1350,6 @@ namespace regenny {
                     bool m_requested;
                 }
             
-                struct ScriptModule 0x70 {
-                    void* vfTable;
-                    uint64_t field_8;
-                    uint64_t field_10;
-                    uint64_t field_18;
-                    uint64_t field_20;
-                    StringId64 m_modulehash;
-                    StringId64 field_30;
-                    uint32_t m_numEntries;
-                    struct DC.Entry* m_Data @ 0x40;
-                    uint64_t field_48;
-                    struct DC.Header* m_header;
-                    uint64_t field_58;
-                    uint32_t field_60;
-                    uint32_t field_64;
-                    uint32_t field_68;
-                    uint32_t m_size;
-                };
-            
                 // ScriptManager::ModuleInfo::Constructor (0x141e71328)
                 struct ModuleInfo 0x60 { 
                      uint64_t field_0;
@@ -1393,43 +1378,74 @@ namespace regenny {
                     uint16_t field_20;
                 };
             
-                struct ScriptModuleLoader 0x30d0 {
-                    ModuleInfo* m_moduleinfo @ 0x3018;
-                    uint64_t m_moduleName;
-                    corelib.memory.Context m_moduleMemContext;
-                    uint32_t field_302c;
-                    uint64_t field_3030;
-                    uint64_t field_3090 @ 0x3090;
-                    uint64_t field_3098;
-                    bool field_30c8 @ 0x30c8;
-                    bool field_30c9;
-                    bool field_30ca;
-                    uint16_t field_30cb;
-                    uint8_t field_30cd;
-                    bool field_30ce;
+                struct ScriptModule 0x70 {
+                    struct Loader 0x4e0 {
+                        ModuleInfo* m_moduleinfo @ 0x440;
+                        uint64_t m_moduleName;
+                        corelib.memory.Context m_moduleMemContext;
+                        void* Data @ 0x480;
+                        uint64_t field_4c0 @ 0x4c0;
+                        uint64_t field_4c8;
+                        bool field_4d0;
+                        bool field_4d1;
+                        bool field_4d2;
+                        uint16_t field_4d3;
+                        bool field_4d5;
+                        bool field_4d6;
+                    };
+
+                    void* vfTable;
+                    uint64_t field_8;
+                    uint64_t field_10;
+                    uint64_t field_18;
+                    uint64_t field_20;
+                    StringId64 m_modulehash;
+                    StringId64 field_30;
+                    uint32_t m_numEntries;
+                    struct DC.Entry* m_Data @ 0x40;
+                    uint64_t field_48;
+                    struct DC.Header* m_header;
+                    uint64_t field_58;
+                    uint32_t field_60;
+                    uint32_t field_64;
+                    uint32_t field_68;
+                    uint32_t m_size;
                 };
             
                 // script-manager.cpp
                 struct ScriptManagerGlobals 0x33b0 {
                     uint64_t field_0;
-                    uint64_t field_10 @ 0x10;
+                    StringId64 m_hash @ 0x10; // ScriptManagerGlobals
                     uint32_t field_18;
                     uint64_t field_20 @ 0x20;
                     uint64_t field_30 @ 0x30;
-                    bool field_40 @ 0x40;
-                    bool m_DisplayRequestedModules @ 0x43;
-                    uint32_t field_44;
-                    uint32_t field_4a @ 0x4a;
-                    uint16_t field_4e;
-                    uint32_t field_51 @ 0x51;
-                    bool m_DisplayGlobalSymbols;
-                    bool field_56;
-                    uint32_t field_58 @ 0x58;
+                    bool m_EnableScriptTrace @ 0x40;
+                    bool m_Autoreloadbinfiles @ 0x42;
+                    bool m_DisplayRequestedModules;
+                    bool m_DumploadlisttoTTY;
+                    bool m_Showoverflowedmodules;
+                    bool m_ShowScriptErrors;
+                    bool m_PrintmodulesCon;
+                    bool m_PrintmodulescountsCon;
+                    bool m_ShowDebugBinStatusCon;
+                    bool m_DumpStateScriptsonStackFrameHighWater @ 0x4c;
+                    bool m_EnableScriptModuleCRC32Checks;
+                    bool m_field4e;
+                    bool m_ValidateModuleSize;
+                    bool m_AssertonGlobalSymbolLookup;
+                    bool m_EnableScripts;
+                    bool m_field52;
+                    bool m_field53;
+                    bool m_DisableScriptDebugPrims;
+                    bool DisplayGlobalSymbols;
+                    bool m_field56;
+                    bool m_DisableDebugBinSuppressionforGameTasks;
+                    bool m_field58;
                     uint16_t field_5c;
                     char field_5e;
                     uint32_t field_60 @ 0x60;
                     uint64_t field_68 @ 0x68;
-                    ModuleRequest.ModuleRequestList* m_moduleRequestListActual; // list
+                    ModuleRequest.ModuleRequestList* m_moduleRequestListActual;
                     uint64_t field_78;
                     uint64_t field_e8  @ 0xe8;
                     uint64_t field_100 @ 0x100;
@@ -1448,7 +1464,7 @@ namespace regenny {
                     uint64_t field_288 @ 0x288;
                     uint64_t field_290;
                     uint64_t m_pNativeMap;
-                    ScriptModuleLoader s_SLoadM;
+                    ScriptModule.Loader* s_SLoadM;
                     uint64_t field_2e80 @ 0x2e80;
                     uint64_t field_3338 @ 0x3338;
                     bool field_3340;
@@ -1462,7 +1478,7 @@ namespace regenny {
                     uint64_t field_3398;
                     uint32_t field_33a0;
                     uint64_t field_33a8 @ 0x33a8;
-                }; // g_scriptGlobals (0x146430e70)
+                }; // g_scriptGlobals
 
             }
     

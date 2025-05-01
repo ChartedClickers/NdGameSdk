@@ -25,9 +25,14 @@ namespace regenny {
         // Forward declared structures.
         namespace ndlib {
             struct FrameParams{};
+            
             namespace render {
                 struct WindowContext{};
             }
+
+            namespace script {
+                struct ScriptModule{};
+             }
         }
 
         // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib
@@ -784,9 +789,151 @@ namespace regenny {
             
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\script
             namespace script {
+
+                // #lang dc
+                namespace DC {
+                    struct Entry 0x18 {
+                        StringId64 m_scriptId;
+                        StringId64 m_typeId;
+                        void* m_entryPtr;
+                    };   
+                
+                    struct Header 0x20 {
+                        uint32_t m_magic;
+                        uint32_t m_versionNumber;
+                        uint32_t m_textSize;
+                        uint32_t unk;
+                        uint32_t unk1;
+                        uint32_t m_numEntries;
+                        Entry* m_pStartOfData;
+                    };
+                }
+
                 struct ScriptValue {
                     uint64_t val[0x10];
                 };
+
+                // script-module-loader.cpp
+                // List<ModuleRequest>
+                struct ModuleRequest 0x40 {
+                
+                    struct ModuleRequestList 0x10 {
+                        ModuleRequest* m_head;
+                        ModuleRequest* m_tail;
+                    }
+                
+                    ModuleRequest* m_NextModuleRequest;
+                    ModuleRequest* m_PrevModuleRequest;
+                    StringId64 hash;
+                    uint64_t field_18;
+                    regenny.shared.corelib.memory.Context MemContext;
+                    uint32_t field_24;
+                    size_t size;
+                    uint64_t field_30;
+                    bool field_38; // DEBUG AssetView?
+                    bool field_39;
+                    bool field_3a;
+                    uint16_t field_3b;
+                    bool m_requested;
+                }
+
+                // ScriptManager::ModuleInfo::Constructor
+                struct ModuleInfo 0x60 { 
+                    uint64_t field_0;
+                    uint64_t field_8;
+                    char* m_name [[utf8*]];
+                    StringId64 hash;
+                    size_t m_size;
+                    uint64_t m_pCollection;
+                    uint32_t m_pNumModules;
+                    uint64_t m_pUnkCollection @ 0x38;
+                    uint32_t m_pUnkNumModules;
+                    ScriptModule* m_ScriptModule @ 0x48;
+                    uint64_t field_50;
+                    uint32_t field_58;
+                    bool field_5c;
+                    bool field_5d;
+                    bool field_5e;
+                    bool m_isLoaded;
+                }
+
+                struct relocatableModule 0x22 {
+                    void* vfTable;
+                    uint64_t m_pRecord;
+                    uint64_t field_10;
+                    uint64_t field_18;
+                    uint16_t field_20;
+                };
+                
+                struct ScriptModule 0x70 {
+                    struct Loader 0x4e0 {
+                        ModuleInfo* m_moduleinfo @ 0x440;
+                        uint64_t m_moduleName;
+                        corelib.memory.Context m_moduleMemContext;
+                        void* Data @ 0x480;
+                        uint64_t field_4c0 @ 0x4c0;
+                        uint64_t field_4c8;
+                        bool field_4d0;
+                        bool field_4d1;
+                        bool field_4d2;
+                        uint16_t field_4d3;
+                        bool field_4d5;
+                        bool field_4d6;
+                    };
+
+                    void* vfTable;
+                    uint64_t field_8;
+                    uint64_t field_10;
+                    uint64_t field_18;
+                    uint64_t field_20;
+                    StringId64 m_modulehash;
+                    StringId64 field_30;
+                    uint32_t m_numEntries;
+                    struct DC.Entry* m_Data @ 0x40;
+                    uint64_t field_48;
+                    struct DC.Header* m_header;
+                    uint64_t field_58;
+                    uint32_t field_60;
+                    uint32_t field_64;
+                    uint32_t field_68;
+                    uint32_t m_size;
+                };
+
+                // script-manager.cpp
+                struct ScriptManagerGlobals 0x7a0 {
+	                StringId64 m_hash @ 0x10;
+	                bool m_EnableScriptTrace @ 0x40;
+	                bool m_Autoreloadbinfiles @ 0x42;
+	                bool m_DisplayRequestedModules;
+	                bool m_DumploadlisttoTTY;
+	                bool m_Showoverflowedmodules;
+	                bool m_ShowScriptErrors;
+	                bool m_PrintmodulesCon;
+	                bool m_PrintmodulescountsCon;
+	                bool m_ShowDebugBinStatusCon;
+	                bool m_DumpStateScriptsonStackFrameHighWater @ 0x4c;
+	                bool m_EnableScriptModuleCRC32Checks;
+	                bool field4e;
+	                bool m_ValidateModuleSize;
+	                bool m_AssertonGlobalSymbolLookup;
+	                bool m_EnableScripts;
+	                bool field52;
+	                bool field53;
+	                bool m_DisableScriptDebugPrims;
+	                bool m_DisplayGlobalSymbols;
+	                bool field56;
+	                bool m_DisableDebugBinSuppressionforGameTasks;
+	                bool field58;
+	                ModuleRequest.ModuleRequestList* m_moduleRequestListActual @ 0x60;
+                    // m_field68 (flex size ALLOCATION_SCRIPT_SYMBOL_TBL)
+                    // count × sizeof(void*)
+	                void* field68;
+	                void* fieldb8 @ 0xb8;
+	                void* field110 @ 0x110;
+	                uint64_t m_pNativeMap @ 0x288;
+	                ScriptModule.Loader* SLoadM;
+	                void* field780 @0x780;
+                } // g_scriptGlobals 
             }
 
         }

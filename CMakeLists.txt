@@ -36,7 +36,7 @@ project(ND.ModClient
 		C
 		CXX
 	VERSION
-		1.1.0
+		1.1.1
 )
 
 add_compile_options(
@@ -272,7 +272,6 @@ set(T1XSDK_SOURCES
 	"shared/NdGameSdk/regenny/t1x/shared/ndlib/script/ScriptCFunc.hpp"
 	"shared/NdGameSdk/regenny/t1x/shared/ndlib/script/ScriptManagerGlobals.hpp"
 	"shared/NdGameSdk/regenny/t1x/shared/ndlib/script/ScriptModule.hpp"
-	"shared/NdGameSdk/regenny/t1x/shared/ndlib/script/ScriptModuleLoader.hpp"
 	"shared/NdGameSdk/regenny/t1x/shared/ndlib/script/ScriptValue.hpp"
 	"shared/NdGameSdk/regenny/t1x/shared/ndlib/script/relocatableModule.hpp"
 	"shared/NdGameSdk/regenny/t1x/shared/ndlib/util/BitReader.hpp"
@@ -506,7 +505,14 @@ set(T2RSDK_SOURCES
 	"shared/NdGameSdk/regenny/t2r/shared/ndlib/render/WindowContextType.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/ndlib/render/text/DebugStringBase.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/ndlib/render/util/PrimServer.hpp"
+	"shared/NdGameSdk/regenny/t2r/shared/ndlib/script/DC/Entry.hpp"
+	"shared/NdGameSdk/regenny/t2r/shared/ndlib/script/DC/Header.hpp"
+	"shared/NdGameSdk/regenny/t2r/shared/ndlib/script/ModuleInfo.hpp"
+	"shared/NdGameSdk/regenny/t2r/shared/ndlib/script/ModuleRequest.hpp"
+	"shared/NdGameSdk/regenny/t2r/shared/ndlib/script/ScriptManagerGlobals.hpp"
+	"shared/NdGameSdk/regenny/t2r/shared/ndlib/script/ScriptModule.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/ndlib/script/ScriptValue.hpp"
+	"shared/NdGameSdk/regenny/t2r/shared/ndlib/script/relocatableModule.hpp"
 	"shared/NdGameSdk/sdk.cpp"
 	"shared/NdGameSdk/sdk.hpp"
 	"shared/NdGameSdk/sdkconfig.hpp"

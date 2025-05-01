@@ -223,18 +223,24 @@ namespace NdGameSdk::ndlib::debug {
 	static_assert(sizeof(DMENU::MenuGroup) == sizeof(DMENU::Component) + 0x280, "Size of DMENU::MenuGroup is not correct.");
 	static_assert(sizeof(DMENU::Item) == sizeof(DMENU::Component) + 0x8, "Size of DMENU::Item is not correct.");
 
+#if defined(T2R)
+	static_assert(sizeof(DMENU::KeyBoard) == sizeof(DMENU::Component) + 0x838, "Size of DMENU::KeyBoard is not correct.");
+#elif defined(T1X)
+	static_assert(sizeof(DMENU::KeyBoard) == sizeof(DMENU::Component) + 0x830, "Size of DMENU::KeyBoard is not correct.");
+#endif
+
 	ASSERT_DMENU_ITEM_SIZE(ItemSubmenu, 0x10);
 	ASSERT_DMENU_ITEM_SIZE(ItemBool, 0x08);
 	ASSERT_DMENU_ITEM_SIZE(ItemFunction, 0x10);
 
-#if defined(T1X)
-	ASSERT_DMENU_ITEM_SIZE(ItemDecimal, 0xb8);
-	ASSERT_DMENU_ITEM_SIZE(ItemFloat, 0x98);
-	ASSERT_DMENU_ITEM_SIZE(ItemSelection, 0x30);
-#elif defined(T2R)
+#if defined(T2R)
 	ASSERT_DMENU_ITEM_SIZE(ItemDecimal, 0xc8);
 	ASSERT_DMENU_ITEM_SIZE(ItemFloat, 0xa8);
 	ASSERT_DMENU_ITEM_SIZE(ItemSelection, 0x38);
+#elif defined(T1X)
+	ASSERT_DMENU_ITEM_SIZE(ItemDecimal, 0xb8);
+	ASSERT_DMENU_ITEM_SIZE(ItemFloat, 0x98);
+	ASSERT_DMENU_ITEM_SIZE(ItemSelection, 0x30);
 #else
 #error "Unsupported Build for NdDevMenu."
 #endif

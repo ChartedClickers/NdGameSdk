@@ -49,8 +49,12 @@ tag = "09c21bda1dc1b578fa55f4a005d79b0afd481296"
 git = "https://github.com/cursey/safetyhook"
 tag = "629558c64009a7291ba6ed5cfb49187086a27a47"
 
+[fetch-content.nlohmann_json]
+git = "https://github.com/nlohmann/json"
+tag = "55f93686c01528224f448c19128836e7df245f72"
+
 [vcpkg]
-version = "2024.05.24"
+version = "2025.04.09"
 url = "https://github.com/microsoft/vcpkg/archive/a8954b904ad2a6939ecd8fc213e87702fa1243ea.tar.gz"
 packages = ["boost-thread", "boost-signals2", "boost-container"]
 
@@ -68,6 +72,7 @@ sources = [
 "shared/NdGameSdk/components/**.cpp",
 "shared/NdGameSdk/shared/**.cpp",
 "shared/NdGameSdk/shared/**.c",
+"shared/NdGameSdk/database/**.cpp",
 "shared/NdGameSdk/sidbase/**.cpp"
 ] 
 headers = [
@@ -76,6 +81,7 @@ headers = [
 "shared/NdGameSdk/components/**.hpp",
 "shared/NdGameSdk/shared/**.hpp",
 "shared/NdGameSdk/shared/**.h",
+"shared/NdGameSdk/database/**.hpp",
 "shared/NdGameSdk/sidbase/**.hpp"
 ]
 include-directories = ["shared/"]
@@ -84,6 +90,7 @@ alias = "NdGameSdk::SDK"
 link-libraries = [ 
     "spdlog::spdlog",
     "glm_static",
+    "nlohmann_json",
     "Utility",
     "Boost::thread",
 	"Boost::signals2",

@@ -106,6 +106,15 @@ FetchContent_Declare(safetyhook
 )
 FetchContent_MakeAvailable(safetyhook)
 
+message(STATUS "Fetching nlohmann_json (55f93686c01528224f448c19128836e7df245f72)...")
+FetchContent_Declare(nlohmann_json
+	GIT_REPOSITORY
+		"https://github.com/nlohmann/json"
+	GIT_TAG
+		55f93686c01528224f448c19128836e7df245f72
+)
+FetchContent_MakeAvailable(nlohmann_json)
+
 # Target: spdlog
 set(spdlog_SOURCES
 	cmake.toml
@@ -219,6 +228,8 @@ set(T1XSDK_SOURCES
 	"shared/NdGameSdk/components/event/SdkEvent.hpp"
 	"shared/NdGameSdk/config/DevModeCfg.hpp"
 	"shared/NdGameSdk/config/MemoryCfg.hpp"
+	"shared/NdGameSdk/database/database.cpp"
+	"shared/NdGameSdk/database/database.hpp"
 	"shared/NdGameSdk/ndgame/t1x/ndgame.cpp"
 	"shared/NdGameSdk/ndgame/t1x/ndgame.hpp"
 	"shared/NdGameSdk/ndgame/t1x/ndgamepatterns.hpp"
@@ -279,6 +290,8 @@ set(T1XSDK_SOURCES
 	"shared/NdGameSdk/sdk.hpp"
 	"shared/NdGameSdk/sdkconfig.hpp"
 	"shared/NdGameSdk/sdkconst.hpp"
+	"shared/NdGameSdk/sdkdatabase.cpp"
+	"shared/NdGameSdk/sdkdatabase.hpp"
 	"shared/NdGameSdk/sdkderived.hpp"
 	"shared/NdGameSdk/sdkexception.hpp"
 	"shared/NdGameSdk/sdklogger.cpp"
@@ -367,6 +380,7 @@ target_include_directories(T1XSDK PUBLIC
 target_link_libraries(T1XSDK PUBLIC
 	spdlog::spdlog
 	glm_static
+	nlohmann_json
 	Utility
 	Boost::thread
 	Boost::signals2
@@ -474,6 +488,8 @@ set(T2RSDK_SOURCES
 	"shared/NdGameSdk/components/event/SdkEvent.hpp"
 	"shared/NdGameSdk/config/DevModeCfg.hpp"
 	"shared/NdGameSdk/config/MemoryCfg.hpp"
+	"shared/NdGameSdk/database/database.cpp"
+	"shared/NdGameSdk/database/database.hpp"
 	"shared/NdGameSdk/ndgame/t2r/ndgame.cpp"
 	"shared/NdGameSdk/ndgame/t2r/ndgame.hpp"
 	"shared/NdGameSdk/ndgame/t2r/ndgamepatterns.hpp"
@@ -517,6 +533,8 @@ set(T2RSDK_SOURCES
 	"shared/NdGameSdk/sdk.hpp"
 	"shared/NdGameSdk/sdkconfig.hpp"
 	"shared/NdGameSdk/sdkconst.hpp"
+	"shared/NdGameSdk/sdkdatabase.cpp"
+	"shared/NdGameSdk/sdkdatabase.hpp"
 	"shared/NdGameSdk/sdkderived.hpp"
 	"shared/NdGameSdk/sdkexception.hpp"
 	"shared/NdGameSdk/sdklogger.cpp"
@@ -605,6 +623,7 @@ target_include_directories(T2RSDK PUBLIC
 target_link_libraries(T2RSDK PUBLIC
 	spdlog::spdlog
 	glm_static
+	nlohmann_json
 	Utility
 	Boost::thread
 	Boost::signals2

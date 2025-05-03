@@ -1,6 +1,7 @@
-#include "sdk.hpp"
+﻿#include "sdk.hpp"
 #include "sdkconfig.hpp"
 #include "components/SdkModule.hpp"
+#include "database/database.hpp"
 #include "sidbase/sidbase.hpp"
 
 #include "shared/shared.hpp"
@@ -34,6 +35,7 @@ namespace NdGameSdk {
         auto sdkcfg = cfg ? std::move(*cfg) : SdkConfig{};
 
         set_default_logger(sdklogger);
+        NdGameSdk::DB::Init(SDK_NAME);
 
         InitSharedComponents(sdkcfg);
         InitNdGameComponents(sdkcfg);

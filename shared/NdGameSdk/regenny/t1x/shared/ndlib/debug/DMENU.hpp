@@ -27,7 +27,8 @@ struct DMENU {
         char* m_pname; // 0x30
         regenny::shared::ndlib::debug::DMENU::Component* m_ParentComponent; // 0x38
         regenny::shared::ndlib::debug::DMENU::Component* m_NextDMenuComponent; // 0x40
-        private: char pad_48[0x8]; public:
+        uint32_t m_MenuLeftPad; // 0x48
+        uint32_t m_MenuWidth; // 0x4c
         uint64_t m_LeftPad; // 0x50
         uint64_t Unk2; // 0x58
         uint64_t m_data; // 0x60
@@ -156,6 +157,9 @@ struct DMENU {
 
     struct ItemSubText : public Item {
     }; // Size: 0xb8
+
+    struct String : public Component {
+    }; // Size: 0xb0
 
     struct ItemPlaceHolder : public Component {
         // Metadata: utf8*

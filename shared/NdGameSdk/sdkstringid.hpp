@@ -81,7 +81,9 @@ constexpr NdGameSdk_API StringId64 ToStringId64(const char* str)
 }
 
 #if defined(Big4R)
+typedef StringId32 StringId;
 #define SID(str) (ToStringId32(str))
 #else
+typedef StringId64 StringId;
 #define SID(str) ToStringId64(str)
 #endif

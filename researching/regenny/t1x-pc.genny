@@ -773,7 +773,9 @@ namespace regenny {
                     char* m_pname [[utf8*]];
                     Component* m_ParentComponent;
                     Component* m_NextDMenuComponent;
-                    uint64_t m_LeftPad @ 0x50
+                    uint32_t m_MenuLeftPad;
+                    uint32_t m_MenuWidth;
+                    uint64_t m_LeftPad;
                     uint64_t Unk2;
                     uint64_t m_data; // For arguments or link variable
                     uint32_t m_color;
@@ -889,6 +891,9 @@ namespace regenny {
 
                 // DMENU::ItemSubText*
                 struct ItemSubText : Item {} // 0x14041e6b0;
+
+                // DMENU::String*
+                struct String : Component {}
 
                 // DMENU::ItemPlaceHolder
                 struct ItemPlaceHolder : Component 0x400 {
@@ -1463,7 +1468,6 @@ namespace regenny {
                     uint32_t field_264;
                     uint64_t field_288 @ 0x288;
                     uint64_t field_290;
-                    uint64_t m_pNativeMap;
                     ScriptModule.Loader* s_SLoadM;
                     uint64_t field_2e80 @ 0x2e80;
                     uint64_t field_3338 @ 0x3338;
@@ -1493,7 +1497,6 @@ namespace regenny {
         namespace gamelib {
 
             // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\gamelib\state-script
-            namespace statescript {
 
                 struct StateScriptConsoleInfo {
                     uint32_t pos_x;

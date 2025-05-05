@@ -51,4 +51,15 @@ namespace NdGameSdk::DB
         g_DataBase->Clear();
         spdlog::info("[DB] Cache cleared");
     }
+
+    bool FlushJsonFile(const std::string& file, bool dirty) {
+        return g_DataBase ? static_cast<JsonDataBase*>(g_DataBase.get())->FlushFile(file, dirty) : false;
+    }
+
+    void ClearJsonFile(const std::string& file)
+    {
+        if (g_DataBase) {
+            static_cast<JsonDataBase*>(g_DataBase.get())->ClearFile(file);
+        }
+    }
 }

@@ -1,4 +1,6 @@
-#include <NdGameSdk/sdkdatabase.cpp>
+#pragma once
+
+#include <NdGameSdk/sdkdatabase.hpp>
 
 namespace NdGameSdk::DB {
 
@@ -25,4 +27,7 @@ namespace NdGameSdk::DB {
     [[nodiscard]] bool Has(const std::string& file, const std::string& key);
 
     void Clear();
+
+    bool FlushJsonFile(const std::string& file, bool dirty = false);
+    void ClearJsonFile(const std::string& file);
 }

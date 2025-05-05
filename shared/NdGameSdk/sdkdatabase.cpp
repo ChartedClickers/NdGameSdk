@@ -5,7 +5,7 @@ namespace fs = std::filesystem;
 
 namespace NdGameSdk {
 
-	inline std::unique_ptr<ISdkDataBase> CreateJsonDataBase(const std::string& folder) {
+	std::unique_ptr<ISdkDataBase> CreateJsonDataBase(const std::string& folder) {
 		auto db = std::make_unique<JsonDataBase>();
 		db->Init(folder);
 		return db;
@@ -24,19 +24,44 @@ namespace NdGameSdk {
         cache_.clear();
     }
 
-    inline auto JsonDataBase::loadFile(const std::string& file) -> Entry& {
+    bool JsonDataBase::FlushFile(const std::string& file, bool dirty) {
+        std::scoped_lock lock(mtx_);
         auto it = cache_.find(file);
+        if (it == cache_.end() || (!it->second.dirty || dirty))
+            return true;
 
-        if (it != cache_.end()) 
+        std::ofstream os(root_ / file);
+        if (!os) { 
+            spdlog::error("[JsonDB] Cannot write {}", file); return false; 
+        }
+
+        os << it->second.data.dump(2);
+        it->second.dirty = false;
+        return true;
+    }
+
+    void JsonDataBase::ClearFile(const std::string& file) {
+        std::scoped_lock lock(mtx_);
+        cache_.erase(file);
+    }
+
+    inline auto JsonDataBase::loadFile(const std::string& file) -> Entry& {
+        if (auto it = cache_.find(file); it != cache_.end()) {
             return it->second;
+        }
 
         Entry ent{};
         std::ifstream is(root_ / file);
         if (is) {
             try { is >> ent.data; }
             catch (const std::exception& e) {
-                spdlog::warn("[JsonDB] Failed to parse {}: {}", file, e.what());
+                spdlog::warn("[JsonDB] parse error in {}: {}", file, e.what());
+                ent.data.clear();
             }
+        }
+
+        if (!ent.data.is_object()) {
+            ent.data = nlohmann::json::object();
         }
 
         auto [pos, _] = cache_.emplace(file, std::move(ent));

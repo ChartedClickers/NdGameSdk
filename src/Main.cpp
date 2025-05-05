@@ -45,6 +45,7 @@ BOOL Initialize(HMODULE dllModule) {
     if (cfg.IsLoaded()) {
         pSdkCfg.NdDevMenu.GameDebugMenu = cfg.get<bool>(PROJECT_SDK, "bGameDebugMenu", g_bGameDebugMenu).value();
         pSdkCfg.Memory.DebugMemory = cfg.get<bool>(PROJECT_SDK, "bDebugMemory", g_bDebugMemory).value();
+		pSdkCfg.Sidbase = cfg.get<bool>(PROJECT_SDK, "bSidbase", g_bSidBase).value();
     }
 
     NdGameSdk::InitializeSdk(&pSdkCfg);

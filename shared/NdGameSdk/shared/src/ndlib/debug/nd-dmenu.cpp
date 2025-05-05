@@ -1,13 +1,15 @@
-#include "nd-dmenu.hpp"
+﻿#include "nd-dmenu.hpp"
 #include <NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp>
 
 namespace NdGameSdk::ndlib::debug {
 
 	regenny::shared::ndlib::debug::DMENU::Component::VTable* DMENU::Component::VTable{};
 	regenny::shared::ndlib::debug::DMENU::ItemLine::VTable* DMENU::ItemLine::VTable{};
+	regenny::shared::ndlib::debug::DMENU::String::VTable* DMENU::String::VTable{};
 	regenny::shared::ndlib::debug::DMENU::Menu::VTable* DMENU::Menu::VTable{};
 	regenny::shared::ndlib::debug::DMENU::MenuGroup::VTable* DMENU::MenuGroup::VTable{};
 	regenny::shared::ndlib::debug::DMENU::KeyBoard::VTable* DMENU::KeyBoard::VTable{};
+	regenny::shared::ndlib::debug::DMENU::ItemPlaceHolder::VTable* DMENU::ItemPlaceHolder::VTable{};
 
 	regenny::shared::ndlib::debug::DMENU::ItemSubText::VTable0* DMENU::ItemSubText::VTable{};
 	regenny::shared::ndlib::debug::DMENU::ItemSubmenu::VTable0* DMENU::ItemSubmenu::VTable{};
@@ -34,8 +36,17 @@ namespace NdGameSdk::ndlib::debug {
 		return name != nullptr ? name : "Component";
 	}
 
-	void DMENU::Component::SetName(const char* new_name) {
-		strcpy(this->Get()->m_pname, new_name);
+	void DMENU::Component::ChangeName(const char* newName) {
+		if (!newName) return;
+
+		char* buf = this->Get()->m_pname;
+		if (buf) {
+			std::size_t cap = std::strlen(buf);
+			std::size_t n = std::strlen(newName);
+			if (n > cap) n = cap;
+			std::memcpy(buf, newName, n);
+			buf[n] = '\0';
+		}
 	}
 
 	std::string DMENU::Component::Description() {
@@ -43,8 +54,18 @@ namespace NdGameSdk::ndlib::debug {
 		return Description != nullptr ? Description : std::string();
 	}
 
-	void DMENU::Component::SetDescription(const char* new_description) {
-		strcpy(this->Get()->m_pDescription, new_description);
+	void DMENU::Component::ChangeDescription(const char* newdescription) {
+
+		if (!newdescription) return;
+
+		char* buf = this->Get()->m_pDescription;
+		if (buf) {
+			std::size_t cap = std::strlen(buf);
+			std::size_t n = std::strlen(newdescription);
+			if (n > cap) n = cap;
+			std::memcpy(buf, newdescription, n);
+			buf[n] = '\0';
+		}
 	}
 
 	Color DMENU::Component::GetColor() {
@@ -67,8 +88,8 @@ namespace NdGameSdk::ndlib::debug {
 		return this->Get()->m_data;
 	}
 
-	DMENU::Menu* DMENU::Component::ParentComponent() {
-		return reinterpret_cast<DMENU::Menu*>(this->Get()->m_ParentComponent);
+	DMENU::Component* DMENU::Component::ParentComponent() {
+		return reinterpret_cast<DMENU::Component*>(this->Get()->m_ParentComponent);
 	}
 
 	DMENU::MenuGroup* DMENU::Component::MenuGroup() {
@@ -77,6 +98,22 @@ namespace NdGameSdk::ndlib::debug {
 
 	DMENU::Menu* DMENU::MenuGroup::RootMenu() {
 		return reinterpret_cast<DMENU::Menu*>(this->Get()->m_RootMenu);
+	}
+
+	bool DMENU::Menu::IsActive() {
+		return this->Get()->m_isActive;
+	}
+
+	int DMENU::Menu::GetMenuItemsCount() {
+		return this->Get()->m_MaxPagePointers;
+	}
+
+	bool DMENU::Menu::DeleteItem(DMENU::Component* pItem) {
+		return DMENU::s_NdDevMenu->Menu_DeleteItem(this, pItem);
+	}
+
+	DMENU::Menu* DMENU::Menu::DeleteAllItems(bool freeArena) {
+		return DMENU::s_NdDevMenu->Menu_DeleteAllItems(this, freeArena);
 	}
 
 	DMENU::Component* DMENU::Menu::PushBackItem(DMENU::Component* pComponent) {
@@ -121,11 +158,27 @@ namespace NdGameSdk::ndlib::debug {
 		return this->Get()->m_displayBuffer;
 	}
 
+	const char* DMENU::ItemPlaceHolder::GetContent() {
+		return this->Get()->m_placeholder;
+	}
+
+	void DMENU::ItemPlaceHolder::SetContent(const char* content) {
+		if (!content) return;
+		char* buf = this->Get()->m_placeholder;
+		if (buf) {
+			std::size_t cap = std::strlen(buf);
+			std::size_t n = std::strlen(content);
+			if (n > cap) n = cap;
+			std::memcpy(buf, content, n);
+			buf[n] = '\0';
+		}
+	}
+
 	void* DMENU::Item::CallBackFunct() {
 		return this->Get()->m_callbackFunct;
 	}
 
-	DMENU::Menu* DMENU::ItemSubmenu::ParentComponent() {
+	DMENU::Menu* DMENU::ItemSubmenu::MenuEntry() {
 		return reinterpret_cast<DMENU::Menu*>(this->Get()->m_pHeader);
 	}
 

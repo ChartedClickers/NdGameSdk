@@ -32,8 +32,10 @@ namespace NdGameSdk::gamelib::debug {
 
 		#define AppendSdkSubMenus_Args DMENU::Menu* CustomMenu, const char* Description, DMENU::ItemSubmenu::SubmenuCallback SubmenuCallback, uint64_t Data
 		using AppendSdkSubMenusCallback = boost::function<void(AppendSdkSubMenus_Args)>;
+		template <typename... Args>
+		using WrapMenuComponent = boost::function<bool(DMENU::Menu*, Args...)>;
 
-		enum DmenuComponentType { Unknown, MenuGroup, Menu, KeyBoard, ItemLine, ItemSubmenu,
+		enum DmenuComponentType { Unknown, MenuGroup, Menu, String, KeyBoard, ItemPlaceHolder, ItemLine, ItemSubmenu,
 			ItemBool, ItemDecimal, ItemFloat, ItemFunction, ItemSelection, ItemSubText
 		};
 
@@ -46,7 +48,9 @@ namespace NdGameSdk::gamelib::debug {
 		NdGameSdk_API bool IsGameDebugMenu();
 
 		NdGameSdk_API DMENU::Menu* Create_DMENU_Menu(std::string pName, HeapArena_Args);
+		NdGameSdk_API DMENU::String* Create_DMENU_String(std::string string, DMENU::Menu* pMenu, const char* pDescription, HeapArena_Args);
 		NdGameSdk_API DMENU::KeyBoard* Create_DMENU_KeyBoard(std::string pName, DMENU::Menu* pMenu, const char* inputBufferPtr, uint64_t maxInputLength, const char* pDescription, HeapArena_Args);
+		NdGameSdk_API DMENU::ItemPlaceHolder* Create_DMENU_ItemPlaceHolder(std::string pName, DMENU::Menu* pMenu, const char* pPlaceHolder, HeapArena_Args);
 		NdGameSdk_API DMENU::ItemLine* Create_DMENU_ItemLine(DMENU::Menu* pMenu, HeapArena_Args);
 		NdGameSdk_API DMENU::ItemSubText* Create_DMENU_ItemSubText(std::string pName, DMENU::Menu* pMenu, HeapArena_Args);
 		NdGameSdk_API DMENU::ItemSubmenu* Create_DMENU_ItemSubmenu(std::string pName, DMENU::Menu* pRootMenu, DMENU::Menu* pSubmenu, DMENU::ItemSubmenu::SubmenuCallback pCallbackFunct, uint64_t pData, const char* pDescription, HeapArena_Args);
@@ -56,6 +60,48 @@ namespace NdGameSdk::gamelib::debug {
 		NdGameSdk_API DMENU::ItemFunction* Create_DMENU_ItemFunction(std::string pName, DMENU::Menu* pMenu, DMENU::ItemFunction::FunctionCallback pFunction, uint64_t args, bool pisActive, HeapArena_Args);
 		NdGameSdk_API DMENU::ItemSelection* Create_DMENU_ItemSelection(std::string pName, DMENU::Menu* pMenu, DMENU::ItemSelection::Item_selection* pItemSelection, uint64_t* pData, const char* pDescription, HeapArena_Args);
 		NdGameSdk_API std::pair<DMENU::ItemLine*, DMENU::ItemSubText*> Create_DMENU_TextLineWrapper(std::string pName, DMENU::Menu* pMenu, HeapArena_Args);
+
+		NdGameSdk_API bool Menu_DeleteItem(DMENU::Menu* pMenu, DMENU::Component* pItem);
+		NdGameSdk_API DMENU::Menu* Menu_DeleteAllItems(DMENU::Menu* pMenu, bool freeArena);
+
+		template <typename... Args>
+		NdGameSdk_API bool RebuildMenuFromItem(DMENU::Menu* pMenu, DMENU::Item* pFirstToErase, const std::vector<WrapMenuComponent<Args...>>& wraps, HeapArena_Args, Args&&... args) {
+			m_Memory->PushAllocator(MemoryContextType::kAllocDevMenuLowMem, source_func, source_line, source_file);
+
+			for (auto* item = pFirstToErase; item != nullptr;) {
+				auto* next = item->NextDMenuComponent<DMENU::Item>();
+				Menu_DeleteItem(pMenu, item);
+				item = next;
+			}
+
+			for (const auto& wrap : wraps) {
+				if (!wrap(pMenu, std::forward<Args>(args)...)) {
+					spdlog::warn("A wrap function at address {} failed while rebuilding the menu.",
+						static_cast<const void*>(&wrap));
+				}
+			}
+
+			m_Memory->PopAllocator();
+			spdlog::debug("RebuildMenuFromComponent(RootMenu: 'DMENU::Component::Menu('{:s}')')", pMenu->Name());
+			return true;
+		}
+
+		template <typename... Args>
+		NdGameSdk_API bool RebuildMenu(DMENU::Menu* pMenu, bool freeArena, const std::vector<WrapMenuComponent<Args...>>& wraps, HeapArena_Args, Args&&... args) {
+			m_Memory->PushAllocator(MemoryContextType::kAllocDevMenuLowMem, source_func, source_line, source_file);
+
+			Menu_DeleteAllItems(pMenu, freeArena);
+			for (const auto& wrap : wraps) {
+				if (!wrap(pMenu, std::forward<Args>(args)...)) {
+					spdlog::warn("A wrap function at address {} failed while rebuilding the menu.",
+						static_cast<const void*>(&wrap));
+				}
+			}
+
+			m_Memory->PopAllocator();
+			spdlog::debug("RebuildMenu(RootMenu: 'DMENU::Component::Menu('{:s}')')", pMenu->Name());
+			return true;
+		}
 
 		NdGameSdk_API DmenuComponentType GetComponentType(DMENU::Component* component);
 
@@ -100,11 +146,14 @@ namespace NdGameSdk::gamelib::debug {
 
 		MEMBER_FUNCTION_PTR(DMENU::Menu*, DMENU_Menu, DMENU::Menu* Heap, const char* name);
 		MEMBER_FUNCTION_PTR(DMENU::ItemLine*, DMENU_ItemLine, DMENU::ItemLine* Heap);
+		MEMBER_FUNCTION_PTR(DMENU::String*, DMENU_String, DMENU::String* Heap, const char* name, uint64_t* data, const char* pDescription);
 #if defined(T2R)
 		MEMBER_FUNCTION_PTR(DMENU::KeyBoard*, DMENU_KeyBoard, DMENU::KeyBoard* Heap, uint64_t ExtraArg, const char* name, uint64_t* pdata, int32_t pPagePointer, const char* pDescription);
 #else
 		MEMBER_FUNCTION_PTR(DMENU::KeyBoard*, DMENU_KeyBoard, DMENU::KeyBoard* Heap, const char* name, uint64_t* pInputBuffer, uint64_t MaxInputLength, const char* pDescription);
 #endif
+		MEMBER_FUNCTION_PTR(DMENU::ItemPlaceHolder*, DMENU_ItemPlaceHolder, DMENU::ItemPlaceHolder* Heap, const char* name, const char* pPlaceHolder);
+
 		MEMBER_FUNCTION_PTR(DMENU::ItemSubText*, DMENU_ItemSubText, DMENU::ItemSubText* Heap, const char* name);
 		MEMBER_FUNCTION_PTR(DMENU::ItemSubmenu*, DMENU_ItemSubmenu, DMENU::ItemSubmenu* Heap, const char* name, DMENU::Menu* pHeader, void* callbackFunct, uint64_t data, const char* pDescription);
 		MEMBER_FUNCTION_PTR(DMENU::ItemBool*, DMENU_ItemBool, DMENU::ItemBool* Heap, const char* name, bool* data, const char* pDescription);
@@ -120,6 +169,8 @@ namespace NdGameSdk::gamelib::debug {
 		MEMBER_FUNCTION_PTR(DMENU::ItemFunction*, DMENU_ItemFunction, DMENU::ItemFunction* Heap, const char* name, void* callbackFunct, uint64_t data, bool isActive);
 
 		MEMBER_FUNCTION_PTR(void*, DMENU_Menu_AppendComponent, DMENU::Menu* RootMenu, DMENU::Component* Component);
+		MEMBER_FUNCTION_PTR(int64_t, DMENU_Menu_DeleteItem, DMENU::Menu* Menu, DMENU::Component* pItem);
+		MEMBER_FUNCTION_PTR(DMENU::Menu*, DMENU_Menu_DeleteAllItems, DMENU::Menu* Menu, bool freeArena);
 		MEMBER_FUNCTION_PTR(bool*, DMENU_Menu_DecimalCallBack, DMENU::Menu* Menu, DMENU::Message message, int32_t format);
 		MEMBER_FUNCTION_PTR(void*, DMENU_Menu_UpdateKeyboard, DMENU* DMENU);
 

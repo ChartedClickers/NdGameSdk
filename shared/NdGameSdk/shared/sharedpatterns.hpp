@@ -43,6 +43,9 @@ namespace NdGameSdk::Patterns
 	static inline const SdkPattern NdDevMenu_DMENU_MenuGroup_SetRootMenu = { L"48 85 d2 0f 84 96 00 00 00 48 89 5c 24 08 57 48 83 ec 20 48 8b da 48 8b f9 48 8b 81 b0 00 00 00 48 3b d0 74 70 48 85 c0 74 43" };
 	static inline const SdkPattern NdDevMenu_DMENU_Menu_AppendComponent = { L"40 56 57 41 56 48 83 ec 20 80 3d ?? ?? ?? ?? 00 48 8b f2 4c 8b f1 0f 84 ?? ?? ?? ?? 48 8b ca e8 ?? ?? ?? ?? 84 c0 0f 85 ?? ?? ?? ?? 48 8b 06 48 8b ce 48 89 5c 24 40 4c 89 64 24 50 4c 89 7c 24 58 ff 50 68 33 c9 48 85 c0 74 10" };
 	static inline const SdkPattern NdDevMenu_DMENU_Menu_UpdateKeyboard = { L"48 89 5C 24 10 48 89 6C 24 18 48 89 74 24 20 57 41 54 41 55 41 56 41 57 48 81 EC A0 00 00 00 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 90 00 00 00 4C 8B F1 33 D2 41 BC 01 00 00 00 41 8B CC E8 ?? ?? ?? ?? 4C 8B E8 48 8D 88 10 0A 01 00" };
+	static inline const SdkPattern NdDevMenu_DMENU_Menu_DeleteItem = { L"48 89 5c 24 ?? 57 48 83 ec 20 48 8b fa 48 8b d9 33 d2 48 8b 81 b0 00 00 00 8b ca 48 85 c0 74 ?? 48 3b c7 74 ?? 48 8b d0 48 8b 40 40" };
+	static inline const SdkPattern NdDevMenu_DMENU_Menu_DeleteAllItems = { L"48 89 5c 24 08 48 89 74 24 18 57 48 83 ec 20 8b f2 48 8b d9 48 8d 05 ?? ?? ?? ?? 48 89 01 c7 44 24 38 11 00 00 00 4c 8d 0d ?? ?? ?? ?? 41 b8 8f 16 00 00 48 8d 15 ?? ?? ?? ?? 48 8d 4c 24 38 e8 ?? ?? ?? ?? 48 8b bb" };
+	static inline const SdkPattern NdDevMenu_DMENU_Menu_DeferDeleteAllItems = { L"48 89 5c 24 ?? 48 89 74 24 18 57 48 83 ec 30 0f b6 f2 48 8b d9 c7 44 24 40 11 00 00 00 4c 8d 0d ?? ?? ?? ?? 41 b8 6c 16 00 00 48 8d 15 ?? ?? ?? ?? 48 8d 4c 24 40 e8 ?? ?? ?? ?? 90" };
 
 	/*DebugDraw*/
 	static inline const SdkPattern GameFramePreRenderUpdate = { L"48 89 5c 24 08 48 89 74 24 10 48 89 7c 24 18 4c 89 74 24 20 55 48 81 ec 20 06 00 00 48 8d ac 24 90 00 00 00 48 83 e5 c0 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 85 80 05 00 00 c5 f9 ef c0 c5 fc 11 85 80 02 00 00 c5 fc 11 85 a0 02 00 00 c5 fc 11 85 c0 02 00 00 c5 fc 11 85 e0 02 00 00 45 33 c0 48 8d 15 ?? ?? ?? ?? 48 8d 8d 80 02 00 00" };
@@ -82,7 +85,6 @@ namespace NdGameSdk::Patterns
 	static inline const SdkPattern Memory_Area_clargnodebugmem = { L"b3 01 45 85 ff 74 ?? 48 8b 0f", +0x1 };
 	static inline const SdkPattern Memory_g_MemoryMap = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 30 48 ?? ?? ?? ?? ?? 04 00 48 8b", +0xf };
 
-	static inline const SdkPattern ScriptManager_ScriptGlobals = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 20 48 8b d9 48 63 fa 48 ?? ?? ?? ?? ?? ?? 45 33 c9 4c 89 49", +0x15 };
 	static inline const SdkPattern ScriptManager_AddModuleRequest = { L"48 8b c4 48 89 58 08 48 89 70 10 48 89 78 18 4c 89 60 20 55 41 56 41 57 48 8d a8 28 fc ff ff 48 81 ec c0 04 00 00 48 ?? ?? ?? ?? ?? ?? 48 33 c4 48 89 85 b0 03 00 00 48" };
 	static inline const SdkPattern ScriptManager_ReloadModule = { L"48 8b c4 48 89 58 08 48 89 70 10 48 89 78 18 55 41 54 41 55 41 56 41 57 48 8d a8 f8 f9 ff ff 48 81 ec e0 06 00 00 c5 f8 29 70 c8 48 ?? ?? ?? ?? ?? ?? 48 33 c4 48 89 85 c0 05 00" };
 	static inline const SdkPattern ScriptManager_IsLoadModule = { L"48 8b c4 48 89 58 08 48 89 70 10 48 89 78 18 55 48 8d 68 a1 48 81 ec c0 00 00 00 48 ?? ?? ?? ?? ?? ?? 48 33 c4 48 89 45 47 c5 f9 ef" };
@@ -102,7 +104,8 @@ namespace NdGameSdk::Patterns
 	static inline const SdkPattern NdDevMenu_DMENU_Menu_AppendComponent = { L"40 53 48 83 ec ?? 48 8b 81 b0 00 00 00 48 8b da 48 85 c0 74 22 66 66 66 0f 1f 84 00 00 00 00 00 48 8b d0 48 8b 40 40 48 85 c0 75 f4 48 85 d2 74 06 48 89 5a 40 eb 07 48 89 99 b0 00 00 00 48 8b d3 48 c7 43 40 00 00 00 00 48 89 4b 38 e8 ?? ?? ?? ?? 48 8b c3 48 83 c4 20 5b c3" };
 	static inline const SdkPattern NdDevMenu_DMENU_Menu_UpdateKeyboard = { L"40 55 56 41 54 41 55 48 81 ec b8 00 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 a0 00 00 00 48 8b f1 41 bc 01 00 00 00 41 8b cc 33 d2 e8 ?? ?? ?? ?? 48 8b e8 48 89 44 24 30 4c 8d a8 90 02 01 00 49 8b cd e8 ?? ?? ?? ?? 84 c0 0f 84 3e 06 00 00" };
 	static inline const SdkPattern NdDevMenu_DMENU_Menu_DeleteItem = { L"48 89 5c 24 10 57 48 83 ec 20 48 8b 81 b0 00 00 00 48 8b fa 33 d2 48 8b d9 8b ca 48 85" };
-	static inline const SdkPattern NdDevMenu_DMENU_Menu_DeleteAllItems = { L"48 89 5c 24 ?? 48 89 74 24 ?? 57 48 83 ec ?? 0f b6 f2 c7 44 24 ?? 10 00 00 00" };
+	static inline const SdkPattern NdDevMenu_DMENU_Menu_DeleteAllItems = { L"48 89 5c 24 08 48 89 74 24 18 57 48 83 ec 20 48 8d 05 ?? ?? ?? ?? c7 44 24 38 10 00 00 00 48 89 01 4c 8d 0d ?? ?? ?? ?? 8b f2 48 8b d9 48 8d 4c 24 38 41 b8 83 13 00 00 48 8d 15 ?? ?? ?? ?? e8 ?? ?? ?? ?? 48 8b bb ?? ?? 00 00 48 85 ff 74 68 80 bb bc 00 00 00 00 74 0e 48 8b 07 ba 01 00 00 00 48 8b cf ff 50 10 48" };
+	static inline const SdkPattern NdDevMenu_DMENU_Menu_DeferDeleteAllItems = { L"48 89 5c 24 ?? 48 89 74 24 ?? 57 48 83 ec 20 0f b6 f2 c7 44 24 30 10 00 00 00 48 8b d9 48 8d 15 ?? ?? ?? ?? 48 8d 4c 24 30 41 b8 60 13 00 00 4c 8d 0d ?? ?? ?? ?? e8 ?? ?? ?? ?? 48 8b bb ?? ?? 00 00 48 85 ff 74 6f 40 84 f6 74 17 80 bb bc" };
 	static inline const SdkPattern NdDevMenu_Assert_UpdateSelectRegionByNameMenu = { L"cc 48 85 db 74 ?? 33 c9 ff d3 48 8d 05 ?? ?? ?? ?? c7 44 24 ?? 10 00 00 00 41 b9 8e 00 00 00" };
 	static inline const SdkPattern NdDevMenu_Assert_UpdateSelectIgcByNameMenu = { L"cc 48 85 db 74 ?? 33 c9 ff d3 48 8d 05 ?? ?? ?? ?? bb 10 00 00 00 41 b9 84 03 00 00" };
 	static inline const SdkPattern NdDevMenu_Assert_UpdateSelectSpawnerByNameMenu = { L"cc 48 85 db 74 ?? 33 c9 ff d3 48 8d 05 ?? ?? ?? ?? c7 44 24 ?? 10 00 00 00 41 b9 a3 00 00 00" };
@@ -140,6 +143,8 @@ namespace NdGameSdk::Patterns
 
 	static inline const SdkPattern Memory_s_MemoryMap = { L"01 00 00 00 02 00 00 00 00 00 ?? 00 00 00 00 00 00 00 10 00" };
 
+	static inline const SdkPattern NdDevMenu_DMENU_String = { L"48 89 5c 24 ?? 48 89 74 24 ?? 57 48 83 ec 20 49 8b f1 49 8b d8 48 8b f9 e8 ?? ?? ?? ?? 48 8d 05 ?? ?? ?? ?? 48 89 5f 60 48 8b 5c 24 ?? 48 89 07" };
+	static inline const SdkPattern NdDevMenu_DMENU_ItemPlaceHolder = { L"48 89 5c 24 08 57 48 83 ec 20 49 8b d8 48 8b f9 e8 ?? ?? ?? ?? 33 c0 48 8b cf 48 89 87 a0 00 00 00 48 2b cb 89 87 a8 00 00 00 48 89 47 60 48 89 87 80 00 00 00 48 8d 05 ?? ?? ?? ?? 48 89 07 90 0f b6 03 88 84 19 b0 00 00 00 48 8d 5b 01 84 c0 75 ee 48 8b 5c 24 30 48 8b c7 48 83 c4 20 5f c3", +0x170 };
 	static inline const SdkPattern NdDevMenu_DMENU_ItemLine = { L"33 c0 c7 41 68 c8 c8 c8 ff 48 89 41 30 89 41 4e 48 89 41 38 48 89 41 40 89 41 48" };
 	static inline const SdkPattern NdDevMenu_DMENU_ItemSubText = { L"48 89 5c 24 08 57 48 83 ec 20 48 8b da 48 8b f9 e8 ?? ?? ?? ?? 33 c0 48 89 9f b0 00 00 00 48 8b 5c 24 30 48 89 87 a0 00 00 00 48 89 47 60 48 89 87 80 00 00 00" };
 	static inline const SdkPattern NdDevMenu_DMENU_ItemSubmenu = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 20 49 8b d9 49 8b f0 48 8b f9 e8 ?? ?? ?? ?? 48 8b 44 24 50 33 c9 48 89 47 60 48 8b 44 24 58" };

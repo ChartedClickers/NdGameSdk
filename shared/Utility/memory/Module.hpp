@@ -24,6 +24,9 @@ namespace Utility::memory
     optional<wstring> get_version_product_name(HMODULE module = nullptr);
 
     optional<string> get_module_name(HMODULE module);
+    
+    optional<std::string> get_module_hash(HMODULE module);
+    optional<string> get_module_hash_from_memory(HMODULE module);
 
     HMODULE get_executable();
     HMODULE get_this_dll_handle();

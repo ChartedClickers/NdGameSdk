@@ -8,6 +8,7 @@
 bool g_bShowDebugConsole{};
 bool g_bGameDebugMenu{true}; 
 bool g_bDebugMemory{};
+bool g_bSidBase{};
 
 namespace Utils {
 
@@ -58,10 +59,12 @@ namespace Utils {
 		g_bShowDebugConsole = true;
 		g_bGameDebugMenu = true;
 		g_bDebugMemory = true;
+		g_bSidBase = true;
 #endif
 		Ini.SetBoolValue(PROJECT_NAME, "bShowDebugConsole", g_bShowDebugConsole);
 		Ini.SetBoolValue(PROJECT_SDK, "bGameDebugMenu", g_bGameDebugMenu);
 		Ini.SetBoolValue(PROJECT_SDK, "bDebugMemory", g_bDebugMemory);
+		Ini.SetBoolValue(PROJECT_SDK, "bSidBase", g_bSidBase);
 	}
 
 	void Config::LogConfigParse()

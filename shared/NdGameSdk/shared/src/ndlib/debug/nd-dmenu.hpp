@@ -32,15 +32,16 @@ namespace NdGameSdk::ndlib::debug {
 
 		class Menu;
 		class MenuGroup;
+		class Item;
 
 		using Message = regenny::shared::ndlib::debug::DMENU::Message;
 
 		class Component : public ISdkRegenny<regenny::shared::ndlib::debug::DMENU::Component> {
 		public:
 			std::string Name();
-			void SetName(const char* new_name);
+			void ChangeName(const char* newName);
 			std::string Description();
-			void SetDescription(const char* new_description);
+			void ChangeDescription(const char* newdescription);
 
 			Color GetColor();
 			Color GetSelectedColor();
@@ -49,12 +50,41 @@ namespace NdGameSdk::ndlib::debug {
 
 			uint64_t Data();
 
-			Menu* ParentComponent();
+			DMENU::Component* ParentComponent();
 			MenuGroup* MenuGroup();
 
-			template <typename ComponentType = Component>
-			ComponentType* NextDMenuComponent() {
+			template<typename ComponentType = Component>
+			ComponentType* NextDMenuComponent() const {
 				return reinterpret_cast<ComponentType*>(this->Get()->m_NextDMenuComponent);
+			}
+
+			struct ComponentRange {
+				struct iterator {
+					Component* cur;
+					iterator(Component* c) : cur(c) {}
+					bool operator!=(iterator const& o) const { return cur != o.cur; }
+					Component* operator*() const { return cur; }
+					iterator& operator++() {
+						cur = cur->NextDMenuComponent<Component>();
+						return *this;
+					}
+				};
+				Component* head;
+				iterator begin() const { return { head }; }
+				iterator end()   const { return { nullptr }; }
+			};
+
+			ComponentRange GetNextComponentsRange() const {
+				return { this->template NextDMenuComponent<>() };
+			}
+
+			template<class ComponentType = Component>
+			ComponentType* GetNextComponent(std::size_t index = 0) {
+				auto* cur = this->template NextDMenuComponent<>();
+				for (std::size_t i = 0; cur && i < index; ++i) {
+					cur = cur->template NextDMenuComponent<>();
+				}
+				return static_cast<ComponentType*>(cur);
 			}
 
 		protected:
@@ -78,6 +108,34 @@ namespace NdGameSdk::ndlib::debug {
 
 		class Menu : public ISdkRegenny<regenny::shared::ndlib::debug::DMENU::Menu, Component> {
 		public:
+			template<typename Component = Component>
+			Component* ItemBegin() const {
+				return reinterpret_cast<Component*>(this->Get()->m_Item);
+			}
+
+			ComponentRange Items() const {
+				return { ItemBegin() };
+			}
+
+			template<class ComponentType = Component>
+			ComponentType* GetComponent(std::size_t index = 0) {
+				static_assert(std::is_base_of_v<Component, ComponentType>, "ComponentType must derive from Component");
+
+				const auto max = static_cast<std::size_t>(this->Get()->m_MaxPagePointers);
+				if (index >= max) return nullptr;
+
+				auto* p = ItemBegin();
+				for (std::size_t i = 0; i < index && p; ++i) {
+					p = p->NextDMenuComponent();
+				}
+
+				return static_cast<ComponentType*>(p);
+			}
+
+			bool IsActive();
+			int GetMenuItemsCount();
+			bool DeleteItem(DMENU::Component* pItem);
+			DMENU::Menu* DeleteAllItems(bool freeArena);
 			DMENU::Component* PushBackItem(DMENU::Component* pComponent);
 		private:
 			static regenny::shared::ndlib::debug::DMENU::Menu::VTable* VTable;
@@ -106,6 +164,21 @@ namespace NdGameSdk::ndlib::debug {
 			friend class gamelib::debug::NdDevMenu;
 		};
 
+		class ItemPlaceHolder : public ISdkRegenny<regenny::shared::ndlib::debug::DMENU::ItemPlaceHolder, Component> {
+		public:
+			const char* GetContent();
+			void SetContent(const char* content);
+		private:
+			static regenny::shared::ndlib::debug::DMENU::ItemPlaceHolder::VTable* VTable;
+			friend class gamelib::debug::NdDevMenu;
+		};
+
+		class String : public Component {
+		private:
+			static regenny::shared::ndlib::debug::DMENU::String::VTable* VTable;
+			friend class gamelib::debug::NdDevMenu;
+		};
+
 
 		class Item : public ISdkRegenny<regenny::shared::ndlib::debug::DMENU::Item, Component> {
 		public:
@@ -123,7 +196,7 @@ namespace NdGameSdk::ndlib::debug {
 			using SubmenuCallbackPtr = bool(*)(DMENU::ItemSubmenu&, DMENU::Message);
 			using SubmenuCallback = boost::function<std::remove_pointer<SubmenuCallbackPtr>::type>;
 
-			Menu* ParentComponent();
+			Menu* MenuEntry();
 		private:
 			static regenny::shared::ndlib::debug::DMENU::ItemSubmenu::VTable0* VTable;
 			friend class gamelib::debug::NdDevMenu;	
@@ -221,6 +294,7 @@ namespace NdGameSdk::ndlib::debug {
 
 	static_assert(sizeof(DMENU::Menu) == sizeof(DMENU::Component) + 0x30, "Size of DMENU::Menu is not correct.");
 	static_assert(sizeof(DMENU::MenuGroup) == sizeof(DMENU::Component) + 0x280, "Size of DMENU::MenuGroup is not correct.");
+	static_assert(sizeof(DMENU::String) == sizeof(DMENU::Component), "Size of DMENU::String is not correct.");
 	static_assert(sizeof(DMENU::Item) == sizeof(DMENU::Component) + 0x8, "Size of DMENU::Item is not correct.");
 
 #if defined(T2R)
@@ -228,6 +302,7 @@ namespace NdGameSdk::ndlib::debug {
 #elif defined(T1X)
 	static_assert(sizeof(DMENU::KeyBoard) == sizeof(DMENU::Component) + 0x830, "Size of DMENU::KeyBoard is not correct.");
 #endif
+	static_assert(sizeof(DMENU::ItemPlaceHolder) == sizeof(DMENU::Component) + 0x400, "Size of DMENU::ItemPlaceHolder is not correct.");
 
 	ASSERT_DMENU_ITEM_SIZE(ItemSubmenu, 0x10);
 	ASSERT_DMENU_ITEM_SIZE(ItemBool, 0x08);

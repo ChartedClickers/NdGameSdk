@@ -48,6 +48,9 @@ namespace NdGameSdk {
         bool Flush() override;
         void Clear() override;
 
+        bool FlushFile(const std::string& file, bool dirty = false);
+        void ClearFile(const std::string& file);
+
     protected:
         void SetImpl(const std::string& file, const std::string& key, const nlohmann::json& v) override;
         nlohmann::json GetImpl(const std::string& file, const std::string& key, const nlohmann::json& def) override;
@@ -65,4 +68,7 @@ namespace NdGameSdk {
 
         Entry& loadFile(const std::string& file);
     };
+
+    std::unique_ptr<ISdkDataBase> CreateJsonDataBase(const std::string& folder);
+
 }

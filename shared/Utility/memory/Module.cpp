@@ -2,10 +2,15 @@
 #include "../assertion/assert.hpp"
 
 #include <shlwapi.h>
+#include <wincrypt.h>
 #include <Psapi.h>
+#include <unordered_map>
+#include <mutex>
 
 #pragma comment(lib,"shlwapi.lib")
 #pragma comment(lib,"Version.lib")
+#pragma comment(lib, "Crypt32.lib")
+#define CALG_SHA256 (ALG_CLASS_HASH | ALG_TYPE_ANY | ALG_SID_SHA_256)  
 
 namespace Utility::memory
 {
@@ -134,6 +139,155 @@ namespace Utility::memory
         size_t len = VirtualQueryEx(GetCurrentProcess(), (void*)get_this_dll_handle, &info, sizeof(info));
         always_assert(len != sizeof(info), nullptr);
         return len ? (HMODULE)info.AllocationBase : NULL;
+    }
+
+    optional<std::string> get_module_hash(HMODULE module)
+    {
+        static std::unordered_map<HMODULE, std::string> hashCache;
+        static std::mutex cacheMutex;
+
+        if (module == nullptr) { return {}; }
+        {
+            std::lock_guard<std::mutex> lock(cacheMutex);
+            auto it = hashCache.find(module);
+            if (it != hashCache.end()) {
+                return it->second;
+            }
+        }
+
+        auto modulePath = get_module_path(module);
+        if (!modulePath.has_value()) { return {}; }
+
+        HANDLE file = CreateFileA(modulePath->c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+        if (file == INVALID_HANDLE_VALUE) { return {}; }
+
+        DWORD fileSize = GetFileSize(file, nullptr);
+        if (fileSize == INVALID_FILE_SIZE) {
+            CloseHandle(file);
+            return {};
+        }
+
+        std::vector<BYTE> fileData(fileSize);
+        DWORD bytesRead = 0;
+        if (!ReadFile(file, fileData.data(), fileSize, &bytesRead, nullptr) || bytesRead != fileSize) {
+            CloseHandle(file);
+            return {};
+        }
+
+        CloseHandle(file);
+
+        HCRYPTPROV hProv = 0;
+        HCRYPTHASH hHash = 0;
+        if (!CryptAcquireContext(&hProv, nullptr, nullptr, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) {
+            return {};
+        }
+
+        if (!CryptCreateHash(hProv, CALG_SHA256, 0, 0, &hHash)) {
+            CryptReleaseContext(hProv, 0);
+            return {};
+        }
+
+        if (!CryptHashData(hHash, fileData.data(), fileSize, 0)) {
+            CryptDestroyHash(hHash);
+            CryptReleaseContext(hProv, 0);
+            return {};
+        }
+
+        DWORD hashSize = 0;
+        DWORD hashSizeLen = sizeof(DWORD);
+
+        if (!CryptGetHashParam(hHash, HP_HASHSIZE, (BYTE*)&hashSize, &hashSizeLen, 0)) {
+            CryptDestroyHash(hHash);
+            CryptReleaseContext(hProv, 0);
+            return {};
+        }
+
+        std::vector<BYTE> hash(hashSize);
+        if (!CryptGetHashParam(hHash, HP_HASHVAL, hash.data(), &hashSize, 0)) {
+            CryptDestroyHash(hHash);
+            CryptReleaseContext(hProv, 0);
+            return {};
+        }
+
+        CryptDestroyHash(hHash);
+        CryptReleaseContext(hProv, 0);
+
+        DWORD base64Size = 0;
+        if (!CryptBinaryToStringA(hash.data(), hashSize, CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, nullptr, &base64Size)) {
+            return {};
+        }
+
+        std::string base64Hash(base64Size, '\0');
+        if (!CryptBinaryToStringA(hash.data(), hashSize, CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, base64Hash.data(), &base64Size)) {
+            return {};
+        }
+
+        std::lock_guard<std::mutex> lock(cacheMutex);
+        hashCache[module] = base64Hash;
+
+        return base64Hash;
+    }
+
+    optional<string> get_module_hash_from_memory(HMODULE module) {
+        if (!module) return {};
+
+        auto optSize = get_module_size(module);
+        if (!optSize.has_value()) return {};
+        size_t imageSize = *optSize;
+
+        auto base = reinterpret_cast<const BYTE*>(module);
+
+        HCRYPTPROV hProv = 0;
+        if (!CryptAcquireContext(&hProv, nullptr, nullptr, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+            return {};
+
+        HCRYPTHASH hHash = 0;
+        if (!CryptCreateHash(hProv, CALG_SHA_256, 0, 0, &hHash)) {
+            CryptReleaseContext(hProv, 0);
+            return {};
+        }
+
+        if (!CryptHashData(hHash, base, static_cast<DWORD>(imageSize), 0)) {
+            CryptDestroyHash(hHash);
+            CryptReleaseContext(hProv, 0);
+            return {};
+        }
+
+        DWORD hashSize = 0, sizeLen = sizeof(hashSize);
+        if (!CryptGetHashParam(hHash, HP_HASHSIZE, reinterpret_cast<BYTE*>(&hashSize), &sizeLen, 0)) {
+            CryptDestroyHash(hHash);
+            CryptReleaseContext(hProv, 0);
+            return {};
+        }
+
+        std::vector<BYTE> hash(hashSize);
+        if (!CryptGetHashParam(hHash, HP_HASHVAL, hash.data(), &hashSize, 0)) {
+            CryptDestroyHash(hHash);
+            CryptReleaseContext(hProv, 0);
+            return {};
+        }
+
+        DWORD b64Len = 0;
+        if (!CryptBinaryToStringA(hash.data(), hashSize,
+            CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF,
+            nullptr, &b64Len)) {
+            CryptDestroyHash(hHash);
+            CryptReleaseContext(hProv, 0);
+            return {};
+        }
+
+        std::string out(b64Len, '\0');
+        if (!CryptBinaryToStringA(hash.data(), hashSize,
+            CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF,
+            out.data(), &b64Len)) {
+            CryptDestroyHash(hHash);
+            CryptReleaseContext(hProv, 0);
+            return {};
+        }
+
+        CryptDestroyHash(hHash);
+        CryptReleaseContext(hProv, 0);
+        return out;
     }
 
 }

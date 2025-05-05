@@ -27,8 +27,9 @@ struct DMENU {
         char* m_pname; // 0x30
         regenny::shared::ndlib::debug::DMENU::Component* m_ParentComponent; // 0x38
         regenny::shared::ndlib::debug::DMENU::Component* m_NextDMenuComponent; // 0x40
-        private: char pad_48[0x8]; public:
-        uint64_t m_LeftPad; // 0x50
+        uint32_t m_MenuLeftPad; // 0x48
+        uint32_t m_MenuWidth; // 0x4c
+        uint64_t m_ItemLeftPad; // 0x50
         uint64_t Unk2; // 0x58
         uint64_t m_data; // 0x60
         uint32_t m_color; // 0x68
@@ -53,8 +54,7 @@ struct DMENU {
         regenny::shared::ndlib::debug::DMENU::Component* m_Item; // 0xb0
         private: char pad_b8[0x4]; public:
         bool m_isActive; // 0xbc
-        uint64_t m_pad : 2; // 0xbd
-        private: uint64_t pad_bitfield_bd_2 : 62; public:
+        uint64_t m_pad; // 0xbd
         private: char pad_c5[0x7]; public:
         int m_MaxDisplayItems; // 0xcc
         uint64_t Unk[2]; // 0xd0
@@ -159,6 +159,9 @@ struct DMENU {
 
     struct ItemSubText : public Item {
     }; // Size: 0xb8
+
+    struct String : public Component {
+    }; // Size: 0xb0
 
     struct ItemPlaceHolder : public Component {
         // Metadata: utf8*

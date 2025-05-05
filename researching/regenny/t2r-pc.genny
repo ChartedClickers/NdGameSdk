@@ -572,7 +572,9 @@ namespace regenny {
                         char* m_pname [[utf8*]];
                         Component* m_ParentComponent;
                         Component* m_NextDMenuComponent;
-                        uint64_t m_LeftPad @ 0x50
+                        uint32_t m_MenuLeftPad;
+                        uint32_t m_MenuWidth;
+                        uint64_t m_ItemLeftPad;
                         uint64_t Unk2;
                         uint64_t m_data; // For arguments or link variable
                         uint32_t m_color;
@@ -592,8 +594,8 @@ namespace regenny {
                     struct Menu : Component 0x30 {
                         Component* m_Item;
                         bool m_isActive + 0x4;
-                        uint64_t m_pad : 2;
-                        int m_MaxDisplayItems +0x7;
+                        uint64_t m_pad;
+                        int m_MaxDisplayItems @ 0xcc;
                         uint64_t Unk[0x2];
                     }
                 
@@ -686,6 +688,9 @@ namespace regenny {
 
                     // DMENU::ItemSubText*
                     struct ItemSubText : Item {}
+
+                    // DMENU::String*
+                    struct String : Component {}
 
                     // DMENU::ItemPlaceHolder
                     struct ItemPlaceHolder : Component 0x400 {
@@ -930,7 +935,6 @@ namespace regenny {
 	                void* field68;
 	                void* fieldb8 @ 0xb8;
 	                void* field110 @ 0x110;
-	                uint64_t m_pNativeMap @ 0x288;
 	                ScriptModule.Loader* SLoadM;
 	                void* field780 @0x780;
                 } // g_scriptGlobals 

@@ -18,12 +18,12 @@ namespace NdGameSdk {
 
 		SharedComponents->AddComponent<ndlib::EngineComponents>();
 		SharedComponents->AddComponent<ndlib::render::dev::DebugDrawCommon>();
-
-#if defined (T2R)
-#elif defined(T1X)
 		SharedComponents->AddComponent<ndlib::script::ScriptManager>();
+
+#if defined(T1X)
 		auto ParticleMgr = SharedComponents->AddComponent<gamelib::render::particle::ParticleManager>();
 #endif
+
 		SharedComponents->AddComponent<common::CommonGame>();
 		auto DmenuComponent = SharedComponents->AddComponent<gamelib::debug::NdDevMenu>(cfg.NdDevMenu);
 

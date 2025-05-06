@@ -134,6 +134,7 @@ namespace NdGameSdk::ndlib::debug {
 
 			bool IsActive();
 			int GetMenuItemsCount();
+			void SetPagePointer(int num);
 			bool DeleteItem(DMENU::Component* pItem);
 			DMENU::Menu* DeleteAllItems(bool freeArena);
 			DMENU::Component* PushBackItem(DMENU::Component* pComponent);
@@ -150,6 +151,8 @@ namespace NdGameSdk::ndlib::debug {
 				bool isDirty;
 				uint64_t cursorIndex;
 			};
+
+			bool HasInputSettled(std::chrono::milliseconds interval = std::chrono::milliseconds{ 200 });
 
 			State GetState();
 			uint64_t GetActiveKey();

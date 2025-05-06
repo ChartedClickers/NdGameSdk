@@ -108,6 +108,10 @@ namespace NdGameSdk::ndlib::debug {
 		return this->Get()->m_MaxPagePointers;
 	}
 
+	void DMENU::Menu::SetPagePointer(int num) {
+		this->Get()->m_PagePointer = num;
+	}
+
 	bool DMENU::Menu::DeleteItem(DMENU::Component* pItem) {
 		return DMENU::s_NdDevMenu->Menu_DeleteItem(this, pItem);
 	}
@@ -118,6 +122,25 @@ namespace NdGameSdk::ndlib::debug {
 
 	DMENU::Component* DMENU::Menu::PushBackItem(DMENU::Component* pComponent) {
 		return DMENU::s_NdDevMenu->DMENU_AppendComponent(this, pComponent);
+	}
+
+	bool DMENU::KeyBoard::HasInputSettled(std::chrono::milliseconds interval) {
+		auto st = GetState();
+		if (!st.isEditing || st.isDirty)
+			return false;
+
+		using clock = std::chrono::steady_clock;
+		auto now = clock::now();
+
+		thread_local std::unordered_map<std::uintptr_t, clock::time_point> s_lastTime;
+		auto ptr = reinterpret_cast<std::uintptr_t>(this);
+		auto& last = s_lastTime[ptr];
+
+		if (now - last < interval)
+			return false;
+
+		last = now;
+		return true;
 	}
 
 	DMENU::KeyBoard::State DMENU::KeyBoard::GetState()

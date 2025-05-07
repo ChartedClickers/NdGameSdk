@@ -63,17 +63,23 @@ namespace NdGameSdk::gamelib::debug {
 
 		NdGameSdk_API bool Menu_DeleteItem(DMENU::Menu* pMenu, DMENU::Component* pItem);
 		NdGameSdk_API DMENU::Menu* Menu_DeleteAllItems(DMENU::Menu* pMenu, bool freeArena);
+		NdGameSdk_API DMENU::Menu* Menu_DeleteAllItems(DMENU::Menu* pMenu, bool pFreeMenu);
 
 		template <typename... Args>
 		NdGameSdk_API bool RebuildMenuFromItem(DMENU::Menu* pMenu, DMENU::Item* pFirstToErase, const std::vector<WrapMenuComponent<Args...>>& wraps, HeapArena_Args, Args&&... args) {
+		NdGameSdk_API bool RebuildMenuFromComponent(DMENU::Menu* pMenu, DMENU::Component* pFirstToErase, const std::vector<WrapMenuComponent<Args...>>& wraps, HeapArena_Args, Args&&... args) {
+			if (pFirstToErase == nullptr) { return false; }
 			m_Memory->PushAllocator(MemoryContextType::kAllocDevMenuLowMem, source_func, source_line, source_file);
 
 			for (auto* item = pFirstToErase; item != nullptr;) {
 				auto* next = item->NextDMenuComponent<DMENU::Item>();
 				Menu_DeleteItem(pMenu, item);
 				item = next;
+			for (auto* component : pFirstToErase->GetNextComponentsRange()) {
+				pMenu->DeleteItem(component);
 			}
 
+			
 			for (const auto& wrap : wraps) {
 				if (!wrap(pMenu, std::forward<Args>(args)...)) {
 					spdlog::warn("A wrap function at address {} failed while rebuilding the menu.",
@@ -88,9 +94,11 @@ namespace NdGameSdk::gamelib::debug {
 
 		template <typename... Args>
 		NdGameSdk_API bool RebuildMenu(DMENU::Menu* pMenu, bool freeArena, const std::vector<WrapMenuComponent<Args...>>& wraps, HeapArena_Args, Args&&... args) {
+		NdGameSdk_API bool RebuildMenu(DMENU::Menu* pMenu, bool pFreeMenu, const std::vector<WrapMenuComponent<Args...>>& wraps, HeapArena_Args, Args&&... args) {
 			m_Memory->PushAllocator(MemoryContextType::kAllocDevMenuLowMem, source_func, source_line, source_file);
 
 			Menu_DeleteAllItems(pMenu, freeArena);
+			Menu_DeleteAllItems(pMenu, pFreeMenu);
 			for (const auto& wrap : wraps) {
 				if (!wrap(pMenu, std::forward<Args>(args)...)) {
 					spdlog::warn("A wrap function at address {} failed while rebuilding the menu.",
@@ -171,6 +179,7 @@ namespace NdGameSdk::gamelib::debug {
 		MEMBER_FUNCTION_PTR(void*, DMENU_Menu_AppendComponent, DMENU::Menu* RootMenu, DMENU::Component* Component);
 		MEMBER_FUNCTION_PTR(int64_t, DMENU_Menu_DeleteItem, DMENU::Menu* Menu, DMENU::Component* pItem);
 		MEMBER_FUNCTION_PTR(DMENU::Menu*, DMENU_Menu_DeleteAllItems, DMENU::Menu* Menu, bool freeArena);
+		MEMBER_FUNCTION_PTR(DMENU::Menu*, DMENU_Menu_DeleteAllItems, DMENU::Menu* Menu, bool pFreeMenu);
 		MEMBER_FUNCTION_PTR(bool*, DMENU_Menu_DecimalCallBack, DMENU::Menu* Menu, DMENU::Message message, int32_t format);
 		MEMBER_FUNCTION_PTR(void*, DMENU_Menu_UpdateKeyboard, DMENU* DMENU);
 

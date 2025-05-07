@@ -296,10 +296,13 @@ namespace NdGameSdk::gamelib::debug {
 	}
 
 	DMENU::Menu* NdDevMenu::Menu_DeleteAllItems(DMENU::Menu* pMenu, bool freeArena) {
+	DMENU::Menu* NdDevMenu::Menu_DeleteAllItems(DMENU::Menu* pMenu, bool pFreeMenu) {
 		always_assert(DMENU_Menu_DeleteAllItems == nullptr, "Function pointer was not set!");
 		if (pMenu) {
 			auto ComponentName = pMenu->Name();
 			DMENU_Menu_DeleteAllItems(pMenu, freeArena);
+			// pFreeMenu - Deallocates pMenu block of memory
+			DMENU_Menu_DeleteAllItems(pMenu, pFreeMenu);
 			spdlog::debug("DMENU_Menu_DeleteAllItems(RootMenu: 'DMENU::Component::Menu('{:s}')')", ComponentName);
 			return pMenu;
 		}

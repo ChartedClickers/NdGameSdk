@@ -21,7 +21,7 @@ namespace NdGameSdk::ndlib::debug {
 #define ITEM_SELECTION_ENTRY(name) { #name, name },
 #define DEFINE_DMENU_ItemSelection(enum_name, ...) \
 			enum enum_name { __VA_ARGS__ }; \
-			NdGameSdk::ndlib::debug::DMENU::ItemSelection::Item_selection enum_name##_selection[] = { \
+			inline NdGameSdk::ndlib::debug::DMENU::ItemSelection::Item_selection enum_name##_selection[] = { \
 				FOR_EACH(ITEM_SELECTION_ENTRY,__VA_ARGS__) \
 				{nullptr, 0} \
 			}

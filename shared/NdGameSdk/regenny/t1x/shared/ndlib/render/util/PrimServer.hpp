@@ -4,11 +4,11 @@
 namespace regenny::shared::ndlib::render {
 struct WindowContext;
 }
-namespace regenny::shared::ndlib {
-struct FrameParams;
-}
 namespace regenny::shared::ndlib::render::text {
 struct DebugStringBase;
+}
+namespace regenny::shared::ndlib {
+struct FrameParams;
 }
 namespace regenny::shared::ndlib::render::util {
 #pragma pack(push, 1)

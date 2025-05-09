@@ -42,6 +42,12 @@ namespace regenny {
              }
         }
 
+        namespace gamelib {
+            namespace state_script {
+                struct ScriptCFuncContext{};
+            }
+        }
+
         // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\corelib
         namespace corelib {
 
@@ -1325,7 +1331,16 @@ namespace regenny {
                 struct ScriptValue {
                     uint64_t val[0x10];
                 };
-            
+
+                struct ScriptCFunc 0x10 {
+                    struct VTable 0x8 {
+                        virtual void CallScriptCFunc(gamelib.state_script.ScriptCFuncContext* CFuncContext, uint32_t ArgsNum, ScriptValue* return_, uint64_t arg4) @ 0;
+                    };  
+
+                    VTable* vftable;
+                    void* m_pFunction;
+                };
+
                 struct ScriptCFunc {
                     void** c_func_caller;
                     void* c_script_func; 
@@ -1506,9 +1521,20 @@ namespace regenny {
             // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\gamelib\state-script
             namespace state_script {
 
-                struct ScriptCFuncContext 0x150 {
+                struct ScriptCFuncContext 0x208 {
                     ndlib.script.ScriptValue m_args;
-                    StringId64 m_scriptHash @ 0x90;
+                };
+
+                struct CFunctionStack 0x40 {
+                    ScriptCFuncContext* m_pScriptCFuncContext;
+                    uint32_t m_NumArgs; // number of received arguments
+                    uint32_t field_c;
+                    uint32_t m_FunctionArgs; // number of function arguments (expected)
+                    uint64_t field_18 @ 0x18;
+                    uint64_t field_20;
+                    uint64_t field_28;
+                    bool field_30;
+                    bool m_MakeAllErrorsFatal;
                 };
 
                 struct StateScriptConsoleInfo {

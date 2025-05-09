@@ -27,29 +27,29 @@ struct ScriptManagerGlobals {
     private: char pad_4a[0x2]; public:
     bool m_DumpStateScriptsonStackFrameHighWater; // 0x4c
     bool m_EnableScriptModuleCRC32Checks; // 0x4d
-    bool field4e; // 0x4e
+    bool field_4e; // 0x4e
     bool m_ValidateModuleSize; // 0x4f
     bool m_AssertonGlobalSymbolLookup; // 0x50
     bool m_EnableScripts; // 0x51
-    bool field52; // 0x52
-    bool field53; // 0x53
+    bool field_52; // 0x52
+    bool field_53; // 0x53
     bool m_DisableScriptDebugPrims; // 0x54
     bool m_DisplayGlobalSymbols; // 0x55
-    bool field56; // 0x56
+    bool field_56; // 0x56
     bool m_DisableDebugBinSuppressionforGameTasks; // 0x57
-    bool field58; // 0x58
+    bool field_58; // 0x58
     private: char pad_59[0x7]; public:
     regenny::shared::ndlib::script::ModuleRequest::ModuleRequestList* m_moduleRequestListActual; // 0x60
-    void* field68; // 0x68
+    void* field_68; // 0x68
     private: char pad_70[0x48]; public:
-    void* fieldb8; // 0xb8
+    void* field_b8; // 0xb8
     private: char pad_c0[0x50]; public:
-    void* field110; // 0x110
+    void* field_110; // 0x110
     private: char pad_118[0x170]; public:
     ScriptCFuncMap* m_NativeMap; // 0x288
     regenny::shared::ndlib::script::ScriptModule::Loader* SLoadM; // 0x290
     private: char pad_298[0x4e8]; public:
-    void* field780; // 0x780
+    void* field_780; // 0x780
     private: char pad_788[0x18]; public:
 }; // Size: 0x7a0
 #pragma pack(pop)

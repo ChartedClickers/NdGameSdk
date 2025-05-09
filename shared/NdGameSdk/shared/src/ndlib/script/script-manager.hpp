@@ -37,6 +37,8 @@ namespace NdGameSdk::ndlib::script {
 
 		SdkEvent<> e_ScriptManagerInitialized{true};
 
+		NdGameSdk_API ScriptCFunc* LookupCFunc(StringId64 Hash);
+
 		static DMENU::ItemSubmenu* CreateScriptManagerMenu(NdDevMenu* pdmenu, DMENU::Menu* pMenu);
 	private:
 		void Initialize() override;
@@ -50,7 +52,6 @@ namespace NdGameSdk::ndlib::script {
 
 		/*ScriptCFuncDebugMenu*/
 		struct ScriptCFuncDebugMenuProperties {
-
 			struct ScriptCFuncEditor {
 				char DescriptionBuf[256]{};
 				struct Args {
@@ -127,6 +128,7 @@ namespace NdGameSdk::ndlib::script {
 		std::vector<NativeFuncEntry> DumpNativeFunctions();
     };
 
+#pragma region JsonSerialize
 	inline void to_json(nlohmann::json& j, const std::map<StringId64, ScriptCFuncInfo>& m) {
 		for (auto& [k, v] : m) {
 			j[std::to_string(k)] = v;
@@ -139,6 +141,7 @@ namespace NdGameSdk::ndlib::script {
 			m[static_cast<StringId64>(std::stoull(k))] = v.get<ScriptCFuncInfo>();
 		} 
 	}
+#pragma endregion
 
 #if defined(T2R)
 	static_assert(sizeof(ScriptManagerGlobals) == 0x7a0, "Size of ScriptManagerGlobals is not correct.");

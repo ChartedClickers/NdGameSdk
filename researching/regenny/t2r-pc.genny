@@ -35,6 +35,12 @@ namespace regenny {
              }
         }
 
+        namespace gamelib {
+            namespace state_script {
+                struct ScriptCFuncContext{};
+            }
+        }
+
         // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib
         namespace corelib {
             
@@ -818,6 +824,15 @@ namespace regenny {
                     uint64_t val[0x10];
                 };
 
+                struct ScriptCFunc 0x10 {
+                    struct VTable 0x8 {
+                        virtual void CallScriptCFunc(gamelib.state_script.ScriptCFuncContext* CFuncContext, uint32_t ArgsNum, ScriptValue* return_, uint64_t arg4) @ 0;
+                    };
+
+                    VTable* vftable;
+                    void* m_pFunction;
+                };
+
                 // script-module-loader.cpp
                 // List<ModuleRequest>
                 struct ModuleRequest 0x40 {
@@ -924,26 +939,26 @@ namespace regenny {
 	                bool m_ShowDebugBinStatusCon;
 	                bool m_DumpStateScriptsonStackFrameHighWater @ 0x4c;
 	                bool m_EnableScriptModuleCRC32Checks;
-	                bool field4e;
+	                bool field_4e;
 	                bool m_ValidateModuleSize;
 	                bool m_AssertonGlobalSymbolLookup;
 	                bool m_EnableScripts;
-	                bool field52;
-	                bool field53;
+	                bool field_52;
+	                bool field_53;
 	                bool m_DisableScriptDebugPrims;
 	                bool m_DisplayGlobalSymbols;
-	                bool field56;
+	                bool field_56;
 	                bool m_DisableDebugBinSuppressionforGameTasks;
-	                bool field58;
+	                bool field_58;
 	                ModuleRequest.ModuleRequestList* m_moduleRequestListActual @ 0x60;
-                    // m_field68 (flex size ALLOCATION_SCRIPT_SYMBOL_TBL)
+                    // m_field_68 (flex size ALLOCATION_SCRIPT_SYMBOL_TBL)
                     // count × sizeof(void*)
-	                void* field68;
-	                void* fieldb8 @ 0xb8;
-	                void* field110 @ 0x110;
+	                void* field_68;
+	                void* field_b8 @ 0xb8;
+	                void* field_110 @ 0x110;
 	                ScriptCFuncMap* m_NativeMap @ 0x288;
 	                ScriptModule.Loader* SLoadM;
-	                void* field780 @0x780;
+	                void* field_780 @0x780;
                 } // g_scriptGlobals 
             }
 
@@ -954,10 +969,21 @@ namespace regenny {
 
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\gamelib\state-script
             namespace state_script {
-                struct ScriptCFuncContext 0x150 {
+                struct ScriptCFuncContext 0x208 {
                     ndlib.script.ScriptValue m_args;
-                    StringId64 m_scriptHash @ 0x90;
-                }
+                };
+
+                struct CFunctionStack 0x40 {
+                    ScriptCFuncContext* m_pScriptCFuncContext;
+                    uint32_t m_NumArgs; // number of received arguments
+                    uint32_t field_c;
+                    uint32_t m_FunctionArgs; // number of function arguments (expected)
+                    uint64_t field_18 @ 0x18;
+                    uint64_t field_20;
+                    uint64_t field_28;
+                    bool field_30;
+                    bool m_MakeAllErrorsFatal;
+                };
             }
         }
         

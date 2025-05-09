@@ -16,8 +16,6 @@ struct ScriptCFunc {
 
     VTable* vftable; // 0x0
     void* m_pFunction; // 0x8
-    void** c_func_caller; // 0x10
-    void* c_script_func; // 0x18
-}; // Size: 0x20
+}; // Size: 0x10
 #pragma pack(pop)
 }

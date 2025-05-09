@@ -34,12 +34,22 @@ namespace NdGameSdk::ndlib::script {
             auto ScriptManagerInitJMP = (void*)Utility::FindAndPrintPattern(module
                 , findpattern.pattern, wstr(Patterns::ScriptManager_InitializeReturn), findpattern.offset);
 
+
 			if (!g_ScriptManagerGlobals ||
                 !ScriptManagerInitJMP) {
 				throw SdkComponentEx
 				{ std::format("Failed to find addresses!"),
 					SdkComponentEx::ErrorCode::PatternFailed };
 			}
+
+            findpattern = Patterns::ScriptManager_LookupCFunc;
+            ScriptManager_LookupCFunc = (ScriptManager_LookupCFunc_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::ScriptManager_LookupCFunc), findpattern.offset);
+
+            if (!ScriptManager_LookupCFunc) {
+                throw SdkComponentEx{ std::format("Failed to find {}:: game functions!", GetName()), SdkComponentEx::ErrorCode::PatternFailed };
+            }
+
 
             m_ScriptManagerInitHook = Utility::MakeMidHook(ScriptManagerInitJMP, ScriptManagerInitialized, 
                 wstr(Patterns::ScriptManager_InitializeReturn), wstr(ScriptManagerInitJMP));
@@ -65,13 +75,13 @@ namespace NdGameSdk::ndlib::script {
         auto logger = SdkLogger::GetLogger();
 
         if (!NdGameSdk::DB::IsDataBaseAvailable()) {
-            logger->warn("[{}] Database is not available!", TOSTRING(ScriptManager));
+            logger->warn("[{}] Database is not available!", GetName());
             return false;
         }
 
         try {
 
-            logger->info("[{}] Refreshing ScriptCFunc info...", TOSTRING(ScriptManager));
+            logger->info("[{}] Refreshing ScriptCFunc info...", GetName());
 
             auto nativeDump = g_ScriptManagerGlobals->DumpNativeFunctions();
             m_ScriptCFuncs = NdGameSdk::DB::Get<std::map<StringId64, ScriptCFuncInfo>>(
@@ -84,7 +94,7 @@ namespace NdGameSdk::ndlib::script {
                     std::string newName = NdGameSdk::Sidbase::StringIdToStringInternal(hash);
                     if (info.Name != newName) {
                         info.Name = std::move(newName);
-                        logger->warn("[{}] Updated ScriptCFunc name: {} (hash: {:#x})", TOSTRING(ScriptManager), info.Name, hash);
+                        logger->warn("[{}] Updated ScriptCFunc name: {} (hash: {:#x})", GetName(), info.Name, hash);
                         changed = true;
                     }
                 }
@@ -96,7 +106,7 @@ namespace NdGameSdk::ndlib::script {
                     auto& info = it->second;
                     info.Name = NdGameSdk::Sidbase::StringIdToStringInternal(native.hash);
                     info.Hash = native.hash;
-                    logger->debug("[{}] Found new ScriptCFunc: {} (hash: {:#x})", TOSTRING(ScriptManager), info.Name, native.hash);
+                    logger->debug("[{}] Found new ScriptCFunc: {} (hash: {:#x})", GetName(), info.Name, native.hash);
                     changed = true;
                 }
             }
@@ -104,28 +114,41 @@ namespace NdGameSdk::ndlib::script {
             if (changed) {
                 NdGameSdk::DB::Set(s_DataBaseFile, "ScriptCFuncs", m_ScriptCFuncs);
                 NdGameSdk::DB::FlushJsonFile(s_DataBaseFile);
-                logger->info("[{}] ScriptCFuncs updated ({} entries cached)", TOSTRING(ScriptManager), m_ScriptCFuncs.size());
+                logger->info("[{}] ScriptCFuncs updated ({} entries cached)", GetName(), m_ScriptCFuncs.size());
                 return true;
             }
 
-            logger->debug("[{}] No updates needed for ScriptCFuncs", TOSTRING(ScriptManager));
+            logger->debug("[{}] No updates needed for ScriptCFuncs", GetName());
             return true;
 		}
         catch (const std::exception& e) {
-            logger->error("[{}] Error while refreshing ScriptCFunc info: {}", TOSTRING(ScriptManager), e.what());
+            logger->error("[{}] Error while refreshing ScriptCFunc info: {}", GetName(), e.what());
             return false;
         }
     }
 
-    bool ScriptManager::TestFunct(DMENU::ItemFunction& pFunction, DMENU::Message pMessage) {
-        if (pMessage == DMENU::Message::OnExecute) {
-            auto ScriptMgr = reinterpret_cast<ScriptManager*>(pFunction.Data());
-            if (ScriptMgr) {
-                spdlog::info("TestFunct called!");
-                return true;
-            }
-        }
-        return true;
+    bool ScriptManager::TestFunct(DMENU::ItemFunction& pFunction, DMENU::Message pMessage) {  
+       if (pMessage == DMENU::Message::OnExecute) {  
+           auto ScriptMgr = reinterpret_cast<ScriptManager*>(pFunction.Data());  
+           if (ScriptMgr) {  
+               spdlog::info("TestFunct called!");  
+               auto CFunct = ScriptMgr->LookupCFunc(SID("kill-player"));
+               spdlog::info(std::format("TestFunct data: {:#x}", reinterpret_cast<uintptr_t>(CFunct)));
+
+               if (CFunct) {
+                   ScriptValue _returnvalue{};
+                   CFunct->CallScriptCFunc(ScriptValue{}, 0, &_returnvalue);
+               }             
+
+               return true;  
+           }  
+       }  
+       return true;  
+    }
+
+    ScriptCFunc* ScriptManager::LookupCFunc(StringId64 Hash) {
+		always_assert(ScriptManager_LookupCFunc == nullptr, "Function pointer was not set!");
+        return ScriptManager_LookupCFunc(Hash, nullptr);
     }
 
     DMENU::ItemSubmenu* ScriptManager::CreateScriptManagerMenu(NdDevMenu* pdmenu, DMENU::Menu* pMenu) {
@@ -133,7 +156,7 @@ namespace NdGameSdk::ndlib::script {
         if (ScriptMgr) {
             uint64_t ScriptMgrAddr = reinterpret_cast<uint64_t>(static_cast<void*>(ScriptMgr));
 
-            DMENU::Menu* ScriptManagerMenu = pdmenu->Create_DMENU_Menu(TOSTRING(ScriptManager), HeapArena_Source);
+            DMENU::Menu* ScriptManagerMenu = pdmenu->Create_DMENU_Menu(ScriptMgr->GetName().data(), HeapArena_Source);
             if (ScriptManagerMenu) {
 
                 pdmenu->Create_DMENU_ItemFunction("Test funct", ScriptManagerMenu, &TestFunct, ScriptMgrAddr, false, HeapArena_Source);
@@ -166,7 +189,7 @@ namespace NdGameSdk::ndlib::script {
                 ScriptManager* ScriptMgr = Instance<ScriptManager>();
 
                 if (ScriptMgr->m_Memory->GetMemSize(MemoryMapId::ALLOCATION_DMENU_LOWMEM) < MemSize(5, SizeUnit::Megabytes)) {
-                    spdlog::error("[{}] Memory DMENU_LOWMEM size is not correct!", TOSTRING(ScriptManager));
+                    spdlog::error("[{}] Memory DMENU_LOWMEM size is not correct!", ScriptMgr->GetName());
                     return false;
                 }
 
@@ -185,7 +208,7 @@ namespace NdGameSdk::ndlib::script {
                 ScriptManager* ScriptMgr = Instance<ScriptManager>();                
                 auto ScriptCFunc = ScriptMgr->m_ScriptCFuncs.find(StringId64{ pSubmenu.Data() });
 				if (ScriptCFunc == ScriptMgr->m_ScriptCFuncs.end()) {
-					spdlog::error("[{}] ScriptCFunc {:#x} not found!", TOSTRING(ScriptManager), pSubmenu.Data());
+					spdlog::error("[{}] ScriptCFunc {:#x} not found!", ScriptMgr->GetName(), pSubmenu.Data());
                     ScriptMgr->m_ScriptCFuncDebugMenuProperties.ScriptCFuncInfo = nullptr;
                 }
                 else {
@@ -552,17 +575,17 @@ namespace NdGameSdk::ndlib::script {
 
         auto NativeMap = GetNativeMap();
         if (!NativeMap) {
-            spdlog::error("[{}] NativeMap is null", TOSTRING(ScriptManager));
+            spdlog::error("[{}] NativeMap is null", TOSTRING(ScriptManagerGlobals));
             return Dump;
         }
 
-        spdlog::info("[{}] Native table contains {} entries", TOSTRING(ScriptManager), NativeMap->m_FunctionsNum);
+        spdlog::info("[{}] Native table contains {} entries", TOSTRING(ScriptManagerGlobals), NativeMap->m_FunctionsNum);
 
         const auto num = static_cast<std::size_t>(NativeMap->m_FunctionsNum);
         auto* base = reinterpret_cast<const NativeFuncEntry*>(NativeMap->m_FunctionsBaseAddress);
 
         if (base == nullptr || num == 0) {
-            spdlog::warn("[{}] Native table is empty", TOSTRING(ScriptManager));
+            spdlog::warn("[{}] Native table is empty", TOSTRING(ScriptManagerGlobals));
             return Dump;
         }
 

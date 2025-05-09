@@ -7,13 +7,13 @@
 
 #if defined(T1X)
 #include <NdGameSdk/shared/src/ndlib/render/window-context.hpp>
-#include <NdGameSdk/regenny/t1x/shared/gamelib/statescript/StateScriptConsoleInfo.hpp>
+#include <NdGameSdk/regenny/t1x/shared/gamelib/state_script/StateScriptConsoleInfo.hpp>
 
 using namespace NdGameSdk::ndlib::render;
 
 namespace NdGameSdk::gamelib::statescript {
 
-	class StateScriptConsoleInfo : public ISdkRegenny<regenny::shared::gamelib::statescript::StateScriptConsoleInfo> {
+	class StateScriptConsoleInfo : public ISdkRegenny<regenny::shared::gamelib::state_script::StateScriptConsoleInfo> {
 	public:
 		StateScriptConsoleInfo() = default;
 

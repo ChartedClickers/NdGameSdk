@@ -6,6 +6,11 @@
 namespace regenny::shared::ndlib::script {
 #pragma pack(push, 1)
 struct ScriptManagerGlobals {
+    struct ScriptCFuncMap {
+        void* m_FunctionsBaseAddress; // 0x0
+        uint64_t m_FunctionsNum; // 0x8
+    }; // Size: 0x10
+
     uint64_t field_0; // 0x0
     private: char pad_8[0x8]; public:
     StringId64 m_hash; // 0x10
@@ -70,7 +75,7 @@ struct ScriptManagerGlobals {
     private: char pad_268[0x20]; public:
     uint64_t field_288; // 0x288
     uint64_t field_290; // 0x290
-    uint64_t m_pNativeMap; // 0x298
+    ScriptCFuncMap* m_NativeMap; // 0x298
     regenny::shared::ndlib::script::ScriptModule::Loader* s_SLoadM; // 0x2a0
     private: char pad_2a8[0x2bd8]; public:
     uint64_t field_2e80; // 0x2e80

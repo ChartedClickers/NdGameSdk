@@ -1,7 +1,7 @@
 #pragma once
 #include <NdGameSdk/components/SdkRegenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
-namespace regenny::shared::gamelib::statescript {
+namespace regenny::shared::gamelib::state_script {
 #pragma pack(push, 1)
 struct StateScriptConsoleInfo {
     uint32_t pos_x; // 0x0

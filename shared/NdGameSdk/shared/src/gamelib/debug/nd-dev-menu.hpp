@@ -58,27 +58,23 @@ namespace NdGameSdk::gamelib::debug {
 		NdGameSdk_API DMENU::ItemDecimal* Create_DMENU_ItemDecimal(std::string pName, DMENU::Menu* pMenu, int* pData, DMENU::ItemDecimal::ValueParams pValueParams, DMENU::ItemDecimal::StepParams pStepParams, const char* pDescription, HeapArena_Args);
 		NdGameSdk_API DMENU::ItemFloat* Create_DMENU_ItemFloat(std::string pName, DMENU::Menu* pMenu, float* pData, DMENU::ItemFloat::ValueParams pValueParams, DMENU::ItemFloat::StepParams pStepParams, const char* pDescription, HeapArena_Args);
 		NdGameSdk_API DMENU::ItemFunction* Create_DMENU_ItemFunction(std::string pName, DMENU::Menu* pMenu, DMENU::ItemFunction::FunctionCallback pFunction, uint64_t args, bool pisActive, HeapArena_Args);
-		NdGameSdk_API DMENU::ItemSelection* Create_DMENU_ItemSelection(std::string pName, DMENU::Menu* pMenu, DMENU::ItemSelection::Item_selection* pItemSelection, uint64_t* pData, const char* pDescription, HeapArena_Args);
+		NdGameSdk_API DMENU::ItemSelection* Create_DMENU_ItemSelection(std::string pName, DMENU::Menu* pMenu, DMENU::ItemSelection::Item_selection* pItemSelection, DMENU::ItemSelection::SelectionHandler pCallback, uint64_t* pData, const char* pDescription, HeapArena_Args);
 		NdGameSdk_API std::pair<DMENU::ItemLine*, DMENU::ItemSubText*> Create_DMENU_TextLineWrapper(std::string pName, DMENU::Menu* pMenu, HeapArena_Args);
 
+		NdGameSdk_API int64_t DecimalCallBack(DMENU::Component& component, DMENU::Message message, uint32_t data);
+
 		NdGameSdk_API bool Menu_DeleteItem(DMENU::Menu* pMenu, DMENU::Component* pItem);
-		NdGameSdk_API DMENU::Menu* Menu_DeleteAllItems(DMENU::Menu* pMenu, bool freeArena);
 		NdGameSdk_API DMENU::Menu* Menu_DeleteAllItems(DMENU::Menu* pMenu, bool pFreeMenu);
 
 		template <typename... Args>
-		NdGameSdk_API bool RebuildMenuFromItem(DMENU::Menu* pMenu, DMENU::Item* pFirstToErase, const std::vector<WrapMenuComponent<Args...>>& wraps, HeapArena_Args, Args&&... args) {
 		NdGameSdk_API bool RebuildMenuFromComponent(DMENU::Menu* pMenu, DMENU::Component* pFirstToErase, const std::vector<WrapMenuComponent<Args...>>& wraps, HeapArena_Args, Args&&... args) {
 			if (pFirstToErase == nullptr) { return false; }
+
 			m_Memory->PushAllocator(MemoryContextType::kAllocDevMenuLowMem, source_func, source_line, source_file);
 
-			for (auto* item = pFirstToErase; item != nullptr;) {
-				auto* next = item->NextDMenuComponent<DMENU::Item>();
-				Menu_DeleteItem(pMenu, item);
-				item = next;
 			for (auto* component : pFirstToErase->GetNextComponentsRange()) {
 				pMenu->DeleteItem(component);
 			}
-
 			
 			for (const auto& wrap : wraps) {
 				if (!wrap(pMenu, std::forward<Args>(args)...)) {
@@ -93,11 +89,9 @@ namespace NdGameSdk::gamelib::debug {
 		}
 
 		template <typename... Args>
-		NdGameSdk_API bool RebuildMenu(DMENU::Menu* pMenu, bool freeArena, const std::vector<WrapMenuComponent<Args...>>& wraps, HeapArena_Args, Args&&... args) {
 		NdGameSdk_API bool RebuildMenu(DMENU::Menu* pMenu, bool pFreeMenu, const std::vector<WrapMenuComponent<Args...>>& wraps, HeapArena_Args, Args&&... args) {
 			m_Memory->PushAllocator(MemoryContextType::kAllocDevMenuLowMem, source_func, source_line, source_file);
 
-			Menu_DeleteAllItems(pMenu, freeArena);
 			Menu_DeleteAllItems(pMenu, pFreeMenu);
 			for (const auto& wrap : wraps) {
 				if (!wrap(pMenu, std::forward<Args>(args)...)) {
@@ -168,19 +162,18 @@ namespace NdGameSdk::gamelib::debug {
 #if defined(T2R)
 		MEMBER_FUNCTION_PTR(DMENU::ItemDecimal*, DMENU_ItemDecimal, DMENU::ItemDecimal* Heap, const char* name, uint64_t* data, DMENU::ItemDecimal::ValueParams* Value, DMENU::ItemDecimal::StepParams* Step, const char* pDescription, bool handle);
 		MEMBER_FUNCTION_PTR(DMENU::ItemFloat*, DMENU_ItemFloat, DMENU::ItemFloat* Heap, const char* name, uint64_t* data, DMENU::ItemFloat::ValueParams* Value, DMENU::ItemFloat::StepParams* Step, const char* pDescription, uint64_t arg7, bool handle);
-		MEMBER_FUNCTION_PTR(DMENU::ItemSelection*, DMENU_ItemSelection, DMENU::ItemSelection* Heap, const char* name, DMENU::ItemSelection::Item_selection* SelectionStruct, void* SelectionCallback, uint64_t* SelectionVar, uint64_t arg6, uint64_t arg7, uint32_t arg8, const char* pDescription, bool handle);
+		MEMBER_FUNCTION_PTR(DMENU::ItemSelection*, DMENU_ItemSelection, DMENU::ItemSelection* Heap, const char* name, DMENU::ItemSelection::Item_selection* SelectionStruct, void* SelectionHandler, uint64_t* SelectionVar, uint64_t arg6, uint64_t arg7, uint32_t arg8, const char* pDescription, bool handle);
 #else
 		MEMBER_FUNCTION_PTR(DMENU::ItemDecimal*, DMENU_ItemDecimal, DMENU::ItemDecimal* Heap, const char* name, uint64_t* data, DMENU::ItemDecimal::ValueParams* Value, DMENU::ItemDecimal::StepParams* Step, const char* pDescription);
 		MEMBER_FUNCTION_PTR(DMENU::ItemFloat*, DMENU_ItemFloat, DMENU::ItemFloat* Heap, const char* name, uint64_t* data, DMENU::ItemFloat::ValueParams* Value, DMENU::ItemFloat::StepParams* Step, const char* pDescription, uint64_t arg7);
-		MEMBER_FUNCTION_PTR(DMENU::ItemSelection*, DMENU_ItemSelection, DMENU::ItemSelection* Heap, const char* name, DMENU::ItemSelection::Item_selection* SelectionStruct, void* SelectionCallback, uint64_t* SelectionVar, uint64_t arg6, uint64_t arg7, uint32_t arg8, const char* pDescription);
+		MEMBER_FUNCTION_PTR(DMENU::ItemSelection*, DMENU_ItemSelection, DMENU::ItemSelection* Heap, const char* name, DMENU::ItemSelection::Item_selection* SelectionStruct, void* SelectionHandler, uint64_t* SelectionVar, uint64_t arg6, uint64_t arg7, uint32_t arg8, const char* pDescription);
 #endif
 		MEMBER_FUNCTION_PTR(DMENU::ItemFunction*, DMENU_ItemFunction, DMENU::ItemFunction* Heap, const char* name, void* callbackFunct, uint64_t data, bool isActive);
 
 		MEMBER_FUNCTION_PTR(void*, DMENU_Menu_AppendComponent, DMENU::Menu* RootMenu, DMENU::Component* Component);
 		MEMBER_FUNCTION_PTR(int64_t, DMENU_Menu_DeleteItem, DMENU::Menu* Menu, DMENU::Component* pItem);
-		MEMBER_FUNCTION_PTR(DMENU::Menu*, DMENU_Menu_DeleteAllItems, DMENU::Menu* Menu, bool freeArena);
 		MEMBER_FUNCTION_PTR(DMENU::Menu*, DMENU_Menu_DeleteAllItems, DMENU::Menu* Menu, bool pFreeMenu);
-		MEMBER_FUNCTION_PTR(bool*, DMENU_Menu_DecimalCallBack, DMENU::Menu* Menu, DMENU::Message message, int32_t format);
+		MEMBER_FUNCTION_PTR(int64_t, DMENU_Menu_DecimalCallBack, DMENU::Component* component, DMENU::Message message, uint32_t data);
 		MEMBER_FUNCTION_PTR(void*, DMENU_Menu_UpdateKeyboard, DMENU* DMENU);
 
 		friend DMENU;

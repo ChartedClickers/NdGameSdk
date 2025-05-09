@@ -775,7 +775,7 @@ namespace regenny {
                     Component* m_NextDMenuComponent;
                     uint32_t m_MenuLeftPad;
                     uint32_t m_MenuWidth;
-                    uint64_t m_LeftPad;
+                    uint64_t m_ItemLeftPad;
                     uint64_t Unk2;
                     uint64_t m_data; // For arguments or link variable
                     uint32_t m_color;
@@ -1419,6 +1419,12 @@ namespace regenny {
             
                 // script-manager.cpp
                 struct ScriptManagerGlobals 0x33b0 {
+
+                    struct ScriptCFuncMap 0x10 {
+                        void* m_FunctionsBaseAddress;
+                        uint64_t m_FunctionsNum;
+                    }
+
                     uint64_t field_0;
                     StringId64 m_hash @ 0x10; // ScriptManagerGlobals
                     uint32_t field_18;
@@ -1468,6 +1474,7 @@ namespace regenny {
                     uint32_t field_264;
                     uint64_t field_288 @ 0x288;
                     uint64_t field_290;
+                    ScriptCFuncMap* m_NativeMap;
                     ScriptModule.Loader* s_SLoadM;
                     uint64_t field_2e80 @ 0x2e80;
                     uint64_t field_3338 @ 0x3338;
@@ -1497,6 +1504,12 @@ namespace regenny {
         namespace gamelib {
 
             // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\gamelib\state-script
+            namespace state_script {
+
+                struct ScriptCFuncContext 0x150 {
+                    ndlib.script.ScriptValue m_args;
+                    StringId64 m_scriptHash @ 0x90;
+                };
 
                 struct StateScriptConsoleInfo {
                     uint32_t pos_x;

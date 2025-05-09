@@ -906,6 +906,12 @@ namespace regenny {
 
                 // script-manager.cpp
                 struct ScriptManagerGlobals 0x7a0 {
+
+                    struct ScriptCFuncMap 0x10 {
+                        void* m_FunctionsBaseAddress;
+                        uint64_t m_FunctionsNum;
+                    }
+
 	                StringId64 m_hash @ 0x10;
 	                bool m_EnableScriptTrace @ 0x40;
 	                bool m_Autoreloadbinfiles @ 0x42;
@@ -935,11 +941,24 @@ namespace regenny {
 	                void* field68;
 	                void* fieldb8 @ 0xb8;
 	                void* field110 @ 0x110;
+	                ScriptCFuncMap* m_NativeMap @ 0x288;
 	                ScriptModule.Loader* SLoadM;
 	                void* field780 @0x780;
                 } // g_scriptGlobals 
             }
 
+        }
+
+        // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\gamelib
+        namespace gamelib {
+
+            // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\gamelib\state-script
+            namespace state_script {
+                struct ScriptCFuncContext 0x150 {
+                    ndlib.script.ScriptValue m_args;
+                    StringId64 m_scriptHash @ 0x90;
+                }
+            }
         }
         
     }

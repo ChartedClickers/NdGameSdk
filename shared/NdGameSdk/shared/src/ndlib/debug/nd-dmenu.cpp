@@ -84,12 +84,16 @@ namespace NdGameSdk::ndlib::debug {
 		this->Get()->m_selectcolor = color.toUint64();
 	}
 
-	uint64_t DMENU::Component::Data() {
-		return this->Get()->m_data;
+	long DMENU::Component::GetLeftPad() {
+		return this->Get()->m_ItemLeftPad;
 	}
 
-	DMENU::Component* DMENU::Component::ParentComponent() {
-		return reinterpret_cast<DMENU::Component*>(this->Get()->m_ParentComponent);
+	void DMENU::Component::SetLeftPad(long leftPad) {
+		this->Get()->m_ItemLeftPad = leftPad;
+	}
+
+	uint64_t DMENU::Component::Data() {
+		return this->Get()->m_data;
 	}
 
 	DMENU::MenuGroup* DMENU::Component::MenuGroup() {
@@ -106,6 +110,10 @@ namespace NdGameSdk::ndlib::debug {
 
 	int DMENU::Menu::GetMenuItemsCount() {
 		return this->Get()->m_MaxPagePointers;
+	}
+
+	int DMENU::Menu::GetWidth() {
+		return this->Get()->m_MenuWidth;
 	}
 
 	void DMENU::Menu::SetPagePointer(int num) {
@@ -207,6 +215,10 @@ namespace NdGameSdk::ndlib::debug {
 
 	bool DMENU::ItemBool::IsActive() {
 		return this->Get()->m_status;
+	}
+
+	void DMENU::ItemDecimal::SetHandler(DecimalHandler* handler) {
+		this->Get()->m_HandlerFunc = reinterpret_cast<void*>(handler);
 	}
 
 	DMENU::ItemDecimal::ValueParams DMENU::ItemDecimal::GetValueParams() {

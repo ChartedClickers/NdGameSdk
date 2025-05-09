@@ -48,10 +48,17 @@ namespace NdGameSdk::ndlib::debug {
 			void SetColor(Color color);
 			void SetSelectedColor(Color color);
 
+			long GetLeftPad();
+			void SetLeftPad(long leftPad);
+
 			uint64_t Data();
 
-			DMENU::Component* ParentComponent();
 			MenuGroup* MenuGroup();
+	        
+			template<typename ComponentType = Component>
+			ComponentType* ParentComponent() const {
+				return reinterpret_cast<ComponentType*>(this->Get()->m_ParentComponent);
+			}
 
 			template<typename ComponentType = Component>
 			ComponentType* NextDMenuComponent() const {
@@ -70,6 +77,13 @@ namespace NdGameSdk::ndlib::debug {
 					}
 				};
 				Component* head;
+				size_t size() const {
+					auto count = 0;
+					for (auto* cur = head; cur; cur = cur->NextDMenuComponent<Component>()) {
+						++count;
+					}
+					return count;
+				}
 				iterator begin() const { return { head }; }
 				iterator end()   const { return { nullptr }; }
 			};
@@ -134,6 +148,7 @@ namespace NdGameSdk::ndlib::debug {
 
 			bool IsActive();
 			int GetMenuItemsCount();
+			int GetWidth();
 			void SetPagePointer(int num);
 			bool DeleteItem(DMENU::Component* pItem);
 			DMENU::Menu* DeleteAllItems(bool freeArena);
@@ -215,6 +230,9 @@ namespace NdGameSdk::ndlib::debug {
 
 		class ItemDecimal : public ISdkRegenny<regenny::shared::ndlib::debug::DMENU::ItemDecimal, Item> {
 		public:
+			using DecimalHandlerPtr = uint64_t(*)(DMENU::ItemDecimal&, DMENU::Message, int32_t);
+			using DecimalHandler = boost::function<std::remove_pointer<DecimalHandlerPtr>::type>;
+
 			struct ValueParams {
 				uint32_t MinValue;
 				uint32_t MaxValue;
@@ -225,6 +243,7 @@ namespace NdGameSdk::ndlib::debug {
 				uint32_t DoubleStepValue;
 			};
 
+			void SetHandler(DecimalHandler* handler);
 			ValueParams GetValueParams();
 			StepParams GetStepParams();
 
@@ -267,6 +286,9 @@ namespace NdGameSdk::ndlib::debug {
 
 		class ItemSelection : public ISdkRegenny<regenny::shared::ndlib::debug::DMENU::ItemSelection, Item> {
 		public:
+			using SelectionHandlerPtr = uint64_t(*)(DMENU::ItemSelection&, DMENU::Message, int32_t);
+			using SelectionHandler = boost::function<std::remove_pointer<SelectionHandlerPtr>::type>;
+
 			struct Item_selection {
 				const char* selection_title;
 				uint64_t selection_value;

@@ -2,8 +2,10 @@
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
 #include <NdGameSdk/shared/src/ndlib/render/dev/debugdraw-common.hpp>
+#include <NdGameSdk/shared/src/ndlib/script/script-manager.hpp>
 
 using namespace boost::placeholders;
+using namespace NdGameSdk::ndlib::script;
 using namespace NdGameSdk::ndlib::render::dev;
 
 namespace NdGameSdk::gamelib::debug {
@@ -243,18 +245,20 @@ namespace NdGameSdk::gamelib::debug {
 		return nullptr;
 	}
 
-	DMENU::ItemSelection* NdDevMenu::Create_DMENU_ItemSelection(std::string pName, DMENU::Menu* pMenu, DMENU::ItemSelection::Item_selection* pItemSelection, uint64_t* pData, const char* pDescription, HeapArena_Args) {
+	DMENU::ItemSelection* NdDevMenu::Create_DMENU_ItemSelection(std::string pName, DMENU::Menu* pMenu, DMENU::ItemSelection::Item_selection* pItemSelection, DMENU::ItemSelection::SelectionHandler pCallback, uint64_t* pData, const char* pDescription, HeapArena_Args) {
 		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::ItemSelection>
 			(sizeof(DMENU::ItemSelection), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
 		DMENU::ItemSelection* SelectionPtr{};
 		if (HeapAllocator) {
 			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::ItemSelection));
 			always_assert(DMENU_ItemSelection == nullptr, "Function pointer was not set!");
+			void* SelectionCallBackPtr = pCallback != NULL ?
+				reinterpret_cast<void*>(*pCallback.target<DMENU::ItemSelection::SelectionHandlerPtr>()) : (void*)DMENU_Menu_DecimalCallBack;
 		#if defined(T2R)
-			SelectionPtr = DMENU_ItemSelection(HeapAllocator, pName.c_str(), pItemSelection, (void*)DMENU_Menu_DecimalCallBack,
+			SelectionPtr = DMENU_ItemSelection(HeapAllocator, pName.c_str(), pItemSelection, SelectionCallBackPtr,
 				pData, NULL, NULL, NULL, pDescription, true);
 		#else
-			SelectionPtr = DMENU_ItemSelection(HeapAllocator, pName.c_str(), pItemSelection, (void*)DMENU_Menu_DecimalCallBack, 
+			SelectionPtr = DMENU_ItemSelection(HeapAllocator, pName.c_str(), pItemSelection, SelectionCallBackPtr,
 				pData, NULL, NULL, NULL, pDescription);
 		#endif
 			spdlog::debug("Created DMENU::Component::ItemSelection('{:s}','{:#x}','{:#x}','{:#x}','{:s}') -> {:#x}",
@@ -273,6 +277,11 @@ namespace NdGameSdk::gamelib::debug {
 		};
 	}
 
+	int64_t NdDevMenu::DecimalCallBack(DMENU::Component& component, DMENU::Message message, uint32_t data) {
+		always_assert(DMENU_Menu_DecimalCallBack == nullptr, "Function pointer was not set!");
+		return DMENU_Menu_DecimalCallBack(&component, message, data);
+	}
+
 	NdDevMenu::DmenuComponentType NdDevMenu::GetComponentType(DMENU::Component* component) {
 		uintptr_t vftablePtr = (uintptr_t)component->Get()->vftable;
 		auto ComponentType = m_DmenuComponentTypeMap.find(vftablePtr);
@@ -287,6 +296,7 @@ namespace NdGameSdk::gamelib::debug {
 		always_assert(DMENU_Menu_DeleteItem == nullptr, "Function pointer was not set!");
 		if (pMenu) {
 			auto ComponentName = pItem->Name();
+			// Consider that this delete also includes internal linked components
 			DMENU_Menu_DeleteItem(pMenu, pItem);
 			spdlog::debug("DMENU_Menu_DeleteItem(RootMenu: 'DMENU::Component::Menu('{:s}')', 'DMENU::Item('{:s}')')",
 				pMenu->Name(), ComponentName);
@@ -295,12 +305,10 @@ namespace NdGameSdk::gamelib::debug {
 		return false;
 	}
 
-	DMENU::Menu* NdDevMenu::Menu_DeleteAllItems(DMENU::Menu* pMenu, bool freeArena) {
 	DMENU::Menu* NdDevMenu::Menu_DeleteAllItems(DMENU::Menu* pMenu, bool pFreeMenu) {
 		always_assert(DMENU_Menu_DeleteAllItems == nullptr, "Function pointer was not set!");
 		if (pMenu) {
 			auto ComponentName = pMenu->Name();
-			DMENU_Menu_DeleteAllItems(pMenu, freeArena);
 			// pFreeMenu - Deallocates pMenu block of memory
 			DMENU_Menu_DeleteAllItems(pMenu, pFreeMenu);
 			spdlog::debug("DMENU_Menu_DeleteAllItems(RootMenu: 'DMENU::Component::Menu('{:s}')')", ComponentName);
@@ -325,6 +333,7 @@ namespace NdGameSdk::gamelib::debug {
 		itemdecimal->SetColor(Color(0xFF00FF00));
 
 		DebugDrawCommon::CreateDebugDrawMenu(this, NdGameSdkMenu);
+		ScriptManager::CreateScriptManagerMenu(this, NdGameSdkMenu);
 
 		return NdGameSdkMenu;
 	}

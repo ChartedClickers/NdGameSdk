@@ -29,7 +29,7 @@ struct DMENU {
         regenny::shared::ndlib::debug::DMENU::Component* m_NextDMenuComponent; // 0x40
         uint32_t m_MenuLeftPad; // 0x48
         uint32_t m_MenuWidth; // 0x4c
-        uint64_t m_LeftPad; // 0x50
+        uint64_t m_ItemLeftPad; // 0x50
         uint64_t Unk2; // 0x58
         uint64_t m_data; // 0x60
         uint32_t m_color; // 0x68

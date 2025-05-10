@@ -1340,11 +1340,6 @@ namespace regenny {
                     VTable* vftable;
                     void* m_pFunction;
                 };
-
-                struct ScriptCFunc {
-                    void** c_func_caller;
-                    void* c_script_func; 
-                };
             
                 // script-module-loader.cpp
                 // List<ModuleRequest>

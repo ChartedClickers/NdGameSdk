@@ -29,7 +29,7 @@ namespace NdGameSdk::ndlib::script {
 
 	class ScriptManagerGlobals;
 	DEFINE_DMENU_ItemSelection(ScriptCFuncDebugMode, Execute, Editor);
-	DEFINE_DMENU_ItemSelection(ScriptCFuncTypeOf, None, Bool, Int, Float, StringId, String);
+	DEFINE_DMENU_ItemSelection(ScriptCFuncTypeOf, None, Bool, Int, Float, String, CFuncValue);
 
 	class ScriptManager : public ISdkComponent {
 	public:
@@ -38,8 +38,17 @@ namespace NdGameSdk::ndlib::script {
 		SdkEvent<> e_ScriptManagerInitialized{true};
 
 		NdGameSdk_API ScriptCFunc* LookupCFunc(StringId64 Hash);
+		template<typename... Args>
+		ScriptValue InvokeCFunc(ScriptCFunc* func, Args&&... args) {
+			std::array<ScriptValue, sizeof...(Args)> argv{ ScriptValue{std::forward<Args>(args)}... };
+
+			ScriptValue ret{};
+			func->CallScriptCFunc(argv.data(), static_cast<uint32_t>(argv.size()), &ret, 0);
+			return ret;
+		}
 
 		static DMENU::ItemSubmenu* CreateScriptManagerMenu(NdDevMenu* pdmenu, DMENU::Menu* pMenu);
+
 	private:
 		void Initialize() override;
 		void Awake() override;
@@ -112,6 +121,7 @@ namespace NdGameSdk::ndlib::script {
 		MidHook m_ScriptManagerInitHook{};
 
 		static std::string s_DataBaseFile;
+
 		/*Extern variables*/
 		ScriptManagerGlobals* g_ScriptManagerGlobals{};
 	};

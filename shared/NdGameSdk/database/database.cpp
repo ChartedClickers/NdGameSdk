@@ -56,10 +56,10 @@ namespace NdGameSdk::DB
         return g_DataBase ? static_cast<JsonDataBase*>(g_DataBase.get())->FlushFile(file, dirty) : false;
     }
 
-    void ClearJsonFile(const std::string& file)
+    void ClearJsonFile(const std::string& file, bool dirty)
     {
         if (g_DataBase) {
-            static_cast<JsonDataBase*>(g_DataBase.get())->ClearFile(file);
+            static_cast<JsonDataBase*>(g_DataBase.get())->ClearFile(file, dirty);
         }
     }
 }

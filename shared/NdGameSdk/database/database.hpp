@@ -42,5 +42,5 @@ namespace NdGameSdk::DB {
     void Clear();
 
     bool FlushJsonFile(const std::string& file, bool dirty = false);
-    void ClearJsonFile(const std::string& file);
+    void ClearJsonFile(const std::string& file, bool dirty = false);
 }

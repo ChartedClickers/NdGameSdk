@@ -84,6 +84,11 @@ namespace NdGameSdk::ndlib::script {
             logger->info("[{}] Refreshing ScriptCFunc info...", GetName());
 
             auto nativeDump = g_ScriptManagerGlobals->DumpNativeFunctions();
+
+            if (!m_ScriptCFuncs.empty()) {
+                NdGameSdk::DB::ClearJsonFile(s_DataBaseFile, false);
+            }
+
             m_ScriptCFuncs = NdGameSdk::DB::Get<std::map<StringId64, ScriptCFuncInfo>>(
                 s_DataBaseFile, "ScriptCFuncs", m_ScriptCFuncs);
 
@@ -133,8 +138,6 @@ namespace NdGameSdk::ndlib::script {
            if (ScriptMgr) {  
                spdlog::info("TestFunct called!");  
                auto CFunct = ScriptMgr->LookupCFunc(SID("kill-player"));
-               spdlog::info(std::format("TestFunct data: {:#x}", reinterpret_cast<uintptr_t>(CFunct)));
-
                if (CFunct) {
                    ScriptValue _returnvalue{};
                    CFunct->CallScriptCFunc(ScriptValue{}, 0, &_returnvalue);
@@ -158,9 +161,6 @@ namespace NdGameSdk::ndlib::script {
 
             DMENU::Menu* ScriptManagerMenu = pdmenu->Create_DMENU_Menu(ScriptMgr->GetName().data(), HeapArena_Source);
             if (ScriptManagerMenu) {
-
-                pdmenu->Create_DMENU_ItemFunction("Test funct", ScriptManagerMenu, &TestFunct, ScriptMgrAddr, false, HeapArena_Source);
-
                 /*ScriptCFuncDebugMenu*/
                 ScriptMgr->m_ScriptCFuncDebugMenu = pdmenu->Create_DMENU_Menu("ScriptCFuncs Debugging", HeapArena_Source);
 
@@ -168,6 +168,10 @@ namespace NdGameSdk::ndlib::script {
                     ScriptMgr->m_ScriptCFuncDebugMenu, OnUpdateScriptCFuncDebugMenu, ScriptMgrAddr, nullptr, HeapArena_Source);
                 pdmenu->Create_DMENU_String("// ScriptCFuncDebugMenu [BETA]", ScriptMgr->m_ScriptCFuncDebugMenu, nullptr, HeapArena_Source);
                 pdmenu->Create_DMENU_String(ScriptMgr->m_NativeTableEntriesText, ScriptMgr->m_ScriptCFuncDebugMenu, nullptr, HeapArena_Source);
+
+            #ifndef NDEBUG
+                pdmenu->Create_DMENU_ItemFunction("Test funct", ScriptManagerMenu, &TestFunct, ScriptMgrAddr, false, HeapArena_Source);
+            #endif
 
                 return pdmenu->Create_DMENU_ItemSubmenu(ScriptManagerMenu->Name(),
                     pMenu, ScriptManagerMenu, NULL, NULL, nullptr, HeapArena_Source);
@@ -231,7 +235,7 @@ namespace NdGameSdk::ndlib::script {
             +[](DMENU::ItemFunction& pFunction, DMENU::Message pMessage)->bool {
                 if (pMessage == DMENU::Message::OnExecute) {
                     ScriptManager* ScriptMgr = Instance<ScriptManager>();
-					return DB::FlushJsonFile(ScriptMgr->s_DataBaseFile);
+					return DB::FlushJsonFile(ScriptMgr->s_DataBaseFile, false);
                 }
                 return true;
             }, 0x0, false, HeapArena_Source);
@@ -265,6 +269,8 @@ namespace NdGameSdk::ndlib::script {
 		static bool RebuildExecutorMenu = false;
         if (!pSwitchMode) {
 
+            pProperties->CFuncEditor.reset();
+
             if (pMenu != ScriptMgr->m_ScriptCFuncDebugExecuteMenu) {
                 NdDevMenu->Create_DMENU_TextLineWrapper("ScriptCFunc Executor", pMenu, HeapArena_Source);
             }
@@ -277,6 +283,22 @@ namespace NdGameSdk::ndlib::script {
                     std::string formattedDesc = std::vformat("// Description: {}", std::make_format_args(CFuncInfo->Description));
                     NdDevMenu->Create_DMENU_String(formattedDesc, pMenu, nullptr, HeapArena_Source);
                 }
+
+                NdDevMenu->Create_DMENU_ItemFunction("Save Data", pMenu,
+                    +[](DMENU::ItemFunction& pFunction, DMENU::Message pMessage)->bool {
+                        if (pMessage == DMENU::Message::OnExecute) {
+                            ScriptManager* ScriptMgr = Instance<ScriptManager>();
+                            ScriptCFuncInfo* CFuncInfo = ScriptMgr->m_ScriptCFuncDebugMenuProperties.ScriptCFuncInfo;
+
+                            if (CFuncInfo) {
+                                NdGameSdk::DB::Set(s_DataBaseFile, "ScriptCFuncs", ScriptMgr->m_ScriptCFuncs);
+                                return true;
+                            }
+                            return false;
+                            
+                        }
+                        return true;
+                    }, 0x0, false, HeapArena_Source);
 
                 NdDevMenu->Create_DMENU_ItemSelection("Mode", pMenu, ScriptCFuncDebugMode_selection, ExecutorModeHandler,
                     (uint64_t*)&pProperties->ScriptCFuncDebugMode, nullptr, HeapArena_Source);
@@ -313,7 +335,48 @@ namespace NdGameSdk::ndlib::script {
                             NdDevMenu->Create_DMENU_ItemFloat(arg.Name, pMenu, (float*)arg.Data, { 0.0f, 5000.0f }, { 0.1f, 5.0f }, arg.Description.c_str(), HeapArena_Source);
                             break;
                         }
-                        case ScriptCFuncInfo::TypeOf::StringId:
+                        case ScriptCFuncInfo::TypeOf::CFuncValue: {
+
+							NdDevMenu->Create_DMENU_ItemFunction(arg.Name, pMenu,
+								+[](DMENU::ItemFunction& pFunction, DMENU::Message pMessage)->bool {
+									if (pMessage == DMENU::Message::OnExecute) {
+                                        ScriptManager* ScriptMgr = Instance<ScriptManager>();
+
+                                        StringId64 CFuncHash = ParseStringToStringId(pFunction.Name().c_str());
+                                        auto ScriptCFuncArg = ScriptMgr->m_ScriptCFuncs.find(CFuncHash);
+                                        if (ScriptCFuncArg == ScriptMgr->m_ScriptCFuncs.end()) {
+											spdlog::error("[{}] ScriptCFunc {} not found!", ScriptMgr->GetName(), pFunction.Name());
+											return false;
+                                        }
+
+                                        ScriptCFuncInfo* CFuncInfo = &ScriptCFuncArg->second;
+                                        ScriptCFunc* CFunc = ScriptMgr->LookupCFunc(CFuncInfo->Hash);
+                                        if (CFunc) {
+                                            ScriptValue _returnvalue{};
+                                            CFunc->CallScriptCFunc(CFuncInfo->makeScriptArgs(), static_cast<uint32_t>(CFuncInfo->Args.size()), &_returnvalue);
+                                            spdlog::info("[{}] ScriptCFunc {} executed!", ScriptMgr->GetName(), CFuncInfo->Name);
+                                            auto ret = _returnvalue.val<uint64_t>(0);
+                                            if (ret != 0) {
+                                                auto* ArgData = reinterpret_cast<uint64_t*>(pFunction.Data());
+                                                ArgData[0] = ret;
+												spdlog::info("[{}] Return value: {:#x}", ScriptMgr->GetName(), ret);
+                                                return true;
+                                            }
+                                            else {
+												spdlog::error("[{}] {}->ScriptValue[0] returned nothing!", ScriptMgr->GetName(), CFuncInfo->Name);
+                                                return false;
+                                            }
+
+                                        }
+                                        else {
+                                            spdlog::error("[{}] ScriptCFunc {} not found!", ScriptMgr->GetName(), CFuncInfo->Name);
+                                        }
+										return false;
+									}
+									return true;
+								}, reinterpret_cast<uint64_t>(&arg.Data), false, HeapArena_Source);
+                            break;
+                        }
                         case ScriptCFuncInfo::TypeOf::String: {
                         default:
                             NdDevMenu->Create_DMENU_KeyBoard(arg.Name, pMenu, (char*)arg.Data, 100, arg.Description.c_str(), HeapArena_Source);
@@ -323,7 +386,35 @@ namespace NdGameSdk::ndlib::script {
                     }
                 }
 
-                NdDevMenu->Create_DMENU_String("Execute", pMenu, nullptr, HeapArena_Source);
+                NdDevMenu->Create_DMENU_ItemFunction("Execute", pMenu,
+                    +[](DMENU::ItemFunction& pFunction, DMENU::Message pMessage)->bool {
+                        if (pMessage == DMENU::Message::OnExecute) {
+                            ScriptManager* ScriptMgr = Instance<ScriptManager>();
+                            auto* CFuncInfo = reinterpret_cast<ScriptCFuncInfo*>(pFunction.Data());
+
+                            if (CFuncInfo) {
+                                ScriptCFunc* CFunc = ScriptMgr->LookupCFunc(CFuncInfo->Hash);
+								if (CFunc) {
+									ScriptValue _returnvalue{};
+									CFunc->CallScriptCFunc(CFuncInfo->makeScriptArgs(), static_cast<uint32_t>(CFuncInfo->Args.size()), &_returnvalue);
+									spdlog::info("[{}] ScriptCFunc {} executed!", ScriptMgr->GetName(), CFuncInfo->Name);
+                                    uint32_t i = 0;
+                                    for (auto v : _returnvalue->val) {
+                                        if (v == 0) break;
+                                        spdlog::info("[{}] Return[{}] = {:#x}", ScriptMgr->GetName(), i++, v);
+                                    }
+                                    return true;
+								}
+								else {
+									spdlog::error("[{}] ScriptCFunc {} not found!", ScriptMgr->GetName(), CFuncInfo->Name);
+                                    return false;
+								}
+                            }
+                            return false;
+                        }
+                        return true;
+                    }, reinterpret_cast<uint64_t>(pProperties->ScriptCFuncInfo), false, HeapArena_Source);
+
 				break;
 			}
             case ScriptCFuncDebugMode::Editor: {
@@ -333,16 +424,24 @@ namespace NdGameSdk::ndlib::script {
                 }
 
                 auto CFuncEditor = pProperties->CFuncEditor.get();
+                uint32_t MaxArgs = 0x10;
 
                 if (!RebuildExecutorMenu) {
 
                     SyncCFuncEditorBuffers(*CFuncInfo, *CFuncEditor, true);
                     NdDevMenu->Create_DMENU_ItemLine(pMenu, HeapArena_Source);
                     NdDevMenu->Create_DMENU_KeyBoard("Description", pMenu, CFuncEditor->DescriptionBuf, sizeof(CFuncEditor->DescriptionBuf), nullptr, HeapArena_Source);
-                    NdDevMenu->Create_DMENU_ItemDecimal("Arguments", pMenu, &CFuncEditor->NumArgs, { 0, 10 }, { 1, 1 }, nullptr, HeapArena_Source)
+                    NdDevMenu->Create_DMENU_ItemDecimal("Arguments", pMenu, &CFuncEditor->NumArgs, { 0, MaxArgs }, {1, 1}, nullptr, HeapArena_Source)
                         ->SetHandler((DMENU::ItemDecimal::DecimalHandler*)ArgumentsHandler);
 					RebuildExecutorMenu = true;
                 }
+                
+				if (CFuncEditor->NumArgs > MaxArgs) {
+					CFuncEditor->NumArgs = MaxArgs;
+				}
+				else if (CFuncEditor->NumArgs < 0) {
+					CFuncEditor->NumArgs = 0;
+				}
 
                 CFuncEditor->EditedArgs.resize(CFuncEditor->NumArgs);
                 for (int i = 0; i < CFuncEditor->NumArgs; i++) {
@@ -526,9 +625,6 @@ namespace NdGameSdk::ndlib::script {
 			return true;
 		}
 		case DMENU::Message::OnClose: {
-			if (MenuProperties->CFuncEditor && !pMenu->IsActive()) {
-				MenuProperties->CFuncEditor.reset();
-			}
 			return true;
 		}
         case DMENU::Message::OnSaveConfig: {
@@ -546,17 +642,9 @@ namespace NdGameSdk::ndlib::script {
         }
 
         std::string_view sv{ input };
+        StringId64 hash = ParseStringToStringId(sv.data());
 
-        if (sv.size() > 2 && (sv.rfind("0x", 0) == 0 || sv.rfind("0X", 0) == 0)) {
-            auto hexPart = sv.substr(2);
-            uint64_t hash = 0;
-            try {
-                hash = std::stoull(std::string(hexPart), nullptr, 16);
-            }
-            catch (...) {
-                return nullptr;
-            }
-
+        if (hash != 0x0) {
             auto it = m_ScriptCFuncs.find(StringId64{ hash });
             return it != m_ScriptCFuncs.end() ? &it->second : nullptr;
         }

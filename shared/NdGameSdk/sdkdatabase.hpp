@@ -49,7 +49,7 @@ namespace NdGameSdk {
         void Clear() override;
 
         bool FlushFile(const std::string& file, bool dirty = false);
-        void ClearFile(const std::string& file);
+        void ClearFile(const std::string& file, bool removeDisk = false);
 
     protected:
         void SetImpl(const std::string& file, const std::string& key, const nlohmann::json& v) override;

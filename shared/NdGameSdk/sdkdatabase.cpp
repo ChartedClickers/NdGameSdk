@@ -40,9 +40,26 @@ namespace NdGameSdk {
         return true;
     }
 
-    void JsonDataBase::ClearFile(const std::string& file) {
+    void JsonDataBase::ClearFile(const std::string& file, bool removeDisk) {
         std::scoped_lock lock(mtx_);
-        cache_.erase(file);
+
+        bool wasDirty = false;
+        auto it = cache_.find(file);
+        if (it != cache_.end()) {
+            wasDirty = it->second.dirty;
+            cache_.erase(it);
+        }
+
+        if (removeDisk && wasDirty) {
+            std::filesystem::path p = root_ / file;
+            std::error_code ec;
+            if (!std::filesystem::remove(p, ec)) {
+                spdlog::warn("[JsonDB] Failed to remove {}: {}", p.string(), ec.message());
+            }
+            else {
+                spdlog::info("[JsonDB] Removed on-disk file {}", p.string());
+            }
+        }
     }
 
     inline auto JsonDataBase::loadFile(const std::string& file) -> Entry& {

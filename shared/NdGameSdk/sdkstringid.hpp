@@ -87,3 +87,20 @@ typedef StringId32 StringId;
 typedef StringId64 StringId;
 #define SID(str) ToStringId64(str)
 #endif
+
+constexpr NdGameSdk_API StringId ParseStringToStringId(const char* str) {
+    if (str && *str) {
+        std::string_view sv{ str };
+        if (sv.size() > 2 && 
+            (sv.rfind("0x", 0) == 0 || sv.rfind("0X", 0) == 0)) {
+            try {
+                return std::stoull(std::string(sv.substr(2)), nullptr, 16);
+            }
+            catch (...) {
+                return 0;
+            }
+        }
+        return SID(str);
+    }
+    return 0;
+}

@@ -20,9 +20,11 @@ using namespace std;
 
 namespace NdGameSdk::ndlib::script {
 
+    class ScriptValue;
+
 	struct ScriptCFuncInfo {
 
-		enum class TypeOf : uint64_t { None, Bool, Int, Float, StringId, String };
+		enum class TypeOf : uint64_t { None, Bool, Int, Float, String, CFuncValue };
 
 		struct Arguments {
 			TypeOf Type;
@@ -32,24 +34,28 @@ namespace NdGameSdk::ndlib::script {
             uint64_t Data[20]{};
 		};
 
+        ScriptValue makeScriptArgs();
+
 		string Name;
         StringId64 Hash;
         vector<Arguments> Args;
 		string Description;
 	};
 
-
-
     class ScriptValue : public ISdkRegenny<regenny::shared::ndlib::script::ScriptValue>
     {
     public:
         ScriptValue() = default;
-        ScriptValue(std::initializer_list<uint64_t> init) : ScriptValue() {
+        ScriptValue(std::initializer_list<uint64_t> init);
+
+        template<typename... Ts, typename = std::enable_if_t<(sizeof...(Ts) >= 1)>>
+            ScriptValue(Ts&&... ts) : ScriptValue() {
             if (auto self = this->Get()) {
-                size_t n = (std::min)(init.size(), std::size(self->val));
-                auto it = init.begin();
-                for (size_t i = 0; i < n; ++i, ++it) {
-                    self->val[i] = *it;
+                uint64_t tmp[] = { to_u64(std::forward<Ts>(ts))... };
+                constexpr size_t M = std::size(tmp);
+                const size_t N = (std::min)(M, std::size(self->val));
+                for (size_t i = 0; i < N; ++i) {
+                    self->val[i] = tmp[i];
                 }
             }
         }
@@ -91,6 +97,16 @@ namespace NdGameSdk::ndlib::script {
         T val(int index) const {
             return (T)this->Get()->val[index];
         }
+    private:
+        static uint64_t to_u64(uint64_t v) { return v; }
+        static uint64_t to_u64(int v) { return static_cast<uint64_t>(v); }
+        static uint64_t to_u64(const char* s) { return SID(s); }
+        static uint64_t to_u64(const std::string& s) { return SID(s.c_str()); }
+        static uint64_t to_u64(float f) {
+            uint64_t bits;
+            std::memcpy(&bits, &f, sizeof(f));
+            return bits;
+        }
     };
 
 
@@ -114,15 +130,32 @@ namespace NdGameSdk::ndlib::script {
     }
 
     inline void to_json(nlohmann::json& j, const ScriptCFuncInfo::Arguments& a) {
+
+        std::string hex;
+        hex.reserve(20 * 16);
+        for (auto v : a.Data) {
+            hex += fmt::format("{:016x}", v);
+        }
+
         j = { { "Type",        a.Type },
               { "Name",        a.Name },
-              { "Description", a.Description } };
+              { "Description", a.Description },
+              { "Data",        hex } };
     }
 
     inline void from_json(const nlohmann::json& j, ScriptCFuncInfo::Arguments& a) {
         j.at("Type").get_to(a.Type);
         j.at("Name").get_to(a.Name);
         j.at("Description").get_to(a.Description);
+
+		if (j.find("Data") != j.end()) {
+            std::string hex = j.at("Data").get<std::string>();
+            for (size_t i = 0; i < 20; ++i) {
+                auto substr = hex.substr(i * 16, 16);
+                a.Data[i] = std::stoull(substr, nullptr, 16);
+            }
+		}
+
     }
 
     inline void to_json(nlohmann::json& j, const ScriptCFuncInfo& s) {
@@ -145,4 +178,5 @@ namespace NdGameSdk::ndlib::script {
 #pragma endregion
 
 	static_assert(sizeof(ScriptValue) == 0x80, "Size of ScriptValue is not correct.");
+    static_assert(sizeof(ScriptCFunc) == 0x10, "Size of ScriptCFunc is not correct.");
 }

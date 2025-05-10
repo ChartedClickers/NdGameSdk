@@ -131,31 +131,42 @@ namespace NdGameSdk::ndlib::script {
 
     inline void to_json(nlohmann::json& j, const ScriptCFuncInfo::Arguments& a) {
 
-        std::string hex;
-        hex.reserve(20 * 16);
-        for (auto v : a.Data) {
-            hex += fmt::format("{:016x}", v);
+        int last_used = -1;
+        for (int i = 0; i < 20; ++i) {
+            if (a.Data[i] != 0)
+                last_used = i;
         }
 
         j = { { "Type",        a.Type },
               { "Name",        a.Name },
-              { "Description", a.Description },
-              { "Data",        hex } };
+              { "Description", a.Description }
+        };
+
+        if (last_used >= 0) {
+            std::string hex;
+            for (int i = 0; i <= last_used; ++i) {
+                hex += fmt::format("{:016x}", a.Data[i]);
+            }
+            j["Data"] = hex;
+        }
     }
 
-    inline void from_json(const nlohmann::json& j, ScriptCFuncInfo::Arguments& a) {
-        j.at("Type").get_to(a.Type);
-        j.at("Name").get_to(a.Name);
-        j.at("Description").get_to(a.Description);
+    inline void from_json(const nlohmann::json& j, ScriptCFuncInfo::Arguments& a) {  
+       j.at("Type").get_to(a.Type);  
+       j.at("Name").get_to(a.Name);  
+       j.at("Description").get_to(a.Description);  
 
-		if (j.find("Data") != j.end()) {
-            std::string hex = j.at("Data").get<std::string>();
-            for (size_t i = 0; i < 20; ++i) {
-                auto substr = hex.substr(i * 16, 16);
-                a.Data[i] = std::stoull(substr, nullptr, 16);
-            }
-		}
+       std::fill(std::begin(a.Data), std::end(a.Data), 0);  
 
+       if (j.contains("Data")) {  
+           std::string hex = j.at("Data").get<std::string>();  
+           size_t len = hex.length() / 16;  
+           len = (std::min)(len, size_t(20)); // Don't overrun  
+           for (size_t i = 0; i < len; ++i) {  
+               auto substr = hex.substr(i * 16, 16);  
+               a.Data[i] = std::stoull(substr, nullptr, 16);  
+           }  
+       }  
     }
 
     inline void to_json(nlohmann::json& j, const ScriptCFuncInfo& s) {

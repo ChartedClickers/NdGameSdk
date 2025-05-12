@@ -141,7 +141,7 @@ namespace NdGameSdk::ndlib::script {
                if (CFunct) {
                    ScriptValue _returnvalue{};
                    CFunct->CallScriptCFunc(ScriptValue{}, 0, &_returnvalue);
-               }             
+				   }
 
                return true;  
            }  
@@ -300,6 +300,29 @@ namespace NdGameSdk::ndlib::script {
                         return true;
                     }, 0x0, false, HeapArena_Source);
 
+                NdDevMenu->Create_DMENU_ItemFunction("Print ScriptCFuncAddress", pMenu,
+                    +[](DMENU::ItemFunction& pFunction, DMENU::Message pMessage)->bool {
+                        if (pMessage == DMENU::Message::OnExecute) {
+                            ScriptManager* ScriptMgr = Instance<ScriptManager>();
+                            auto* CFuncInfo = reinterpret_cast<ScriptCFuncInfo*>(pFunction.Data());
+
+                            if (CFuncInfo) {
+                                ScriptCFunc* CFunc = ScriptMgr->LookupCFunc(CFuncInfo->Hash);
+                                if (CFunc) {
+                                    spdlog::info("[{}] ScriptCFuncAddress {:#x}", ScriptMgr->GetName(), reinterpret_cast<uintptr_t>(CFunc->GetFunc()));
+                                    return true;
+                                }
+                                else {
+                                    spdlog::error("[{}] ScriptCFunc {} not found!", ScriptMgr->GetName(), CFuncInfo->Name);
+                                    return false;
+                                }
+                            }
+                            return false;
+
+                        }
+                        return true;
+                    }, reinterpret_cast<uint64_t>(pProperties->ScriptCFuncInfo), false, HeapArena_Source);
+
                 NdDevMenu->Create_DMENU_ItemSelection("Mode", pMenu, ScriptCFuncDebugMode_selection, ExecutorModeHandler,
                     (uint64_t*)&pProperties->ScriptCFuncDebugMode, nullptr, HeapArena_Source);
             } else {
@@ -336,45 +359,7 @@ namespace NdGameSdk::ndlib::script {
                             break;
                         }
                         case ScriptCFuncInfo::TypeOf::CFuncValue: {
-
-							NdDevMenu->Create_DMENU_ItemFunction(arg.Name, pMenu,
-								+[](DMENU::ItemFunction& pFunction, DMENU::Message pMessage)->bool {
-									if (pMessage == DMENU::Message::OnExecute) {
-                                        ScriptManager* ScriptMgr = Instance<ScriptManager>();
-
-                                        StringId64 CFuncHash = ParseStringToStringId(pFunction.Name().c_str());
-                                        auto ScriptCFuncArg = ScriptMgr->m_ScriptCFuncs.find(CFuncHash);
-                                        if (ScriptCFuncArg == ScriptMgr->m_ScriptCFuncs.end()) {
-											spdlog::error("[{}] ScriptCFunc {} not found!", ScriptMgr->GetName(), pFunction.Name());
-											return false;
-                                        }
-
-                                        ScriptCFuncInfo* CFuncInfo = &ScriptCFuncArg->second;
-                                        ScriptCFunc* CFunc = ScriptMgr->LookupCFunc(CFuncInfo->Hash);
-                                        if (CFunc) {
-                                            ScriptValue _returnvalue{};
-                                            CFunc->CallScriptCFunc(CFuncInfo->makeScriptArgs(), static_cast<uint32_t>(CFuncInfo->Args.size()), &_returnvalue);
-                                            spdlog::info("[{}] ScriptCFunc {} executed!", ScriptMgr->GetName(), CFuncInfo->Name);
-                                            auto ret = _returnvalue.val<uint64_t>(0);
-                                            if (ret != 0) {
-                                                auto* ArgData = reinterpret_cast<uint64_t*>(pFunction.Data());
-                                                ArgData[0] = ret;
-												spdlog::info("[{}] Return value: {:#x}", ScriptMgr->GetName(), ret);
-                                                return true;
-                                            }
-                                            else {
-												spdlog::error("[{}] {}->ScriptValue[0] returned nothing!", ScriptMgr->GetName(), CFuncInfo->Name);
-                                                return false;
-                                            }
-
-                                        }
-                                        else {
-                                            spdlog::error("[{}] ScriptCFunc {} not found!", ScriptMgr->GetName(), CFuncInfo->Name);
-                                        }
-										return false;
-									}
-									return true;
-								}, reinterpret_cast<uint64_t>(&arg.Data), false, HeapArena_Source);
+							NdDevMenu->Create_DMENU_String(arg.Name, pMenu, arg.Description.c_str(), HeapArena_Source);
                             break;
                         }
                         case ScriptCFuncInfo::TypeOf::String: {
@@ -395,6 +380,40 @@ namespace NdGameSdk::ndlib::script {
                             if (CFuncInfo) {
                                 ScriptCFunc* CFunc = ScriptMgr->LookupCFunc(CFuncInfo->Hash);
 								if (CFunc) {
+                                    for (auto& arg : CFuncInfo->Args) {
+                                        if (arg.Type == ScriptCFuncInfo::TypeOf::CFuncValue) {
+
+                                            StringId64 CFuncHash = ParseStringToStringId(arg.Name.c_str());
+                                            auto ScriptCFuncArg = ScriptMgr->m_ScriptCFuncs.find(CFuncHash);
+                                            if (ScriptCFuncArg == ScriptMgr->m_ScriptCFuncs.end()) {
+                                                spdlog::error("[{}] ScriptCFunc {} not found!", ScriptMgr->GetName(), pFunction.Name());
+                                                return false;
+                                            }
+
+                                            ScriptCFuncInfo* CFuncInfo = &ScriptCFuncArg->second;
+                                            ScriptCFunc* CFunc = ScriptMgr->LookupCFunc(CFuncInfo->Hash);
+                                            if (CFunc) {
+                                                ScriptValue _returnvalue{};
+                                                CFunc->CallScriptCFunc(CFuncInfo->makeScriptArgs(), static_cast<uint32_t>(CFuncInfo->Args.size()), &_returnvalue);
+                                                spdlog::info("[{}] ScriptCFunc {} executed!", ScriptMgr->GetName(), CFuncInfo->Name);
+                                                auto ret = _returnvalue.val<uint64_t>(0);
+                                                if (ret != 0) {
+                                                    arg.Data[0] = ret;
+                                                    spdlog::info("[{}] Return value: {:#x}", ScriptMgr->GetName(), ret);
+                                                }
+                                                else {
+                                                    spdlog::error("[{}] {}->ScriptValue[0] returned nothing!", ScriptMgr->GetName(), CFuncInfo->Name);
+                                                    return false;
+                                                }
+                                            }
+                                            else {
+                                                spdlog::error("[{}] ScriptCFunc {} not found!", ScriptMgr->GetName(), CFuncInfo->Name);
+                                                return false;
+                                            }
+
+                                        }
+                                    }
+
 									ScriptValue _returnvalue{};
 									CFunc->CallScriptCFunc(CFuncInfo->makeScriptArgs(), static_cast<uint32_t>(CFuncInfo->Args.size()), &_returnvalue);
 									spdlog::info("[{}] ScriptCFunc {} executed!", ScriptMgr->GetName(), CFuncInfo->Name);

@@ -788,10 +788,10 @@ namespace NdGameSdk::gamelib::debug {
 		if (CursorIndex > len) CursorIndex = static_cast<uint32_t>(len);
 		size_t n = (std::min)(kMaxPaste - 1 - len, clip.size());
 
-		memmove(buf + CursorIndex + n, buf + CursorIndex, len - CursorIndex);
+		memmove(buf + CursorIndex + n, buf + CursorIndex, (len - CursorIndex) + 1);
 		memcpy(buf + CursorIndex, clip.data(), n);
-		buf[CursorIndex + n] = '\0';
 		CursorIndex += static_cast<uint32_t>(n);
+
 		*reinterpret_cast<uintptr_t*>(ctx.trampoline_rsp) = 
 			pNdDevMenu->m_KeyBoard_ClipBoardHook.target_address() + kSkipInputData;
 		return;

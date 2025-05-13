@@ -182,6 +182,8 @@ set(Utility_SOURCES
 	"shared/Utility/memory/String.hpp"
 	"shared/Utility/memory/proc-memory.cpp"
 	"shared/Utility/memory/proc-memory.hpp"
+	"shared/Utility/system/clipboard.cpp"
+	"shared/Utility/system/clipboard.hpp"
 )
 
 add_library(Utility STATIC)

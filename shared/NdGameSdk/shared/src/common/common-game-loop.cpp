@@ -3,8 +3,6 @@
 
 namespace NdGameSdk::common {
 
-	using NdKeyboardKey = NdFrameState::NdKeyboardLayer::Key;
-
 	CommonGameLoop::CommonGameLoop(EngineComponents* pEngineComponents, NdDevMenu* pNdDevMenu)
 		: m_EngineComponents{ pEngineComponents }, m_NdDevMenu{ pNdDevMenu }, ISdkSubComponent(TOSTRING(CommonGameLoop)) {}
 
@@ -43,6 +41,7 @@ namespace NdGameSdk::common {
 	}
 
 	void CommonGameLoop::GameLoopUpdate(SafetyHookContext& ctx) {
+		using NdKeyboardKey = NdFrameState::NdKeyboardLayer::Key;
 
 #ifndef NDEBUG
 		static shared_ptr<CommonGameLoop> pCommonGameLoop = GetSharedComponents()->

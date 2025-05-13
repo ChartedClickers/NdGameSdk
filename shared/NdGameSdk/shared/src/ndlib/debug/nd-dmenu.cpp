@@ -171,6 +171,10 @@ namespace NdGameSdk::ndlib::debug {
 		return this->Get()->m_maxInputLength;
 	}
 
+	uint64_t DMENU::KeyBoard::GetCursorIndex() {
+		return this->Get()->m_cursorIndex;
+	}
+
 	uint64_t DMENU::KeyBoard::SetMaxInputLength(uint64_t length) {
 		return this->Get()->m_maxInputLength = length;
 	}

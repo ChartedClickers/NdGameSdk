@@ -172,6 +172,7 @@ namespace NdGameSdk::ndlib::debug {
 			State GetState();
 			uint64_t GetActiveKey();
 			uint64_t GetMaxInputLength();
+			uint64_t GetCursorIndex();
 			char* GetInputBuffer();
 			char* GetDisplayBuffer();
 

@@ -14,6 +14,7 @@
 
 #include <map>
 #include <Utility/helper.hpp>
+#include <Utility/system/clipboard.hpp>
 
 using namespace NdGameSdk::corelib::memory;
 using namespace NdGameSdk::corelib::memory::HeapAllocator;
@@ -29,11 +30,12 @@ namespace NdGameSdk::gamelib::debug {
 
 	class NdDevMenu : public ISdkComponent {
 	public:
-
 		#define AppendSdkSubMenus_Args DMENU::Menu* CustomMenu, const char* Description, DMENU::ItemSubmenu::SubmenuCallback SubmenuCallback, uint64_t Data
 		using AppendSdkSubMenusCallback = boost::function<void(AppendSdkSubMenus_Args)>;
 		template <typename... Args>
 		using WrapMenuComponent = boost::function<bool(DMENU::Menu*, Args...)>;
+
+		using NdKeyboardKey = NdFrameState::NdKeyboardLayer::Key;
 
 		enum DmenuComponentType { Unknown, MenuGroup, Menu, String, KeyBoard, ItemPlaceHolder, ItemLine, ItemSubmenu,
 			ItemBool, ItemDecimal, ItemFloat, ItemFunction, ItemSelection, ItemSubText
@@ -130,6 +132,9 @@ namespace NdGameSdk::gamelib::debug {
 		NdDevMenuCfg m_cfg{};
 
 		MidHook m_SetRootMenuHook{};
+		MidHook m_KeyBoard_ClipBoardHook{};
+		FunctionHook::Ptr m_FavoriteItemKeyCodeHook{};
+		FunctionHook::Ptr m_KeyboardSearchStateHook{};
 		Patch::Ptr m_GameConfig_DevModePatch{};
 #if defined(T1X)
 		Patch::Ptr m_Assert_UpdateSelectRegionByNameMenuPatch{};
@@ -145,6 +150,12 @@ namespace NdGameSdk::gamelib::debug {
 		shared_ptr<EngineComponents> m_EngineComponents;
 		shared_ptr<Memory> m_Memory;
 		shared_ptr<CommonGame> m_CommonGame;
+
+		static void DMENU_KeyBoard_ClipBoardHook(SafetyHookContext& ctx);
+
+		/*Extern variables*/
+		static bool* s_IsKeyboardSearchActive;
+		static bool* s_IsKeyboardComponentActive;
 
 		MEMBER_FUNCTION_PTR(DMENU::Menu*, DMENU_Menu, DMENU::Menu* Heap, const char* name);
 		MEMBER_FUNCTION_PTR(DMENU::ItemLine*, DMENU_ItemLine, DMENU::ItemLine* Heap);
@@ -178,6 +189,7 @@ namespace NdGameSdk::gamelib::debug {
 
 		friend DMENU;
 		friend CommonGameLoop;
+		friend void FavoriteItemKeycode_CC();
 	};
 
 }

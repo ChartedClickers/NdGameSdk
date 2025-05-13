@@ -3,6 +3,7 @@
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/components/SdkSubComponent.hpp"
 #include <NdGameSdk/shared/src/ndlib/engine-components.hpp>
+#include <NdGameSdk/shared/src/ndlib/nd-frame-state.hpp>
 #include <NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp>
 
 #include <Utility/helper.hpp>

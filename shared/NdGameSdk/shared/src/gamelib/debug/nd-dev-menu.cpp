@@ -4,6 +4,8 @@
 #include <NdGameSdk/shared/src/ndlib/render/dev/debugdraw-common.hpp>
 #include <NdGameSdk/shared/src/ndlib/script/script-manager.hpp>
 
+#include <cstddef> 
+
 using namespace boost::placeholders;
 using namespace NdGameSdk::ndlib::script;
 using namespace NdGameSdk::ndlib::render::dev;
@@ -19,6 +21,18 @@ namespace NdGameSdk::gamelib::debug {
 			m_CommonGame->e_GameInitialized.Unsubscribe({ this, &NdDevMenu::OnGameInitialized });
 		}
 	}
+	
+	constexpr uint32_t DMENU_CurrentMenuOffset = offsetof(regenny::shared::ndlib::debug::DMENU, m_CurrentMenu);
+	constexpr uint32_t DMENU_KeyBoard_CursorIndexOffset = offsetof(regenny::shared::ndlib::debug::DMENU::KeyBoard, m_cursorIndex)
+		- sizeof(regenny::shared::ndlib::debug::DMENU::Component);
+	constexpr uint32_t DMENU_KeyBoard_isDirtyOffset = offsetof(regenny::shared::ndlib::debug::DMENU::KeyBoard, m_isDirty)
+		- sizeof(regenny::shared::ndlib::debug::DMENU::Component);
+
+	uintptr_t FavoriteItemKeyCode_ReturnAddr = NULL;
+	void FavoriteItemKeycode_CC();
+
+	uintptr_t KeyboardSearchState_ReturnAddr = NULL;
+	void KeyboardSearchState_CC();
 
 	bool NdDevMenu::IsGameDebugMenu() {
 
@@ -392,10 +406,53 @@ namespace NdGameSdk::gamelib::debug {
 #if defined(T2R)
 			constexpr unsigned char m_DevMode_1[] = { 0xb2, 0x01, 0x90 };
 			constexpr size_t SetRootMenuHook_Offset = 0x95;
+
+			// Disable FavoriteItem keycode handler if any DMENU keyboard component is active
+			findpattern = Patterns::NdDevMenu_DMENU_Menu_UpdateItems_FavoriteItemKeyCode;
+			auto pFavoriteItemKeyCode = Utility::FindAndPrintPattern(module
+				, findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_Menu_UpdateItems_FavoriteItemKeyCode), findpattern.offset);
+
 #elif defined(T1X)
 			constexpr unsigned char m_DevMode_1[] = { 0xb9, 0x00, 0x00, 0x00, 0x00, 0x90 };
 			constexpr size_t SetRootMenuHook_Offset = 0x93;
 #endif
+			findpattern = Patterns::NdDevMenu_DMENU_MenuGroup_SetRootMenu;
+			auto SetRootMenuJMP = (void*)Utility::FindAndPrintPattern(module, 
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_MenuGroup_SetRootMenu), findpattern.offset + SetRootMenuHook_Offset);
+
+			findpattern = Patterns::NdDevMenu_DMENU_KeyBoard_Handler_ClipBoardHook;
+			auto pKeyboardClipBoardJMP = (void*)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_KeyBoard_Handler_ClipBoardHook), findpattern.offset);
+
+			// Enable Ctrl + F combination if only DMENU is active, otherwise keep locked.
+			findpattern = Patterns::NdDevMenu_DMENU_Menu_Update_KeyboardSearchState;
+			auto pKeyboardSearchState = Utility::FindAndPrintPattern(module
+				, findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_Menu_Update_KeyboardSearchState), findpattern.offset);
+
+			findpattern = Patterns::NdDevMenu_DMENU_s_IsKeyboardSearchActive;
+			auto IsKeyboardSearchActive = Utility::ReadLEA32(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_s_IsKeyboardSearchActive), findpattern.offset, 3, 7);
+
+			findpattern = Patterns::NdDevMenu_DMENU_s_IsKeyboardComponentActive;
+			auto IsKeyboardComponentActive = Utility::ReadLEA32(module,
+				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_s_IsKeyboardComponentActive), findpattern.offset, 2, 7);
+
+			if (!SetRootMenuJMP ||
+				!IsKeyboardSearchActive ||
+				!IsKeyboardComponentActive ||
+			#if defined(T2R)
+				!pFavoriteItemKeyCode ||
+			#endif 
+				!pKeyboardSearchState ||
+				!pKeyboardClipBoardJMP
+				) {
+				throw SdkComponentEx
+				{ std::format("Failed to find addresses!"),
+					SdkComponentEx::ErrorCode::PatternFailed };
+			}
+
+			s_IsKeyboardSearchActive = reinterpret_cast<bool*>(IsKeyboardSearchActive);
+			s_IsKeyboardComponentActive = reinterpret_cast<bool*>(IsKeyboardComponentActive);
 
 			findpattern = Patterns::NdDevMenu_GameConfig_DevMode;
 			m_GameConfig_DevModePatch = Utility::WritePatchPattern(module, findpattern.pattern, m_DevMode_1, sizeof(m_DevMode_1),
@@ -426,10 +483,6 @@ namespace NdGameSdk::gamelib::debug {
 
 				spdlog::info("ExtendedDebugMenu is enabled!");
 			}
-
-			findpattern = Patterns::NdDevMenu_DMENU_MenuGroup_SetRootMenu;
-			auto SetRootMenuJMP = (void*)Utility::FindAndPrintPattern(module
-				, findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_MenuGroup_SetRootMenu), findpattern.offset + SetRootMenuHook_Offset);
 
 			findpattern = Patterns::NdDevMenu_DMENU_Menu;
 			DMENU_Menu = (DMENU_Menu_ptr)Utility::FindAndPrintPattern(module,
@@ -499,8 +552,7 @@ namespace NdGameSdk::gamelib::debug {
 			DMENU_Menu_UpdateKeyboard = (DMENU_Menu_UpdateKeyboard_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_Menu_UpdateKeyboard), findpattern.offset);
 
-			if (!SetRootMenuJMP ||
-				!DMENU_Menu ||
+			if (!DMENU_Menu ||
 				!DMENU_String ||
 				!DMENU_KeyBoard ||
 				!DMENU_ItemPlaceHolder ||
@@ -642,6 +694,32 @@ namespace NdGameSdk::gamelib::debug {
 				{ reinterpret_cast<uintptr_t>(DMENU::ItemSubText::VTable), DmenuComponentType::ItemSubText },
 			};
 
+			m_KeyboardSearchStateHook = Utility::MakeFunctionHook((void*)(pKeyboardSearchState),
+				(void*)KeyboardSearchState_CC, wstr(m_KeyboardSearchStateHook));
+
+			m_KeyBoard_ClipBoardHook = Utility::MakeMidHook(pKeyboardClipBoardJMP, DMENU_KeyBoard_ClipBoardHook,
+				wstr(Patterns::NdDevMenu_DMENU_KeyBoard_Handler_ClipBoardHook), wstr(pKeyboardClipBoardJMP));
+
+#if defined(T2R)
+			m_FavoriteItemKeyCodeHook = Utility::MakeFunctionHook((void*)(pFavoriteItemKeyCode),
+				(void*)FavoriteItemKeycode_CC, wstr(m_FavoriteItemKeyCodeHook));
+#endif
+
+			if (!m_KeyboardSearchStateHook ||
+				#if defined(T2R)
+				!m_FavoriteItemKeyCodeHook ||
+				#endif 
+				!m_KeyBoard_ClipBoardHook
+				) {
+				throw SdkComponentEx{ std::format("Failed to create hooks!"),
+					SdkComponentEx::ErrorCode::PatchFailed };
+			}
+
+			KeyboardSearchState_ReturnAddr = m_KeyboardSearchStateHook->get_original();
+#if defined(T2R)
+			FavoriteItemKeyCode_ReturnAddr = m_FavoriteItemKeyCodeHook->get_original();
+#endif
+
 			m_CommonGame->e_GameInitialized.Subscribe(this, &NdDevMenu::OnGameInitialized);
 
 			m_SetRootMenuHook = Utility::MakeMidHook(SetRootMenuJMP,
@@ -665,4 +743,101 @@ namespace NdGameSdk::gamelib::debug {
 
 		});
 	}
+
+	void NdDevMenu::DMENU_KeyBoard_ClipBoardHook(SafetyHookContext& ctx) {
+		static NdDevMenu* pNdDevMenu = GetSharedComponents()->GetComponent<NdDevMenu>().get();
+	#if defined(T2R)
+		constexpr std::ptrdiff_t kSkipInputData = 0x5C;
+	#elif defined(T1X)
+		constexpr std::ptrdiff_t kSkipInputData = 0x60;
+	#else
+		static_assert(false, "define kSkipInputData for this build");
+	#endif
+
+		constexpr size_t kMaxPaste = 
+			std::extent_v<decltype(regenny::shared::ndlib::debug::DMENU::KeyBoard::m_inputBuffer)>;
+
+	#if defined(T2R)
+		auto* frame = reinterpret_cast<NdFrameState*>(ctx.r13);
+	#elif defined(T1X)
+		auto* frame = reinterpret_cast<NdFrameState*>(ctx.r15);
+	#endif
+
+		auto* kbDmenu = reinterpret_cast<void*>(ctx.rbx);
+		char* buf = const_cast<char*>(reinterpret_cast<const char*>(ctx.r14));
+
+		auto* kbIme = frame->GetIMEKeyboard();
+		if (!(kbIme->isCtrlDown() && kbIme->wasPressed(NdKeyboardKey::V))) return;
+
+		std::string clip = Utility::sys::GetClipboardAnsi();
+		if (clip.empty()) return;
+		if (clip.size() > kMaxPaste) clip.resize(kMaxPaste);
+
+		uint32_t& CursorIndex = *reinterpret_cast<uint32_t*>(
+			static_cast<std::byte*>(kbDmenu) + DMENU_KeyBoard_CursorIndexOffset);
+		uint8_t& isDirty = *reinterpret_cast<uint8_t*>(
+			static_cast<std::byte*>(kbDmenu) + DMENU_KeyBoard_isDirtyOffset);
+
+		if (isDirty) {
+			*buf = 0;
+			CursorIndex = 0;
+			isDirty = false;
+		}
+
+		size_t len = strnlen(buf, kMaxPaste - 1);
+		if (CursorIndex > len) CursorIndex = static_cast<uint32_t>(len);
+		size_t n = (std::min)(kMaxPaste - 1 - len, clip.size());
+
+		memmove(buf + CursorIndex + n, buf + CursorIndex, len - CursorIndex);
+		memcpy(buf + CursorIndex, clip.data(), n);
+		buf[CursorIndex + n] = '\0';
+		CursorIndex += static_cast<uint32_t>(n);
+		*reinterpret_cast<uintptr_t*>(ctx.trampoline_rsp) = 
+			pNdDevMenu->m_KeyBoard_ClipBoardHook.target_address() + kSkipInputData;
+		return;
+	}
+
+	void __attribute__((naked)) KeyboardSearchState_CC()
+	{
+		__asm
+		{
+			test al, al;
+			je exit_;
+			mov rcx, DMENU_CurrentMenuOffset
+			// if (!DMENU->m_CurrentMenu)
+#if defined(T2R)
+			cmp qword ptr[rsi + rcx], 0;
+#elif defined(T1X)
+			cmp qword ptr[r14 + rcx], 0;
+#endif
+			jne exit_;
+			mov al, 0x0;
+		exit_:;
+			jmp qword ptr[KeyboardSearchState_ReturnAddr]
+		}
+	}
+
+#if defined(T2R)
+	void __attribute__((naked)) FavoriteItemKeycode_CC()
+	{
+		__asm
+		{
+			mov rcx, qword ptr[NdDevMenu::s_IsKeyboardSearchActive];
+			cmp byte ptr[rcx], 0
+			jnz disablehotkey_;
+			mov rcx, qword ptr[NdDevMenu::s_IsKeyboardComponentActive];
+			cmp byte ptr[rcx], 0
+			jz exit_;
+		disablehotkey_:;
+			mov al, 0x1;
+		exit_:;
+			jmp[rip + FavoriteItemKeyCode_ReturnAddr];
+		}
+	}
+#endif
+
+	bool* NdDevMenu::s_IsKeyboardSearchActive = nullptr;
+	bool* NdDevMenu::s_IsKeyboardComponentActive = nullptr;
+
+
 }

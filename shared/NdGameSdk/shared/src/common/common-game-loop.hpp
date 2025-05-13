@@ -17,8 +17,13 @@ namespace NdGameSdk::common {
 		explicit CommonGameLoop(EngineComponents* pEngineComponents, NdDevMenu* pNdDevMenu);
 		void Init() override;
 	private:
+
+		static void GameLoopUpdate(SafetyHookContext& ctx);
+		static void GameDebugUpdate(SafetyHookContext& ctx);
+
 		EngineComponents* m_EngineComponents;
 		NdDevMenu* m_NdDevMenu;
-		MidHook m_GameDebugUpdate_DMENU_KeyboardDevMode{};
+		MidHook m_GameLoopUpdate{};
+		MidHook m_GameDebugUpdate{};
 	};
 }

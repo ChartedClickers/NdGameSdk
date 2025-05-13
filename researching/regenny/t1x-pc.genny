@@ -744,9 +744,37 @@ namespace regenny {
             }
         
             struct NdFrameState 0x288a0 {
+
+                struct NdKeyboardLayer 0x1A60 {
+                    bool m_enabled;
+                    bool m_DebugKeyboard;
+                    uint64_t m_keysPressed[4] @ 0x8; // 0x008-0x027
+                    uint64_t m_keyState[4]; // 0x028-0x047
+                    uint64_t m_keyState2[4]; // 0x048-0x067
+                    uint64_t m_keys[4]; // 0x068-0x087  (current down mask)
+                    uint64_t m_keyState3[4]; // helper masks (auto-repeat, etc.)
+                    uint64_t m_keyCodes[4];
+                    uint8_t scratch[0x80]; // zeroed in ctor
+                    uint64_t m_invalid[4];
+                    float m_repeatDelay @ 0x168; // 0.5 s   (3F000000h)
+                    float m_repeatRate; // 0.1 s   (3DCCCCCDh)
+                    uint32_t m_maxKeyCode; // r8d in ctor
+                    uint64_t m_firstRepeatT @ 0x178; // initialised to -0x4000…
+                    uint64_t m_nextRepeatT;
+                    uint64_t m_keyTime[0x100]; // per-key timestamps (256 × 8 B)
+                    NdKeyboardLayer* ring[8] @0x9C8; // layer ring-buffer pointers
+                    uint32_t layerIndex @ 0xD28; // [rcx+0xD28] = edx in ctor
+                };
+
                 void* vftable;
                 uint64_t m_gameFrameNumber @ 0x40
-                bool m_KeyboardDevMode @ 0x51a // Enable toggle devmode menu via the keyboard
+                bool m_KeyboardDevMode @ 0x51a
+                NdKeyboardLayer m_IMEKeyboard @ 0x10290;
+                NdKeyboardLayer m_kbdLayer1;
+                NdKeyboardLayer m_kbdLayer2;
+                NdKeyboardLayer m_GameKeyboard;
+                NdKeyboardLayer m_kbdLayer4;
+                NdKeyboardLayer m_kbdLayer5;
             }
         
             struct FrameParams 0x1a3180 {

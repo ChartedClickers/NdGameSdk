@@ -55,6 +55,7 @@ namespace Utility
     uintptr_t ReadLEA32(HMODULE module, const wchar_t* Patch_Pattern, const wchar_t* Pattern_Name, size_t offset, size_t lea_size, size_t lea_opcode_size);
 
     MidHook MakeMidHook(void* source_target, MidHookFn target_jmp, const wchar_t* source_name, const wchar_t* hook_name);
+    InlineHook MakeSafetyHookInline(void* source_target, void* target_jmp, const wchar_t* source_name, const wchar_t* hook_name);
 
     memory::FunctionHook::Ptr MakeFunctionHook(void* source_target, void* target_jmp, const wchar_t* hook_name);
     memory::FunctionHook::Ptr WritePatchPattern_Hook(HMODULE module, const wchar_t* Patch_Pattern, const wchar_t* Patch_Name, uint64_t Patch_Offset, void* Function_Target);

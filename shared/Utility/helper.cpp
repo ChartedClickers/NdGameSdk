@@ -181,6 +181,17 @@ namespace Utility {
         return std::move(*mid_hook);
     }
 
+	InlineHook MakeSafetyHookInline(void* source_target, void* target_jmp, const wchar_t* source_name, const wchar_t* hook_name)
+	{
+		auto safety_hook = SafetyHookInline::create(source_target, target_jmp);
+		if (!safety_hook.has_value()) {
+			LOG_ERROR(L"Failed to create SafetyHookInline for %s: %d", hook_name, static_cast<uint8_t>(safety_hook.error().type));
+			return {};
+		}
+		LOG_INFO(L"Created SafetyHookInline %s (0x%016llx) to %s (0x%016llx)\n", source_name, safety_hook->target_address(), hook_name, (uintptr_t)safety_hook->destination());
+		return std::move(*safety_hook);
+	}
+
     FunctionHook::Ptr MakeFunctionHook(void* source_target, void* target_jmp, const wchar_t* hook_name)
     {
         auto hook = make_unique<FunctionHook>(source_target, target_jmp, hook_name);

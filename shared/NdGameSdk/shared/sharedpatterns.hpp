@@ -30,6 +30,9 @@ namespace NdGameSdk::Patterns
 	static inline const SdkPattern Memory_TaggedHeap_SetTaggedGpuDevHeap = { L"8b 07 48 8d 0d ?? ?? ?? ?? 48 8b 5c 24 40 48 89 34 c1 48 8b 74 24 48 48 83 c4 30 5f c3 cc cc 48 89 0d ?? ?? ?? ?? c3 cc cc cc cc cc cc cc cc 48 89 0d ?? ?? ?? ?? c3 cc cc cc cc cc cc cc cc 48 89 0d ?? ?? ?? ?? c3 cc cc cc cc cc cc cc cc 48 89 0d ?? ?? ?? ?? c3", +0x3f };
 	static inline const SdkPattern Memory_g_MemoryMap = { L"48 89 5c 24 18 56 48 83 ec 30 48 83 3d ?? ?? ?? ?? 00 48 8b f2 48 89 6c 24 40 48 8b e9", +0xa };
 	static inline const SdkPattern Memory_TaggedHeap_TaggedGpuDevHeap = { L"8b 07 48 8d 0d ?? ?? ?? ?? 48 8b 5c 24 40 48 89 34 c1 48 8b 74 24 48 48 83 c4 30 5f c3 cc cc 48 89 0d ?? ?? ?? ?? c3 cc cc cc cc cc cc cc cc 48 89 0d ?? ?? ?? ?? c3 cc cc cc cc cc cc cc cc 48 89 0d ?? ?? ?? ?? c3 cc cc cc cc cc cc cc cc 48 89 0d ?? ?? ?? ?? c3", +0x3F };
+	static inline const SdkPattern Memory_FixedSizeHeap_FreeIndex = { L"48 89 5c 24 10 48 89 74 24 18 41 56 48 83 ec 30 45 33 c0 48 8b f2 48 8b d9 4c 39 41 40 74 24 48 8b 09 48 8b c2 48 2b c1" };
+	static inline const SdkPattern Memory_FixedSizeHeap_Copy = { L"48 89 5c 24 20 56 48 83 ec 30 48 83 79 30 00 48 8b f2 48 89 6c 24 40 48 8b d9 48 89 7c 24 48 4c 89 74 24 50 0f 85 ?? ?? ?? ?? e8 ?? ?? ?? ?? 48 8b f8 48 85 c0 74 04 b1 01 ff d7" };
+	static inline const SdkPattern Memory_FixedSizeHeap_AddIndex = { L"44 8b 51 28 33 d2 4c 8b d9 49 83 ea 01 74 2c 4c 8b 41 10 0f 1f 40 00 66" };
 
 	static inline const SdkPattern ScriptManager_g_ScriptManagerGlobals = { L"48 89 5c 24 08 48 89 74 24 10 48 89 7c 24 18 55 41 54 41 55 41 56 41 57 48 8d ac 24 20 fd ff ff 48 81 ec e0 03 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 85", +0x42 };
 	static inline const SdkPattern ScriptManager_InitializeReturn = { L"80 3D ?? ?? ?? ?? 00 75 19 4D 8B CD 41 B8 13 0F 00 00 49 8B D4 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 90", +0x22 };
@@ -102,6 +105,9 @@ namespace NdGameSdk::Patterns
 	static inline const SdkPattern Memory_HeapAllocator_Allocate = { L"48 89 5c 24 ?? 48 89 6c 24 ?? 48 89 74 24 ?? 57 48 83 ec 30 48 85 c9 bf 01 00 00 00 41 8b f1 49 8b e8 48 0f 45 f9 48 8b da e8 ?? ?? 00 00 84 c0 ??" };
 	static inline const SdkPattern Memory_Area_clargnodebugmem = { L"b3 01 45 85 ff 74 ?? 48 8b 0f", +0x1 };
 	static inline const SdkPattern Memory_g_MemoryMap = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 30 48 ?? ?? ?? ?? ?? 04 00 48 8b", +0xf };
+	static inline const SdkPattern Memory_FixedSizeHeap_FreeIndex = { L"48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 57 48 83 ec 30 48 8b 41 10 48 8b f9 48 63 ea b1 01 48 8b f5 83 e5 3f 48 c1" };
+	static inline const SdkPattern Memory_FixedSizeHeap_Copy = { L"48 89 5c 24 08 48 89 74 24 10 48 89 7c 24 18 41 56 48 83 ec 30 48 83 79 30 00 4c 8b f2 48 8b d9 0f 85 91 00 00 00 48 8b 3d ?? ?? ?? ?? 48 85 ff 74 04 b1 01 ff d7 48 8b 05 ?? ?? ?? ?? 48 85 c0 74 02 ff d0 48 8b 05" };
+	static inline const SdkPattern Memory_FixedSizeHeap_AddIndex = { L"48 89 5c 24 08 57 48 83 ec 20 48 8b d9 48 83 c1 10 e8 ?? ?? ?? ?? 4c 8b d0 48 83 f8 ff 74 3e 48 3b 43 30 73 38 48 ff 43 40 49 8b d2 48 0f af 43 38 4c 8b 43 10 4d 8b ca 48 03 03 83" };
 
 	static inline const SdkPattern ScriptManager_g_ScriptManagerGlobals = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 20 48 8b d9 48 63 fa 48 ?? ?? ?? ?? ?? ?? 45 33 c9 4c 89 49", +0x15 };
 	static inline const SdkPattern ScriptManager_InitializeReturn = { L"4c 8d 0d ?? ?? ?? ?? 4c 8b c3 49 8b d6 48 8b cf e8 ?? ?? ?? ?? 4c 8b c3 44 89 64 24 40 48 8d 54 24 40 48 8b cb e8 ?? ?? ?? ?? 48 85 c0 74 10 48 89 38 44 89 70 08 48 89 05 ?? ?? ?? ?? eb 08 48 83 25 ?? ?? ?? ?? 00", +0x68 };

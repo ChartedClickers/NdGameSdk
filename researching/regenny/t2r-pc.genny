@@ -431,13 +431,6 @@ namespace regenny {
                     size_t m_heap_size
                 }
 
-                struct TaggedHeap 0xDB308 {
-                    struct VTable {
-                        virtual uint64_t GetBlockSize() @ 0x30
-                    } 
-                    VTable* vftable;
-                }
-
             }
 
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib\util
@@ -458,6 +451,33 @@ namespace regenny {
                     bool m_ShowCacheMissesDebugText;
                 }
             }
+
+            // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib\containers
+            namespace containers {
+                
+                struct TaggedHeap 0xDB308 {
+                    struct VTable {
+                        virtual uint64_t GetBlockSize() @ 0x30
+                    } 
+                    VTable* vftable;
+                }
+
+                struct FixedSizeHeap 0x58 {
+                    void* m_data;
+                    void* m_block;
+                    uint64_t* m_usage;
+                    uint64_t m_usageSize;
+                    uint64_t m_granularity;
+                    uint32_t m_bitmapCount;
+                    uint64_t m_capacity @ 0x30;
+                    uint64_t m_elementSize;
+                    uint64_t m_count;
+                    uint64_t m_allocCount;
+                    uint64_t m_lastIndex;
+                } // fixedsizeheap.h
+
+            }
+
         }
 
         // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib

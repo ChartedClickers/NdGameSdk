@@ -1,7 +1,7 @@
 #pragma once
 #include <NdGameSdk/components/SdkRegenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
-namespace regenny::shared::corelib::memory {
+namespace regenny::shared::corelib::containers {
 #pragma pack(push, 1)
 struct TaggedHeap {
     struct VTable {

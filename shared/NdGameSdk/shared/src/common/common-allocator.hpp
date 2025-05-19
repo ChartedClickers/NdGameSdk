@@ -1,16 +1,12 @@
 #pragma once
 
 #include "NdGameSdk/sdk.hpp"
-#include <Utility/helper.hpp>
+
+#include <NdGameSdk/shared/src/corelib/containers/tagged-heap.hpp>
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
 
-#if defined(T2R)
-#include <NdGameSdk/regenny/t2r/shared/corelib/memory/TaggedHeap.hpp>
-#elif defined(T1X)
-#include <NdGameSdk/regenny/t1x/shared/corelib/memory/TaggedHeap.hpp>
-#endif
+#include <Utility/helper.hpp>
 
-using TaggedHeap = ::regenny::shared::corelib::memory::TaggedHeap;
 using namespace NdGameSdk::corelib::memory;
 
 namespace NdGameSdk::common {

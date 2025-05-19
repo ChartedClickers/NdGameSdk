@@ -175,6 +175,18 @@ namespace NdGameSdk::corelib::memory {
 			m_HeapArena.Memory_HeapArena_Allocate = (HeapAllocator::HeapArena::Memory_HeapArena_Allocate_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::Memory_HeapAllocator_Allocate), findpattern.offset);
 
+			findpattern = Patterns::Memory_FixedSizeHeap_FreeIndex;
+			FixedSizeHeap_FreeIndex = (FixedSizeHeap_FreeIndex_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::Memory_FixedSizeHeap_FreeIndex), findpattern.offset);
+
+			findpattern = Patterns::Memory_FixedSizeHeap_Copy;
+			FixedSizeHeap_Copy = (FixedSizeHeap_Copy_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::Memory_FixedSizeHeap_Copy), findpattern.offset);
+
+			findpattern = Patterns::Memory_FixedSizeHeap_AddIndex;
+			FixedSizeHeap_AddIndex = (FixedSizeHeap_AddIndex_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::Memory_FixedSizeHeap_AddIndex), findpattern.offset);
+
 			if (!SetMemoryMapJMP ||
 				!Memory_ModifyMemoryMap ||
 				#if defined(T1X)
@@ -184,7 +196,10 @@ namespace NdGameSdk::corelib::memory {
 				!Memory_PushAllocator ||
 				!Memory_PopAllocator ||
 				!Memory_GetAllocator ||
-				!m_HeapArena.Memory_HeapArena_Allocate
+				!m_HeapArena.Memory_HeapArena_Allocate ||
+				!FixedSizeHeap_FreeIndex ||
+				!FixedSizeHeap_Copy ||
+				!FixedSizeHeap_AddIndex
 				) { throw SdkComponentEx { std::format("Failed to find {}:: game functions!", GetName()), SdkComponentEx::ErrorCode::PatternFailed, true }; }
 
 			constexpr uint64_t size_mb = (1024ULL * 1024ULL);

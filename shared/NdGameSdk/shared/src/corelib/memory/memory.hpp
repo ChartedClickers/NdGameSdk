@@ -8,6 +8,7 @@
 #include "allocator-heap.hpp"
 #include "allocator-tagged-heap.hpp"
 #include "memory-area-win.hpp"
+#include "../containers/fixedsizeheap.hpp"
 
 #include <Utility/helper.hpp>
 
@@ -25,6 +26,9 @@ namespace NdGameSdk::corelib::memory
 	public:
 		Memory(MemoryCfg& cfg);
 		SdkEvent<corelib::memory::Memory*> e_MemoryMapMapped{true};
+
+		using Context = MemoryContextType;
+		using MapId = MemoryMapId;
 
 		class NdGameSdk_API Allocator : public ISdkRegenny<regenny::shared::corelib::memory::Allocator> 
 		{

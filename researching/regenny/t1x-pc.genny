@@ -518,248 +518,245 @@ namespace regenny {
                 void* vftable;
                 uint64_t m_internalname @ 0x118 [[utf8*]];
                 StringId64 m_gametitlehash @ 0x120;
-                char m_SavePath[0x400] [[utf8*]]
-                char m_SavePath_unk[0x400] [[utf8*]]
-                char m_GamePath[0x400] [[utf8*]]
-                char m_GamePath_unk[0x400] [[utf8*]]
-                char m_NetUserPath[0x400] [[utf8*]]
-                char m_NetPath[0x400] [[utf8*]]
-                char m_GameDataPath[0x400] [[utf8*]]
-                char m_GameDataPath_unk[0x400] [[utf8*]]
-                char m_BinPath[0x400] [[utf8*]]
-                char m_BinPath_unk[0x400] [[utf8*]]
-                char m_BranchName[0x40] [[utf8*]]
-                char m_SrcPath[0x400] [[utf8*]]
-                char m_DbPath[0x400] [[utf8*]]
-                char m_GamePath_unk2[0x400] [[utf8*]]
-                char m_CfgPath[0x400] +0x402 [[utf8*]]
-                char m_CfgFolderName[0x80] [[utf8*]]
-                char m_CfgDefaultsPath[0x80] [[utf8*]]
-                uint16_t Unk_3ef0 +0x85
-                bool m_AssetView [[bool*]]
-                bool m_DevConfig [[bool*]]
-                bool m_onDisc [[bool*]]
-                bool m_onDiscUseManifest [[bool*]]
-                bool Unk_3ef5 [[bool*]]
-                bool Unk_3ef6 [[bool*]]
-                bool Unk_3ef7 [[bool*]]
-                bool Unk_3ef8 [[bool*]]
-                bool Unk_3ef9 [[bool*]]
-                bool Unk_3efa [[bool*]]
-                bool Unk_3efb [[bool*]]
-                bool Unk_3efc [[bool*]]
-                bool Unk_3efd [[bool*]]
-                bool Unk_3efe [[bool*]]
-                bool Unk_3eff [[bool*]]
-                bool Unk_3f00 [[bool*]]
-                bool Unk_3f01 [[bool*]]
-                bool Unk_3f02 [[bool*]]
-                bool Unk_3f03 [[bool*]]
-                bool Unk_3f04 [[bool*]]
-                bool Unk_3f05 [[bool*]]
-                bool Unk_3f06 [[bool*]]
-                bool Unk_3f07 [[bool*]]
-                bool Unk_3f08 [[bool*]]
-                bool Unk_3f09 [[bool*]]
-                bool Unk_3f0a [[bool*]]
-                bool Unk_3f0b [[bool*]]
-                bool Unk_3f0c [[bool*]]
-                bool Unk_3f0d [[bool*]]
-                bool Unk_3f0e [[bool*]]
-                bool Unk_3f0f [[bool*]]
-                bool Unk_3f10 [[bool*]]
-                bool Unk_3f11 [[bool*]]
-                bool Unk_3f12 [[bool*]]
-                bool Unk_3f13 [[bool*]]
-                bool Unk_3f14 [[bool*]]
-                bool Unk_3f15 [[bool*]]
-                bool Unk_3f16 [[bool*]]
-                bool Unk_3f17 [[bool*]]
-                bool Unk_3f18 [[bool*]]
-                bool Unk_3f19 [[bool*]]
-                bool Unk_3f1a [[bool*]]
-                bool Unk_3f1b [[bool*]]
-                bool m_IsMultiplayer [[bool*]]
-                bool Unk_3f1d [[bool*]]
-                bool Unk_3f1e [[bool*]]
-                bool Unk_3f1f [[bool*]]
-                bool Unk_3f20 [[bool*]]
-                bool Unk_3f21 [[bool*]]
-                bool Unk_3f22 [[bool*]]
-                bool Unk_3f23 [[bool*]]
-                bool Unk_3f24 [[bool*]]
-                bool Unk_3f25 [[bool*]]
-                bool Unk_3f26 [[bool*]]
-                bool Unk_3f27 [[bool*]]
-                bool Unk_3f28 [[bool*]]
-                bool Unk_3f29 [[bool*]]
-                bool Unk_3f2a [[bool*]]
-                bool Unk_3f2b [[bool*]]
-                bool Unk_3f2c [[bool*]]
-                bool Unk_3f2d [[bool*]]                          
-                bool Unk_3f2e [[bool*]]
-                bool m_DevMode [[bool*]]
-                bool Unk_3f30 [[bool*]]
-                bool Unk_3f31 [[bool*]]
-                bool Unk_3f32 [[bool*]]
-                bool Unk_3f33 [[bool*]]
-                bool Unk_3f34 [[bool*]]
-                bool Unk_3f35 [[bool*]]
-                bool Unk_3f36 [[bool*]]
-                bool Unk_3f37 [[bool*]]
-                bool Unk_3f38 [[bool*]]
-                bool Unk_3f39 [[bool*]]
-                bool Unk_3f3a [[bool*]]
-                bool Unk_3f3b [[bool*]]
-                bool Unk_3f3c [[bool*]]
-                bool m_DebugRendering [[bool*]]
-                bool Unk_3f3e [[bool*]]
+                char m_SavePath[0x400] [[utf8*]];
+                char m_SavePath_unk[0x400] [[utf8*]];
+                char m_GamePath[0x400] [[utf8*]];
+                char m_GamePath_unk[0x400] [[utf8*]];
+                char m_NetUserPath[0x400] [[utf8*]];
+                char m_NetPath[0x400] [[utf8*]];
+                char m_GameDataPath[0x400] [[utf8*]];
+                char m_GameDataPath_unk[0x400] [[utf8*]];
+                char m_BinPath[0x400] [[utf8*]];
+                char m_BinPath_unk[0x400] [[utf8*]];
+                char m_BranchName[0x40] [[utf8*]];
+                char m_SrcPath[0x400] [[utf8*]];
+                char m_DbPath[0x400] [[utf8*]];
+                char m_GamePath_unk2[0x400] [[utf8*]];
+                char m_CfgPath[0x400] +0x402 [[utf8*]];
+                char m_CfgFolderName[0x80] [[utf8*]];
+                char m_CfgDefaultsPath[0x80] [[utf8*]];
+                uint16_t Unk_3ef0 +0x85;
+                bool m_AssetView [[bool*]];
+                bool m_DevConfig [[bool*]];
+                bool m_onDisc [[bool*]];
+                bool m_onDiscUseManifest [[bool*]];
+                bool Unk_3ef5 [[bool*]];
+                bool Unk_3ef6 [[bool*]];
+                bool Unk_3ef7 [[bool*]];
+                bool Unk_3ef8 [[bool*]];
+                bool Unk_3ef9 [[bool*]];
+                bool Unk_3efa [[bool*]];
+                bool Unk_3efb [[bool*]];
+                bool Unk_3efc [[bool*]];
+                bool Unk_3efd [[bool*]];
+                bool Unk_3efe [[bool*]];
+                bool Unk_3eff [[bool*]];
+                bool Unk_3f00 [[bool*]];
+                bool Unk_3f01 [[bool*]];
+                bool Unk_3f02 [[bool*]];
+                bool Unk_3f03 [[bool*]];
+                bool Unk_3f04 [[bool*]];
+                bool Unk_3f05 [[bool*]];
+                bool Unk_3f06 [[bool*]];
+                bool Unk_3f07 [[bool*]];
+                bool Unk_3f08 [[bool*]];
+                bool Unk_3f09 [[bool*]];
+                bool Unk_3f0a [[bool*]];
+                bool Unk_3f0b [[bool*]];
+                uint32_t m_env;
+                bool Unk_3f10 [[bool*]];
+                bool Unk_3f11 [[bool*]];
+                bool Unk_3f12 [[bool*]];
+                bool Unk_3f13 [[bool*]];
+                bool Unk_3f14 [[bool*]];
+                bool Unk_3f15 [[bool*]];
+                bool Unk_3f16 [[bool*]];
+                bool Unk_3f17 [[bool*]];
+                bool Unk_3f18 [[bool*]];
+                bool Unk_3f19 [[bool*]];
+                bool Unk_3f1a [[bool*]];
+                bool Unk_3f1b [[bool*]];
+                bool m_IsMultiplayer [[bool*]];
+                bool Unk_3f1d [[bool*]];
+                bool Unk_3f1e [[bool*]];
+                bool Unk_3f1f [[bool*]];
+                bool Unk_3f20 [[bool*]];
+                bool Unk_3f21 [[bool*]];
+                bool Unk_3f22 [[bool*]];
+                bool Unk_3f23 [[bool*]];
+                bool Unk_3f24 [[bool*]];
+                bool Unk_3f25 [[bool*]];
+                bool Unk_3f26 [[bool*]];
+                bool Unk_3f27 [[bool*]];
+                bool Unk_3f28 [[bool*]];
+                bool Unk_3f29 [[bool*]];
+                bool Unk_3f2a [[bool*]];
+                bool Unk_3f2b [[bool*]];
+                bool Unk_3f2c [[bool*]];
+                bool Unk_3f2d [[bool*]];
+                bool Unk_3f2e [[bool*]];
+                bool m_DevMode [[bool*]];
+                bool Unk_3f30 [[bool*]];
+                bool Unk_3f31 [[bool*]];
+                bool Unk_3f32 [[bool*]];
+                bool Unk_3f33 [[bool*]];
+                bool Unk_3f34 [[bool*]];
+                bool Unk_3f35 [[bool*]];
+                bool Unk_3f36 [[bool*]];
+                bool Unk_3f37 [[bool*]];
+                bool Unk_3f38 [[bool*]];
+                bool Unk_3f39 [[bool*]];
+                bool Unk_3f3a [[bool*]];
+                bool Unk_3f3b [[bool*]];
+                bool Unk_3f3c [[bool*]];
+                bool m_DebugRendering [[bool*]];
+                bool Unk_3f3e [[bool*]];
                 bool Unk_3f3f [[bool*]]
-                bool Unk_3f40 [[bool*]]
-                bool Unk_3f41 [[bool*]]
-                bool Unk_3f42 [[bool*]]
-                bool Unk_3f43 [[bool*]]
-                bool Unk_3f44 [[bool*]]
-                bool Unk_3f45 [[bool*]]
-                bool Unk_3f46 [[bool*]]
-                bool Unk_3f47 [[bool*]]
-                bool Unk_3f48 [[bool*]]
-                bool Unk_3f49 [[bool*]]
-                bool Unk_3f4a [[bool*]]
-                bool Unk_3f4b [[bool*]]
-                bool Unk_3f4c [[bool*]]
-                bool Unk_3f4d [[bool*]]
-                bool Unk_3f4e [[bool*]]
-                bool Unk_3f4f [[bool*]]
-                bool Unk_3f50 [[bool*]]
-                bool Unk_3f51 [[bool*]]
-                bool Unk_3f52 [[bool*]]
-                bool Unk_3f53 [[bool*]]
-                bool Unk_3f54 [[bool*]]
-                bool Unk_3f55 [[bool*]]
-                bool Unk_3f56 [[bool*]]
-                bool Unk_3f57 [[bool*]]
-                uint32_t Unk_3f58
-                bool Unk_3f5c [[bool*]]
-                bool Unk_3f5d [[bool*]]
-                bool Unk_3f5e [[bool*]]
-                bool Unk_3f5f [[bool*]]
-                uint32_t Unk_3f60
-                bool m_DisableFpsStat [[bool*]]
-                bool Unk_3f65 [[bool*]]
-                bool Unk_3f66 [[bool*]]
-                bool Unk_3f67 [[bool*]]
-                bool Unk_3f68 [[bool*]]
-                bool Unk_3f69 [[bool*]]
+                bool Unk_3f40 [[bool*]];
+                bool Unk_3f41 [[bool*]];
+                bool Unk_3f42 [[bool*]];
+                bool Unk_3f43 [[bool*]];
+                bool Unk_3f44 [[bool*]];
+                bool Unk_3f45 [[bool*]];
+                bool Unk_3f46 [[bool*]];
+                bool Unk_3f47 [[bool*]];
+                bool Unk_3f48 [[bool*]];
+                bool Unk_3f49 [[bool*]];
+                bool Unk_3f4a [[bool*]];
+                bool Unk_3f4b [[bool*]];
+                bool Unk_3f4c [[bool*]];
+                bool Unk_3f4d [[bool*]];
+                bool Unk_3f4e [[bool*]];
+                bool Unk_3f4f [[bool*]];
+                bool Unk_3f50 [[bool*]];
+                bool Unk_3f51 [[bool*]];
+                bool Unk_3f52 [[bool*]];
+                bool Unk_3f53 [[bool*]];
+                bool Unk_3f54 [[bool*]];
+                bool Unk_3f55 [[bool*]];
+                bool Unk_3f56 [[bool*]];
+                bool Unk_3f57 [[bool*]];
+                uint32_t Unk_3f58;
+                bool Unk_3f5c [[bool*]];
+                bool Unk_3f5d [[bool*]];
+                bool Unk_3f5e [[bool*]];
+                bool Unk_3f5f [[bool*]];
+                uint32_t Unk_3f60;
+                bool m_DisableFpsStat [[bool*]];
+                bool Unk_3f65 [[bool*]];
+                bool Unk_3f66 [[bool*]];
+                bool Unk_3f67 [[bool*]];
+                bool Unk_3f68 [[bool*]];
+                bool Unk_3f69 [[bool*]];
                 bool Unk_3f6a [[bool*]]
                 bool Unk_3f6b [[bool*]]
-                bool Unk_3f6c [[bool*]]
-                bool Unk_3f6d [[bool*]]
-                bool Unk_3f6e [[bool*]]
-                bool Unk_3f6f [[bool*]]
-                bool Unk_3f70 [[bool*]]
-                bool Unk_3f71 [[bool*]]
-                bool Unk_3f72 [[bool*]]
-                bool m_showBuildInfo [[bool*]]
-                bool Unk_3f74 [[bool*]]
-                bool Unk_3f75 [[bool*]]
-                bool Unk_3f76 [[bool*]]
-                bool Unk_3f77 [[bool*]]
-                bool Unk_3f78 [[bool*]]
+                bool Unk_3f6c [[bool*]];
+                bool Unk_3f6d [[bool*]];
+                bool Unk_3f6e [[bool*]];
+                bool Unk_3f6f [[bool*]];
+                bool Unk_3f70 [[bool*]];
+                bool Unk_3f71 [[bool*]];
+                bool Unk_3f72 [[bool*]];
+                bool m_showBuildInfo [[bool*]];
+                bool Unk_3f74 [[bool*]];
+                bool Unk_3f75 [[bool*]];
+                bool Unk_3f76 [[bool*]];
+                bool Unk_3f77 [[bool*]];
+                bool Unk_3f78 [[bool*]];
                 bool Unk_3f79 [[bool*]]
                 bool Unk_3f7a [[bool*]]
                 bool Unk_3f7b [[bool*]]
-                bool Unk_3f7c [[bool*]]
-                bool Unk_3f7d [[bool*]]
-                bool Unk_3f7e [[bool*]]
-                bool Unk_3f7f [[bool*]]
-                bool Unk_3f80 [[bool*]]
-                bool Unk_3f81 [[bool*]]
-                bool Unk_3f82 [[bool*]]
-                bool Unk_3f83 [[bool*]]
-                bool Unk_3f84 [[bool*]]
-                bool Unk_3f85 [[bool*]]
-                bool Unk_3f86 [[bool*]]
-                bool Unk_3f87 [[bool*]]
-                bool Unk_3f88 [[bool*]]
-                bool Unk_3f89 [[bool*]]
-                bool Unk_3f8a [[bool*]]
-                bool Unk_3f8b [[bool*]]
-                bool Unk_3f8c [[bool*]]
-                bool Unk_3f8d [[bool*]]
-                bool Unk_3f8e [[bool*]]
-                bool Unk_3f8f [[bool*]]
-                bool Unk_3f90 [[bool*]]
-                bool Unk_3f91 [[bool*]]
-                bool Unk_3f92 [[bool*]] // smoketest
-                bool Unk_3f93 [[bool*]]
-                bool Unk_3f94 [[bool*]]
-                bool Unk_3f95 [[bool*]]
-                bool Unk_3f96 [[bool*]]
-                bool Unk_3f97 [[bool*]]
-                bool Unk_3f98 [[bool*]]
-                bool Unk_3f99 [[bool*]]
-                bool Unk_3f9a [[bool*]]
-                bool Unk_3f9b [[bool*]]
-                bool Unk_3f9c [[bool*]]
-                bool Unk_3f9d [[bool*]]
-                bool Unk_3f9e [[bool*]]
-                bool Unk_3f9f [[bool*]]
-                uint32_t Unk_3fa0
-                bool Unk_3fa4 [[bool*]]
-                bool Unk_3fa5 [[bool*]]
-                bool Unk_3fa6 [[bool*]]
-                bool Unk_3fa7 [[bool*]]
-                bool Unk_3fa8 [[bool*]]
-                bool Unk_3fa9 [[bool*]]
-                bool Unk_3faa [[bool*]]
-                bool Unk_3fab [[bool*]]
-                bool Unk_3fac [[bool*]]
-                bool Unk_3fad [[bool*]]
-                bool Unk_3fae [[bool*]]
-                bool Unk_3faf [[bool*]]
-                bool Unk_3fb0 [[bool*]]
-                bool Unk_3fb1 [[bool*]]
-                bool Unk_3fb2 [[bool*]]
-                bool Unk_3fb3 [[bool*]]
-                bool Unk_3fb4 [[bool*]]
-                bool Unk_3fb5 [[bool*]]
-                bool Unk_3fb6 [[bool*]]
-                bool Unk_3fb7 [[bool*]]
-                bool Unk_3fb8 [[bool*]]
-                bool Unk_3fb9 [[bool*]]
-                bool Unk_3fba [[bool*]]
-                bool Unk_3fbb [[bool*]]
-                uint32_t Unk_3fbc
-                bool Unk_3fc0 [[bool*]]
-                bool Unk_3fc1 [[bool*]]
-                bool Unk_3fc2 [[bool*]]
-                bool Unk_3fc3 [[bool*]]
-                bool Unk_3fc4 [[bool*]]
-                bool Unk_3fc5 [[bool*]]
-                bool Unk_3fc6 [[bool*]]
-                bool Unk_3fc7 [[bool*]]
-                bool Unk_3fc8 [[bool*]]
-                bool Unk_3fc9 [[bool*]]
-                bool Unk_3fca [[bool*]]
-                bool Unk_3fcb [[bool*]]
-                bool Unk_3fcc [[bool*]]
-                bool Unk_3fcd [[bool*]]
-                bool Unk_3fce [[bool*]]
-                bool Unk_3fcf [[bool*]]
-                bool Unk_3fd0 [[bool*]]
-                bool Unk_3fd1 [[bool*]]
-                bool Unk_3fd2 [[bool*]]
-                bool Unk_3fd3 [[bool*]]
-                bool Unk_3fd4 [[bool*]]
-                bool Unk_3fd5 [[bool*]]
-                bool Unk_3fd6 [[bool*]]
-                bool Unk_3fd7 [[bool*]]
-                char m_DiscUser[0x20] +0x30 [[utf8*]]
+                bool Unk_3f7c [[bool*]];
+                bool Unk_3f7d [[bool*]];
+                bool Unk_3f7e [[bool*]];
+                bool Unk_3f7f [[bool*]];
+                bool Unk_3f80 [[bool*]];
+                bool Unk_3f81 [[bool*]];
+                bool Unk_3f82 [[bool*]];
+                bool Unk_3f83 [[bool*]];
+                bool Unk_3f84 [[bool*]];
+                bool Unk_3f85 [[bool*]];
+                bool Unk_3f86 [[bool*]];
+                bool Unk_3f87 [[bool*]];
+                bool Unk_3f88 [[bool*]];
+                bool Unk_3f89 [[bool*]];
+                bool Unk_3f8a [[bool*]];
+                bool Unk_3f8b [[bool*]];
+                bool Unk_3f8c [[bool*]];
+                bool Unk_3f8d [[bool*]];
+                bool Unk_3f8e [[bool*]];
+                bool Unk_3f8f [[bool*]];
+                bool Unk_3f90 [[bool*]];
+                bool Unk_3f91 [[bool*]];
+                bool Unk_3f92 [[bool*]]; // smoketest
+                bool Unk_3f93 [[bool*]];
+                bool Unk_3f94 [[bool*]];
+                bool Unk_3f95 [[bool*]];
+                bool Unk_3f96 [[bool*]];
+                bool Unk_3f97 [[bool*]];
+                bool Unk_3f98 [[bool*]];
+                bool Unk_3f99 [[bool*]];
+                bool Unk_3f9a [[bool*]];
+                bool Unk_3f9b [[bool*]];
+                bool Unk_3f9c [[bool*]];
+                bool Unk_3f9d [[bool*]];
+                bool Unk_3f9e [[bool*]];
+                bool Unk_3f9f [[bool*]];
+                uint32_t Unk_3fa0;
+                bool Unk_3fa4 [[bool*]];
+                bool Unk_3fa5 [[bool*]];
+                bool Unk_3fa6 [[bool*]];
+                bool Unk_3fa7 [[bool*]];
+                bool Unk_3fa8 [[bool*]];
+                bool Unk_3fa9 [[bool*]];
+                bool Unk_3faa [[bool*]];
+                bool Unk_3fab [[bool*]];
+                bool Unk_3fac [[bool*]];
+                bool Unk_3fad [[bool*]];
+                bool Unk_3fae [[bool*]];
+                bool Unk_3faf [[bool*]];
+                bool Unk_3fb0 [[bool*]];
+                bool Unk_3fb1 [[bool*]];
+                bool Unk_3fb2 [[bool*]];
+                bool Unk_3fb3 [[bool*]];
+                bool Unk_3fb4 [[bool*]];
+                bool Unk_3fb5 [[bool*]];
+                bool Unk_3fb6 [[bool*]];
+                bool Unk_3fb7 [[bool*]];
+                bool Unk_3fb8 [[bool*]];
+                bool Unk_3fb9 [[bool*]];
+                bool Unk_3fba [[bool*]];
+                bool Unk_3fbb [[bool*]];
+                uint32_t Unk_3fbc;
+                bool Unk_3fc0 [[bool*]];
+                bool Unk_3fc1 [[bool*]];
+                bool Unk_3fc2 [[bool*]];
+                bool Unk_3fc3 [[bool*]];
+                bool Unk_3fc4 [[bool*]];
+                bool Unk_3fc5 [[bool*]];
+                bool Unk_3fc6 [[bool*]];
+                bool Unk_3fc7 [[bool*]];
+                bool Unk_3fc8 [[bool*]];
+                bool Unk_3fc9 [[bool*]];
+                bool Unk_3fca [[bool*]];
+                bool Unk_3fcb [[bool*]];
+                bool Unk_3fcc [[bool*]];
+                bool Unk_3fcd [[bool*]];
+                bool Unk_3fce [[bool*]];
+                bool Unk_3fcf [[bool*]];
+                bool Unk_3fd0 [[bool*]];
+                bool Unk_3fd1 [[bool*]];
+                bool Unk_3fd2 [[bool*]];
+                bool Unk_3fd3 [[bool*]];
+                bool Unk_3fd4 [[bool*]];
+                bool Unk_3fd5 [[bool*]];
+                bool Unk_3fd6 [[bool*]];
+                bool Unk_3fd7 [[bool*]];
+                char m_DiscUser[0x20] +0x30 [[utf8*]];
                 char m_StatsBuild[0x20] @ 0x407c [[utf8*]];
-                StringId64 AudioStringId @ 0x4180
+                StringId64 AudioStringId @ 0x4180;
                 bool m_ShowStats @ 0x43af [[bool*]];
-                char m_GameStudio[0x40] @ 0x4463 [[utf8*]]
+                char m_GameStudio[0x40] @ 0x4463 [[utf8*]];
             }
         
             struct NdFrameState 0x288a0 {
@@ -835,11 +832,12 @@ namespace regenny {
                     uint32_t m_selectcolor;
                     uint32_t m_editedcolor; // maybe
                     bool m_Islinked; // BY KEY ID
-                    char* m_pDescription +0xb [[utf8*]];
+                    void* m_lazyinitcallback @ 0x78;
+                    char* m_pDescription [[utf8*]];
                     bool m_atsign;
                     Component* m_MenuGroup + 0x7;
                     bool m_isfavorite + 0x1;
-                    int m_PagePointer +0x6; // Only with menu component?
+                    int m_PagePointer + 0x6; // Only with menu component?
                     int m_MaxPagePointers;
                     uint64_t m_ExtraArg;
                 } 
@@ -1399,45 +1397,56 @@ namespace regenny {
                 
                     ModuleRequest* m_NextModuleRequest;
                     ModuleRequest* m_PrevModuleRequest;
-                    StringId64 hash;
-                    uint64_t field_18;
-                    regenny.shared.corelib.memory.Context MemContext;
-                    uint32_t field_24;
-                    size_t size;
-                    uint64_t field_30;
-                    bool field_38; // DEBUG AssetView?
-                    bool field_39;
-                    bool field_3a;
-                    uint16_t field_3b;
+                    StringId64 m_hash;
+                    uint64_t m_field18;
+                    regenny.shared.corelib.memory.Context m_MemContext;
+                    uint32_t m_index;
+                    size_t m_size;
+                    uint64_t m_field30;
+                    bool m_field38; // DEBUG AssetView?
+                    bool m_field39;
+                    bool m_field3a;
+                    bool m_field3b;
+                    bool m_field3c;
                     bool m_requested;
                 }
             
                 // ScriptManager::ModuleInfo::Constructor (0x141e71328)
-                struct ModuleInfo 0x60 { 
-                     uint64_t field_0;
-                     uint64_t field_8;
+                struct ModuleInfo 0x60 {
+                     ModuleInfo* m_NextModule;
+                     ModuleInfo* m_PrevModule;
                      char* m_name [[utf8*]];
-                     StringId64 hash;
+                     StringId64 m_hash;
                      size_t m_size;
                      uint64_t m_pCollection;
                      uint32_t m_pNumModules;
                      uint64_t m_pUnkCollection @ 0x38;
-                     uint32_t m_pUnkNumModules;
+                     uint32_t m_pNumEntries;
                      ScriptModule* m_ScriptModule @ 0x48;
-                     uint64_t field_50;
-                     uint32_t field_58;
+                     uint64_t m_field50;
+                     uint32_t m_field58;
                      bool field_5c;
-                     bool field_5d;
-                     bool field_5e;
+                     bool m_IsLocal;
+                     bool m_DebugModule;
                      bool m_isLoaded;
                 }
-            
-                struct relocatableModule 0x22 {
+
+                struct LookupDcEntry 0x28 {
+                    void* m_entryPtr; // DC::Entry.m_entryPtr
+                    ModuleInfo* m_module;
+                    StringId64 m_scriptId;
+                    StringId64 m_typeId;
+                    uint32_t m_field20;
+                    uint8_t m_field24;
+                };
+
+                struct relocatableModule 0x30 {
                     void* vfTable;
                     uint64_t m_pRecord;
-                    uint64_t field_10;
-                    uint64_t field_18;
-                    uint16_t field_20;
+                    uint64_t m_field10;
+                    uint64_t m_field18;
+                    char* m_ModuleInfoArray [[utf8*]];
+                    char* m_ModuleInfoArrayDebug [[utf8*]];
                 };
             
                 struct ScriptModule 0x70 {
@@ -1446,33 +1455,73 @@ namespace regenny {
                         uint64_t m_moduleName;
                         corelib.memory.Context m_moduleMemContext;
                         void* Data @ 0x480;
-                        uint64_t field_4c0 @ 0x4c0;
-                        uint64_t field_4c8;
-                        bool field_4d0;
-                        bool field_4d1;
-                        bool field_4d2;
-                        uint16_t field_4d3;
-                        bool field_4d5;
-                        bool field_4d6;
+                        ScriptModule* m_Module @ 0x4c0;
+                        uint64_t m_field4c8;
+                        bool m_field4d0;
+                        bool m_field4d1;
+                        bool m_field4d2;
+                        uint16_t m_field4d3;
+                        bool m_field4d5;
+                        bool m_field4d6;
                     };
 
                     void* vfTable;
-                    uint64_t field_8;
-                    uint64_t field_10;
-                    uint64_t field_18;
-                    uint64_t field_20;
+                    ScriptModule* m_NextModule;
+                    ScriptModule* m_PrevModule;
+                    uint64_t m_field18;
+                    char* m_ModuleName [[utf8*]];
                     StringId64 m_modulehash;
-                    StringId64 field_30;
+                    StringId64 m_field30;
                     uint32_t m_numEntries;
-                    struct DC.Entry* m_Data @ 0x40;
-                    uint64_t field_48;
-                    struct DC.Header* m_header;
-                    uint64_t field_58;
-                    uint32_t field_60;
-                    uint32_t field_64;
-                    uint32_t field_68;
+                    DC.Entry* m_Data @ 0x40;
+                    ModuleInfo* m_ModuleInfo;
+                    DC.Header* m_header;
+                    uint64_t m_loadtime;
+                    corelib.memory.Context m_moduleMemContext;
+                    uint32_t m_field64;
+                    uint32_t m_field68;
                     uint32_t m_size;
                 };
+
+
+                struct ModuleBucket 0x98 {
+                    uint64_t m_data;
+                    corelib.containers.FixedSizeHeap m_heap;
+                    uint64_t m_data2;
+                    uint32_t m_elementSize;
+                    uint64_t m_capacity;
+                    uint64_t m_data3;
+                    uint64_t m_field80;
+                    uint64_t m_field88;
+                    uint32_t m_field90;
+                    uint32_t m_flags;
+                };
+
+                struct ModuleBucketMap 0x1f0 {
+                    corelib.containers.FixedSizeHeap m_SymbolsHeap @ 0x8;
+                    uint64_t* field_60;
+                    uint64_t field_68;
+                    uint64_t m_maxGlobalSymbols;
+                    void* m_SymbolsHead;
+                    void* m_SymbolsTail;
+                    uint64_t m_numGlobalSymbols;
+                    uint64_t* m_symbolBuckets;
+                    ModuleInfo* m_ModulesHead;
+                    ModuleInfo* m_ModulesTail;
+                    ModuleBucket* m_ModuleBucket;
+                    corelib.containers.FixedSizeHeap m_ModulesHeap;
+                    uint64_t m_maxModules @ 0x118;
+                    uint64_t m_numModules @ 0x130;
+                    uint64_t m_ScriptModuleCapacity @ 0x140;
+                    ScriptModule* m_ScriptModulesHead;
+                    ScriptModule* m_ScriptModulesTail;
+                    ModuleBucket* m_ScriptModuleBucket;
+                    corelib.containers.FixedSizeHeap m_ScriptModuleHeap;
+                    uint64_t m_maxScriptModules @ 0x1c8;
+                    uint64_t m_numScriptModules @ 0x1e0;
+                    uint32_t m_bucketCount;
+                    uint32_t m_lookupFlags;
+                }
             
                 // script-manager.cpp
                 struct ScriptManagerGlobals 0x33b0 {
@@ -1505,47 +1554,33 @@ namespace regenny {
                     bool m_field52;
                     bool m_field53;
                     bool m_DisableScriptDebugPrims;
-                    bool DisplayGlobalSymbols;
-                    bool m_field56;
+                    bool m_DisplayGlobalSymbols;
+                    bool m_ModuleIndexInit;
                     bool m_DisableDebugBinSuppressionforGameTasks;
                     bool m_field58;
-                    uint16_t field_5c;
-                    char field_5e;
-                    uint32_t field_60 @ 0x60;
-                    uint64_t field_68 @ 0x68;
+                    bool m_field5a @ 0x5a;
+                    bool m_DisableDebugBins;
+                    bool m_field5c;
+                    char m_field5e @ 0x5e;
+                    uint32_t m_field60 @ 0x60;
+                    uint64_t m_field68 @ 0x68;
                     ModuleRequest.ModuleRequestList* m_moduleRequestListActual;
-                    uint64_t field_78;
-                    uint64_t field_e8  @ 0xe8;
-                    uint64_t field_100 @ 0x100;
-                    uint32_t field_108;
-                    uint32_t field_10c;
-                    uint64_t field_110;
-                    uint64_t field_118;
-                    uint64_t field_120;
-                    uint32_t field_1b0 @ 0x1b0;
-                    uint32_t field_1b8 @ 0x1b8;
-                    uint64_t field_1c0 @ 0x1c0;
-                    uint64_t field_1c8;
-                    uint64_t field_1d0;
-                    uint32_t field_260 @ 0x260;
-                    uint32_t field_264;
-                    uint64_t field_288 @ 0x288;
-                    uint64_t field_290;
-                    ScriptCFuncMap* m_NativeMap;
+                    ModuleBucketMap m_ModulesBucket;
+                    ScriptCFuncMap* m_NativeMap @ 0x298;
                     ScriptModule.Loader* s_SLoadM;
-                    uint64_t field_2e80 @ 0x2e80;
-                    uint64_t field_3338 @ 0x3338;
-                    bool field_3340;
+                    uint64_t m_field2e80 @ 0x2e80;
+                    uint64_t m_field3338 @ 0x3338;
+                    bool m_field3340;
                     bool m_moduleLoader @ 0x336b;
-                    bool field_336c;
-                    bool field_336d;
-                    bool field_3371 @ 0x3371;
-                    uint32_t field_3380 @ 0x3380;
-                    uint64_t field_3388 @ 0x3388;
-                    uint64_t field_3390;
-                    uint64_t field_3398;
-                    uint32_t field_33a0;
-                    uint64_t field_33a8 @ 0x33a8;
+                    bool m_field336c;
+                    bool m_field336d;
+                    bool m_field3371 @ 0x3371;
+                    uint32_t m_field3380 @ 0x3380;
+                    uint64_t m_field3388 @ 0x3388;
+                    uint64_t m_field3390;
+                    uint64_t m_field3398;
+                    uint32_t m_field33a0;
+                    uint64_t m_field33a8 @ 0x33a8;
                 }; // g_scriptGlobals
 
             }
@@ -1570,12 +1605,12 @@ namespace regenny {
                 struct CFunctionStack 0x40 {
                     ScriptCFuncContext* m_pScriptCFuncContext;
                     uint32_t m_NumArgs; // number of received arguments
-                    uint32_t field_c;
+                    uint32_t m_field_c;
                     uint32_t m_FunctionArgs; // number of function arguments (expected)
-                    uint64_t field_18 @ 0x18;
-                    uint64_t field_20;
-                    uint64_t field_28;
-                    bool field_30;
+                    uint64_t m_field_18 @ 0x18;
+                    uint64_t m_field_20;
+                    uint64_t m_field_28;
+                    bool m_field_30;
                     bool m_MakeAllErrorsFatal;
                 };
 

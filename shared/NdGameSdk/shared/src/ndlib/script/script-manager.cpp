@@ -2,7 +2,6 @@
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 #include <NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp>
 
-using namespace boost::placeholders;
 using namespace NdGameSdk::gamelib::debug;
 
 namespace NdGameSdk::ndlib::script {
@@ -34,31 +33,135 @@ namespace NdGameSdk::ndlib::script {
             auto ScriptManagerInitJMP = (void*)Utility::FindAndPrintPattern(module
                 , findpattern.pattern, wstr(Patterns::ScriptManager_InitializeReturn), findpattern.offset);
 
+            findpattern = Patterns::ScriptManager_InitializeModuleIndexReturn;
+            auto InitializeModuleIndexJMP = (void*)Utility::FindAndPrintPattern(module
+                , findpattern.pattern, wstr(Patterns::ScriptManager_InitializeModuleIndexReturn), findpattern.offset);
+
+#if defined(T2R)
+            findpattern = Patterns::ScriptManager_GetDebugModuleBucket;
+            auto GetDebugModuleBucket = Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::ScriptManager_GetDebugModuleBucket), findpattern.offset);
+#endif
 
 			if (!g_ScriptManagerGlobals ||
-                !ScriptManagerInitJMP) {
+                !ScriptManagerInitJMP ||
+                !InitializeModuleIndexJMP
+                #if defined(T2R)
+                || !GetDebugModuleBucket
+                #endif
+                ) 
+            {
 				throw SdkComponentEx
 				{ std::format("Failed to find addresses!"),
 					SdkComponentEx::ErrorCode::PatternFailed };
 			}
 
-            findpattern = Patterns::ScriptManager_LookupCFunc;
-            ScriptManager_LookupCFunc = (ScriptManager_LookupCFunc_ptr)Utility::FindAndPrintPattern(module,
-                findpattern.pattern, wstr(Patterns::ScriptManager_LookupCFunc), findpattern.offset);
+            findpattern = Patterns::ScriptManager_ScriptModuleAdd;
+            ScriptManager_ScriptModuleAdd = (ScriptManager_ScriptModuleAdd_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::ScriptManager_ScriptModuleAdd), findpattern.offset);
+            
+            findpattern = Patterns::ScriptManager_ScriptModuleRemove;
+            ScriptManager_ScriptModuleRemove = (ScriptManager_ScriptModuleRemove_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::ScriptManager_ScriptModuleRemove), findpattern.offset);
 
-            if (!ScriptManager_LookupCFunc) {
+            findpattern = Patterns::ScriptManager_RemoveModule;
+            ScriptManager_RemoveModule = (ScriptManager_RemoveModule_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::ScriptManager_RemoveModule), findpattern.offset);
+
+            findpattern = Patterns::ScriptManager_AddModuleInfo;
+            ScriptManager_AddModuleInfo = (ScriptManager_AddModuleInfo_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::ScriptManager_AddModuleInfo), findpattern.offset);
+
+            findpattern = Patterns::ScriptManager_FindExportingModule;
+            ScriptManager_FindExportingModule = (ScriptManager_FindExportingModule_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::ScriptManager_FindExportingModule), findpattern.offset);
+
+            findpattern = Patterns::ScriptManager_IsLoadModule;
+            ScriptManager_IsLoadModule = (ScriptManager_IsLoadModule_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::ScriptManager_IsLoadModule), findpattern.offset);
+
+            findpattern = Patterns::ScriptManager_AddModuleRequest;
+            ScriptManager_AddModuleRequest = (ScriptManager_AddModuleRequest_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::ScriptManager_AddModuleRequest), findpattern.offset);
+
+            findpattern = Patterns::ScriptManager_ReloadModule;
+            ScriptManager_ReloadModule = (ScriptManager_ReloadModule_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::ScriptManager_ReloadModule), findpattern.offset);
+
+            findpattern = Patterns::ScriptManager_LoadModuleFromFile;
+            ScriptManager_LoadModuleFromFile = (ScriptManager_LoadModuleFromFile_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::ScriptManager_LoadModuleFromFile), findpattern.offset);
+
+            findpattern = Patterns::ScriptManager_LookupSymbol;
+            ScriptManager_LookupSymbol = (ScriptManager_LookupSymbol_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::ScriptManager_LookupSymbol), findpattern.offset);
+
+            findpattern = Patterns::ScriptManager_LookupInModule;
+            ScriptManager_LookupInModule = (ScriptManager_LookupInModule_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::ScriptManager_LookupInModule), findpattern.offset);
+
+            findpattern = Patterns::ScriptManager_BindValue;
+            ScriptManager_BindValue = (ScriptManager_BindValue_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::ScriptManager_BindValue), findpattern.offset);
+
+            findpattern = Patterns::ScriptManager_UnbindValue;
+			ScriptManager_UnbindValue = (ScriptManager_UnbindValue_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::ScriptManager_UnbindValue), findpattern.offset);
+
+			findpattern = Patterns::ScriptManager_ModuleInfo_LookupModuleByDcEntry;
+			ModuleInfo_LookupModuleByDcEntry = (ModuleInfo_LookupModuleByDcEntry_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::ScriptManager_ModuleInfo_LookupModuleByDcEntry), findpattern.offset);
+
+			findpattern = Patterns::ScriptManager_ModuleInfo_LookupDcEntry;
+			ModuleInfo_LookupDcEntry = (ModuleInfo_LookupDcEntry_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::ScriptManager_ModuleInfo_LookupDcEntry), findpattern.offset);
+
+			findpattern = Patterns::ScriptManager_ScriptModule_FetchScriptModuleEntry;
+			ScriptModule_FetchScriptModuleEntry = (ScriptModule_FetchScriptModuleEntry_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::ScriptManager_ScriptModule_FetchScriptModuleEntry), findpattern.offset);
+
+            if (!ScriptManager_ScriptModuleAdd ||
+                !ScriptManager_ScriptModuleRemove ||
+                !ScriptManager_RemoveModule ||
+                !ScriptManager_AddModuleInfo ||
+                !ScriptManager_FindExportingModule ||
+                !ScriptManager_IsLoadModule ||
+                !ScriptManager_AddModuleRequest ||
+                !ScriptManager_ReloadModule ||
+                !ScriptManager_LoadModuleFromFile ||
+                !ScriptManager_LookupSymbol ||
+                !ScriptManager_LookupInModule ||
+                !ScriptManager_BindValue ||
+                !ScriptManager_UnbindValue ||
+                !ModuleInfo_LookupModuleByDcEntry ||
+                !ModuleInfo_LookupDcEntry ||
+                !ScriptModule_FetchScriptModuleEntry
+            ) {
                 throw SdkComponentEx{ std::format("Failed to find {}:: game functions!", GetName()), SdkComponentEx::ErrorCode::PatternFailed };
             }
 
-
             m_ScriptManagerInitHook = Utility::MakeMidHook(ScriptManagerInitJMP, ScriptManagerInitialized, 
                 wstr(Patterns::ScriptManager_InitializeReturn), wstr(ScriptManagerInitJMP));
+
+            m_InitializeModuleIndexHook = Utility::MakeMidHook(ScriptManagerInitJMP, ModuleIndexInitialized,
+                wstr(Patterns::ScriptManager_InitializeModuleIndexReturn), wstr(ScriptManagerInitJMP));
 
             if (!m_ScriptManagerInitHook) {
                 throw SdkComponentEx{ "Failed to create hooks!", SdkComponentEx::ErrorCode::PatchFailed };
             }
 
-            m_Memory->IncreaseMemoryMap(MemoryMapId::ALLOCATION_DMENU_LOWMEM, MemSize(6.2, SizeUnit::Megabytes));
+        #if defined(T2R)
+
+			m_GetDebugModulesHook = Utility::MakeSafetyHookInline((void*)GetDebugModuleBucket,
+              ScriptManager::GetDebugModuleBucket, wstr(Patterns::ScriptManager_Lookup), wstr(GetDebugModules));
+
+            if (!m_GetDebugModulesHook) {
+				throw SdkComponentEx{ "Failed to create InlineHooks!", SdkComponentEx::ErrorCode::PatchFailed };
+            }
+
+        #endif
+
+            m_Memory->IncreaseMemoryMap(Memory::MapId::ALLOCATION_DMENU_LOWMEM, MemSize(6.2, SizeUnit::Megabytes));
 
 		});
 	}
@@ -68,6 +171,43 @@ namespace NdGameSdk::ndlib::script {
 
         ScriptMgr->InvokeSdkEvent(ScriptMgr->e_ScriptManagerInitialized);
         return;
+    }
+
+    void ScriptManager::ModuleIndexInitialized(SafetyHookContext& ctx) {
+        ScriptManager* ScriptMgr = Instance<ScriptManager>();
+
+        /*auto BucketModules = ScriptMgr->g_ScriptManagerGlobals->GetBucketModules();
+
+        std::size_t moduleIdx = 0;
+        for (auto* sm : BucketModules->ScriptModules())
+        {
+            auto* mi = sm->GetModuleInfo();
+            bool promoted = sm >= BucketModules->ScriptModuleHead() &&
+                sm < BucketModules->ScriptModuleTail();
+
+            spdlog::debug("{:5} {:>9} KiB  {:4.1f}s   {}   {}   {}",
+                moduleIdx++,
+                mi ? mi->GetModuleSize() / 1024 : 0,
+                sm->GetLoadTimeSec(),  
+                (mi && mi->IsDebugModule()) ? 'Y' : 'N',
+                promoted ? 'Y' : 'N', 
+                mi ? mi->GetModuleName() : "<null>"); 
+        }*/
+
+
+        ScriptMgr->InvokeSdkEvent(ScriptMgr->e_ModuleIndexInitialized);
+        return;
+    }
+
+    ModuleBucketMap* ScriptManager::GetDebugModuleBucket(ScriptManagerGlobals* pScriptManagerGlobals) {
+        if (pScriptManagerGlobals->IsDebugBins()) {
+			auto moduleBucket = pScriptManagerGlobals->GetBucketDebugModules();
+			if (moduleBucket) {
+				return moduleBucket;
+			}
+        }
+
+        return nullptr;
     }
 
     bool ScriptManager::RefreshScriptCFuncInfo(bool UpdateSidBase = false) {
@@ -137,11 +277,12 @@ namespace NdGameSdk::ndlib::script {
            auto ScriptMgr = reinterpret_cast<ScriptManager*>(pFunction.Data());  
            if (ScriptMgr) {  
                spdlog::info("TestFunct called!");  
-               auto CFunct = ScriptMgr->LookupCFunc(SID("kill-player"));
-               if (CFunct) {
-                   ScriptValue _returnvalue{};
-                   CFunct->CallScriptCFunc(ScriptValue{}, 0, &_returnvalue);
-				   }
+              auto BucketModules = ScriptMgr->g_ScriptManagerGlobals->GetBucketModules();
+
+			  int i = 0;
+              for (const auto& module : BucketModules->Modules()) {
+				  spdlog::info("Module{}: {} (ID: {:#x})", i++, module->GetModuleName(), module->GetModuleId());
+              }
 
                return true;  
            }  
@@ -150,8 +291,8 @@ namespace NdGameSdk::ndlib::script {
     }
 
     ScriptCFunc* ScriptManager::LookupCFunc(StringId64 Hash) {
-		always_assert(ScriptManager_LookupCFunc == nullptr, "Function pointer was not set!");
-        return ScriptManager_LookupCFunc(Hash, nullptr);
+		always_assert(ScriptManager_LookupSymbol == nullptr, "Function pointer was not set!");
+        return reinterpret_cast<ScriptCFunc*>(ScriptManager_LookupSymbol(Hash, nullptr));
     }
 
     DMENU::ItemSubmenu* ScriptManager::CreateScriptManagerMenu(NdDevMenu* pdmenu, DMENU::Menu* pMenu) {
@@ -597,8 +738,6 @@ namespace NdGameSdk::ndlib::script {
 
                     auto& KeyBoard = *ScriptMgr->m_ScriptCFuncInput;
 
-					// Not perfect cuz need to fix some issues with the NdDevMode keyboard
-					// implemented for demonstration of real-time input
                     if (KeyBoard.HasInputSettled()) {
                         auto text = KeyBoard.GetInputBuffer();
                         if (text && *text) {
@@ -676,6 +815,62 @@ namespace NdGameSdk::ndlib::script {
         return nullptr;
     }
 
+    FixedSizeHeap* ModuleBucketMap::GetSymbolsHeap() const {
+        return reinterpret_cast<FixedSizeHeap*>(&this->Get()->m_SymbolsHeap);
+    }
+
+    FixedSizeHeap* ModuleBucketMap::GetModulesHeap() const {
+        return reinterpret_cast<FixedSizeHeap*>(&this->Get()->m_ModulesHeap);
+    }
+
+    FixedSizeHeap* ModuleBucketMap::GetScriptModuleHeap() const {
+        return reinterpret_cast<FixedSizeHeap*>(&this->Get()->m_ScriptModuleHeap);
+    }
+
+    uint64_t ModuleBucketMap::MaxGlobalSymbols() const {
+        return this->Get()->m_maxGlobalSymbols;
+    }
+
+    uint64_t ModuleBucketMap::NumGlobalSymbols() const {
+        return this->Get()->m_numGlobalSymbols;
+    }
+
+    uint64_t ModuleBucketMap::MaxModules() const {
+        return this->Get()->m_maxModules;
+    }
+
+    uint64_t ModuleBucketMap::NumModules() const {
+        return this->Get()->m_numModules;
+    }
+
+    uint64_t ModuleBucketMap::MaxScriptModules() const {
+        return this->Get()->m_maxScriptModules;
+    }
+
+    uint64_t ModuleBucketMap::NumScriptModules() const {
+        return this->Get()->m_numScriptModules;
+    }
+
+    ModuleInfo* ModuleBucketMap::ModuleHead() {
+        return reinterpret_cast<ModuleInfo*>(this->Get()->m_ModulesHead);
+    }
+
+    const ModuleInfo* ModuleBucketMap::ModuleHead() const {
+		return reinterpret_cast<const ModuleInfo*>(this->Get()->m_ModulesHead);
+    }
+
+    ScriptModule* ModuleBucketMap::ScriptModuleHead() {
+        return reinterpret_cast<ScriptModule*>(this->Get()->m_ScriptModulesHead);
+    }
+
+    const ScriptModule* ModuleBucketMap::ScriptModuleHead() const {
+		return reinterpret_cast<const ScriptModule*>(this->Get()->m_ScriptModulesHead);
+    }
+
+    ScriptModule* ModuleBucketMap::ScriptModuleTail() {
+		return reinterpret_cast<ScriptModule*>(this->Get()->m_ScriptModulesTail);
+    }
+
     std::vector<ScriptManagerGlobals::NativeFuncEntry> ScriptManagerGlobals::DumpNativeFunctions() {
 
         std::vector<NativeFuncEntry> Dump{};
@@ -704,9 +899,28 @@ namespace NdGameSdk::ndlib::script {
         return Dump;
     }
 
+    bool ScriptManagerGlobals::IsDebugBins() {
+        return !this->Get()->m_DisableDebugBins;
+    }
+
+    ModuleBucketMap* ScriptManagerGlobals::GetBucketModules() {
+        return reinterpret_cast<ModuleBucketMap*>(&this->Get()->m_ModulesBucket);
+    }
+
+    ModuleBucketMap* ScriptManagerGlobals::GetBucketDebugModules() {
+    #if defined(T2R)
+        return reinterpret_cast<ModuleBucketMap*>(this->Get()->m_DebugModulesBucket);
+    #else
+        // For T1X, we need to implement a manual allocation and implementation (Not in the priority)
+		spdlog::error("[{}] GetBucketDebugModules is not implemented for this version", TOSTRING(ScriptManagerGlobals));
+		return nullptr;
+    #endif
+    }
+
     ScriptManagerGlobals::ScriptCFuncMap* ScriptManagerGlobals::GetNativeMap() {
         return this->Get()->m_NativeMap;
     }
 
     std::string ScriptManager::s_DataBaseFile{"ScriptManager.json"};
+
 }

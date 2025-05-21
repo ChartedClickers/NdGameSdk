@@ -34,7 +34,7 @@ public:
 
 class CFunctionStack : public ISdkRegenny<regenny::shared::gamelib::state_script::CFunctionStack> {};  
 
-static_assert(sizeof(ScriptCFuncContext), "Size of ScriptCFuncContext is not correct.");  
-static_assert(sizeof(CFunctionStack), "Size of CFunctionStack is not correct.");  
+static_assert(sizeof(ScriptCFuncContext) == 0x208, "Size of ScriptCFuncContext is not correct.");
+static_assert(sizeof(CFunctionStack) == 0x40, "Size of CFunctionStack is not correct.");  
 
 }

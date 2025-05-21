@@ -1,6 +1,7 @@
 #pragma once
 #include <NdGameSdk/components/SdkRegenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
+#include "ModuleBucketMap.hpp"
 #include "ModuleRequest.hpp"
 #include "ScriptModule.hpp"
 namespace regenny::shared::ndlib::script {
@@ -31,26 +32,27 @@ struct ScriptManagerGlobals {
     bool m_ValidateModuleSize; // 0x4f
     bool m_AssertonGlobalSymbolLookup; // 0x50
     bool m_EnableScripts; // 0x51
-    bool field_52; // 0x52
-    bool field_53; // 0x53
+    bool m_field52; // 0x52
+    bool m_field53; // 0x53
     bool m_DisableScriptDebugPrims; // 0x54
     bool m_DisplayGlobalSymbols; // 0x55
-    bool field_56; // 0x56
+    bool m_ModuleIndexInit; // 0x56
     bool m_DisableDebugBinSuppressionforGameTasks; // 0x57
-    bool field_58; // 0x58
-    private: char pad_59[0x7]; public:
+    bool m_field58; // 0x58
+    private: char pad_59[0x1]; public:
+    bool m_field5a; // 0x5a
+    bool m_DisableDebugBins; // 0x5b
+    bool m_field5c; // 0x5c
+    private: char pad_5d[0x3]; public:
     regenny::shared::ndlib::script::ModuleRequest::ModuleRequestList* m_moduleRequestListActual; // 0x60
-    void* field_68; // 0x68
-    private: char pad_70[0x48]; public:
-    void* field_b8; // 0xb8
-    private: char pad_c0[0x50]; public:
-    void* field_110; // 0x110
-    private: char pad_118[0x170]; public:
+    regenny::shared::ndlib::script::ModuleBucketMap m_ModulesBucket; // 0x68
+    private: char pad_258[0x30]; public:
     ScriptCFuncMap* m_NativeMap; // 0x288
-    regenny::shared::ndlib::script::ScriptModule::Loader* SLoadM; // 0x290
+    regenny::shared::ndlib::script::ScriptModule::Loader* s_SLoadM; // 0x290
     private: char pad_298[0x4e8]; public:
-    void* field_780; // 0x780
-    private: char pad_788[0x18]; public:
+    void* m_field780; // 0x780
+    private: char pad_788[0x10]; public:
+    regenny::shared::ndlib::script::ModuleBucketMap* m_DebugModulesBucket; // 0x798
 }; // Size: 0x7a0
 #pragma pack(pop)
 }

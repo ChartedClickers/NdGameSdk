@@ -1,11 +1,11 @@
 #pragma once
 #include <NdGameSdk/components/SdkRegenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
-namespace regenny::shared::ndlib::script {
-struct ScriptValue;
-}
 namespace regenny::shared::gamelib::state_script {
 struct ScriptCFuncContext;
+}
+namespace regenny::shared::ndlib::script {
+struct ScriptValue;
 }
 namespace regenny::shared::ndlib::script {
 #pragma pack(push, 1)

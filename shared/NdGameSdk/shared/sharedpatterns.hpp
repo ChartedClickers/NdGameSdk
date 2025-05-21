@@ -1,8 +1,7 @@
 #pragma once
 #include "NdGameSdk/sdkpattern.hpp"
 
-namespace NdGameSdk::Patterns
-{
+namespace NdGameSdk::Patterns {
 
 #if defined(T2R)
 	static inline const SdkPattern EngineComponents_s_table = { L"48 89 74 24 20 41 54 41 56 41 57 48 83 ec 30 8b f1 45 8b f8 4c 8d 25 ?? ?? ?? ?? 4c 8b f2 48 85 d2 0f 84 ?? ?? ?? ??", +0x14 };
@@ -36,13 +35,25 @@ namespace NdGameSdk::Patterns
 
 	static inline const SdkPattern ScriptManager_g_ScriptManagerGlobals = { L"48 89 5c 24 08 48 89 74 24 10 48 89 7c 24 18 55 41 54 41 55 41 56 41 57 48 8d ac 24 20 fd ff ff 48 81 ec e0 03 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 85", +0x42 };
 	static inline const SdkPattern ScriptManager_InitializeReturn = { L"80 3D ?? ?? ?? ?? 00 75 19 4D 8B CD 41 B8 13 0F 00 00 49 8B D4 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 90", +0x22 };
+	static inline const SdkPattern ScriptManager_InitializeModuleIndexReturn = { L"80 3d ?? ?? ?? ?? 00 75 19 4d 8b cd 41 b8 33 10 00 00 48 8b d7 48 8d 0d ?? ?? ?? ?? e8 ?? ?? ?? ?? 90 48 8d 0d ?? ?? ?? ?? e8 ?? ?? ?? ?? 48 8b f8 48", +0xa8 };
 	static inline const SdkPattern ScriptManager_Lookup = { L"48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 57 48 83 ec 40 48 8b d9 33 d2 8d 4a 03 e8 ?? ?? ?? ?? 48 85 c0 0f 84 ?? ?? ?? ?? 48 85 db 0f 84 ?? ?? ?? ?? c5 f9 ef c0 c5 fc 11 44 24 20 48 8d 3d ?? ?? ?? ?? 48 89 7c 24 20" };
-	static inline const SdkPattern ScriptManager_LookupCFunc = { L"40 53 48 83 ec 20 48 8b da e8 ?? ?? ?? ?? 48 85 c0 75 ?? 48 8b c3 48 83 c4 20 5b c3" };
+	static inline const SdkPattern ScriptManager_LookupSymbol = { L"40 53 48 83 ec 20 48 8b da e8 ?? ?? ?? ?? 48 85 c0 75 ?? 48 8b c3 48 83 c4 20 5b c3" };
 	static inline const SdkPattern ScriptManager_LookupInModule = { L"48 89 5c 24 08 48 89 6c 24 10 57 48 83 ec 20 48 8b d9 33 ed 48 85 c9 0f 84 ?? ?? ?? ?? 48 b8 ca de 18 72 18 1c ?? ?? ?? ??" };
+	static inline const SdkPattern ScriptManager_BindValue = { L"4c 8b dc 49 89 5b 08 49 89 6b 10 49 89 73 18 49 89 7b 20 41 54 41 56 41 57 48 83 ec 60 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 50 41 0f b6 f0 48 8b ea 48 8b d9 c5 f9 ef c0 c5 fc 11 44 24 20 4c 8d 35 ?? ?? ?? ?? 4d 89 73 a8 4c 8d 3d ?? ?? ?? ?? 4d 89 7b b0 c7 44 24 38 38 04 00 00 4c 8d 25 ?? ?? ?? ?? 4d 89 63 b8 80" };
+	static inline const SdkPattern ScriptManager_UnbindValue = { L"48 8b c4 48 89 58 08 48 89 68 10 48 89 70 18 57 41 56 41 57 48 83 ec 40 48 8b d9 c5 f9 ef c0 c5 fc 11 40 c8 48 8d 2d ?? ?? ?? ?? 48 89 68 c8 4c 8d 35 ?? ?? ?? ?? 4c 89 70 d0 c7 40 e0 08 0d 00 00 4c 8d 3d ?? ?? ?? ?? 4c 89 78 d8 80" };
+	static inline const SdkPattern ScriptManager_ScriptModuleAdd = { L"48 8b c4 48 89 58 08 48 89 68 18 48 89 50 10 56 57 41 56 48 83 ec 50 48 8b fa 48 8b d9 c5 f9 ef c0 c5 fc 11 40 c8 48 8d 35 ?? ?? ?? ?? 48 89 70 c8 48 8d" };
+	static inline const SdkPattern ScriptManager_ScriptModuleRemove = { L"48 8b c4 48 89 58 08 48 89 68 10 48 89 70 18 57 41 56 41 57 48 83 ec 40 48 8b d9 c5 f9 ef c0 c5 fc 11 40 c8 48 8d 2d ?? ?? ?? ?? 48 89 68 c8 4c 8d 35 ?? ?? ?? ?? 4c 89 70 d0 c7 40 e0 ed 02 00 00 4c 8d 3d" };
+	static inline const SdkPattern ScriptManager_RemoveModule = { L"48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 48 89 7c 24 20 41 54 41 56 41 57 48 81 ec c0 00 00 00 48 8b 05" };
+	static inline const SdkPattern ScriptManager_AddModuleInfo = { L"48 8b c4 48 89 58 08 48 89 68 10 48 89 70 18 57 48 83 ec 40 48 8b d9 c5 f9 ef c0 c5 fc 11 40 d8 48 8d 3d ?? ?? ?? ?? 48 89 78 d8 48 8d" };
+	static inline const SdkPattern ScriptManager_LoadModuleFromFile = { L"48 89 5c 24 08 48 89 6c 24 20 56 57 41 54 41 56 41 57 48 83 ec 60 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 50 45 8b f9 49 8b e8 48 8b f2 48 8b d9 4c 8b b4 24 b0 00 00 00 41 83 3e 0b 75 0f" };
 	static inline const SdkPattern ScriptManager_AddModuleRequest = { L"48 89 5c 24 08 48 89 74 24 10 48 89 7c 24 18 41 54 41 56 41 57 48 83 ec 30 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 28 41 0f b6 f9 45 0f b6 e0 4c 8b fa 48 8b d9 48 8b b4 24 80 00 00 00 48 85 f6 74 03 c6 06 00 83 3a 0b 75 0f 33 c9 e8 ?? ?? ?? ??" };
 	static inline const SdkPattern ScriptManager_ReloadModule = { L"48 8b c4 48 89 58 08 48 89 70 10 48 89 78 18 55 41 54 41 55 41 56 41 57 48 8d a8 38 fa ff ff 48 81 ec a0 06 00 00 c5 f8 29 70 c8 c5 f8 29 78 b8 48 8b 05" };
 	static inline const SdkPattern ScriptManager_IsLoadModule = { L"48 89 5c 24 08 57 48 81 ec a0 00 00 00 48 8b d9 80 3d ?? ?? ?? ?? 00 75 20 4c 8d 0d ?? ?? ?? ?? 41 b8 9e 0b 00 00 48 8d 15 ?? ?? ?? ?? 48 8d 0d ?? ?? ?? ?? e8 ?? ?? ?? ?? c5 f9 ef c0 33 c0 c5 fc 11 44 24 30 c5 f8 11 44 24 50 48 89 44 24 60 8b 3d ?? ?? ?? ?? 48 8d 0d ?? ?? ?? ??" };
 	static inline const SdkPattern ScriptManager_FindExportingModule = { L"48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 57 41 54 41 55 41 56 41 57 48 83 ec 50 49 8b f0 0f b6 ea 48 8b f9 e8 ?? ?? ?? ?? 48 85 c0 0f 84 ?? ?? ?? ?? c5 f9 ef c0 c5 fc 11 44 24 30 4c 8d 2d ?? ?? ?? ?? 4c 89 6c 24 30 48 8d 05 ?? ?? ?? ?? 48 89 44 24 38 c7 44 24 48 11 0b 00 00" };
+	static inline const SdkPattern ScriptManager_GetDebugModuleBucket = { L"48 8b 74 24 50 48 89 74 24 40 40 b5 01 40 88 6c 24 48 0f 1f 40 00 66 66 0f 1f 84 00 00 00 00 00 41 b8 01 00 00 00 49 bf", +0xF0 };
+	static inline const SdkPattern ScriptManager_ModuleInfo_LookupModuleByDcEntry = { L"48 89 5C 24 10 48 89 74 24 18 48 89 7C 24 20 41 56 48 81 EC B0 00 00 00 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 A0 00 00 00 44 8B 0D ?? ?? ?? ?? 33 C0 4C 8B 1D ?? ?? ?? ?? 48 8B FA 48 89 44 24 60 33 D2 48 8B C1 45 33 F6 49 F7 F1 C5 F9 EF C0 8B C2" };
+	static inline const SdkPattern ScriptManager_ModuleInfo_LookupDcEntry = { L"48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 57 48 83 ec 20 33 ed 48 89 51 10 49 8b d8 48 89 29 48 89 69 08 48 8b fa 48 89 59 18 48 8b f1 40 88 69 24 c7 41 20 ff ff ff ff" };
+	static inline const SdkPattern ScriptManager_ScriptModule_FetchScriptModuleEntry = { L"48 89 5c 24 08 44 8b 49 38 45 33 d2 41 83 e9 01 48 8b 59 40 4c 8b c2 78 ?? 0f 1f 80 00 00 00 00 43 8d 04 11 99 2b c2 d1 f8 48 63 c8 48 8d 14 49 4c 39" };
 
 	static inline const SdkPattern NdDevMenu_GameConfig_DevMode = { L"41 0f b6 8c 24 13 3f 00 00 84 c9 0f 94 c2 84 c9 0f 95 c1", +0xb };
 	static inline const SdkPattern NdDevMenu_NdDevMenuAppend_Particles = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 40 48 8b f1 33 c9 e8 ?? ?? ?? ?? 84 c0 0f 84 9d" };
@@ -111,13 +122,24 @@ namespace NdGameSdk::Patterns
 
 	static inline const SdkPattern ScriptManager_g_ScriptManagerGlobals = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 20 48 8b d9 48 63 fa 48 ?? ?? ?? ?? ?? ?? 45 33 c9 4c 89 49", +0x15 };
 	static inline const SdkPattern ScriptManager_InitializeReturn = { L"4c 8d 0d ?? ?? ?? ?? 4c 8b c3 49 8b d6 48 8b cf e8 ?? ?? ?? ?? 4c 8b c3 44 89 64 24 40 48 8d 54 24 40 48 8b cb e8 ?? ?? ?? ?? 48 85 c0 74 10 48 89 38 44 89 70 08 48 89 05 ?? ?? ?? ?? eb 08 48 83 25 ?? ?? ?? ?? 00", +0x68 };
+	static inline const SdkPattern ScriptManager_InitializeModuleIndexReturn = { L"49 8b c9 e8 ?? ?? ?? ?? 41 ff c4 48 83 c6 28 44 3b 27 0f 8c 5c ff ff ff", +0xe3 };
 	static inline const SdkPattern ScriptManager_Lookup = { L"48 89 5c 24 10 48 89 4c 24 08 57 48 83 ec 60 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 50 48 83 3d" };
-	static inline const SdkPattern ScriptManager_LookupCFunc = { L"40 53 48 83 ec ?? 48 8b da e8 ?? ?? ?? ?? 48 85 c0 75 ?? 48 8b c3 eb ?? 48 8b 00 48 83 c4 ?? 5b c3" };
+	static inline const SdkPattern ScriptManager_LookupSymbol = { L"40 53 48 83 ec ?? 48 8b da e8 ?? ?? ?? ?? 48 85 c0 75 ?? 48 8b c3 eb ?? 48 8b 00 48 83 c4 ?? 5b c3" };
 	static inline const SdkPattern ScriptManager_LookupInModule = { L"48 89 4c 24 08 57 48 83 ec 50 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 48 33 ff 48 8b d9 48 85 c9 0f 84 ?? ?? ?? ?? 48 b9 25 23 22 84 e4 9c" };
+	static inline const SdkPattern ScriptManager_BindValue = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 70 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 60 c5 f9 ef c0 41 8a f8 4c 8d 0d ?? ?? ?? ?? 48 8b f2 48 8b d9 c5 fc 11 44 24 40 41 b8 27 02 00" };
+	static inline const SdkPattern ScriptManager_UnbindValue = { L"40 53 48 83 ec 70 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 60 c5 f9 ef c0 48 8b d9 4c 8d 0d ?? ?? ?? ?? c5 fc 11 44 24 40 41 b8 53 0f 00 00 48 8d 15 ?? ?? ?? ?? 48 8d 4c 24" };
+	static inline const SdkPattern ScriptManager_ScriptModuleAdd = { L"48 89 5c 24 08 48 89 54 24 10 57 48 83 ec 70 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 60 c5 f9 ef c0 48 8b fa 4c 8d 0d ?? ?? ?? ?? 48 8b d9 48 8d 15 ?? ?? ?? ?? c5 fc 11 44 24 40 41 b8 c5 03 00 00 48 8d 4c 24 40 c5 f8 77 e8 ?? ?? ?? ?? 48 8b 47 48 48 85 c0 74 06 80 78 5e 00 75 1c 4c 8d 8c 24 88" };
+	static inline const SdkPattern ScriptManager_ScriptModuleRemove = { L"40 53 48 83 ec 70 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 60 c5 f9 ef c0 48 8b d9 4c 8d 0d ?? ?? ?? ?? c5 fc 11 44 24 40 41 b8 d7 03 00 00 48 8d 15 ?? ?? ?? ?? 48 8d 4c 24 40 c5" };
+	static inline const SdkPattern ScriptManager_RemoveModule = { L"48 8b c4 48 89 58 08 48 89 70 10 48 89 78 18 55 41 56 41 57 48 8d 68 a1 48 81 ec c0 00 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 45 37 48 83 65 a7 00" };
+	static inline const SdkPattern ScriptManager_AddModuleInfo = { L"40 53 48 83 ec 50 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 40 c5 f9 ef c0 48 8b d9 4c 8d 0d ?? ?? ?? ?? c5 fc 11 44 24 20 41 b8 87 03 00 00 48 8d" };
+	static inline const SdkPattern ScriptManager_LoadModuleFromFile = { L"48 89 5c 24 08 48 89 74 24 10 55 57 41 54 41 56 41 57 48 8b ec 48 83 ec 70 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 45 f8 48 8b 7d 50 45 8b e1 4d 8b f8 48 8b d9 83 3f 0a 0f 84 ?? ?? ?? ?? e8 ?? ?? ?? ?? 84 c0 75 ?? 48 8b cb" };
 	static inline const SdkPattern ScriptManager_AddModuleRequest = { L"48 8b c4 48 89 58 08 48 89 70 10 48 89 78 18 4c 89 60 20 55 41 56 41 57 48 8d a8 28 fc ff ff 48 81 ec c0 04 00 00 48 ?? ?? ?? ?? ?? ?? 48 33 c4 48 89 85 b0 03 00 00 48" };
 	static inline const SdkPattern ScriptManager_ReloadModule = { L"48 8b c4 48 89 58 08 48 89 70 10 48 89 78 18 55 41 54 41 55 41 56 41 57 48 8d a8 f8 f9 ff ff 48 81 ec e0 06 00 00 c5 f8 29 70 c8 48 ?? ?? ?? ?? ?? ?? 48 33 c4 48 89 85 c0 05 00" };
 	static inline const SdkPattern ScriptManager_IsLoadModule = { L"48 8b c4 48 89 58 08 48 89 70 10 48 89 78 18 55 48 8d 68 a1 48 81 ec c0 00 00 00 48 ?? ?? ?? ?? ?? ?? 48 33 c4 48 89 45 47 c5 f9 ef" };
 	static inline const SdkPattern ScriptManager_FindExportingModule = { L"4c 8b dc 49 89 5b 08 49 89 73 10 49 89 7b 18 4d 89 63 20 41 55 41 56 41 57 48 83 ec 60 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 58 48 8b 05 ?? ?? ?? ?? 49 8b f8 44 8a ea 48 8b f1 48 85 c0 0f 84 ?? ?? ?? ?? c5 f9 ef c0 c5 fc 11 44 24 38" };
+	static inline const SdkPattern ScriptManager_ModuleInfo_LookupModuleByDcEntry = { L"4c 8b dc 49 89 5b 10 49 89 6b 18 48 89 4c 24 08 56 57 41 56 48 81 ec a0 00 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 90 00 00 00 c5 f9 ef c0 c5 fc 11 44 24 58 33 c0 4d 8d 43 08 c5 f8 11 44 24 78 48" };
+	static inline const SdkPattern ScriptManager_ModuleInfo_LookupDcEntry = { L"48 89 5c 24 08 57 48 83 ec 20 48 83 21 00 83 cf ff 48 83 61 08 00 48 8b d9 89 79 20 48 89 51 10 4c 89 41 18 c6 41 24 00 48 8b" };
+	static inline const SdkPattern ScriptManager_ScriptModule_FetchScriptModuleEntry = { L"44 8b 49 38 45 33 d2 41 83 e9 01 4c 8b 59 40 4c 8b c2 78 2a b9 02 00 00 00 43 8d 04 11 99 f7 f9 48 63 c8 48 8d 14 49 4d 39 04 d3 73" };
 
 	static inline const SdkPattern NdDevMenu_GameConfig_DevMode = { L"8a 8f ?? ?? ?? ?? 84 c9 0f 94 c2 84 c9 0f 95 c1" };
 	static inline const SdkPattern NdDevMenu_NdDevMenuAppend_Particles = { L"40 56 48 83 ec 30 48 8b f1 33 c9 e8 ?? ?? ?? ?? 84 c0 0f 84 ?? ?? ?? ?? 48 89 5c 24 40 4c 8d 0d ?? ?? ?? ??" };

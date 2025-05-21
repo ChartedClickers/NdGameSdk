@@ -45,7 +45,9 @@ struct NdGameInfo {
     char m_CfgFolderName[128]; // 0x3d8a
     // Metadata: utf8*
     char m_CfgDefaultsPath[128]; // 0x3e0a
-    private: char pad_3e8a[0x87]; public:
+    private: char pad_3e8a[0x82]; public:
+    uint32_t m_env; // 0x3f0c
+    private: char pad_3f10[0x1]; public:
     // Metadata: bool*
     bool m_AssetView; // 0x3f11
     // Metadata: bool*

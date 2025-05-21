@@ -53,22 +53,6 @@ namespace NdGameSdk::ndlib::script {
 		}
 	}
 
-	/*
-	 It is a dirty method for executing a virtual function.
-	 By some reason, the compiler takes the ptr address of VfTable instead of using the actual this (ScriptCFunc)
-	 So we need to use the first element of the table as a function pointer. I will look into it later.
-	 CFunc->vftable->CallScriptCFunc(ctx.Get(), numArgs, return_->Get(), 0);
-	 00007FFE2C2FC03C  mov         rax,qword ptr [CFunc]
-	 00007FFE2C2FC041  mov         rcx,qword ptr [rax] // There is the problem (Clang)
-	 00007FFE2C2FC044  mov         r8d,dword ptr [numArgs]
-	 00007FFE2C2FC049  mov         rax,qword ptr [rcx]
-	 00007FFE2C2FC04C  xor         edx,edx
-	 00007FFE2C2FC04E  mov         r9d,edx
-	 00007FFE2C2FC051  mov         rdx,r9
-	 00007FFE2C2FC054  mov         qword ptr [rsp+20h],0
-	 00007FFE2C2FC05D  call        qword ptr [rax]
-	*/
-
 	void ScriptCFunc::CallScriptCFunc(ScriptValue args, int numArgs, ScriptValue* return_)  {
 		auto* CFunc = this->Get();
 		if (!CFunc || !CFunc->vftable) return;
@@ -92,5 +76,8 @@ namespace NdGameSdk::ndlib::script {
 		return this->Get()->m_pFunction;
 	}
 
-	INIT_FUNCTION_PTR(ScriptManager_LookupCFunc);
+	INIT_FUNCTION_PTR(ScriptManager_LookupSymbol);
+	INIT_FUNCTION_PTR(ScriptManager_LookupInModule);
+	INIT_FUNCTION_PTR(ScriptManager_BindValue);
+	INIT_FUNCTION_PTR(ScriptManager_UnbindValue);
 }

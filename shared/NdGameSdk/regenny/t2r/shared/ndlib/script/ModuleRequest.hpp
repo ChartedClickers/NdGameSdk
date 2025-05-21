@@ -12,16 +12,17 @@ struct ModuleRequest {
 
     regenny::shared::ndlib::script::ModuleRequest* m_NextModuleRequest; // 0x0
     regenny::shared::ndlib::script::ModuleRequest* m_PrevModuleRequest; // 0x8
-    StringId64 hash; // 0x10
-    uint64_t field_18; // 0x18
-    regenny::shared::corelib::memory::Context MemContext; // 0x20
-    uint32_t field_24; // 0x24
-    size_t size; // 0x28
-    uint64_t field_30; // 0x30
-    bool field_38; // 0x38
-    bool field_39; // 0x39
-    bool field_3a; // 0x3a
-    uint16_t field_3b; // 0x3b
+    StringId64 m_hash; // 0x10
+    uint64_t m_field18; // 0x18
+    regenny::shared::corelib::memory::Context m_MemContext; // 0x20
+    uint32_t m_index; // 0x24
+    size_t m_size; // 0x28
+    uint64_t m_field30; // 0x30
+    bool m_field38; // 0x38
+    bool m_field39; // 0x39
+    bool m_field3a; // 0x3a
+    bool m_field3b; // 0x3b
+    bool m_field3c; // 0x3c
     bool m_requested; // 0x3d
     private: char pad_3e[0x2]; public:
 }; // Size: 0x40

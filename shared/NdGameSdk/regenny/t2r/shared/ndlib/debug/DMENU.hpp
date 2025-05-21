@@ -36,7 +36,8 @@ struct DMENU {
         uint32_t m_selectcolor; // 0x6c
         uint32_t m_editedcolor; // 0x70
         bool m_Islinked; // 0x74
-        private: char pad_75[0xb]; public:
+        private: char pad_75[0x3]; public:
+        void* m_lazyinitcallback; // 0x78
         // Metadata: utf8*
         char* m_pDescription; // 0x80
         bool m_atsign; // 0x88

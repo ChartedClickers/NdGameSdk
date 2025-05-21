@@ -100,14 +100,7 @@ struct NdGameInfo {
     bool Unk_3f0a; // 0x3f0a
     // Metadata: bool*
     bool Unk_3f0b; // 0x3f0b
-    // Metadata: bool*
-    bool Unk_3f0c; // 0x3f0c
-    // Metadata: bool*
-    bool Unk_3f0d; // 0x3f0d
-    // Metadata: bool*
-    bool Unk_3f0e; // 0x3f0e
-    // Metadata: bool*
-    bool Unk_3f0f; // 0x3f0f
+    uint32_t m_env; // 0x3f0c
     // Metadata: bool*
     bool Unk_3f10; // 0x3f10
     // Metadata: bool*

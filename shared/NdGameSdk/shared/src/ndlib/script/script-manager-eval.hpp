@@ -11,10 +11,11 @@
 #include <NdGameSdk/regenny/t1x/shared/ndlib/script/ScriptCFunc.hpp>
 #endif
 
-
 #include <Utility/helper.hpp>
 #include <Utility/function_ptr.hpp>
 
+#include "module-info.hpp"
+#include "script-module.hpp"
 
 using namespace std;
 
@@ -30,7 +31,6 @@ namespace NdGameSdk::ndlib::script {
 			TypeOf Type;
 			string Name;
 			string Description;
-
             uint64_t Data[20]{};
 		};
 
@@ -42,7 +42,7 @@ namespace NdGameSdk::ndlib::script {
 		string Description;
 	};
 
-    class ScriptValue : public ISdkRegenny<regenny::shared::ndlib::script::ScriptValue>
+    class NdGameSdk_API ScriptValue : public ISdkRegenny<regenny::shared::ndlib::script::ScriptValue>
     {
     public:
         ScriptValue() = default;
@@ -97,6 +97,7 @@ namespace NdGameSdk::ndlib::script {
         T val(int index) const {
             return (T)this->Get()->val[index];
         }
+
     private:
         static uint64_t to_u64(uint64_t v) { return v; }
         static uint64_t to_u64(int v) { return static_cast<uint64_t>(v); }
@@ -110,15 +111,22 @@ namespace NdGameSdk::ndlib::script {
     };
 
 
-    class ScriptCFunc : public ISdkRegenny<regenny::shared::ndlib::script::ScriptCFunc>
+    class NdGameSdk_API ScriptCFunc : public ISdkRegenny<regenny::shared::ndlib::script::ScriptCFunc>
     {
     public:
         void CallScriptCFunc(ScriptValue args, int numArgs, ScriptValue* return_);
         void* GetFunc() const;
     };
 
+    TYPEDEF_EXTERN_FUNCTION_PTR(void*, ScriptManager_LookupSymbol, StringId64 Lookup, void* return_);
+    TYPEDEF_EXTERN_FUNCTION_PTR(ScriptValue*, ScriptManager_LookupInModule, StringId64 Symbol, StringId64 Module);
+    TYPEDEF_EXTERN_FUNCTION_PTR(void, ScriptManager_UnbindValue, StringId64 Symbol);
 
-    TYPEDEF_EXTERN_FUNCTION_PTR(ScriptCFunc*, ScriptManager_LookupCFunc, StringId64 Lookup, void* return_);
+#if defined(T2R)
+    TYPEDEF_EXTERN_FUNCTION_PTR(void, ScriptManager_BindValue, StringId64 Symbol, ScriptValue* value, bool isDebugModule, StringId64 module);
+#elif defined(T1X)
+    TYPEDEF_EXTERN_FUNCTION_PTR(void, ScriptManager_BindValue, StringId64 Symbol, ScriptValue* value, StringId64 module);
+#endif
 
 #pragma region JsonSerialize
     inline void to_json(nlohmann::json& j, const ScriptCFuncInfo::TypeOf& t) {
@@ -137,8 +145,8 @@ namespace NdGameSdk::ndlib::script {
                 last_used = i;
         }
 
-        j = { { "Type",        a.Type },
-              { "Name",        a.Name },
+        j = { { "Type", a.Type },
+              { "Name", a.Name },
               { "Description", a.Description }
         };
 
@@ -171,10 +179,10 @@ namespace NdGameSdk::ndlib::script {
 
     inline void to_json(nlohmann::json& j, const ScriptCFuncInfo& s) {
         auto Hash = std::format("0x{:016X}", s.Hash);
-        j = { { "Name",  s.Name },
-              { "Hash",  Hash },
+        j = { { "Name", s.Name },
+              { "Hash", Hash },
               { "Description", s.Description },
-              { "Args",        s.Args } };
+              { "Args", s.Args } };
     }
 
     inline void from_json(const nlohmann::json& j, ScriptCFuncInfo& s) {

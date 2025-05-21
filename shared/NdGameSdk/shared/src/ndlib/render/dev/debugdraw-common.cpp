@@ -38,8 +38,8 @@ namespace NdGameSdk::ndlib::render::dev {
 
 	void DebugDrawCommon::Awake() {
 		auto SharedComponents = ISdkComponent::GetSharedComponents();
-		m_EngineComponents = SharedComponents->GetComponent<EngineComponents>();
-		m_Memory = SharedComponents->GetComponent<Memory>();
+		m_EngineComponents = GetDependencyComponent<EngineComponents>(SharedComponents);
+		m_Memory = GetDependencyComponent<Memory>(SharedComponents);
 
 		m_MsgConDraw = AddSubComponent<MsgConDraw>();
 		m_PrimServerMgr = AddSubComponent<PrimServerManager>();
@@ -52,15 +52,6 @@ namespace NdGameSdk::ndlib::render::dev {
 		std::call_once(Initialized, [this] {
 
 			spdlog::info("Initializing {} patterns...", GetName());
-
-			auto MissingDependencies = CheckSdkComponents<Memory, EngineComponents>
-				({ m_Memory.get(), m_EngineComponents.get()});
-
-			if (MissingDependencies.has_value()) {
-				throw SdkComponentEx
-				{ std::format("Missing necessary dependencies: {:s}", MissingDependencies.value()),
-					SdkComponentEx::ErrorCode::DependenciesFailed };
-			}
 
 			Patterns::SdkPattern findpattern{};
 			auto module = Utility::memory::get_executable();

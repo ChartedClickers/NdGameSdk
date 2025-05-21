@@ -33,7 +33,7 @@ namespace NdGameSdk {
 		if (MemComponent->IsDebugMemoryAvailable()) {
 			auto MissingDependencies = ISdkComponent::CheckSdkComponents
 				<gamelib::debug::NdDevMenu, gamelib::render::particle::ParticleManager>({
-					ParticleMgr.get(), DmenuComponent.get() });
+					ParticleMgr, DmenuComponent });
 
 			if (MissingDependencies.has_value()) {
 				throw SdkComponentEx

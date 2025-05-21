@@ -13,11 +13,12 @@ namespace NdGameSdk::game::player {
 	class Player : public ISdkComponent {
 	public:
 		Player();
+		SDK_DEPENDENCIES(weapon::Weapon, NdDevMenu);
 	private:
 		void Initialize() override;
 		void Awake() override;
 
-		shared_ptr<gamelib::debug::NdDevMenu> m_DMENU;
+		gamelib::debug::NdDevMenu* m_DMENU;
 		optional<PlayerMenu> m_PlayerMenu;
 	};
 

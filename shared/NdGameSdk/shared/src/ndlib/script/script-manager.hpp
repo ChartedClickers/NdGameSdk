@@ -36,6 +36,7 @@ namespace NdGameSdk::ndlib::script {
 		ScriptManager();
 
 		SdkEvent<> e_ScriptManagerInitialized{true};
+		SDK_DEPENDENCIES(CommonGame, NdDevMenu, Memory);
 
 		NdGameSdk_API ScriptCFunc* LookupCFunc(StringId64 Hash);
 		template<typename... Args>
@@ -84,7 +85,7 @@ namespace NdGameSdk::ndlib::script {
 			DMENU::Message msg,
 			int32_t data) {
 			auto* mgr = Instance<ScriptManager>();
-			auto* menu = mgr->m_NdDevMenu.get();
+			auto* menu = mgr->m_NdDevMenu;
 
 			auto ret = menu->DecimalCallBack(item, msg, data);
 			if (msg == DMENU::Message::OnExecute) {
@@ -114,9 +115,9 @@ namespace NdGameSdk::ndlib::script {
 		std::map<StringId64, ScriptCFuncInfo> m_ScriptCFuncs{};
 		
 
-		shared_ptr<Memory> m_Memory;
-		shared_ptr<CommonGame> m_CommonGame;
-		shared_ptr<NdDevMenu> m_NdDevMenu;
+		Memory* m_Memory;
+		CommonGame* m_CommonGame;
+		NdDevMenu* m_NdDevMenu;
 
 		MidHook m_ScriptManagerInitHook{};
 

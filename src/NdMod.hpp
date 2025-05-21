@@ -28,14 +28,14 @@ protected:
     };
 
     template <typename SdkComponent>
-    std::shared_ptr<SdkComponent> GetSharedSdkComponent() {
+    SdkComponent* GetSharedSdkComponent() {
         return GetDependentComponent<SdkComponent>(
             g_ndmodclient->GetSharedSdkComponent<SdkComponent>()
         );
     };
 
     template <typename SdkComponent>
-    std::shared_ptr<SdkComponent> GetNdGameSdkComponent() {
+    SdkComponent* GetNdGameSdkComponent() {
         return GetDependentComponent<SdkComponent>(
             g_ndmodclient->GetNdGameSdkComponent<SdkComponent>()
         );
@@ -49,7 +49,7 @@ private:
     virtual void OnConfigSave(Utils::Config& cfg) {}
 
     template <typename DependentComponent>
-    std::shared_ptr<DependentComponent> GetDependentComponent(std::shared_ptr<DependentComponent> component) {
+    DependentComponent* GetDependentComponent(DependentComponent* component) {
         if (component && component->IsInitialized())
             return component;
 

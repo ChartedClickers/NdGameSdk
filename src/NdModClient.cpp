@@ -59,9 +59,9 @@ bool NdModClient::Initialize() {
 }
 
 void NdModClient::OnModuleRegistered() {
-	m_EngineComponents = GetSharedSdkComponent<ndlib::EngineComponents>().get();
-	m_CommonGame = GetSharedSdkComponent<common::CommonGame>().get();
-	m_DebugDraw = GetSharedSdkComponent<ndlib::render::dev::DebugDrawCommon>().get();
+	m_EngineComponents = GetSharedSdkComponent<ndlib::EngineComponents>();
+	m_CommonGame = GetSharedSdkComponent<common::CommonGame>();
+	m_DebugDraw = GetSharedSdkComponent<ndlib::render::dev::DebugDrawCommon>();
 }
 
 void NdModClient::OnGameInitialized(bool status) {

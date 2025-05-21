@@ -11,9 +11,9 @@ namespace NdGameSdk::ndlib::script {
 
 	void ScriptManager::Awake() {
 		auto SharedComponents = ISdkComponent::GetSharedComponents();
-        m_Memory = SharedComponents->GetComponent<Memory>();
-        m_NdDevMenu = SharedComponents->GetComponent<NdDevMenu>();
-        m_CommonGame = SharedComponents->GetComponent<CommonGame>();
+        m_Memory = GetDependencyComponent<Memory>(SharedComponents);
+        m_NdDevMenu = GetDependencyComponent<NdDevMenu>(SharedComponents);
+        m_CommonGame = GetDependencyComponent<CommonGame>(SharedComponents);
 	}
 
 	void ScriptManager::Initialize()
@@ -182,7 +182,7 @@ namespace NdGameSdk::ndlib::script {
 
     bool ScriptManager::WrapScriptCFuncDebugMenu(DMENU::Menu* pMenu, ScriptCFuncDebugMenuProperties* pProperties) {
         ScriptManager* ScriptMgr = Instance<ScriptManager>();
-		NdDevMenu* NdDevMenu = ScriptMgr->m_NdDevMenu.get();
+		NdDevMenu* NdDevMenu = ScriptMgr->m_NdDevMenu;
 
         ScriptMgr->m_ScriptCFuncInput = nullptr;
         ScriptMgr->m_ScriptCFuncDebugMenuProperties.ScriptCFuncInfo = nullptr;
@@ -260,7 +260,7 @@ namespace NdGameSdk::ndlib::script {
 
     bool ScriptManager::WrapScriptCFuncExecutorMenu(DMENU::Menu* pMenu, ScriptCFuncDebugMenuProperties* pProperties, bool pSwitchMode) {
         ScriptManager* ScriptMgr = Instance<ScriptManager>();
-        NdDevMenu* NdDevMenu = ScriptMgr->m_NdDevMenu.get();
+        NdDevMenu* NdDevMenu = ScriptMgr->m_NdDevMenu;
 
         static auto ExecutorModeHandler = &ScriptManager::OnExecuteRebuild<DMENU::ItemSelection>;
         static auto ArgumentsHandler = &ScriptManager::OnExecuteRebuild<DMENU::ItemDecimal>;

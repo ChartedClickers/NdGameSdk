@@ -38,6 +38,8 @@ namespace NdGameSdk::ndlib::render::dev {
 		DebugDrawCommon();
 		~DebugDrawCommon();
 
+		SDK_DEPENDENCIES(EngineComponents, Memory);
+
 		MsgCon* GetMsgCon();
 		void TextPrintV(WindowContext* ctx, const TextLayout& layout, const char* fmt, ...);
 		void PrintToActiveMsgOutput(const char* pStr);
@@ -71,11 +73,11 @@ namespace NdGameSdk::ndlib::render::dev {
 		MidHook m_DebugDrawHook{};
 		MidHook m_DebugDrawSidHook{};
 
-		shared_ptr<EngineComponents> m_EngineComponents;
-		shared_ptr<Memory> m_Memory;
+		EngineComponents* m_EngineComponents;
+		Memory* m_Memory;
 
-		shared_ptr<MsgConDraw> m_MsgConDraw;
-		shared_ptr<PrimServerManager> m_PrimServerMgr;
+		MsgConDraw* m_MsgConDraw;
+		PrimServerManager* m_PrimServerMgr;
 
 		friend class ISdkModule;
 		friend class MsgConDraw;

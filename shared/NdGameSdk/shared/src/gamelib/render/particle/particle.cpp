@@ -11,7 +11,7 @@ namespace NdGameSdk::gamelib::render::particle {
 
 	void ParticleManager::Awake() {
 		auto SharedComponents = ISdkComponent::GetSharedComponents();
-		m_Memory = SharedComponents->GetComponent<Memory>();
+		m_Memory = GetDependencyComponent<Memory>(SharedComponents);
 	}
 
 	void ParticleManager::Initialize() {
@@ -20,15 +20,6 @@ namespace NdGameSdk::gamelib::render::particle {
 		std::call_once(Initialized, [this] {
 
 			spdlog::info("Initializing {} patterns...", GetName());
-
-			auto MissingDependencies = CheckSdkComponents<Memory>({ m_Memory.get()});
-
-			if (MissingDependencies.has_value()) {
-				throw SdkComponentEx
-				{ std::format("Missing necessary dependencies: {:s}", MissingDependencies.value()),
-					SdkComponentEx::ErrorCode::DependenciesFailed };
-			}
-
 
 			Patterns::SdkPattern findpattern{};
 			auto module = Utility::memory::get_executable();

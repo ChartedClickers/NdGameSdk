@@ -3,8 +3,8 @@
 
 namespace NdGameSdk::common {
 
-	CommonGameLoop::CommonGameLoop(EngineComponents* pEngineComponents, NdDevMenu* pNdDevMenu)
-		: m_EngineComponents{ pEngineComponents }, m_NdDevMenu{ pNdDevMenu }, ISdkSubComponent(TOSTRING(CommonGameLoop)) {}
+	CommonGameLoop::CommonGameLoop(EngineComponents* pEngineComponents)
+		: m_EngineComponents{ pEngineComponents }, ISdkSubComponent(TOSTRING(CommonGameLoop)) {}
 
 	void CommonGameLoop::Init() {
 		
@@ -44,7 +44,7 @@ namespace NdGameSdk::common {
 		using NdKeyboardKey = NdFrameState::NdKeyboardLayer::Key;
 
 #ifndef NDEBUG
-		static shared_ptr<CommonGameLoop> pCommonGameLoop = GetSharedComponents()->
+		static CommonGameLoop* pCommonGameLoop = GetSharedComponents()->
 			GetComponent<CommonGame>()->GetSubComponent<CommonGameLoop>();
 		auto NdFrameState = pCommonGameLoop->m_EngineComponents->GetNdFrameState();
 		auto kbd = NdFrameState.GetIMEKeyboard();
@@ -65,12 +65,13 @@ namespace NdGameSdk::common {
 	}
 
 	void CommonGameLoop::GameDebugUpdate(SafetyHookContext& ctx) {
-		static shared_ptr<CommonGameLoop> pCommonGameLoop = GetSharedComponents()->
-			GetComponent<CommonGame>()->GetSubComponent<CommonGameLoop>();
 
-		if (pCommonGameLoop->m_NdDevMenu) {
-			auto NdConfig = pCommonGameLoop->m_EngineComponents->m_ndConfig;
-			pCommonGameLoop->m_NdDevMenu->DMENU_Menu_Update(&NdConfig.GetDmenu());
+		static EngineComponents* pEngineComponents = GetSharedComponents()->GetComponent<EngineComponents>();
+		static NdDevMenu* pNdDevMenu = GetSharedComponents()->GetComponent<NdDevMenu>();
+
+		if (pNdDevMenu) {
+			auto NdConfig = pEngineComponents->m_ndConfig;
+			pNdDevMenu->DMENU_Menu_Update(&NdConfig.GetDmenu());
 		}
 
 	}

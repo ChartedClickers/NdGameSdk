@@ -5,7 +5,7 @@
 
 namespace NdGameSdk::common {
 
-	CommonGame::CommonGame() : ISdkComponent("CommonGameInit") {}
+	CommonGame::CommonGame() : ISdkComponent(TOSTRING(CommonGame)) {}
 
 	uint32_t CommonGame::GetGameVersion() {
 		return m_GameVersion;
@@ -17,13 +17,11 @@ namespace NdGameSdk::common {
 
 	void CommonGame::Awake() {
 		auto SharedComponents = ISdkComponent::GetSharedComponents();
-		m_Memory = SharedComponents->GetComponent<Memory>();
-		m_EngineComponents = SharedComponents->GetComponent<ndlib::EngineComponents>();
-		m_PrimServer = SharedComponents->GetComponent<ndlib::render::dev::DebugDrawCommon>()->GetSubComponent<PrimServerManager>();
-		m_NdDevMenu = SharedComponents->GetComponent<NdDevMenu>();
+		m_Memory = GetDependencyComponent<Memory>(SharedComponents);
+		m_EngineComponents = GetDependencyComponent<EngineComponents>(SharedComponents);
 
 		m_IAllocator = AddSubComponent<IAllocator>();
-		m_CommonGameLoop = AddSubComponent<CommonGameLoop>(m_EngineComponents.get(), m_NdDevMenu.get());
+		m_CommonGameLoop = AddSubComponent<CommonGameLoop>(m_EngineComponents);
 	}
 
 	void CommonGame::Initialize() {
@@ -32,15 +30,6 @@ namespace NdGameSdk::common {
 		std::call_once(Initialized, [this] {
 			
 			spdlog::info("Initializing {} patterns...", GetName());
-
-			auto MissingDependencies = CheckSdkComponents
-				<Memory, EngineComponents>({ m_Memory.get(), m_EngineComponents.get() });
-
-			if (MissingDependencies.has_value()) {
-				throw SdkComponentEx
-				{ std::format("Missing necessary dependencies: {:s}", MissingDependencies.value()),
-					SdkComponentEx::ErrorCode::DependenciesFailed, true };
-			}
 
 			auto module = Utility::memory::get_executable();
 
@@ -62,7 +51,7 @@ namespace NdGameSdk::common {
 				!GameInitReturnJMP) {
 				throw SdkComponentEx
 				{ std::format("Failed to find addresses!"),
-					SdkComponentEx::ErrorCode::PatternFailed };
+					SdkComponentEx::ErrorCode::PatternFailed, true };
 			}
 
 			m_GameInitHook = Utility::MakeMidHook(GameInitJMP,
@@ -109,11 +98,12 @@ namespace NdGameSdk::common {
 				spdlog::warn("Failed to patch {:s}! Logs may not work!", TOSTRING(Patterns::NIXXES_StdHandle));
 			}
 
-			m_IAllocator->Init();
-
 	#elif defined(T1X)
 			if (m_Memory->IsDebugMemoryAvailable()) {
-				if (m_PrimServer.get() && m_PrimServer->IsInitialized()) {
+
+				auto DebugDraw = GetSharedComponents()->GetComponent<ndlib::render::dev::DebugDrawCommon>();
+
+				if (DebugDraw) {
 
 					findpattern = Patterns::CommonGame_PrimServer_Create;
 					auto PrimServerCreateJMP = (void*)Utility::FindAndPrintPattern(module
@@ -123,25 +113,38 @@ namespace NdGameSdk::common {
 						[](SafetyHookContext& ctx)
 						{
 							auto gameinit = GetSharedComponents()->GetComponent<CommonGame>();
-							MemoryMapEntry* DebugDrawing = gameinit->m_Memory->GetMemoryMapEntry(MemoryMapId::ALLOCATION_DEBUG_DRAWING);
-							PrimServer::InitParams pParams{ DebugDrawing->Size() };
-							gameinit->m_PrimServer->Create(&pParams);
+							auto pPrimServer = GetSharedComponents()->GetComponent<ndlib::render::dev::DebugDrawCommon>()
+								->GetSubComponent<PrimServerManager>();
+
+							if (pPrimServer) {
+								MemoryMapEntry* DebugDrawing = gameinit->m_Memory->GetMemoryMapEntry(MemoryMapId::ALLOCATION_DEBUG_DRAWING);
+								PrimServer::InitParams pParams{ DebugDrawing->Size() };
+								pPrimServer->Create(&pParams);
+							}
 
 						}, wstr(Patterns::CommonGame_PrimServer_Create), wstr(PrimServerCreateJMP));
 
 					if (!m_PrimServer_CreateHook) {
 						throw SdkComponentEx{ std::format("Failed to create hook {:s} in {:s}!", TOSTRING(m_PrimServer_CreateHook),GetName()),
-							SdkComponentEx::ErrorCode::PatchFailed };
+							SdkComponentEx::ErrorCode::PatchFailed, true };
 					}
 				}
 			}
 	#endif
-			m_CommonGameLoop->Init();
 
 			if (!m_GameInitHook ||
 				!m_GameInitReturnHook) {
 				throw SdkComponentEx{ "Failed to hook CommonGame functions!",
-					SdkComponentEx::ErrorCode::PatchFailed };
+					SdkComponentEx::ErrorCode::PatchFailed, true };
+			}
+
+			try {
+				spdlog::info("Initializing {} subcomponents...", GetName());
+				this->InitSubComponents();
+			}
+			catch (const SdkComponentEx& e) {
+				spdlog::error("Failed to initialize SubComponent {}: {}", GetName(), e.what());
+				throw SdkComponentEx{ e.what(), e.ErrCode(), true };
 			}
 
 			const char* game_ver_text = "BUILD_NUMBER=";

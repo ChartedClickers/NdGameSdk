@@ -6,8 +6,12 @@
 #include <vector>
 #include <memory>
 #include <unordered_map>
+#include <unordered_set>
 #include <typeindex>
 #include <deque>
+#include <array>
+#include <span>
+#include <numeric>
 #include <spdlog/spdlog.h>
 #include <Utility/helper.hpp>
 
@@ -20,6 +24,7 @@
 
 #include <NdGameSdk/shared/src/ndlib/render/frame-params.hpp>
 
+
 namespace NdGameSdk::ndlib::render::dev { class DebugDrawCommon; }
 
 namespace NdGameSdk {
@@ -30,67 +35,72 @@ namespace NdGameSdk {
     class SdkComponentFactory final {
     public:
         SdkComponentFactory() = default;
+        ~SdkComponentFactory();
 
         void InitializeSdkComponents();
-        const std::unordered_map<std::type_index, std::shared_ptr<ISdkComponent>>& GetSdkComponents() const;
+        const std::unordered_map<std::type_index, std::unique_ptr<ISdkComponent>>& GetSdkComponents() const;
 
         template <typename ComponentType, typename... Args>
-        std::shared_ptr<ComponentType> AddComponent(Args&&... args) {
+        ComponentType* AddComponent(Args&&... args) {
             static_assert(SdkDerived::is_derived_from_ISdkComponent<ComponentType>::value, "ComponentType must be derived from ISdkComponent");
-            auto sdkcomponent = std::make_shared<ComponentType>(std::forward<Args>(args)...);
-            m_orderedSdkComponents.push_back(sdkcomponent);
-            m_sdkcomponents.emplace(typeid(ComponentType), sdkcomponent);
-            return std::static_pointer_cast<ComponentType>(sdkcomponent);
+            auto sdkcomponent = std::make_unique<ComponentType>(std::forward<Args>(args)...);
+            auto rawPtr = sdkcomponent.get();
+            m_orderedSdkComponents.push_back(rawPtr);
+            m_sdkcomponents[typeid(ComponentType)] = std::move(sdkcomponent);
+            return static_cast<ComponentType*>(rawPtr);
         }
 
         template <typename ComponentType>
-        NdGameSdk_API std::shared_ptr<ComponentType> GetComponent() {
+        NdGameSdk_API ComponentType* GetComponent() {
             static_assert(SdkDerived::is_derived_from_ISdkComponent<ComponentType>::value, "ComponentType must be derived from ISdkComponent");
             auto it = m_sdkcomponents.find(typeid(ComponentType));
-            return it != m_sdkcomponents.end() ? std::static_pointer_cast<ComponentType>(it->second) : nullptr;
+            return (it != m_sdkcomponents.end()) ? static_cast<ComponentType*>(it->second.get()) : nullptr;
         }
 
     private:
-        std::unordered_map<std::type_index, std::shared_ptr<ISdkComponent>> m_sdkcomponents{};
-        std::deque<std::shared_ptr<ISdkComponent>> m_orderedSdkComponents{};
+        std::unordered_map<std::type_index, std::unique_ptr<ISdkComponent>> m_sdkcomponents{};
+        std::deque<ISdkComponent*> m_orderedSdkComponents{};
     };
 
     class ISdkComponent {
     public:
         virtual ~ISdkComponent() = default;
 
+        virtual std::span<const std::type_index> Dependencies() const noexcept {
+            static const std::array<std::type_index, 0> none{};
+            return { none.data(), none.size() };
+        }
+
         NdGameSdk_API std::string_view GetName() const;
         NdGameSdk_API bool IsInitialized() const;
 
         template <typename... SdkComponents>
-        NdGameSdk_API static optional<std::string> CheckSdkComponents(const std::vector<ISdkComponent*>& componentList) {
-            static_assert(std::conjunction_v<SdkDerived::is_derived_from_ISdkComponent<SdkComponents>...>,
+        NdGameSdk_API static std::optional<std::string> CheckSdkComponents(const std::vector<ISdkComponent*>& componentList) {
+            static_assert((SdkDerived::is_derived_from_ISdkComponent<SdkComponents>::value && ...),
                 "All types must be derived from ISdkComponent");
-            std::string missingComponentNames{};
-            (([&]() {
+
+            std::vector<std::string> missing;
+            ([&] {
                 bool found = std::any_of(componentList.begin(), componentList.end(),
-                    [](ISdkComponent* component) {
-                        return component && (typeid(*component) == typeid(SdkComponents));
-                    });
-                if (!found) {
-                    if (!missingComponentNames.empty()) {
-                        missingComponentNames += ", ";
-                    }
-                    missingComponentNames += typeid(SdkComponents).name();
-                }
-                }()), ...);
-            if (!missingComponentNames.empty()) {
-                return missingComponentNames;
-            }
-            return {};
+                    [](ISdkComponent* c) { return c && typeid(*c) == typeid(SdkComponents); });
+                if (!found)
+                    missing.emplace_back(typeid(SdkComponents).name());
+                }(), ...);
+
+            if (!missing.empty())
+                return std::optional<std::string>(std::accumulate(
+                    std::next(missing.begin()), missing.end(), missing[0],
+                    [](const std::string& a, const std::string& b) { return a + ", " + b; }
+                ));
+            return std::nullopt;
         }
 
         template<typename SubT>
-        NdGameSdk_API std::shared_ptr<SubT> GetSubComponent() {
+        NdGameSdk_API SubT* GetSubComponent() {
             static_assert(SdkDerived::is_derived_from_ISdkSubComponent<SubT>::value, "SubT must derive from ISdkSubComponent");
             auto it = m_subcomponents.find(typeid(SubT));
             return (it != m_subcomponents.end())
-                ? std::static_pointer_cast<SubT>(it->second)
+                ? static_cast<SubT*>(it->second.get())
                 : nullptr;
         }
 
@@ -102,7 +112,7 @@ namespace NdGameSdk {
             ClassType* Instance = nullptr,
             bool OneTimeInvoke = false)
         {
-            auto sdkcomponent = ComponentFactory->GetComponent<ComponentType>().get();
+            auto sdkcomponent = ComponentFactory->GetComponent<ComponentType>();
             if (sdkcomponent) {
                 if constexpr (!std::is_same_v<ClassType, void>)
                     return (sdkcomponent->*event).Subscribe(Instance, memberFunc, OneTimeInvoke);
@@ -119,7 +129,7 @@ namespace NdGameSdk {
             MemberFunc memberFunc,
             ClassType* Instance = nullptr)
         {
-            auto sdkcomponent = ComponentFactory->GetComponent<ComponentType>().get();
+            auto sdkcomponent = ComponentFactory->GetComponent<ComponentType>();
             if (sdkcomponent) {
                 if constexpr (!std::is_same_v<ClassType, void>)
                     (sdkcomponent->*event).Unsubscribe({ Instance, memberFunc });
@@ -141,14 +151,33 @@ namespace NdGameSdk {
 
         void InitSubComponents();
 
+        template<typename... Deps>
+        static std::span<const std::type_index> MakeDependencies() noexcept {
+            static const std::array<std::type_index, sizeof...(Deps)> deps = {
+                typeid(Deps)...
+            };
+            return { deps.data(), deps.size() };
+        }
+
+        template <typename DepT>
+        DepT* GetDependencyComponent(SdkComponentFactory* factory) const {
+            auto deps = this->Dependencies();
+            bool found = std::find(deps.begin(), deps.end(), typeid(DepT)) != deps.end();
+            always_assert(!found, std::format("Tried to get component '{}' in '{}' but not declared in SDK DEPENDENCIES!",
+                typeid(DepT).name(), typeid(*this).name()).c_str());
+            auto* dep = factory->GetComponent<DepT>();
+            return dep;
+        }
+
         template<typename SubT, typename... Args>
-        std::shared_ptr<SubT> AddSubComponent(Args&&... a)
+        SubT* AddSubComponent(Args&&... a)
         {
             static_assert(SdkDerived::is_derived_from_ISdkSubComponent<SubT>::value, "SubT must derive from ISdkSubComponent");
-            auto sub = std::make_shared<SubT>(std::forward<Args>(a)...);
+            auto sub = std::make_unique<SubT>(std::forward<Args>(a)...);
             sub->AttachOwnerComponent(this);
-            m_subcomponents[typeid(SubT)] = sub;
-            return sub;
+            SubT* rawPtr = sub.get();
+            m_subcomponents[typeid(SubT)] = std::move(sub);
+            return rawPtr;
         }
 
         template<typename CompT>
@@ -156,8 +185,7 @@ namespace NdGameSdk {
         {
             static CompT* p =
                 ISdkComponent::GetSharedComponents()
-                ->GetComponent<CompT>()
-                .get();
+                ->GetComponent<CompT>();
             return p;
         }
 
@@ -169,7 +197,7 @@ namespace NdGameSdk {
         std::string m_name;
         bool m_Initialized;
 
-        std::unordered_map<std::type_index, std::shared_ptr<ISdkSubComponent>> m_subcomponents;
+        std::unordered_map<std::type_index, std::unique_ptr<ISdkSubComponent>> m_subcomponents;
 
         static const std::vector<ISdkComponent*>& GetSdkComponents();
 
@@ -214,5 +242,11 @@ namespace NdGameSdk {
         ErrorCode m_errcode;
         bool m_critical;
     };
+
+#define SDK_DEPENDENCIES(...)                                                 \
+std::span<const std::type_index> Dependencies() const noexcept override       \
+{                                                                              \
+    return MakeDependencies<__VA_ARGS__>();                                    \
+}
 
 }

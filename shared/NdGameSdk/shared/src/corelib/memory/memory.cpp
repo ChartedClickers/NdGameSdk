@@ -220,7 +220,7 @@ namespace NdGameSdk::corelib::memory {
 				{
 					auto memory = GetSharedComponents()->GetComponent<Memory>();
 					memory->m_MemoryMapMapped = true;
-					memory->InvokeSdkEvent(memory->e_MemoryMapMapped, memory.get());
+					memory->InvokeSdkEvent(memory->e_MemoryMapMapped, memory);
 
 				}, wstr(Patterns::Memory_AllocateMemoryMap), wstr(SetMemoryMapJMP));
 

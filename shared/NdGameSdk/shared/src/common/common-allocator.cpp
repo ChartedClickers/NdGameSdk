@@ -48,7 +48,7 @@ namespace NdGameSdk::common {
 
 				if (!m_IAllocator_InitTaggedHeapsHook) {
 					throw SdkComponentEx{ std::format("Failed to create hook {:s} in {:s}!", TOSTRING(m_IAllocator_InitTaggedHeapsHook), TOSTRING(IAllocator)),
-						SdkComponentEx::ErrorCode::PatchFailed };
+						SdkComponentEx::ErrorCode::PatchFailed, true };
 				}
 			}
 	#endif 

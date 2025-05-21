@@ -70,13 +70,13 @@ namespace NdGameSdk {
         bool IsRegistered();
 
         template <typename SdkComponent>
-        std::shared_ptr<SdkComponent> GetSharedSdkComponent() {
+        SdkComponent* GetSharedSdkComponent() {
             auto SharedComponents = ISdkComponent::GetSharedComponents();
             return SharedComponents->GetComponent<SdkComponent>();
         };
 
         template <typename SdkComponent>
-        std::shared_ptr<SdkComponent> GetNdGameSdkComponent() {
+        SdkComponent* GetNdGameSdkComponent() {
             auto SharedComponents = ISdkComponent::GetNdGameComponents();
             return SharedComponents->GetComponent<SdkComponent>();
         };

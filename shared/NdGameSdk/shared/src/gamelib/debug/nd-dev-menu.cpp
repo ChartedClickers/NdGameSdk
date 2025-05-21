@@ -378,9 +378,9 @@ namespace NdGameSdk::gamelib::debug {
 
 	void NdDevMenu::Awake() {
 		auto SharedComponents = ISdkComponent::GetSharedComponents();
-		m_Memory = SharedComponents->GetComponent<Memory>();
-		m_EngineComponents = SharedComponents->GetComponent<EngineComponents>();
-		m_CommonGame = SharedComponents->GetComponent<CommonGame>();
+		m_Memory = GetDependencyComponent<Memory>(SharedComponents);
+		m_EngineComponents = GetDependencyComponent<EngineComponents>(SharedComponents);
+		m_CommonGame = GetDependencyComponent<CommonGame>(SharedComponents);
 	}
 
 	void NdDevMenu::Initialize() {
@@ -389,16 +389,6 @@ namespace NdGameSdk::gamelib::debug {
 		std::call_once(Initialized, [this] {
 
 			spdlog::info("Initializing {} patterns...", GetName());
-
-			auto MissingDependencies = CheckSdkComponents
-				<Memory, CommonGame, EngineComponents>
-				({ m_Memory.get(), m_CommonGame.get(), m_EngineComponents.get() });
-
-			if (MissingDependencies.has_value()) {
-				throw SdkComponentEx
-				{ std::format("Missing necessary dependencies: {:s}", MissingDependencies.value()),
-					SdkComponentEx::ErrorCode::DependenciesFailed };
-			}
 
 			Patterns::SdkPattern findpattern{};
 			auto module = Utility::memory::get_executable();
@@ -438,12 +428,13 @@ namespace NdGameSdk::gamelib::debug {
 				findpattern.pattern, wstr(Patterns::NdDevMenu_DMENU_s_IsKeyboardComponentActive), findpattern.offset, 2, 7);
 
 			if (!SetRootMenuJMP ||
+				!pKeyboardSearchState ||
 				!IsKeyboardSearchActive ||
 				!IsKeyboardComponentActive ||
 			#if defined(T2R)
 				!pFavoriteItemKeyCode ||
 			#endif 
-				!pKeyboardSearchState ||
+				
 				!pKeyboardClipBoardJMP
 				) {
 				throw SdkComponentEx
@@ -694,6 +685,8 @@ namespace NdGameSdk::gamelib::debug {
 				{ reinterpret_cast<uintptr_t>(DMENU::ItemSubText::VTable), DmenuComponentType::ItemSubText },
 			};
 
+			/* KeyBoard Patches */
+
 			m_KeyboardSearchStateHook = Utility::MakeFunctionHook((void*)(pKeyboardSearchState),
 				(void*)KeyboardSearchState_CC, wstr(m_KeyboardSearchStateHook));
 
@@ -737,7 +730,7 @@ namespace NdGameSdk::gamelib::debug {
 							NdGameSdkMenu, NULL, NULL, nullptr, HeapArena_Source)->MenuEntry();
 					}
 
-					NdDevMenuComponent->InvokeSdkEvent(NdDevMenuComponent->e_AppendMenuGroup, NdDevMenuComponent.get(), MenuGroup);
+					NdDevMenuComponent->InvokeSdkEvent(NdDevMenuComponent->e_AppendMenuGroup, NdDevMenuComponent, MenuGroup);
 
 				}, wstr(Patterns::NdDevMenu_DMENU_MenuGroup_SetRootMenu), wstr(SetRootMenuJMP));
 
@@ -745,7 +738,7 @@ namespace NdGameSdk::gamelib::debug {
 	}
 
 	void NdDevMenu::DMENU_KeyBoard_ClipBoardHook(SafetyHookContext& ctx) {
-		static NdDevMenu* pNdDevMenu = GetSharedComponents()->GetComponent<NdDevMenu>().get();
+		static NdDevMenu* pNdDevMenu = GetSharedComponents()->GetComponent<NdDevMenu>();
 	#if defined(T2R)
 		constexpr std::ptrdiff_t kSkipInputData = 0x5C;
 	#elif defined(T1X)

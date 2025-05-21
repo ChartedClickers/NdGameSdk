@@ -4,7 +4,7 @@ namespace ExampleMod
 {
 	void DevSandboxMod::OnNdModinitialize()
 	{
-		auto SomeComponent1 = GetSharedSdkComponent<ndlib::EngineComponents>().get();
+		auto SomeComponent1 = GetSharedSdkComponent<ndlib::EngineComponents>();
 
 	#if defined(T2R)
 		auto module = Utility::memory::get_executable();

@@ -55,40 +55,106 @@ namespace NdGameSdk {
 
 
 
-	void SdkComponentFactory::InitializeSdkComponents() {
-
-		std::for_each(m_orderedSdkComponents.begin(), m_orderedSdkComponents.end(), 
-			[](const auto& sdkcomponent) { 
-				sdkcomponent->Awake(); 
-			});
-
-		for (auto& sdkcomponent : m_orderedSdkComponents) {
-			spdlog::info("Initialize SdkComponent: {:s}", sdkcomponent->GetName().data());
-
-			try {
-				sdkcomponent->Initialize();
-				sdkcomponent->m_Initialized = true;
-			} 
-			catch (SdkComponentEx ComponentEx) {
-				spdlog::error("Error initialize {:s}: {:s}", sdkcomponent->GetName().data(), ComponentEx.what());
-
-				if (ComponentEx.IsCritical())
-					throw ComponentEx;
-			}
-			catch (std::exception Ex) {
-				spdlog::error("Error initialize {:s}: {:s}", sdkcomponent->GetName().data(), Ex.what());
-				throw Ex;
-			}
-			catch (...) {
-				spdlog::error("Error initialize: {:s}", sdkcomponent->GetName().data());
-				throw;
+	SdkComponentFactory::~SdkComponentFactory() {
+		for (auto it = m_orderedSdkComponents.rbegin(); it != m_orderedSdkComponents.rend(); ++it) {
+			ISdkComponent* ptr = *it;
+			if (!ptr) continue;
+			auto found = std::find_if(
+				m_sdkcomponents.begin(), m_sdkcomponents.end(),
+				[ptr](const auto& kv) { return kv.second.get() == ptr; });
+			if (found != m_sdkcomponents.end()) {
+				found->second.reset();
 			}
 		}
 
 		m_orderedSdkComponents.clear();
-		std::erase_if(m_sdkcomponents, 
-			[](const pair<std::type_index, std::shared_ptr<ISdkComponent>>& pair) 
-			{ return !pair.second->m_Initialized; });
+		m_sdkcomponents.clear();
+	}
+
+	void SdkComponentFactory::InitializeSdkComponents() {
+
+		for (auto& comp : m_orderedSdkComponents)
+			comp->Awake();
+
+		std::size_t progress;
+		std::unordered_set<std::type_index> failed;
+
+		do {
+
+			progress = 0;
+
+			for (auto& comp : m_orderedSdkComponents)
+			{
+				std::type_index id{ typeid(*comp) };
+				if (comp->IsInitialized() || failed.count(id))
+					continue;
+
+				bool ready = std::all_of(
+					comp->Dependencies().begin(),
+					comp->Dependencies().end(),
+					[&](auto const& d) {
+						auto it = m_sdkcomponents.find(d);
+						return it != m_sdkcomponents.end() && it->second->IsInitialized();
+					});
+
+				if (!ready)
+					continue;
+
+				try {
+					spdlog::info("Initialize {}", comp->GetName());
+					comp->Initialize();
+					comp->m_Initialized = true;
+					++progress;
+				}
+				catch (const SdkComponentEx& ex) {
+					if (ex.IsCritical()) {
+						spdlog::critical("Critical initialization error in {}: {}", comp->GetName(), ex.what());
+						throw;
+					}
+
+					spdlog::error("Init failed for {}: {}", comp->GetName(), ex.what());
+					failed.insert(id);  
+				}
+				catch (const std::exception& ex) {
+					spdlog::error("Error initialize {}: {}", comp->GetName(), ex.what());
+					failed.insert(id);
+				}
+				catch (...) {
+					spdlog::error("Error initialize: {}", comp->GetName());
+					failed.insert(id);
+				}
+			}
+
+		} while (progress > 0);
+
+		{
+			std::deque<std::type_index> queue{ failed.begin(), failed.end() };
+			while (!queue.empty()) {
+				auto bad = queue.front(); queue.pop_front();
+
+				for (auto& [cid, compPtr] : m_sdkcomponents) {
+					if (compPtr->IsInitialized() || failed.count(cid))
+						continue;
+
+					auto deps = compPtr->Dependencies();
+					if (std::find(deps.begin(), deps.end(), bad) != deps.end()) {
+						failed.insert(cid);
+						queue.push_back(cid);
+					}
+				}
+			}
+		}
+
+		std::erase_if(m_sdkcomponents,
+			[&](auto const& kv) {
+				auto& ptr = kv.second;
+				auto  cid = kv.first;
+				return !ptr->IsInitialized() || failed.count(cid);
+			});
+
+		for (auto const& cid : failed) {
+			spdlog::warn("Component {} permanently failed", cid.name());
+		}
 	}
 
 	void ISdkComponent::InitSubComponents() {
@@ -121,7 +187,7 @@ namespace NdGameSdk {
 		}
 	}
 
-	const std::unordered_map<std::type_index, std::shared_ptr<ISdkComponent>>& SdkComponentFactory::GetSdkComponents() const {
+	const std::unordered_map<std::type_index, std::unique_ptr<ISdkComponent>>& SdkComponentFactory::GetSdkComponents() const {
 		return m_sdkcomponents;
 	}
 

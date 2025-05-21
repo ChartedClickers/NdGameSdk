@@ -12,7 +12,6 @@ using namespace NdGameSdk::common::win;
 
 #include <NdGameSdk/shared/src/ndlib/engine-components.hpp>
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
-#include <NdGameSdk/shared/src/ndlib/render/util/prim.hpp>
 #include <NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp>
 
 #include "common-allocator.hpp"
@@ -21,43 +20,44 @@ using namespace NdGameSdk::common::win;
 using namespace NdGameSdk::corelib::memory;
 using namespace NdGameSdk::gamelib::debug;
 using namespace NdGameSdk::ndlib;
-using namespace NdGameSdk::ndlib::render::util;
 
 namespace NdGameSdk::common {
 
-	class CommonGameLoop;
+class CommonGameLoop;
 
-	class CommonGame : public ISdkComponent
-	{
-	public:
-		CommonGame();
+class CommonGame : public ISdkComponent
+{
+public:
+	CommonGame();
 
-		SdkEvent<bool> e_GameInitialized{true};
+	SDK_DEPENDENCIES(Memory, EngineComponents);
 
-		NdGameSdk_API uint32_t GetGameVersion();
-		NdGameSdk_API bool IsGameInitialized();
-	private:
-		void Awake() override;
-		void Initialize() override;
+	SdkEvent<bool> e_GameInitialized{true};
 
-		uint32_t m_GameVersion;
-		bool m_GameInitialized;
+	NdGameSdk_API uint32_t GetGameVersion();
+	NdGameSdk_API bool IsGameInitialized();
+private:
+	void Awake() override;
+	void Initialize() override;
 
-		MidHook m_GameInitHook{};
-		MidHook m_GameInitReturnHook{};
+	uint32_t m_GameVersion;
+	bool m_GameInitialized;
 
-		shared_ptr<IAllocator> m_IAllocator;
-		shared_ptr<CommonGameLoop> m_CommonGameLoop;
+	MidHook m_GameInitHook{};
+	MidHook m_GameInitReturnHook{};
 
-		shared_ptr<Memory> m_Memory;
-		shared_ptr<EngineComponents> m_EngineComponents;
-		shared_ptr<NdDevMenu> m_NdDevMenu;
-		shared_ptr<PrimServerManager> m_PrimServer;
+	IAllocator* m_IAllocator;
+	CommonGameLoop* m_CommonGameLoop;
+
+	Memory* m_Memory;
+	EngineComponents* m_EngineComponents;
+
 #if defined(T2R)
-		NxAppHooks m_NxAppHooks{};
+	NxAppHooks m_NxAppHooks{};
 #elif defined(T1X)
-		MidHook m_PrimServer_CreateHook{};
+	MidHook m_PrimServer_CreateHook{};
 #endif
-		friend class IAllocator;
-	};
+
+	friend class IAllocator;
+};
 }

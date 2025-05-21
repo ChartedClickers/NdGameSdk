@@ -21,6 +21,7 @@ namespace NdGameSdk::gamelib::render::particle {
 	class ParticleManager : public ISdkComponent {
 	public:
 		ParticleManager();
+		SDK_DEPENDENCIES(Memory);
 		ParticleInternal::ParticleDebug m_ParticleDebug{};
 	private:
 		void Awake() override;
@@ -29,7 +30,7 @@ namespace NdGameSdk::gamelib::render::particle {
 		Patch::Ptr m_ParticleDebug_RenderUpdatePatch{};
 		FunctionHook::Ptr m_ParticleDebug_OnExecuteRootDataSelectorHook{};
 		MidHook m_ParticleDebug_InitHook{};
-		shared_ptr<Memory> m_Memory;
+		Memory* m_Memory;
 	};
 
 }

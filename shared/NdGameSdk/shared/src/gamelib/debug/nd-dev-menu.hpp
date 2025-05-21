@@ -47,6 +47,8 @@ namespace NdGameSdk::gamelib::debug {
 		SdkEvent<NdDevMenu*, DMENU::MenuGroup*> e_AppendMenuGroup;
 	    SdkEvent<NdDevMenu*, AppendSdkSubMenusCallback> e_AppendSdkMenu{true};
 
+		SDK_DEPENDENCIES(CommonGame, EngineComponents, Memory);
+
 		NdGameSdk_API bool IsGameDebugMenu();
 
 		NdGameSdk_API DMENU::Menu* Create_DMENU_Menu(std::string pName, HeapArena_Args);
@@ -147,9 +149,9 @@ namespace NdGameSdk::gamelib::debug {
 
 		std::unordered_map<uintptr_t, DmenuComponentType> m_DmenuComponentTypeMap{};
 
-		shared_ptr<EngineComponents> m_EngineComponents;
-		shared_ptr<Memory> m_Memory;
-		shared_ptr<CommonGame> m_CommonGame;
+		EngineComponents* m_EngineComponents;
+		Memory* m_Memory;
+		CommonGame* m_CommonGame;
 
 		static void DMENU_KeyBoard_ClipBoardHook(SafetyHookContext& ctx);
 

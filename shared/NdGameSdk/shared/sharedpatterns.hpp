@@ -9,7 +9,7 @@ namespace NdGameSdk::Patterns
 	static inline const SdkPattern EngineComponents_s_ndConfig = { L"48 8d 0d ?? ?? ?? ?? b8 04 00 00 00 48 8d 89 80 00 00 00 c5 f8 10 03 48 8d 9b 80 00 00 00 c5 f8 11 41 80 c5 f8 10 4b 90 c5 f8 11 49 90 c5 f8 10 43 a0 c5 f8 11 41 a0 c5 f8 10 4b b0 c5 f8 11 49 b0 c5 f8 10 43 c0 c5 f8 11 41 c0 c5 f8 10 4b d0 c5 f8 11 49" };
 
 	static inline const SdkPattern CommonGame_GameInit = { L"40 53 48 83 ec 30 48 8b d9 48 8d 4c 24 20 e8 ?? ?? ?? ?? 8b 10 85 d2 7e 11 c5 f8 10 00 c5 f8 11 03 48 8b c3 48 83 c4 30 5b c3" };
-	static inline const SdkPattern CommonGameLoop_GameLoopUpdate = { L"c6 05 ?? ?? ?? ?? 01 c6 05 ?? ?? ?? ?? 00 48 8b 05 ?? ?? ?? ?? 48 ff c8 48 83 f8 0b 0f 87 ?? ?? ?? ?? 48 8d 0d ?? ?? ?? ?? 8b 84 81 4c 8a 2b 00 48 03 c1 ff e0", +0xf0 };
+	static inline const SdkPattern CommonGameLoop_GameLoopUpdate = { L"c6 05 ?? ?? ?? ?? 01 c6 05 ?? ?? ?? ?? 00 48 8b 05 ?? ?? ?? ?? 48 ff c8 48 83 f8 0b 0f 87 ?? ?? ?? ?? 48 8d 0d", +0xf0 };
 	static inline const SdkPattern CommonGameLoop_GameDebugUpdate = { L"48 8d 4d 08 e8 ?? ?? ?? ?? c7 44 24 30 01 00 00 00 4c 89 7c 24 28 c7 44 24 20 15 15 00 00 4c 8d 0d ?? ?? ?? ?? 33 d2 44 8d 42 03 48 8d 0d", +0x51 };
 
 	static inline const SdkPattern IAllocator_Init = { L"48 89 5c 24 10 55 56 57 41 54 41 55 41 56 41 57 48 8b ec 48 83 ec 50 4c 63 f9 4c 8b f2 33 c9 e8 ?? ?? ?? ?? 84 c0 c7 45 40 07 00 00 00 48 8d 3d ?? ?? ?? ?? 48 8d 1d ?? ?? ?? ?? 48 8d 15 ?? ?? ?? ?? 48 0f 45 df 48 8d 4d 40" };
@@ -62,7 +62,7 @@ namespace NdGameSdk::Patterns
 	static inline const SdkPattern NdDevMenu_DMENU_Menu_DeleteAllItems = { L"48 89 5c 24 08 48 89 74 24 18 57 48 83 ec 20 8b f2 48 8b d9 48 8d 05 ?? ?? ?? ?? 48 89 01 c7 44 24 38 11 00 00 00 4c 8d 0d ?? ?? ?? ?? 41 b8 8f 16 00 00 48 8d 15 ?? ?? ?? ?? 48 8d 4c 24 38 e8 ?? ?? ?? ?? 48 8b bb" };
 	static inline const SdkPattern NdDevMenu_DMENU_Menu_DeferDeleteAllItems = { L"48 89 5c 24 ?? 48 89 74 24 18 57 48 83 ec 30 0f b6 f2 48 8b d9 c7 44 24 40 11 00 00 00 4c 8d 0d ?? ?? ?? ?? 41 b8 6c 16 00 00 48 8d 15 ?? ?? ?? ?? 48 8d 4c 24 40 e8 ?? ?? ?? ?? 90" };
 	static inline const SdkPattern NdDevMenu_DMENU_Menu_UpdateItems_FavoriteItemKeyCode = { L"e9 ?? ?? ?? ?? 48 8b 8f 28 01 00 00 48 0f ba e1 0e 73 ?? 8b 87 38 01 00 00 48 0f ba e0 0a 72 ?? 48 0f ba e1 0a 73 ?? 8b 87 38 01 00 00 48 0f ba e0 0e 72", +0x4e };
-	static inline const SdkPattern NdDevMenu_DMENU_Menu_Update_KeyboardSearchState = { L"41 b9 ff ff ff ff 41 b0 01 48 8b cd e8 35 3d 2c 00 44 0f b6 e8 b2 01 49 8d 8f ?? ?? ?? ?? e8 43 dd 39 00 49 0f ba a7", +0x32 };
+	static inline const SdkPattern NdDevMenu_DMENU_Menu_Update_KeyboardSearchState = { L"41 b9 ff ff ff ff 41 b0 01 48 8b cd e8 ?? ?? ?? ?? 44 0f b6 e8 b2 01 49 8d 8f 10 0a 01 00 e8 ?? ?? ?? ?? 49 0f ba a7 20 0a", +0x32 };
 	static inline const SdkPattern NdDevMenu_DMENU_KeyBoard_Handler_ClipBoardHook = { L"48 63 4b 08 3b c8 7d 2a 48 63 d0 4c 8b c1 48 3b ca 7d 10 49 8d 3c 0e 48 8b ca 49 2b c8 48 8d 77 01 f3 a4 45 88 7c 16 ff 49 b8 ?? ?? ?? ?? ?? ?? ?? ?? 44 38 7b 05 74 2c 41 83 f9 2e 75 26 b1 01 32 d2 44 38 7b 04 75 2b 41", +0x87 };
 	static inline const SdkPattern NdDevMenu_DMENU_s_IsKeyboardComponentActive = { NdDevMenu_DMENU_Menu_UpdateKeyboard.pattern, +0xfa };
 	static inline const SdkPattern NdDevMenu_DMENU_s_IsKeyboardSearchActive = { NdDevMenu_DMENU_Menu_UpdateKeyboard.pattern, +0x133 };

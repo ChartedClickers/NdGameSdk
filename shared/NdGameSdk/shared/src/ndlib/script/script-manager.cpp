@@ -15,8 +15,7 @@ namespace NdGameSdk::ndlib::script {
         m_CommonGame = GetDependencyComponent<CommonGame>(SharedComponents);
 	}
 
-	void ScriptManager::Initialize()
-	{
+	void ScriptManager::Initialize() {
 		static std::once_flag Initialized;
 		std::call_once(Initialized, [this] {
 
@@ -116,6 +115,10 @@ namespace NdGameSdk::ndlib::script {
 			ModuleInfo_LookupDcEntry = (ModuleInfo_LookupDcEntry_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::ScriptManager_ModuleInfo_LookupDcEntry), findpattern.offset);
 
+            findpattern = Patterns::ScriptManager_ModuleInfo_FetchModule;
+			ModuleInfo_FetchModule = (ModuleInfo_FetchModule_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::ScriptManager_ModuleInfo_FetchModule), findpattern.offset);
+
 			findpattern = Patterns::ScriptManager_ScriptModule_FetchScriptModuleEntry;
 			ScriptModule_FetchScriptModuleEntry = (ScriptModule_FetchScriptModuleEntry_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::ScriptManager_ScriptModule_FetchScriptModuleEntry), findpattern.offset);
@@ -135,6 +138,7 @@ namespace NdGameSdk::ndlib::script {
                 !ScriptManager_UnbindValue ||
                 !ModuleInfo_LookupModuleByDcEntry ||
                 !ModuleInfo_LookupDcEntry ||
+				!ModuleInfo_FetchModule ||
                 !ScriptModule_FetchScriptModuleEntry
             ) {
                 throw SdkComponentEx{ std::format("Failed to find {}:: game functions!", GetName()), SdkComponentEx::ErrorCode::PatternFailed };
@@ -143,8 +147,8 @@ namespace NdGameSdk::ndlib::script {
             m_ScriptManagerInitHook = Utility::MakeMidHook(ScriptManagerInitJMP, ScriptManagerInitialized, 
                 wstr(Patterns::ScriptManager_InitializeReturn), wstr(ScriptManagerInitJMP));
 
-            m_InitializeModuleIndexHook = Utility::MakeMidHook(ScriptManagerInitJMP, ModuleIndexInitialized,
-                wstr(Patterns::ScriptManager_InitializeModuleIndexReturn), wstr(ScriptManagerInitJMP));
+            m_InitializeModuleIndexHook = Utility::MakeMidHook(InitializeModuleIndexJMP, ModuleIndexInitialized,
+                wstr(Patterns::ScriptManager_InitializeModuleIndexReturn), wstr(InitializeModuleIndexJMP));
 
             if (!m_ScriptManagerInitHook) {
                 throw SdkComponentEx{ "Failed to create hooks!", SdkComponentEx::ErrorCode::PatchFailed };
@@ -169,35 +173,27 @@ namespace NdGameSdk::ndlib::script {
     void ScriptManager::ScriptManagerInitialized(SafetyHookContext& ctx) {
         ScriptManager* ScriptMgr = Instance<ScriptManager>();
 
-        ScriptMgr->InvokeSdkEvent(ScriptMgr->e_ScriptManagerInitialized);
+        if (ScriptMgr->m_Memory->IsDebugMemoryAvailable()) {
+            ScriptCFunc* CFunc = ScriptMgr->LookupCFunc(SID("is-final-build?"));
+            if (CFunc) {
+				// Activate Debug possibilities for state script functions
+                ScriptMgr->m_ScriptCFuncIsFinalBuildHook = CFunc->InlinePatchCfunc(ScriptCFunc_IsFinalBuild, L"is-final-build?", L"ScriptCFunc_IsFinalBuild->false");
+				spdlog::info("Patched CFunc `is-final-build?` to return false");
+            }
+        }
+
+        ScriptMgr->InvokeSdkEvent(ScriptMgr->e_ScriptManagerInitialized, ScriptMgr);
         return;
     }
 
     void ScriptManager::ModuleIndexInitialized(SafetyHookContext& ctx) {
         ScriptManager* ScriptMgr = Instance<ScriptManager>();
 
-        /*auto BucketModules = ScriptMgr->g_ScriptManagerGlobals->GetBucketModules();
-
-        std::size_t moduleIdx = 0;
-        for (auto* sm : BucketModules->ScriptModules())
-        {
-            auto* mi = sm->GetModuleInfo();
-            bool promoted = sm >= BucketModules->ScriptModuleHead() &&
-                sm < BucketModules->ScriptModuleTail();
-
-            spdlog::debug("{:5} {:>9} KiB  {:4.1f}s   {}   {}   {}",
-                moduleIdx++,
-                mi ? mi->GetModuleSize() / 1024 : 0,
-                sm->GetLoadTimeSec(),  
-                (mi && mi->IsDebugModule()) ? 'Y' : 'N',
-                promoted ? 'Y' : 'N', 
-                mi ? mi->GetModuleName() : "<null>"); 
-        }*/
-
-
+        ScriptMgr->PrintModuleInfos(true);
         ScriptMgr->InvokeSdkEvent(ScriptMgr->e_ModuleIndexInitialized);
         return;
     }
+
 
     ModuleBucketMap* ScriptManager::GetDebugModuleBucket(ScriptManagerGlobals* pScriptManagerGlobals) {
         if (pScriptManagerGlobals->IsDebugBins()) {
@@ -208,6 +204,71 @@ namespace NdGameSdk::ndlib::script {
         }
 
         return nullptr;
+    }
+
+    uint64_t* ScriptManager::ScriptCFunc_IsFinalBuild(uint64_t* _return) {
+        *_return = false;
+        return _return;
+    }
+
+    void ScriptManager::PrintModuleInfos(bool PrintDebugModules) {
+
+        auto* retailBucket = g_ScriptManagerGlobals->GetBucketModules();
+        auto* debugBucket = g_ScriptManagerGlobals->GetBucketDebugModules();
+
+        auto printModules = [](ModuleBucketMap* bucket, const char* label) {
+            if (!bucket) return;
+            std::size_t moduleIdx = 0;
+            spdlog::debug("{} Modules:", label);
+            spdlog::debug("{:>3} | {:>8} | {:^6} | {:^9} | {:^7} | {}",
+                "Idx", "SizeKiB", "Debug", "IsLocal", "Loaded", "Name");
+            spdlog::debug("{:-<3}-+-{:-<8}-+-{:-<6}-+-{:-<9}-+-{:-<7}-+-{:-<32}",
+                "", "", "", "", "", "");
+            for (const auto& mi : bucket->Modules()) {
+                spdlog::debug("{:>3} | {:>8} | {:^6} | {:^9} | {:^7} | {}",
+                    moduleIdx++,
+                    mi ? (mi->GetModuleSize() + 1023) / 1024 : 0,
+                    (mi && mi->IsDebugModule()) ? "Y" : "N",
+                    (mi && mi->IsLocal()) ? "Y" : "N",
+                    (mi && mi->IsLoaded()) ? "Y" : "N",
+                    mi ? mi->GetModuleName() : "<null>");
+            }
+        };
+
+        printModules(retailBucket, "Retail");
+        if (PrintDebugModules) {
+            printModules(debugBucket, "Debug");
+        }
+    }
+
+    void ScriptManager::PrintScriptModules(bool PrintDebugModules) {
+
+        auto* retailBucket = g_ScriptManagerGlobals->GetBucketModules();
+        auto* debugBucket = g_ScriptManagerGlobals->GetBucketDebugModules();
+
+        auto printModules = [](ModuleBucketMap* bucket, const char* label) {
+            if (!bucket) return;
+            std::size_t moduleIdx = 0;
+            spdlog::debug("{} ScriptModules:", label);
+            spdlog::debug("{:>3} | {:>8} | {:>14} | {:^6} | {:^9} | {}", "Idx", "SizeKiB", "Load Time(s)", "Debug", "Promoted", "Name");
+            spdlog::debug("{:-<3}-+-{:-<8}-+-{:-<10}-+-{:-<6}-+-{:-<9}-+-{:-<32}", "", "", "", "", "", "");
+            for (const auto& sm : bucket->ScriptModules()) {
+                auto* mi = sm->GetModuleInfo();
+                bool promoted = sm >= bucket->ScriptModuleHead() && sm < bucket->ScriptModuleTail();
+                spdlog::debug("{:>3} | {:>8} | {:>14.1f}s | {:^6} | {:^9} | {}",
+                    moduleIdx++,
+                    mi ? (mi->GetModuleSize() + 1023) / 1024 : 0,
+                    sm->GetLoadTimeSec(),
+                    (mi && mi->IsDebugModule()) ? "Y" : "N",
+                    promoted ? "Y" : "N",
+                    mi ? mi->GetModuleName() : "<null>");
+            }
+        };
+
+        printModules(retailBucket, "Retail");
+        if (PrintDebugModules) {
+            printModules(debugBucket, "Debug");
+        }
     }
 
     bool ScriptManager::RefreshScriptCFuncInfo(bool UpdateSidBase = false) {
@@ -276,19 +337,105 @@ namespace NdGameSdk::ndlib::script {
        if (pMessage == DMENU::Message::OnExecute) {  
            auto ScriptMgr = reinterpret_cast<ScriptManager*>(pFunction.Data());  
            if (ScriptMgr) {  
-               spdlog::info("TestFunct called!");  
-              auto BucketModules = ScriptMgr->g_ScriptManagerGlobals->GetBucketModules();
-
-			  int i = 0;
-              for (const auto& module : BucketModules->Modules()) {
-				  spdlog::info("Module{}: {} (ID: {:#x})", i++, module->GetModuleName(), module->GetModuleId());
-              }
-
+               spdlog::info("TestFunct called!");
+               //ScriptMgr->AddModuleRequest(SID("test-tasks"), Memory::Context::kAllocDevCpu, true, true, "test-tasks");
                return true;  
            }  
        }  
        return true;  
     }
+
+    ModuleInfo* ScriptManager::FindExportingModule(StringId64 pSymbol, bool pRestrictToModule, StringId64 pModule) {
+		always_assert(ScriptManager_FindExportingModule == nullptr, "Function pointer was not set!");
+		return ScriptManager_FindExportingModule(pSymbol, pRestrictToModule, pModule);
+    }
+
+    void ScriptManager::ScriptModuleAdd(StringId64 module, ScriptModule* pScriptModule) {
+		always_assert(ScriptManager_ScriptModuleAdd == nullptr, "Function pointer was not set!");
+		spdlog::debug("[{}] ScriptModuleAdd: {:#x} ({})", GetName(), module, pScriptModule->GetModuleName());
+		ScriptManager_ScriptModuleAdd(module, pScriptModule);
+    }
+
+    void ScriptManager::ScriptModuleRemove(StringId64 module) {
+		always_assert(ScriptManager_ScriptModuleRemove == nullptr, "Function pointer was not set!");
+		spdlog::debug("[{}] ScriptModuleRemove: {:#x}", GetName(), module);
+		ScriptManager_ScriptModuleRemove(module);
+    }
+
+    bool ScriptManager::AddModuleInfo(ModuleInfo* pModule) {
+		always_assert(ScriptManager_AddModuleInfo == nullptr, "Function pointer was not set!");
+		spdlog::debug("[{}] AddModuleInfo: {:#x} ({})", GetName(), pModule->GetModuleId(), pModule->GetModuleName());
+		return ScriptManager_AddModuleInfo(pModule);
+    }
+
+    void ScriptManager::RemoveModuleInfo(StringId64 pModule, bool pUpdateRelocatableHeap, bool pForce) {
+		always_assert(ScriptManager_RemoveModule == nullptr, "Function pointer was not set!");
+		spdlog::debug("[{}] RemoveModuleInfo: {:#x} (updateRelocatableHeap: {}, force: {})", GetName(), pModule, 
+            pUpdateRelocatableHeap, pForce);
+		ScriptManager_RemoveModule(pModule, pUpdateRelocatableHeap, pForce);
+    }
+
+    bool ScriptManager::AddModuleRequest(StringId64 pModule, Memory::Context pContext,
+        bool pForceLoad, bool pIncludeDependities, std::string pModuleName) {
+        bool FetchModule = ModuleInfo::FetchModule(pModule, pContext);
+        always_assert(ScriptManager_AddModuleRequest == nullptr, "Function pointer was not set!");
+
+        spdlog::debug("[{}] AddModuleRequest: {:#x} (ctx: {:#x}, force={}, deps={}, fetch={})", GetName(), pModule,
+            (uintptr_t)pContext, pForceLoad, pIncludeDependities, FetchModule);
+        return ScriptManager_AddModuleRequest(pModule, &pContext, pForceLoad, pIncludeDependities, FetchModule, 0, pModuleName.c_str());
+    }
+
+    bool ScriptManager::AddModuleRequest(ModuleInfo* pModule, Memory::Context pContext,
+        bool pForceLoad, bool pIncludeDependities) {
+        always_assert(pModule == nullptr, "ModuleInfo is null!");
+
+        StringId64 id = pModule->GetModuleId();
+        const char* name = pModule->GetModuleName().c_str();
+        bool FetchModule = pModule->FetchModule(pContext);
+
+        always_assert(ScriptManager_AddModuleRequest == nullptr, "Function pointer was not set!");
+        spdlog::debug("[{}] AddModuleRequest: {:#x} (ctx: {:#x}, force={}, deps={}, fetch={})", GetName(), id,
+            (uintptr_t)pContext, pForceLoad, pIncludeDependities, FetchModule);
+        return ScriptManager_AddModuleRequest(id, &pContext, pForceLoad, pIncludeDependities, FetchModule, 0, name);
+
+    }
+
+    bool ScriptManager::IsModuleLoaded(StringId64 pModule) {
+		always_assert(ScriptManager_IsLoadModule == nullptr, "Function pointer was not set!");
+		return ScriptManager_IsLoadModule(pModule);
+    }
+
+    bool ScriptManager::ReloadModule(StringId64 pModule, Memory::Context pContext, bool pLoadDebug) {
+		always_assert(ScriptManager_ReloadModule == nullptr, "Function pointer was not set!");
+		spdlog::debug("[{}] ReloadModule: {:#x} (ctx: {:#x}, loadDebug={})", GetName(), pModule,
+			(uintptr_t)pContext, pLoadDebug);
+    #if defined(T1X)
+        return ScriptManager_ReloadModule(pModule, pContext);
+    #else
+        return ScriptManager_ReloadModule(pModule, pContext, pLoadDebug);
+    #endif
+    }
+
+    bool ScriptManager::LoadModuleFromFile(StringId64 pModule, char* pFilePath, uint32_t pSize, Memory::Context* pContextType, 
+        bool pIsDebugModule, uint32_t pUpdateAndDispatch) {
+		always_assert(ScriptManager_LoadModuleFromFile == nullptr, "Function pointer was not set!");
+		spdlog::debug("[{}] LoadModuleFromFile: {:#x} (ctx: {:#x}, debug={})", GetName(), pModule,
+			(uintptr_t)pContextType, pIsDebugModule);
+    #if defined(T1X)
+		return ScriptManager_LoadModuleFromFile(pModule, false, pFilePath);
+    #else
+		return ScriptManager_LoadModuleFromFile(pModule, pFilePath, nullptr, pSize, pContextType, pIsDebugModule, pUpdateAndDispatch);
+    #endif
+    }
+
+#if defined(T2R)
+    bool ScriptManager::LoadModuleFromBuffer(StringId64 pModule, void* pUserBuffer, uint32_t pSize, Memory::Context* pContextType, bool pIsDebugModule, uint32_t pUpdateAndDispatch) {
+		always_assert(ScriptManager_LoadModuleFromFile == nullptr, "Function pointer was not set!");
+		spdlog::debug("[{}] LoadModuleFromBuffer: {:#x} (ctx: {:#x}, debug={})", GetName(), pModule,
+			(uintptr_t)pContextType, pIsDebugModule);
+		return ScriptManager_LoadModuleFromFile(pModule, nullptr, pUserBuffer, pSize, pContextType, pIsDebugModule, pUpdateAndDispatch);
+    }
+#endif
 
     ScriptCFunc* ScriptManager::LookupCFunc(StringId64 Hash) {
 		always_assert(ScriptManager_LookupSymbol == nullptr, "Function pointer was not set!");
@@ -302,6 +449,13 @@ namespace NdGameSdk::ndlib::script {
 
             DMENU::Menu* ScriptManagerMenu = pdmenu->Create_DMENU_Menu(ScriptMgr->GetName().data(), HeapArena_Source);
             if (ScriptManagerMenu) {
+				auto RetailModulesCount = ScriptMgr->g_ScriptManagerGlobals->GetBucketModules()->NumModules();
+                pdmenu->Create_DMENU_String(std::vformat("// Retail Modules: {:d}", std::make_format_args(RetailModulesCount)), ScriptManagerMenu, nullptr, HeapArena_Source);
+                if (ScriptMgr->g_ScriptManagerGlobals->GetBucketDebugModules()) {
+                    auto DebugModulesCount = ScriptMgr->g_ScriptManagerGlobals->GetBucketDebugModules()->NumModules();
+                    pdmenu->Create_DMENU_String(std::vformat("// Debug Modules: {:d}", std::make_format_args(DebugModulesCount)), ScriptManagerMenu, nullptr, HeapArena_Source);
+                }
+
                 /*ScriptCFuncDebugMenu*/
                 ScriptMgr->m_ScriptCFuncDebugMenu = pdmenu->Create_DMENU_Menu("ScriptCFuncs Debugging", HeapArena_Source);
 
@@ -503,7 +657,7 @@ namespace NdGameSdk::ndlib::script {
 							NdDevMenu->Create_DMENU_String(arg.Name, pMenu, arg.Description.c_str(), HeapArena_Source);
                             break;
                         }
-                        case ScriptCFuncInfo::TypeOf::String: {
+                        case ScriptCFuncInfo::TypeOf::StringId: {
                         default:
                             NdDevMenu->Create_DMENU_KeyBoard(arg.Name, pMenu, (char*)arg.Data, 100, arg.Description.c_str(), HeapArena_Source);
                             break;
@@ -912,7 +1066,6 @@ namespace NdGameSdk::ndlib::script {
         return reinterpret_cast<ModuleBucketMap*>(this->Get()->m_DebugModulesBucket);
     #else
         // For T1X, we need to implement a manual allocation and implementation (Not in the priority)
-		spdlog::error("[{}] GetBucketDebugModules is not implemented for this version", TOSTRING(ScriptManagerGlobals));
 		return nullptr;
     #endif
     }

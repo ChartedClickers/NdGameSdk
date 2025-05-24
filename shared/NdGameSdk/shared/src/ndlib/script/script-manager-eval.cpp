@@ -29,7 +29,13 @@ namespace NdGameSdk::ndlib::script {
 				case ScriptCFuncInfo::TypeOf::CFuncValue: {
 					u = arg.Data[0x0];
 				} break;
-				case TypeOf::String:
+				case ScriptCFuncInfo::TypeOf::String: {
+                    auto str = reinterpret_cast<const char*>(arg.Data);
+                    if (str && *str) {
+                    u = reinterpret_cast<uint64_t>(str);
+                    }
+				} break;
+				case TypeOf::StringId:
 				default: {
 					auto str = reinterpret_cast<const char*>(arg.Data);
 					if (str && *str) {
@@ -75,6 +81,83 @@ namespace NdGameSdk::ndlib::script {
 	void* ScriptCFunc::GetFunc() const {
 		return this->Get()->m_pFunction;
 	}
+
+	InlineHook ScriptCFunc::InlinePatchCfunc(void* target_jmp, const wchar_t* source_name, const wchar_t* hook_name) {
+		InlineHook CfuncHook =
+			Utility::MakeSafetyHookInline(this->GetFunc(), target_jmp, source_name, hook_name);
+
+		if (CfuncHook) {
+			spdlog::warn(
+				"InlineHook ScriptCFunc: {:#x} -> {:#x} ({:#x} -> {:#x}) | Hook target address: {:#x}",
+				reinterpret_cast<uintptr_t>(this->GetFunc()),
+				reinterpret_cast<uintptr_t>(target_jmp),
+				reinterpret_cast<uintptr_t>(source_name),
+				reinterpret_cast<uintptr_t>(hook_name),
+				reinterpret_cast<uintptr_t>(CfuncHook.target_address())
+			);
+			return CfuncHook;
+		}
+
+		spdlog::error(
+			"Failed to InlineHook ScriptCFunc: {:#x} -> {:#x} ({:#x} -> {:#x})",
+			reinterpret_cast<uintptr_t>(this->GetFunc()),
+			reinterpret_cast<uintptr_t>(target_jmp),
+			reinterpret_cast<uintptr_t>(source_name),
+			reinterpret_cast<uintptr_t>(hook_name)
+		);
+		return {};
+	}
+
+	MidHook ScriptCFunc::PatchCfunc(MidHookFn target_jmp, const wchar_t* source_name, const wchar_t* hook_name) {
+		MidHook CfuncHook =
+			Utility::MakeMidHook(this->GetFunc(), target_jmp, source_name, hook_name);
+
+		if (CfuncHook) {
+			spdlog::warn(
+				"MidHook ScriptCFunc: {:#x} -> {:#x} ({:#x} -> {:#x}) | Hook target address: {:#x}",
+				reinterpret_cast<uintptr_t>(this->GetFunc()),
+				reinterpret_cast<uintptr_t>(target_jmp),
+				reinterpret_cast<uintptr_t>(source_name),
+				reinterpret_cast<uintptr_t>(hook_name),
+				reinterpret_cast<uintptr_t>(CfuncHook.target_address())
+			);
+			return CfuncHook;
+		}
+
+		spdlog::error(
+			"Failed to MidHook ScriptCFunc: {:#x} -> {:#x} ({:#x} -> {:#x})",
+			reinterpret_cast<uintptr_t>(this->GetFunc()),
+			reinterpret_cast<uintptr_t>(target_jmp),
+			reinterpret_cast<uintptr_t>(source_name),
+			reinterpret_cast<uintptr_t>(hook_name)
+		);
+		return {};
+	}
+
+	FunctionHook::Ptr ScriptCFunc::MakeFunctionHook(void* target_jmp, const wchar_t* hook_name) {
+		FunctionHook::Ptr CfuncHook =
+			Utility::MakeFunctionHook(this->GetFunc(), target_jmp, hook_name);
+
+		if (CfuncHook) {
+			spdlog::warn(
+				"FunctionHook ScriptCFunc: {:#x} -> {:#x} ({:#x}) | Hook target address: {:#x}",
+				reinterpret_cast<uintptr_t>(this->GetFunc()),
+				reinterpret_cast<uintptr_t>(target_jmp),
+				reinterpret_cast<uintptr_t>(hook_name),
+				*CfuncHook->GetTarget()
+			);
+			return CfuncHook;
+		}
+
+		spdlog::error(
+			"Failed to FunctionHook ScriptCFunc: {:#x} -> {:#x} ({:#x})",
+			reinterpret_cast<uintptr_t>(this->GetFunc()),
+			reinterpret_cast<uintptr_t>(target_jmp),
+			reinterpret_cast<uintptr_t>(hook_name)
+		);
+		return {};
+	}
+
 
 	INIT_FUNCTION_PTR(ScriptManager_LookupSymbol);
 	INIT_FUNCTION_PTR(ScriptManager_LookupInModule);

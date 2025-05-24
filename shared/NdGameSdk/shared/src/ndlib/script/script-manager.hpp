@@ -32,16 +32,35 @@ namespace NdGameSdk::ndlib::script {
 	class ScriptManagerGlobals;
 
 	DEFINE_DMENU_ItemSelection(ScriptCFuncDebugMode, Execute, Editor);
-	DEFINE_DMENU_ItemSelection(ScriptCFuncTypeOf, None, Bool, Int, Float, String, CFuncValue);
+	DEFINE_DMENU_ItemSelection(ScriptCFuncTypeOf, None, Bool, Int, Float, StringId, CFuncValue, String);
 
 	class NdGameSdk_API ScriptManager : public ISdkComponent {
 	public:
 		ScriptManager();
 
-		SdkEvent<> e_ScriptManagerInitialized{true};
+		SdkEvent<ScriptManager*> e_ScriptManagerInitialized{true};
 		SdkEvent<> e_ModuleIndexInitialized{true};
 
 		SDK_DEPENDENCIES(CommonGame, NdDevMenu, Memory);
+
+		ModuleInfo* FindExportingModule(StringId64 pSymbol, bool pRestrictToModule, StringId64 pModule);
+
+		void ScriptModuleAdd(StringId64 pModule, ScriptModule* pScriptModule);
+		void ScriptModuleRemove(StringId64 pModule);
+		bool AddModuleInfo(ModuleInfo* pModule);
+		void RemoveModuleInfo(StringId64 pModule, bool pUpdateRelocatableHeap = false, bool pForce = false);
+
+		bool AddModuleRequest(StringId64 pModule, Memory::Context pContext, bool pForceLoad, bool pIncludeDependities, std::string pModuleName);
+		bool AddModuleRequest(ModuleInfo* pModule, Memory::Context pContext, bool pForceLoad, bool pIncludeDependities);
+		bool IsModuleLoaded(StringId64 pModule);
+
+		bool ReloadModule(StringId64 pModule, Memory::Context pContext, bool pLoadDebug = false);
+		bool LoadModuleFromFile(StringId64 pModule, char* pFilePath,uint32_t pSize, 
+			Memory::Context* pContextType, bool pIsDebugModule, uint32_t pUpdateAndDispatch);
+#if defined(T2R)
+		bool LoadModuleFromBuffer(StringId64 pModule, void* pUserBuffer,
+			uint32_t pSize, Memory::Context* pContextType, bool pIsDebugModule, uint32_t pUpdateAndDispatch);
+#endif
 
 		ScriptCFunc* LookupCFunc(StringId64 Hash);
 		template<typename... Args>
@@ -53,11 +72,12 @@ namespace NdGameSdk::ndlib::script {
 			return ret;
 		}
 
-		static DMENU::ItemSubmenu* CreateScriptManagerMenu(NdDevMenu* pdmenu, DMENU::Menu* pMenu);
-
 	private:
 		void Initialize() override;
 		void Awake() override;
+
+		void PrintModuleInfos(bool PrintDebugModules = false);
+		void PrintScriptModules(bool PrintDebugModules = false);
 
 		bool RefreshScriptCFuncInfo(bool UpdateSidBase);
 		ScriptCFuncInfo* FindScriptCFuncByInput(const char* input);
@@ -68,6 +88,7 @@ namespace NdGameSdk::ndlib::script {
 		static void ScriptManagerInitialized(SafetyHookContext& ctx);
 		static void ModuleIndexInitialized(SafetyHookContext& ctx);
 		static ModuleBucketMap* GetDebugModuleBucket(ScriptManagerGlobals* pScriptManagerGlobals);
+		static uint64_t* ScriptCFunc_IsFinalBuild(uint64_t* _return);
 
 		/*ScriptCFuncDebugMenu*/
 		struct ScriptCFuncDebugMenuProperties {
@@ -109,6 +130,8 @@ namespace NdGameSdk::ndlib::script {
 			}
 			return ret;
 		}
+
+		static DMENU::ItemSubmenu* CreateScriptManagerMenu(NdDevMenu* pdmenu, DMENU::Menu* pMenu);
 		static bool WrapScriptCFuncDebugMenu(DMENU::Menu* pMenu, ScriptCFuncDebugMenuProperties* pProperties);
 		static bool WrapScriptCFuncExecutorMenu(DMENU::Menu* pMenu, ScriptCFuncDebugMenuProperties* pProperties, bool pSwitchMode = false);
 		static void SyncCFuncEditorBuffers(ScriptCFuncInfo& info, ScriptCFuncDebugMenuProperties::ScriptCFuncEditor& editor, bool toEditor);
@@ -131,6 +154,7 @@ namespace NdGameSdk::ndlib::script {
 		MidHook m_ScriptManagerInitHook{};
 		MidHook m_InitializeModuleIndexHook{};
 		InlineHook m_GetDebugModulesHook{};
+		InlineHook m_ScriptCFuncIsFinalBuildHook{};
 
 		static std::string s_DataBaseFile;
 
@@ -140,10 +164,10 @@ namespace NdGameSdk::ndlib::script {
 		MEMBER_FUNCTION_PTR(void, ScriptManager_ScriptModuleAdd, StringId64 module, ScriptModule* pScriptModule);
 		MEMBER_FUNCTION_PTR(void, ScriptManager_ScriptModuleRemove, StringId64 module);
 		MEMBER_FUNCTION_PTR(void, ScriptManager_RemoveModule, StringId64 module, bool UpdateRelocatableHeap, bool force);
-		MEMBER_FUNCTION_PTR(bool, ScriptManager_AddModuleInfo, ModuleInfo module);
+		MEMBER_FUNCTION_PTR(bool, ScriptManager_AddModuleInfo, ModuleInfo* module);
 		MEMBER_FUNCTION_PTR(ModuleInfo*, ScriptManager_FindExportingModule, StringId64 symbol, bool restrictToModule, StringId64 module);
 		MEMBER_FUNCTION_PTR(bool, ScriptManager_IsLoadModule, StringId64 module);
-		MEMBER_FUNCTION_PTR(bool, ScriptManager_AddModuleRequest, StringId64 module, Memory::Context context, 
+		MEMBER_FUNCTION_PTR(bool, ScriptManager_AddModuleRequest, StringId64 module, Memory::Context* context, 
 			bool pforce, bool pIncludeDependities, bool arg5, uint64_t arg6, const char* module_name);
 
 #if defined(T2R)
@@ -160,6 +184,8 @@ namespace NdGameSdk::ndlib::script {
 		* MEMBER_FUNCTION_PTR(void, ScriptManager_InsertModuleInfoToBucket);
 		* MEMBER_FUNCTION_PTR(void, ScriptManager_AddModulesToBucket, struct DC::modules::ModuleInfoArray* ModuleInfoArray, bool Islocal, bool IsDebugModule);
 		*/
+
+		friend class NdDevMenu;
 	};
 
 	class NdGameSdk_API ModuleBucketMap : public ISdkRegenny<regenny::shared::ndlib::script::ModuleBucketMap> 
@@ -185,60 +211,60 @@ namespace NdGameSdk::ndlib::script {
 
 		struct ModuleInfoIterator {
 			ModuleInfo* cur{};
-			ModuleInfo* anchor{}; // sentinel (tail)
+			std::size_t remaining{};
 			ModuleInfo* operator*() const { return cur; }
 			ModuleInfoIterator& operator++() {
-				if (!cur || cur == anchor) { cur = nullptr; return *this; }
+				if (remaining == 0 || !cur) { remaining = 0; cur = nullptr; return *this; }
 				cur = cur->NextModule();
-				if (cur == anchor) cur = nullptr;
+				--remaining;
 				return *this;
 			}
-			bool operator!=(ModuleInfoIterator const& o) const { return cur != o.cur; }
+			bool operator!=(ModuleInfoIterator const& o) const { return remaining != o.remaining; }
 		};
 
 		struct ModuleInfoRange {
 			ModuleInfo* first{};
-			ModuleInfo* anchor{};
-			std::size_t maxCnt{};
-			ModuleInfoIterator begin() const { return { first,  anchor }; }
-			ModuleInfoIterator end()   const { return { nullptr, anchor }; }
-			std::size_t size()  const { return maxCnt; }
+			std::size_t    count{};
+			ModuleInfoIterator begin() const { return { first, count }; }
+			ModuleInfoIterator end()   const { return { nullptr, 0 }; }
+			std::size_t size()  const { return count; }
 		};
 
 		ModuleInfoRange Modules() {
 			ModuleInfo* first = ModuleHead();
-			if (!first) return { nullptr, nullptr, 0 };
-			ModuleInfo* sentinel = reinterpret_cast<ModuleInfo*>(this->Get()->m_ModulesTail); // list terminator
-			return { first, sentinel, GetModulesHeap()->Count() }; // guard by heap count
+			auto heap = GetModulesHeap();
+			std::size_t cnt = static_cast<std::size_t>(heap->GetLastIndex()) + 0x1;
+			if (!first || cnt == 0) return { nullptr, 0 };
+			return { first, cnt };
 		}
 
 		struct ScriptModuleIterator {
 			ScriptModule* cur{};
-			ScriptModule* anchor{}; // sentinel (tail)
-			ScriptModule* operator*() const { return cur; }
+			std::size_t remaining{};
+			ScriptModule* operator*()   const { return cur; }
 			ScriptModuleIterator& operator++() {
-				if (!cur || cur == anchor) { cur = nullptr; return *this; }
+				if (remaining == 0 || !cur) { remaining = 0; cur = nullptr; return *this; }
 				cur = cur->NextScriptModule();
-				if (cur == anchor) cur = nullptr;
+				--remaining;
 				return *this;
 			}
-			bool operator!=(ScriptModuleIterator const& o) const { return cur != o.cur; }
+			bool operator!=(ScriptModuleIterator const& o) const { return remaining != o.remaining;}
 		};
 
 		struct ScriptModuleRange {
 			ScriptModule* first{};
-			ScriptModule* anchor{};
-			std::size_t   maxCnt{};
-			ScriptModuleIterator begin() const { return { first,  anchor }; }
-			ScriptModuleIterator end() const { return { nullptr, anchor }; }
-			std::size_t size() const { return maxCnt; }
+			std::size_t count{};
+			ScriptModuleIterator begin() const { return { first,count }; }
+			ScriptModuleIterator end() const { return { nullptr, 0 }; }
+			std::size_t size() const { return count; }
 		};
 
 		ScriptModuleRange ScriptModules() {
 			ScriptModule* first = ScriptModuleHead();
-			if (!first) return { nullptr, nullptr, 0 };
-			ScriptModule* sentinel = reinterpret_cast<ScriptModule*>(this->Get()->m_ScriptModulesTail); // list terminator
-			return { first, sentinel, GetScriptModuleHeap()->Count() }; // guard by heap count
+			auto* heap = GetScriptModuleHeap();
+			std::size_t cnt = static_cast<std::size_t>(heap->GetLastIndex()) + 0x1;
+			if (!first || cnt == 0) return { nullptr, 0 };
+			return { first, cnt };
 		}
 
 	};

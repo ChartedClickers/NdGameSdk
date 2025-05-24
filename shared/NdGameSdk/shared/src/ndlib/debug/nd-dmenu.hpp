@@ -122,6 +122,9 @@ namespace NdGameSdk::ndlib::debug {
 
 		class Menu : public ISdkRegenny<regenny::shared::ndlib::debug::DMENU::Menu, Component> {
 		public:
+			using LazyInitCallbackPtr = void(*)(DMENU::Menu&);
+			using LazyInitCallback = boost::function<std::remove_pointer<LazyInitCallbackPtr>::type>;
+
 			template<typename Component = Component>
 			Component* ItemBegin() const {
 				return reinterpret_cast<Component*>(this->Get()->m_Item);
@@ -151,6 +154,7 @@ namespace NdGameSdk::ndlib::debug {
 			int GetWidth();
 			void SetPagePointer(int num);
 			bool DeleteItem(DMENU::Component* pItem);
+			void SetLazyInitHandler(LazyInitCallback* handler);
 			DMENU::Menu* DeleteAllItems(bool freeArena);
 			DMENU::Component* PushBackItem(DMENU::Component* pComponent);
 		private:

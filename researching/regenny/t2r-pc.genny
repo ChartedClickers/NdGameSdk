@@ -967,7 +967,7 @@ namespace regenny {
                     uint64_t m_pUnkCollection @ 0x38;
                     uint32_t m_pNumEntries;
                     ScriptModule* m_ScriptModule @ 0x48;
-                    uint64_t m_field50;
+                    uint64_t m_field50; // if SsScript
                     uint32_t m_field58;
                     bool m_field5c;
                     bool m_IsLocal;

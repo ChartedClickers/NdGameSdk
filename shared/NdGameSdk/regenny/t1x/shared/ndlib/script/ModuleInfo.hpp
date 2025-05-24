@@ -22,7 +22,7 @@ struct ModuleInfo {
     regenny::shared::ndlib::script::ScriptModule* m_ScriptModule; // 0x48
     uint64_t m_field50; // 0x50
     uint32_t m_field58; // 0x58
-    bool field_5c; // 0x5c
+    bool m_field5c; // 0x5c
     bool m_IsLocal; // 0x5d
     bool m_DebugModule; // 0x5e
     bool m_isLoaded; // 0x5f

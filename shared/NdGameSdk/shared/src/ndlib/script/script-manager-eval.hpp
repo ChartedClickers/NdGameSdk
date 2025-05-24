@@ -18,6 +18,7 @@
 #include "script-module.hpp"
 
 using namespace std;
+using namespace Utility::memory;
 
 namespace NdGameSdk::ndlib::script {
 
@@ -25,7 +26,7 @@ namespace NdGameSdk::ndlib::script {
 
 	struct ScriptCFuncInfo {
 
-		enum class TypeOf : uint64_t { None, Bool, Int, Float, String, CFuncValue };
+		enum class TypeOf : uint64_t { None, Bool, Int, Float, StringId, CFuncValue, String };
 
 		struct Arguments {
 			TypeOf Type;
@@ -116,6 +117,10 @@ namespace NdGameSdk::ndlib::script {
     public:
         void CallScriptCFunc(ScriptValue args, int numArgs, ScriptValue* return_);
         void* GetFunc() const;
+
+        InlineHook InlinePatchCfunc(void* target_jmp, const wchar_t* source_name, const wchar_t* hook_name);
+		MidHook PatchCfunc(MidHookFn target_jmp, const wchar_t* source_name, const wchar_t* hook_name);
+        FunctionHook::Ptr MakeFunctionHook(void* target_jmp, const wchar_t* hook_name);
     };
 
     TYPEDEF_EXTERN_FUNCTION_PTR(void*, ScriptManager_LookupSymbol, StringId64 Lookup, void* return_);

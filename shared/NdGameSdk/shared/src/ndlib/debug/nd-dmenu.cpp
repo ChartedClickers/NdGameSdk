@@ -124,6 +124,10 @@ namespace NdGameSdk::ndlib::debug {
 		return DMENU::s_NdDevMenu->Menu_DeleteItem(this, pItem);
 	}
 
+	void DMENU::Menu::SetLazyInitHandler(LazyInitCallback* handler) {
+		this->Get()->m_lazyinitcallback = reinterpret_cast<void*>(handler);
+	}
+
 	DMENU::Menu* DMENU::Menu::DeleteAllItems(bool freeArena) {
 		return DMENU::s_NdDevMenu->Menu_DeleteAllItems(this, freeArena);
 	}

@@ -2,6 +2,7 @@
 #include "NdGameSdk/components/SdkRegenny.hpp"
 
 #include <NdGameSdk/shared/src/corelib/memory/memory-map.hpp>
+#include <NdGameSdk/shared/src/corelib/system/platform/synchronized.hpp>
 
 #if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/ndlib/script/ScriptModule.hpp>
@@ -16,9 +17,14 @@
 #include <Utility/helper.hpp>
 #include <Utility/function_ptr.hpp>
 
+using namespace NdGameSdk::corelib::system::platform;
+
 namespace NdGameSdk::ndlib::script {
 
     class ModuleInfo;
+    class ScriptModule;
+
+    TYPEDEF_EXTERN_FUNCTION_PTR(void*, ScriptModule_FetchScriptModuleEntry, ScriptModule* scriptmodule, StringId64 scriptid);
 
     class NdGameSdk_API ScriptModule : public ISdkRegenny<regenny::shared::ndlib::script::ScriptModule> 
     {
@@ -27,7 +33,7 @@ namespace NdGameSdk::ndlib::script {
         std::string GetModuleName() const;
 		StringId64 GetModuleId() const;
         uint32_t GetNumEntries() const;
-        double GetLoadTimeSec() const;
+        float GetLoadTimeSec() const;
 
         ScriptModule* NextScriptModule() const;
         ScriptModule* PrevScriptModule() const;
@@ -43,6 +49,13 @@ namespace NdGameSdk::ndlib::script {
         dc::Entry<Data>* DcEntry(std::size_t i = 0) {
             auto* h = DcHeader();
             return h ? h->GetEntry<Data>(i) : nullptr;
+        }
+
+        template<class Data = void>
+        dc::Entry<Data>* FetchDcEntry(StringId64 scriptid) {
+			always_assert(ScriptModule_FetchScriptModuleEntry, "Function pointer was not set!");
+			auto* e = ScriptModule_FetchScriptModuleEntry(this, scriptid);
+			return e ? reinterpret_cast<dc::Entry<Data>*>(e) : nullptr;
         }
 
         // Directly fetch the i-th payload pointer, already cast to Data*.
@@ -96,8 +109,6 @@ namespace NdGameSdk::ndlib::script {
         }
 
     };
-
-    TYPEDEF_EXTERN_FUNCTION_PTR(void*, ScriptModule_FetchScriptModuleEntry, ScriptModule* scriptmodule, StringId64 scriptid);
     
     /*
     * TYPEDEF_EXTERN_FUNCTION_PTR(bool, ScriptModule_Login, struct ScriptManager::ScriptModule* module);

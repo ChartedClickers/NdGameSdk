@@ -31,8 +31,9 @@ namespace NdGameSdk::ndlib::script {
 		return this->Get()->m_numEntries;
 	}
 
-	double ScriptModule::GetLoadTimeSec() const {
-		return *reinterpret_cast<const double*>(&this->Get()->m_loadtime);
+	float ScriptModule::GetLoadTimeSec() const {
+		uint64_t rawTicks = this->Get()->m_loadtime;
+		return rawTicks * s_ticksToSec;
 	}
 
 	dc::Header* ScriptModule::DcHeader() {

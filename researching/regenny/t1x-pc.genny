@@ -1425,7 +1425,7 @@ namespace regenny {
                      ScriptModule* m_ScriptModule @ 0x48;
                      uint64_t m_field50;
                      uint32_t m_field58;
-                     bool field_5c;
+                     bool m_field5c;
                      bool m_IsLocal;
                      bool m_DebugModule;
                      bool m_isLoaded;

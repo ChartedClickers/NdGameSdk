@@ -36,7 +36,7 @@ project(ND.ModClient
 		C
 		CXX
 	VERSION
-		1.2.0
+		1.3.0
 )
 
 add_compile_options(
@@ -413,6 +413,7 @@ target_link_libraries(T1XSDK PUBLIC
 
 target_compile_definitions(T1XSDK PUBLIC
 	T1X
+	"ND_GAME_NAME=\"${PROJECT_TARGET}\""
 )
 
 set_target_properties(T1XSDK PROPERTIES
@@ -681,6 +682,7 @@ target_link_libraries(T2RSDK PUBLIC
 
 target_compile_definitions(T2RSDK PUBLIC
 	T2R
+	"ND_GAME_NAME=\"${PROJECT_TARGET}\""
 )
 
 set_target_properties(T2RSDK PROPERTIES

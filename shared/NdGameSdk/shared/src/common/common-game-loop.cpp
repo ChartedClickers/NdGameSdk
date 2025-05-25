@@ -15,13 +15,13 @@ namespace NdGameSdk::common {
 			Patterns::SdkPattern findpattern{};
 			auto module = Utility::memory::get_executable();
 
-			findpattern = Patterns::CommonGameLoop_GameLoopUpdate;
+			findpattern = Patterns::CommonGame_CommonGameLoop_GameLoopUpdate;
 			auto GameLoopUpdateJMP = (void*)Utility::FindAndPrintPattern(module
-				, findpattern.pattern, wstr(Patterns::CommonGameLoop_GameLoopUpdate), findpattern.offset);
+				, findpattern.pattern, wstr(Patterns::CommonGame_CommonGameLoop_GameLoopUpdate), findpattern.offset);
 
-			findpattern = Patterns::CommonGameLoop_GameDebugUpdate;
+			findpattern = Patterns::CommonGame_CommonGameLoop_GameDebugUpdate;
 			auto GameDebugUpdateJMP = (void*)Utility::FindAndPrintPattern(module
-				, findpattern.pattern, wstr(Patterns::CommonGameLoop_GameDebugUpdate), findpattern.offset);
+				, findpattern.pattern, wstr(Patterns::CommonGame_CommonGameLoop_GameDebugUpdate), findpattern.offset);
 
 			if (!GameLoopUpdateJMP || !GameDebugUpdateJMP) {
 				throw SdkComponentEx
@@ -29,8 +29,8 @@ namespace NdGameSdk::common {
 					SdkComponentEx::ErrorCode::PatternFailed };
 			}
 
-			m_GameLoopUpdate = Utility::MakeMidHook(GameLoopUpdateJMP, GameLoopUpdate, wstr(Patterns::CommonGameLoop_GameLoopUpdate), wstr(GameLoopUpdateJMP));
-			m_GameDebugUpdate = Utility::MakeMidHook(GameDebugUpdateJMP, GameDebugUpdate, wstr(Patterns::CommonGameLoop_GameDebugUpdate), wstr(GameDebugUpdateJMP));
+			m_GameLoopUpdate = Utility::MakeMidHook(GameLoopUpdateJMP, GameLoopUpdate, wstr(Patterns::CommonGame_CommonGameLoop_GameLoopUpdate), wstr(GameLoopUpdateJMP));
+			m_GameDebugUpdate = Utility::MakeMidHook(GameDebugUpdateJMP, GameDebugUpdate, wstr(Patterns::CommonGame_CommonGameLoop_GameDebugUpdate), wstr(GameDebugUpdateJMP));
 
 			if (!m_GameLoopUpdate || !m_GameDebugUpdate) {
 				throw SdkComponentEx{ std::format("Failed to create hooks!"),
@@ -43,7 +43,7 @@ namespace NdGameSdk::common {
 	void CommonGameLoop::GameLoopUpdate(SafetyHookContext& ctx) {
 		using NdKeyboardKey = NdFrameState::NdKeyboardLayer::Key;
 
-#ifndef NDEBUG
+#if SDK_DEBUG
 		static CommonGameLoop* pCommonGameLoop = GetSharedComponents()->
 			GetComponent<CommonGame>()->GetSubComponent<CommonGameLoop>();
 		auto NdFrameState = pCommonGameLoop->m_EngineComponents->GetNdFrameState();

@@ -3,23 +3,23 @@
 
 namespace NdGameSdk {
 
-	SdkLogger::SdkLogger(std::string name, std::string log_path, spdlog::level::level_enum log_level)
-	{
-		auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-		auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_path, true);
+	SdkLogger::SdkLogger(const std::string& name, const std::string& log_path, level::level_enum log_level) {
+		auto console_sink = std::make_shared<sinks::stdout_color_sink_mt>();
+		auto file_sink = std::make_shared<sinks::basic_file_sink_mt>(log_path, true);
+		s_sinks = { console_sink, file_sink };
 
-		spdlog::sinks_init_list sink_list = { console_sink, file_sink };
-
+		sinks_init_list sink_list{ console_sink, file_sink };
 		m_logger = std::make_shared<logger>(name, sink_list);
 		register_logger(m_logger);
-		flush_on(log_level);
-		set_level(log_level);
+
+		m_logger->set_level(log_level);
+		m_logger->flush_on(log_level);
 	}
 
 	std::shared_ptr<logger> SdkLogger::GetLogger()
 	{
 		static SdkLogger sdklogger{ SDK_NAME, SDK_LOG_PATH,  
-		#if NDEBUG
+		#if !SDK_DEBUG
 		level::info
 		#else
 		level::debug
@@ -27,6 +27,24 @@ namespace NdGameSdk {
 		};
 
 		return sdklogger.m_logger;
+	}
+
+	std::shared_ptr<logger> SdkLogger::GetNdGameLogger()
+	{
+		auto def = GetLogger();
+
+		if (!s_ndgameLogger) {
+			s_ndgameLogger = std::make_shared<logger>(
+				ND_GAME_NAME,
+				s_sinks.begin(),
+				s_sinks.end()
+			);
+			s_ndgameLogger->set_level(def->level());
+			s_ndgameLogger->flush_on(def->flush_level());
+			register_logger(s_ndgameLogger);
+		}
+
+		return s_ndgameLogger;
 	}
 
 	std::shared_ptr<sinks::basic_file_sink_mt> SdkLogger::LinkFileSink(logger& plogger)
@@ -73,4 +91,7 @@ namespace NdGameSdk {
 
 		return false;
 	}
+
+	std::vector<sink_ptr> SdkLogger::s_sinks;
+	std::shared_ptr<logger> SdkLogger::s_ndgameLogger = nullptr;
 }

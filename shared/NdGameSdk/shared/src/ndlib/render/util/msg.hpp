@@ -18,7 +18,7 @@ namespace NdGameSdk::ndlib::render::dev {
 
 namespace NdGameSdk::ndlib::render::util
 {
-	class MsgCon : public ISdkRegenny<::regenny::shared::corelib::util::MsgCon> {};
+	class MsgCon;
 
 	class NdGameSdk_API Msg {
 	public:
@@ -27,6 +27,13 @@ namespace NdGameSdk::ndlib::render::util
 	private:
 		MEMBER_FUNCTION_PTR(void, Msg_PrintToActiveMsgOutput, const char* pStr);
 		friend class NdGameSdk::ndlib::render::dev::DebugDrawCommon;
+	};
+
+	class NdGameSdk_API MsgCon : public ISdkRegenny<::regenny::shared::corelib::util::MsgCon>
+	{
+	public:
+		bool GetPrintTTY() const;
+		void SetPrintTTY(bool status);
 	};
 
 	static_assert(sizeof(MsgCon) == 0x118, "Size of MsgCon is not correct.");

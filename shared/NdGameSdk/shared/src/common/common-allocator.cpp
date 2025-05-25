@@ -22,9 +22,9 @@ namespace NdGameSdk::common {
 	#if defined(T2R)
 			if (pCommonGame->m_Memory->IsDebugMemoryAvailable()) {
 
-				findpattern = Patterns::IAllocator_s_TaggedGpuDevHeap;
+				findpattern = Patterns::CommonGame_IAllocator_s_TaggedGpuDevHeap;
 				s_TaggedGpuDevHeap = (TaggedHeap*)Utility::ReadLEA32(module,
-					findpattern.pattern, wstr(Patterns::IAllocator_s_TaggedGpuDevHeap), findpattern.offset, 3, 7);
+					findpattern.pattern, wstr(Patterns::CommonGame_IAllocator_s_TaggedGpuDevHeap), findpattern.offset, 3, 7);
 
 				if (!s_TaggedGpuDevHeap) {
 					throw SdkComponentEx
@@ -32,9 +32,9 @@ namespace NdGameSdk::common {
 						SdkComponentEx::ErrorCode::PatternFailed, true };
 				}
 
-				findpattern = Patterns::IAllocator_Init;
+				findpattern = Patterns::CommonGame_IAllocator_Init;
 				auto InitTaggedHeapsJMP = (void*)Utility::FindAndPrintPattern(module
-					, findpattern.pattern, wstr(Patterns::IAllocator_Init), (findpattern.offset + 0x4a7));
+					, findpattern.pattern, wstr(Patterns::CommonGame_IAllocator_Init), (findpattern.offset + 0x4a7));
 
 				m_IAllocator_InitTaggedHeapsHook = Utility::MakeMidHook(InitTaggedHeapsJMP,
 					[](SafetyHookContext& ctx) {
@@ -43,7 +43,7 @@ namespace NdGameSdk::common {
 						pCommonGame->m_Memory->m_AllocatorTaggedHeap.SetTaggedGpuDevHeap(s_TaggedGpuDevHeap);
 						spdlog::info("TaggedGpuDevHeap installed!");
 
-					}, wstr(Patterns::IAllocator_Init), wstr(InitTaggedHeapsJMP));
+					}, wstr(Patterns::CommonGame_IAllocator_Init), wstr(InitTaggedHeapsJMP));
 
 
 				if (!m_IAllocator_InitTaggedHeapsHook) {

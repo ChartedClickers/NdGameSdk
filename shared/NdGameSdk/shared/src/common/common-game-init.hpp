@@ -16,6 +16,7 @@ using namespace NdGameSdk::common::win;
 
 #include "common-allocator.hpp"
 #include "common-game-loop.hpp"
+#include "common-main-win.hpp"
 
 using namespace NdGameSdk::corelib::memory;
 using namespace NdGameSdk::gamelib::debug;
@@ -48,6 +49,7 @@ private:
 
 	IAllocator* m_IAllocator;
 	CommonGameLoop* m_CommonGameLoop;
+	CommonMainWin* m_CommonMainWin;
 
 	Memory* m_Memory;
 	EngineComponents* m_EngineComponents;

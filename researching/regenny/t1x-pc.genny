@@ -428,20 +428,23 @@ namespace regenny {
 
             // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\corelib\util
             namespace util {
-                 struct MsgCon 0x118 {
+                struct MsgCon 0x118 {
                     void* vftable;
-                    float m_MsgConScale @0x10
-                    uint32_t m_MsgConLeftPad
-                    uint32_t m_MsgConHorizontalSize
-                    uint32_t m_MsgConVerticalSize
-                    uint32_t m_MsgConTopPad
-                    bool m_DrawRedisTTYTimes @0x32;
+                    float m_MsgConScale @0x10;
+                    uint32_t m_MsgConLeftPad;
+                    uint32_t m_MsgConHorizontalSize;
+                    uint32_t m_MsgConVerticalSize;
+                    uint32_t m_MsgConTopPad;
+                    bool m_PrintTimeInTTY @0x2e;
+                    bool m_PrintTTY @0x30;
+                    bool m_RedisTTY;
+                    bool m_DrawRedisTTYTimes;
                     bool m_DrawRedisTTYStatus;
                     bool m_ApplyMsgConScaletoDebugText @0x36;
                     bool m_EnableMsgConLineWrap;
                     bool m_EnableMsgConAutoResize;
                     bool m_ShowCacheMissesDebugText;
-                 }
+                }
             }
 
             // c:\branches\discbot??\t1x-pc-?.?.?\shared\src\corelib\containers

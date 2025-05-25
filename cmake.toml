@@ -1,7 +1,7 @@
 # Reference: https://build-cpp.github.io/cmkr/cmake-toml
 [project]
 name = "ND.ModClient"
-version = "1.2.0"
+version = "1.3.0"
 languages = ["C", "CXX"]
 cmake-after = """
 add_compile_options(
@@ -177,7 +177,7 @@ link-libraries = [
     
 [target.T1XSDK]  
 type = "NdGameSdk"
-compile-definitions = ["T1X"]
+compile-definitions = ["T1X", "ND_GAME_NAME=\"${PROJECT_TARGET}\""]
 sources = [
 "shared/NdGameSdk/ndgame/t1x/**.cpp",
 "shared/NdGameSdk/ndgame/t1x/**.c"
@@ -197,7 +197,7 @@ type = "ModClient"
 
 [target.T2RSDK]  
 type = "NdGameSdk"
-compile-definitions = ["T2R"]
+compile-definitions = ["T2R", "ND_GAME_NAME=\"${PROJECT_TARGET}\""]
 sources = [
 "shared/NdGameSdk/ndgame/t2r/**.cpp",
 "shared/NdGameSdk/ndgame/t2r/**.c"

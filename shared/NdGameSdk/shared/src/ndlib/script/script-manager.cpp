@@ -464,9 +464,11 @@ namespace NdGameSdk::ndlib::script {
                 pdmenu->Create_DMENU_String("// ScriptCFuncDebugMenu [BETA]", ScriptMgr->m_ScriptCFuncDebugMenu, nullptr, HeapArena_Source);
                 pdmenu->Create_DMENU_String(ScriptMgr->m_NativeTableEntriesText, ScriptMgr->m_ScriptCFuncDebugMenu, nullptr, HeapArena_Source);
 
-            #ifndef NDEBUG
+            #if SDK_DEBUG
                 pdmenu->Create_DMENU_ItemFunction("Test funct", ScriptManagerMenu, &TestFunct, ScriptMgrAddr, false, HeapArena_Source);
             #endif
+
+				// TODO: Implement debug menu for API functions
 
                 return pdmenu->Create_DMENU_ItemSubmenu(ScriptManagerMenu->Name(),
                     pMenu, ScriptManagerMenu, NULL, NULL, nullptr, HeapArena_Source);

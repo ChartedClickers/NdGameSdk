@@ -28,7 +28,8 @@ namespace NdGameSdk::ndlib::render::util {
 
 		DebugDrawCommon* DebugDraw{ GetParentComponent<DebugDrawCommon>() };
 #if defined(T1X)
-		if (DebugDraw->m_Memory->IsDebugMemoryAvailable()) {
+		// https://github.com/ChartedClickers/NdGameSdk/issues/12
+		if (false/*DebugDraw->m_Memory->IsDebugMemoryAvailable()*/) {
 
 			/* It's a dirty and broken hack for MsgCon, unfortunately, in T1X specific handler for msgcon is stripped out. 
 			Yes, we can rollback this from T2R, but it is taking a long time rn. Thanks, illusion0001, for this method. 
@@ -109,6 +110,12 @@ namespace NdGameSdk::ndlib::render::util {
 	void __attribute__((naked)) Msg_MsgConDrawBuffersHook_SubCC()
 	{
 		__asm {
+			pushfq;
+			push rax;
+			push rcx;
+			push rdx;
+			push r8;
+			push r9;
 			mov rcx, r12;
 			test rcx, rcx;
 			jz exit_;
@@ -118,6 +125,12 @@ namespace NdGameSdk::ndlib::render::util {
 		call_:;
 			call MsgConDrawBuffersAddr;
 		exit_:;
+			pop r9;
+			pop r8;
+			pop rdx;
+			pop rcx;
+			pop rax;
+			popfq;
 			jmp[rip + Msg_MsgConDrawBuffersHook_ReturnAddr];
 		}
 	}

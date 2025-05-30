@@ -94,8 +94,18 @@ namespace NdGameSdk {
 					comp->Dependencies().end(),
 					[&](auto const& d) {
 						auto it = m_sdkcomponents.find(d);
-						return it != m_sdkcomponents.end() && it->second->IsInitialized();
+						if (it != m_sdkcomponents.end())
+							return it->second->IsInitialized();
+
+						if (this != &ISdkComponent::s_SharedComponents) {
+							const auto& shared = ISdkComponent::s_SharedComponents.GetSdkComponents();
+							auto it_shared = shared.find(d);
+							return it_shared != shared.end() && it_shared->second->IsInitialized();
+						}
+
+						return false;
 					});
+
 
 				if (!ready)
 					continue;

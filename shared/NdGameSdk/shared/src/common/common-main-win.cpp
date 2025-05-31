@@ -116,15 +116,27 @@ namespace NdGameSdk::common {
 	}
 
     std::string CommonMainWin::vformat(const char* fmt, va_list args) {
-        va_list tmp;
-        va_copy(tmp, args);
-        int len = std::vsnprintf(nullptr, 0, fmt, tmp);
-        va_end(tmp);
-        if (len < 0) return "";
+        if (!fmt) return "";
 
-        std::vector<char> buf(len + 1);
-        std::vsnprintf(buf.data(), buf.size(), fmt, args);
-        return std::string(buf.data(), len);
+        std::string out;
+        __try {
+            va_list tmp;
+            va_copy(tmp, args);
+            int len = std::vsnprintf(nullptr, 0, fmt, tmp);
+            va_end(tmp);
+            if (len < 0) return "";
+
+            std::vector<char> buf(len + 1);
+            std::vsnprintf(buf.data(), buf.size(), fmt, args);
+            out.assign(buf.data(), len);
+        }
+        __except (GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION
+            ? EXCEPTION_EXECUTE_HANDLER
+            : EXCEPTION_CONTINUE_SEARCH) {
+            out = "[Formatting error]";
+        }
+
+        return out;
     }
 
     void __fastcall CommonMainWin::CommonGamePrintF(const char* fmt, ...) {
@@ -245,14 +257,27 @@ namespace NdGameSdk::common {
         logger->warn("[SSMGR] {}", msg);
     }
 
-    void __fastcall CommonMainWin::SsManagerErrorPrintF(void* /*file*/, const char* fmt, ...) {
-        va_list args;
-        va_start(args, fmt);
-        auto msg = vformat(fmt, args);
-        va_end(args);
+    void __fastcall CommonMainWin::SsManagerErrorPrintF(void* /*file*/, const char* fmt, void* argBuffer, void* /*unused*/) {
+        if (!fmt) return;
+
+        const char* firstRaw = "[invalid]";
+        const char* secondRaw = "[invalid]";
+
+        __try {
+            char** buf = reinterpret_cast<char**>(argBuffer);
+            firstRaw = buf[0] ? buf[0] : "[invalid]";
+            secondRaw = buf[1] ? buf[1] : "[invalid]";
+        }
+        __except (GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH) {}
+
+        std::string result(fmt);
+        size_t pos = result.find("%s");
+        if (pos != std::string::npos) result.replace(pos, 2, firstRaw);
+        pos = result.find("%s");
+        if (pos != std::string::npos) result.replace(pos, 2, secondRaw);
 
         auto logger = SdkLogger::GetNdGameLogger();
-        logger->error("[SSMGR] {}", msg);
+        logger->error("[SSMGR] {}", result);
     }
 
     void CommonMainWin::ScriptManagerErrorPrintF(const char* fmt, ...) {

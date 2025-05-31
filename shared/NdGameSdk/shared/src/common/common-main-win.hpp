@@ -22,7 +22,7 @@ namespace NdGameSdk::common {
 		static void __fastcall CommonGamePrintF(const char* fmt, ...);
 		static void __fastcall SsManagerPrintF(void* /*file*/, const char* fmt, ...);
 		static void __fastcall SsManagerWarnPrintF(void* /*file*/, const char* fmt, ...);
-		static void __fastcall SsManagerErrorPrintF(void* /*file*/, const char* fmt, ...);
+		static void __fastcall SsManagerErrorPrintF(void* /*file*/, const char* fmt, void* argBuffer, void* /*unused*/);
 		static void __fastcall ScriptManagerErrorPrintF(const char* fmt, ...);
 
 #if defined(T2R)

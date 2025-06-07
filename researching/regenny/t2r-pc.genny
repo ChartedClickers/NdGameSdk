@@ -436,6 +436,22 @@ namespace regenny {
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib\util
             namespace util {
 
+                struct NameCache 0x50 {
+                    void* vftable;
+                    void* m_bucketTable;
+                    void* m_nodePool;
+                    void* m_freeList;
+                    void* m_allocator;
+                    uint32_t m_bucketCount;
+                    uint32_t m_entryCount;
+                    uint32_t m_nameCapacity;
+                    uint32_t m_nameCount;
+                    char* m_writePtr;
+                    uint32_t m_offset;
+                    uint32_t m_stringCount;
+                    uint32_t m_cacheSize;
+                }; // string-cache.c
+
                 struct MsgCon 0x118 {
                     void* vftable;
                     float m_MsgConScale @0x10;
@@ -452,7 +468,7 @@ namespace regenny {
                     bool m_EnableMsgConLineWrap;
                     bool m_EnableMsgConAutoResize;
                     bool m_ShowCacheMissesDebugText;
-                }
+                };
             }
 
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib\containers
@@ -480,6 +496,9 @@ namespace regenny {
                 } // fixedsizeheap.h
 
             }
+
+            // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib\system
+            namespace system {}
 
         }
 
@@ -1089,7 +1108,7 @@ namespace regenny {
 	                bool m_ShowDebugBinStatusCon;
 	                bool m_DumpStateScriptsonStackFrameHighWater @ 0x4c;
 	                bool m_EnableScriptModuleCRC32Checks;
-	                bool field_4e;
+	                bool m_field4e;
 	                bool m_ValidateModuleSize;
 	                bool m_AssertonGlobalSymbolLookup;
 	                bool m_EnableScripts;
@@ -1112,10 +1131,260 @@ namespace regenny {
                 } // g_scriptGlobals 
             }
 
+            // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\io
+            namespace io {
+
+                struct LoadingHeapMgr {
+                    enum LevelHeapType : uint32_t {
+                        main = 0x0,
+                        gameplay = 0x1,
+                        pso_preload = 0x2
+                    }
+                } // loadingheap-mgr.cpp
+
+                struct Package 0x1b00 {
+                
+                    enum PakItem : uint32_t
+                    {
+                        INTERACTIVE_BG_1 = 0x4f,
+                        NAV_MESH_1 = 0x21,
+                        PATH_TRACING_1 = 0x49,
+                        NURBS_TABLE_1 = 0x1d,
+                        MOTION_MATCH_SET_1 = 0x48,
+                        VOXELIZATION_1 = 0x46,
+                        TEXTURE_TABLE = 0x1,
+                        CAMERA_TABLE_1 = 0x1e,
+                        PM_FG_PROTOTYPES = 0x32,
+                        LEVEL_FLOOR_PATS_1 = 0x30,
+                        LEVEL_FLOOR_PATS_2 = 0x3f,
+                        TEXTURE_BLOB_TABLE_1 = 0x51,
+                        CIN_SEQUENCE_1 = 0x44,
+                        SPHERE_TREE_NODE_1 = 0x15,
+                        COLLISION_DATA_BACKGROUND = 0x7,
+                        JSON_GEOMETRY = 0x18,
+                        SPLINE_TABLE = 0x10,
+                        GRAPH_TABLE = 0xd,
+                        VIS_CHEAT = 0x36,
+                        CUTSCENE_DATA = 0xf,
+                        LEVEL_PATS_1 = 0x2f,
+                        LEVEL_PATS_2 = 0x3e,
+                        COLLISION_DATA_HAVOK_BG = 0x2c,
+                        PACKAGE_ITEM_LOOKUP = 0xa,
+                        INSTANCE_TAGS_1 = 0x35,
+                        VERTEX_SHADER_TABLE = 0x2,
+                        ANIMATED_LIGHTS = 0x4d,
+                        SPECULAR_CUBEMAPSET = 0x3d,
+                        LIGHT_TABLE_1 = 0x12,
+                        SOUND_BANK_TABLE = 0x31,
+                        PM_COLLECTION_1 = 0x16,
+                        PM_COLLECTION_2 = 0x17,
+                        LEVEL_OFFSET_1 = 0x1f,
+                        DEBUG_INFO_1 = 0x1c,
+                        AMBSHADOWS_OCCLUDER_INFO = 0x37,
+                        JSON_DOC = 0x39,
+                        TAG_INT = 0x26,
+                        COLLISION_DATA_CLOTH = 0x9,
+                        LEVEL_BOUNDING_BOX_DATA = 0x42,
+                        REGION_TREE = 0xe,
+                        ACTOR_FLAGS = 0x4a,
+                        RES_ITEM_ART_ITEM = 0xb,
+                        POPULATOR_1 = 0x47,
+                        CINEMATIC_1 = 0x43,
+                        FEATURE_DB_2 = 0x23,
+                        ANIM = 0x29,
+                        NAV_MESH_HEIGHT_MAP_TEX_1 = 0x4c,
+                        FT_SVG = 0x50,
+                        RIVER_SECTION = 0x11,
+                        GEOMETRY_1 = 0x19,
+                        TAG_FLOAT = 0x27,
+                        TEXTURE_DICTIONARY = 0x40,
+                        UI_TEXTURES_METADATA = 0x4b,
+                        FOREGROUND_SECTION_2 = 0x6,
+                        WATER_DATA = 0x24,
+                        TAG_VEC4 = 0x28,
+                        VIS_INFO_1 = 0x20,
+                        BG_COLLISION_DEBUG_INFO = 0x4e,
+                        SPAWNER_GROUP = 0xc,
+                        TAG_STRING = 0x25,
+                        NAV_LEDGE_GRAPH_1 = 0x22,
+                        JOINT_HIERARCHY = 0x2b,
+                        KD_TREE_1 = 0x41,
+                        KD_TREE_2 = 0x45,
+                        ANIM_GROUP = 0x2a,
+                        ATTACHED_FG_MAPPING = 0x1a,
+                        ANIM_STREAM = 0x33,
+                        EFFECT_TABLE = 0x14,
+                        BACKGROUND_SECTION = 0x4,
+                        LEVEL_INFO_3 = 0x3b,
+                        LEVEL_INFO_2 = 0x3a,
+                        LEVEL_INFO_1 = 0x2e,
+                        LEVEL_INFO_4 = 0x3c,
+                        FOREGROUND_SECTION = 0x5,
+                        NAME_TABLE_1 = 0x34,
+                        PIXEL_SHADER_TABLE = 0x3,
+                        MATERIAL_TABLE_1 = 0x13,
+                        SHRUB_COLLECTION_2 = 0x1b,
+                        COLLISION_DATA_FOREGROUND = 0x8
+                    };
+
+                    enum Status : uint8_t {
+                        PackageStatusUnused = 0x0,
+                        PackageStatusInvalid = 0x1,
+                        PackageStatusFailedOptionalFile = 0x2,
+                        PackageStatusLoading = 0x3,
+                        PackageStatusLoaded = 0x4,
+                        PackageStatusUnloading = 0x5
+                    };
+
+                    struct PakHeader 0x98 {
+                        uint32_t m_magic;
+                        uint32_t m_hdrSize;
+                        uint32_t m_pakLoginTableIdx;
+                        uint32_t m_pakLoginTableOffset;
+                        uint32_t m_pageCt;
+                        uint32_t m_pakPageEntryTableOffset;
+                        uint32_t m_numPointerFixUpPages;
+                        uint32_t m_pointerFixUpTableOffset;
+                        uint32_t m_dataSize;
+                        uint32_t m_field24;
+                        uint32_t m_field28;
+                        uint32_t m_field2c;
+                        uint32_t m_field30;
+                        uint32_t m_field34;
+                        uint32_t m_field38;
+                        uint32_t m_hdrsizeleft;
+                        uint32_t m_field40;
+                        uint32_t m_field44;
+                        uint64_t m_field50 @ 0x50;
+                        uint64_t m_field58;
+                        uint64_t m_field60;
+                        uint32_t m_field68;
+                        uint32_t m_LoggedResourcesCounter;
+                    };
+
+                    struct PakPageEntry 0xc {
+                        uint32_t m_resPageOffset;
+                        uint32_t m_pageSize;
+                        uint32_t m_owningPackageIndex;
+                    };
+
+                    // Base struct for all resources in a package
+                    struct ResItem 0x34 {
+                        uint64_t m_resNameStrOffset;
+                        uint32_t m_pageSize @ 0x10;
+                        StringId64 m_ResourceId @ 0x18;
+                        StringId64 m_resourceTypeId;
+                        uint32_t m_MaxResources @ 0x30; // max number of resources in this package
+                    };
+
+
+                    uint64_t m_field8 @ 0x8;
+                    uint64_t m_size;
+                    uint32_t m_numAllocatedPages;
+                    LoadingHeapMgr.LevelHeapType m_levelheaptype @ 0x980;
+                    uint64_t m_ChunkSize @ 0x988;
+                    uint32_t m_hdrSize;
+                    uint32_t m_pageCt;
+                    uint32_t m_dataSize;
+                    void* m_Level @ 0x9b0;
+                    char m_packname[0x80] @ 0x9c8 [[utf8*]];
+                    StringId64 m_packid @ 0xa48;
+                    char m_packfilepath[0x80] + 0x1 [[utf8*]];
+                    StringId64 m_packfilepathid @ 0xad8;
+                    Status m_status @ 0xaec;
+                } // package.cpp
+
+                struct PackageProcessingInfo 0xad0 {
+                    enum LoadingStatus : uint32_t {
+                        LoadingPackageStatusUnused = 0x0,
+                        LoadingPackageStatusError = 0x1,
+                        LoadingPackageStatusInvalid = 0x2,
+                        LoadingPackageStatusWanted = 0x3,
+                        LoadingPackageStatusOpenFile = 0x4,
+                        LoadingPackageStatusLoadingPakHeader = 0x5,
+                        LoadingPackageStatusLoadingHeader = 0x6,
+                        LoadingPackageStatusLoadingPages = 0x7,
+                        LoadingPackageStatusLoadingVram = 0x8,
+                        LoadingPackageStatusWaitingForVramPages = 0x9,
+                        LoadingPackageStatusDataIsLoaded = 0xa,
+                        LoadingPackageStatusWaitingForVramProcessing = 0xb,
+                        LoadingPackageStatusDoingLogin = 0xc,
+                        LoadingPackageStatusFinalizing = 0xd,
+                        LoadingPackageStatusLoaded = 0xe,
+                        LoadingPackageStatusWaitingForLogout = 0xf,
+                        LoadingPackageStatusDoingLogout = 0x10,
+                        LoadingPackageStatusWaitingForUnload = 0x11,
+                        LoadingPackageStatusFailedOptionalFile = 0x12
+                    };
+
+                    Package* m_package;
+                    LoadingStatus m_status;
+                    Package.PakHeader m_pakHdr @ 0xa38;
+
+                } // package-mgr.cpp
+
+                struct PackageMgr 0x4f70 {
+
+                    // s_kMaxNumPackagesAwaitingUnload = 0x800;
+                    // s_kMaxSubPagesPerPackage = 0x258;
+
+                    struct Configuration 0x50 { 
+                        uint32_t m_freepackageslots;
+                        uint32_t m_allocationRingBufferSize;
+                        regenny.shared.corelib.memory.Context m_memcontext @ 0xc;
+                        void* m_GetGameFrameNumber @ 0x20; // function pointer
+                        uint64_t* m_PackageLoginResFunc @ 0x38; // function pointer
+                        LoadingHeapMgr.LevelHeapType m_levelheaptype;
+                    };
+
+                    struct PkgNameLookupHdr 0x30 {
+                        void* buckets;
+                        void* bitMaskWords;
+                        void* freeList;
+                        void* allocator;
+                        uint32_t bucketMask;
+                        uint32_t capacity @ 0x28;
+                        uint32_t size;
+                    };
+
+                    uint32_t m_freepackageslots;
+                    uint32_t m_allocationRingBufferSize;
+                    uint32_t m_field8;
+                    regenny.shared.corelib.memory.Context m_memcontext;
+                    LoadingHeapMgr.LevelHeapType m_levelheaptype @ 0x40;
+                    uint32_t m_field50 @ 0x50;
+                    uint64_t m_field60 @ 0x60;
+                    Package* m_packages; // array of Package
+                    uint64_t m_field70;
+                    PkgNameLookupHdr m_pakNameLookup;
+                    PkgNameLookupHdr m_nickNameLookup;
+                    uint32_t m_PackageWantedCount @ 0xe8;
+                    PackageProcessingInfo** m_packageinfos @ 0xf0; // array of PackageProcessingInfo
+                    uint64_t m_numPackagesAwaitingUnload @ 0x540;
+
+                } // package-mgr.cpp
+            }
+
         }
 
         // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\gamelib
         namespace gamelib {
+
+            // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\gamelib\level
+            namespace level {
+                struct DataLoading {
+                    struct Config 0x20 {
+                        uint32_t m_memsize;
+                        uint32_t m_freepackageslots;
+                        uint32_t m_field8;
+                        uint32_t m_fieldc;
+                        uint32_t m_field10;
+                        uint32_t m_field14;
+                        uint32_t m_field18;
+                        uint32_t m_field1c;
+                    };
+                };
+            };
 
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\gamelib\state-script
             namespace state_script {

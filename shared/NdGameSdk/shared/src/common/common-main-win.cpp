@@ -96,7 +96,7 @@ namespace NdGameSdk::common {
 
             }
             else {
-				spdlog::error("Failed to find all nessesary patterns for NdGame logging!");
+				spdlog::error("Failed to find all necessary patterns for NdGame logging!");
             }
 
 		});

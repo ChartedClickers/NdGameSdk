@@ -104,6 +104,9 @@ namespace NdGameSdk::game::player {
 	void __attribute__((naked)) GivePlayerWeapon_SubCC() {
 		__asm {
 			push rcx;
+			push rdi;
+			push r9;
+			push r8;
 			push r15;
 			push r14;
 			push rsi;
@@ -134,6 +137,9 @@ namespace NdGameSdk::game::player {
 			pop rsi;
 			pop r14;
 			pop r15;
+			pop r8;
+			pop r9;
+			pop rdi;
 			pop rcx;
 			jmp[rip + GiveMenuWeaponMain_SubSection_ReturnAddr];
 		}

@@ -60,8 +60,8 @@ namespace NdGameSdk {
 				return SdkModule->second;
 			}
 
-			throw SdkModuleException("Module " + get_module_name(ActionModule).value_or("UNKNOW") + "is not registered in SDK!",
-				SdkModuleException::ErrorCode::NotRegistered);
+                        throw SdkModuleException("Module " + get_module_name(ActionModule).value_or("UNKNOWN") + "is not registered in SDK!",
+                                SdkModuleException::ErrorCode::NotRegistered);
 		}
 
 		return nullptr;

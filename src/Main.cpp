@@ -24,7 +24,7 @@ BOOL Initialize(HMODULE dllModule) {
     HMODULE baseModule = GetModuleHandle(NULL);
     std::string moduleName = Utility::memory::get_module_name(baseModule).value();
     std::wstring exePath = Utility::memory::get_module_pathw(baseModule).value();
-    std::wstring VerProductName = Utility::memory::get_version_product_name(baseModule).value_or(L"UNKNOW");
+    std::wstring VerProductName = Utility::memory::get_version_product_name(baseModule).value_or(L"UNKNOWN");
 
     if (moduleName != std::string(GAME_MODULE_NAME) ||
         !Utils::Config::InitDefaultConfig()) {

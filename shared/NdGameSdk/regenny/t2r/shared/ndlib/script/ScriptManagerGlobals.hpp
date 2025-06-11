@@ -28,7 +28,7 @@ struct ScriptManagerGlobals {
     private: char pad_4a[0x2]; public:
     bool m_DumpStateScriptsonStackFrameHighWater; // 0x4c
     bool m_EnableScriptModuleCRC32Checks; // 0x4d
-    bool field_4e; // 0x4e
+    bool m_field4e; // 0x4e
     bool m_ValidateModuleSize; // 0x4f
     bool m_AssertonGlobalSymbolLookup; // 0x50
     bool m_EnableScripts; // 0x51

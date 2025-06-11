@@ -2,6 +2,7 @@
 
 #include "src/corelib/memory/memory.hpp"
 #include "src/ndlib/engine-components.hpp"
+#include "src/ndlib/io/package-mgr.hpp"
 #include "src/ndlib/script/script-manager.hpp"
 #include "src/ndlib/render/dev/debugdraw-common.hpp"
 #include "src/common/common-game-init.hpp"
@@ -22,6 +23,8 @@ namespace NdGameSdk {
 
 #if defined(T1X)
 		auto ParticleMgr = SharedComponents->AddComponent<gamelib::render::particle::ParticleManager>();
+#elif defined(T2R)
+		SharedComponents->AddComponent<ndlib::io::PackageManager>();
 #endif
 
 		SharedComponents->AddComponent<common::CommonGame>();

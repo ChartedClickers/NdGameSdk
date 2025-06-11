@@ -150,7 +150,8 @@ namespace NdGameSdk::ndlib::script {
             m_InitializeModuleIndexHook = Utility::MakeMidHook(InitializeModuleIndexJMP, ModuleIndexInitialized,
                 wstr(Patterns::ScriptManager_InitializeModuleIndexReturn), wstr(InitializeModuleIndexJMP));
 
-            if (!m_ScriptManagerInitHook) {
+            if (!m_ScriptManagerInitHook ||
+                !m_InitializeModuleIndexHook) {
                 throw SdkComponentEx{ "Failed to create hooks!", SdkComponentEx::ErrorCode::PatchFailed };
             }
 

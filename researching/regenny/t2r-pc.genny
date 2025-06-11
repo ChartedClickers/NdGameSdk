@@ -1337,29 +1337,56 @@ namespace regenny {
                         LoadingHeapMgr.LevelHeapType m_levelheaptype;
                     };
 
+                    struct PkgNameLookupEntry 0x38 {
+                        PkgNameLookupEntry* m_next;
+                        StringId64 m_key;
+                        StringId64 m_hash;
+                        uint64_t m_field20 @ 0x20;
+                        uint64_t m_field28;
+                        uint64_t m_capacity;
+                    };
+
                     struct PkgNameLookupHdr 0x30 {
-                        void* buckets;
-                        void* bitMaskWords;
-                        void* freeList;
+                        PkgNameLookupEntry** buckets;
+                        uint64_t* bitMask;
+                        PkgNameLookupEntry* freeList;
                         void* allocator;
                         uint32_t bucketMask;
                         uint32_t capacity @ 0x28;
                         uint32_t size;
                     };
 
+                    struct PackageWantLoad 0x18 {
+                        uint32_t m_requestcount;
+                        uint32_t m_needrequestcount;
+                        uint32_t m_field8;
+                        uint32_t m_fieldc;
+                        uint64_t m_field10;
+                    };
+
+
                     uint32_t m_freepackageslots;
                     uint32_t m_allocationRingBufferSize;
                     uint32_t m_field8;
                     regenny.shared.corelib.memory.Context m_memcontext;
                     LoadingHeapMgr.LevelHeapType m_levelheaptype @ 0x40;
-                    uint32_t m_field50 @ 0x50;
-                    uint64_t m_field60 @ 0x60;
+                    PackageWantLoad m_WantLoad @ 0x50;
                     Package* m_packages; // array of Package
                     uint64_t m_field70;
                     PkgNameLookupHdr m_pakNameLookup;
                     PkgNameLookupHdr m_nickNameLookup;
-                    uint32_t m_PackageWantedCount @ 0xe8;
-                    PackageProcessingInfo** m_packageinfos @ 0xf0; // array of PackageProcessingInfo
+                    uint32_t m_fielde0 @ 0xe0;
+                    uint32_t m_filede4;
+                    uint32_t m_PackageWantedCount;
+                    uint32_t m_filedec;
+                    PackageProcessingInfo** m_packageinfos; // array of PackageProcessingInfo
+                    uint32_t m_filed130 @ 0x130;
+                    uint32_t m_filed134;
+                    uint32_t m_PackageLogoutWanted;
+                    uint32_t m_filed13c;
+                    uint64_t m_filed140;
+                    uint32_t m_filed148;
+                    uint32_t m_filed14c;
                     uint64_t m_numPackagesAwaitingUnload @ 0x540;
 
                 } // package-mgr.cpp

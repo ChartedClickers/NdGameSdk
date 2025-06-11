@@ -42,4 +42,10 @@ namespace NdGameSdk::ndlib {
 	ndlib::NdFrameState& EngineComponents::GetNdFrameState() {
 		return *GetEngineComponent<ndlib::NdFrameState>(EngineComponent::NdFrameState);
 	}
+	
+#if defined(T2R)
+	ndlib::io::PackageMgr& EngineComponents::GetPackageMgr() {
+		return *GetEngineComponent<ndlib::io::PackageMgr>(EngineComponent::PackageMgr);
+	}
+#endif
 }

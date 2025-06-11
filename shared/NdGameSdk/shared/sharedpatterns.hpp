@@ -24,7 +24,6 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern SsManager_ErrorPrintF = { L"48 8d 05 ?? ?? ?? ?? 33 d2 4c 8d 05 ?? ?? ?? ?? 48 3b 08 75 03 48 89 10 48 83 c0 08 49 3b c0 7c ef c3", +0x70 };
 	static inline const SdkPattern ScriptManager_ErrorPrintF = { L"4d 8b cf 41 b8 ed 02 00 00 49 8b d6 48 8b cd c5 f8 77 e8 ?? ?? ?? ?? 90 c5 f8 77 48 8b 5c 24 60 48 8b 6c 24 68 48 8b 74 24 70 48 83 c4 40 41 5f 41 5e 5f c3", +0x3e };
 
-
 	static inline const SdkPattern Memory_AllocateMemoryMap = { L"48 83 ec 58 48 89 5c 24 60 48 89 6c 24 68 48 89 7c 24 50 4c 89 6c 24 40 4c 89 74 24 38 4c 8b f2 4c 63 e9 48 8d 15 ?? ?? ?? ?? 48 8d 0d ?? ?? ?? ?? 4c 89 7c 24 30", +0xaa };
 	static inline const SdkPattern Memory_ValidateContext = { L"4c 89 6c 24 28 4c 8d 0d ?? ?? ?? ?? 4c 8d 05 ?? ?? ?? ?? c7 44 24 20 27 00 00 00 48 8d", +0x30 };
 	static inline const SdkPattern Memory_ModifyMemoryMap = { L"48 89 5c 24 18 48 89 74 24 20 57 48 83 ec 30 48 b8 00 00 00 00 02 00 00 00 48 8b fa 8b f1 48 3b d0 0f 82 a9 00 00 00 48 89 6c 24 40" };
@@ -64,6 +63,9 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern ScriptManager_ModuleInfo_LookupDcEntry = { L"48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 57 48 83 ec 20 33 ed 48 89 51 10 49 8b d8 48 89 29 48 89 69 08 48 8b fa 48 89 59 18 48 8b f1 40 88 69 24 c7 41 20 ff ff ff ff" };
 	static inline const SdkPattern ScriptManager_ModuleInfo_FetchModule = { L"48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 48 89 7c 24 20 41 56 48 83 ec 40 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 38 48 8b d9 80 3d ?? ?? ?? ?? 00 75 07 b0 01 e9 ?? ?? ?? ?? 40 32 ed 33 f6 48 89 74 24 20 40 32" };
 	static inline const SdkPattern ScriptManager_ScriptModule_FetchScriptModuleEntry = { L"48 89 5c 24 08 44 8b 49 38 45 33 d2 41 83 e9 01 48 8b 59 40 4c 8b c2 78 ?? 0f 1f 80 00 00 00 00 43 8d 04 11 99 2b c2 d1 f8 48 63 c8 48 8d 14 49 4c 39" };
+
+	static inline const SdkPattern PackageManager_Init = { L"48 89 5c 24 10 48 89 74 24 18 48 89 7c 24 20 55 41 54 41 55 41 56 41 57 48 8d ac 24 ?? ?? ?? ?? 48 81 ec 70 02 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 85 60 01 00 00 48 8b fa 48 8b d9 48 81 c1 68 47 00 00 33 d2 41 b8 00 08 00" };
+	static inline const SdkPattern PackageManager_InitReturn = { L"e8 ?? ?? ?? ?? 48 8b 4b 68 49 03 cf e8 ?? ?? ?? ?? 48 8b 83 d8 00 00 00 89 34 b8 41 ff c6 44 3b 33 72 ?? 48 8b c6 48 87 05 ?? ?? ?? ?? 89 75 c8 48 8d 15 ?? ?? ?? ?? 48 8d 4d c8 e8 ?? ?? ?? ?? 48 8d 93 80 04 00 00 48 8d 4d c8 e8 ?? ?? ?? ?? 33 d2 48 8d 4d 18 e8 ?? ?? ?? ?? 48 8d 93 c0 04", +0xe9 };
 
 	static inline const SdkPattern NdDevMenu_GameConfig_DevMode = { L"41 0f b6 8c 24 13 3f 00 00 84 c9 0f 94 c2 84 c9 0f 95 c1", +0xb };
 	static inline const SdkPattern NdDevMenu_NdDevMenuAppend_Particles = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 40 48 8b f1 33 c9 e8 ?? ?? ?? ?? 84 c0 0f 84 9d" };

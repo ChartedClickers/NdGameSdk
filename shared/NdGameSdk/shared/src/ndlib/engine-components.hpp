@@ -17,6 +17,7 @@
 
 #include "nd-game-info.hpp"
 #include "nd-frame-state.hpp"
+#include "io/package-mgr.hpp"
 #include "nd-config.hpp"
 
 using EngineComponent = ::regenny::shared::ndlib::EngineComponents::Component;
@@ -29,6 +30,10 @@ namespace NdGameSdk::ndlib {
 
 		NdGameSdk_API ndlib::NdGameInfo& GetNdGameInfo();
 		NdGameSdk_API ndlib::NdFrameState& GetNdFrameState();
+
+#if defined(T2R)
+		NdGameSdk_API ndlib::io::PackageMgr& GetPackageMgr();
+#endif
 
 		template <typename TComponent>
 		NdGameSdk_API TComponent* GetEngineComponent(EngineComponent index) {

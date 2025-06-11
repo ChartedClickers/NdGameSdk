@@ -65,6 +65,11 @@ namespace NdGameSdk {
     class ISdkComponent {
     public:
         virtual ~ISdkComponent() = default;
+        
+        ISdkComponent(ISdkComponent const&) = delete;
+        ISdkComponent& operator=(ISdkComponent const&) = delete;
+        ISdkComponent(ISdkComponent&&) = delete;
+        ISdkComponent& operator=(ISdkComponent&&) = delete;
 
         virtual std::span<const std::type_index> Dependencies() const noexcept {
             static const std::array<std::type_index, 0> none{};

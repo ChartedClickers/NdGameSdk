@@ -498,7 +498,30 @@ namespace regenny {
             }
 
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib\system
-            namespace system {}
+            namespace system {
+
+                // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib\system\platform
+                namespace platform {
+
+                    class ndsys {
+                        class Mutex 0x40 {
+                            enum Type : uint32_t {
+                                MUTEX_RECURSIVE = 0x1
+                            };
+
+                            void* m_data;
+                            uint32_t m_threadID;
+                            uint32_t m_lockCount;
+                            Type m_type;
+                            bool m_initialized;
+                        } // mutex.h
+
+                        class ConditionVariable 0x20 {
+
+                        } // condition-variable.h
+                    }
+                }
+            }
 
         }
 
@@ -1141,7 +1164,8 @@ namespace regenny {
                         pso_preload = 0x2
                     }
                 } // loadingheap-mgr.cpp
-
+                
+                // 0x1b40 - t1x
                 struct Package 0x1b00 {
                 
                     enum PakItem : uint32_t
@@ -1255,7 +1279,8 @@ namespace regenny {
                         uint32_t m_hdrsizeleft;
                         uint32_t m_field40;
                         uint32_t m_field44;
-                        uint64_t m_field50 @ 0x50;
+                        uint64_t m_field48;
+                        uint64_t m_field50;
                         uint64_t m_field58;
                         uint64_t m_field60;
                         uint32_t m_field68;
@@ -1281,19 +1306,27 @@ namespace regenny {
                     uint64_t m_field8 @ 0x8;
                     uint64_t m_size;
                     uint32_t m_numAllocatedPages;
+                    uint32_t m_field1c;
                     LoadingHeapMgr.LevelHeapType m_levelheaptype @ 0x980;
                     uint64_t m_ChunkSize @ 0x988;
                     uint32_t m_hdrSize;
                     uint32_t m_pageCt;
                     uint32_t m_dataSize;
-                    void* m_Level @ 0x9b0;
+                    uint32_t m_field99c;
+                    uint32_t m_field9a0;
+                    uint32_t m_field9a4;
+                    uint64_t m_VirtualMemoryAddressRange;
+                    void* m_Level;
                     char m_packname[0x80] @ 0x9c8 [[utf8*]];
                     StringId64 m_packid @ 0xa48;
                     char m_packfilepath[0x80] + 0x1 [[utf8*]];
                     StringId64 m_packfilepathid @ 0xad8;
-                    Status m_status @ 0xaec;
+                    uint64_t m_fieldae0;
+                    uint32_t m_fieldae8;
+                    Status m_status;
                 } // package.cpp
 
+                // 0x1b8 - t1x
                 struct PackageProcessingInfo 0xad0 {
                     enum LoadingStatus : uint32_t {
                         LoadingPackageStatusUnused = 0x0,
@@ -1319,14 +1352,18 @@ namespace regenny {
 
                     Package* m_package;
                     LoadingStatus m_status;
+                    uint64_t m_NumAsyncReadOps @ 0x210;
+                    uint64_t m_handle;
+                    uint64_t m_ChunkSize @ 0x230;
+                    uint64_t m_fielda18 @ 0xa18;
                     Package.PakHeader m_pakHdr @ 0xa38;
 
                 } // package-mgr.cpp
 
                 struct PackageMgr 0x4f70 {
 
-                    // s_kMaxNumPackagesAwaitingUnload = 0x800;
-                    // s_kMaxSubPagesPerPackage = 0x258;
+                    // kMaxNumPackagesAwaitingUnload = 0x800;
+                    // kMaxSubPagesPerPackage = 0x258;
 
                     struct Configuration 0x50 { 
                         uint32_t m_freepackageslots;
@@ -1347,48 +1384,71 @@ namespace regenny {
                     };
 
                     struct PkgNameLookupHdr 0x30 {
-                        PkgNameLookupEntry** buckets;
-                        uint64_t* bitMask;
-                        PkgNameLookupEntry* freeList;
-                        void* allocator;
-                        uint32_t bucketMask;
-                        uint32_t capacity @ 0x28;
-                        uint32_t size;
+                        PkgNameLookupEntry** m_buckets;
+                        uint64_t* m_bitMask;
+                        PkgNameLookupEntry* m_freeList;
+                        void* m_allocator;
+                        uint32_t m_bucketMask;
+                        uint32_t m_capacity @ 0x28;
+                        uint32_t m_size;
                     };
 
-                    struct PackageWantLoad 0x18 {
-                        uint32_t m_requestcount;
-                        uint32_t m_needrequestcount;
-                        uint32_t m_field8;
-                        uint32_t m_fieldc;
-                        uint64_t m_field10;
+                    struct PackageRequest 0xa0 {
+                        uint64_t m_RequestType; // 0x0 - Login, 0x1 Logout
+                        StringId64 m_packid;
+                        char m_name[0x80] [[utf8*]];
+                        uint32_t m_field90;
+                        uint32_t m_field94;
+                        uint64_t m_Level;
                     };
 
+                    struct PackageRequestInfo 0x18 {
+                        uint32_t m_totalrequested;
+                        uint32_t m_overallrequested;
+                        uint32_t m_numPackagesRequested;
+                        uint32_t m_maxrequestlimit;
+                        PackageRequest* m_PackagesRequested;
+                    };
 
                     uint32_t m_freepackageslots;
                     uint32_t m_allocationRingBufferSize;
                     uint32_t m_field8;
                     regenny.shared.corelib.memory.Context m_memcontext;
-                    LoadingHeapMgr.LevelHeapType m_levelheaptype @ 0x40;
-                    PackageWantLoad m_WantLoad @ 0x50;
+                    void* m_field30 @ 0x30; // function pointer
+                    void* m_PackageLoginResFunc; // function pointer
+                    LoadingHeapMgr.LevelHeapType m_levelheaptype;
+                    uint32_t m_filed4c @ 0x4c;
+                    PackageRequestInfo m_RequestInfo;
                     Package* m_packages; // array of Package
                     uint64_t m_field70;
                     PkgNameLookupHdr m_pakNameLookup;
                     PkgNameLookupHdr m_nickNameLookup;
                     uint32_t m_fielde0 @ 0xe0;
                     uint32_t m_filede4;
-                    uint32_t m_PackageWantedCount;
+                    uint32_t m_LoadQueue;
                     uint32_t m_filedec;
                     PackageProcessingInfo** m_packageinfos; // array of PackageProcessingInfo
+                    uint32_t m_numPackagesAwaitingUpdate @ 0x100;
+                    uint32_t m_field104;
+                    uint64_t m_filed108;
                     uint32_t m_filed130 @ 0x130;
                     uint32_t m_filed134;
-                    uint32_t m_PackageLogoutWanted;
+                    uint32_t m_numPackagesAwaitingLoad;
                     uint32_t m_filed13c;
                     uint64_t m_filed140;
                     uint32_t m_filed148;
                     uint32_t m_filed14c;
-                    uint64_t m_numPackagesAwaitingUnload @ 0x540;
-
+                    regenny.shared.corelib.system.platform.ndsys.Mutex m_LoadingLock @ 0x480;
+                    regenny.shared.corelib.system.platform.ndsys.ConditionVariable m_ConditionVariable;
+                    regenny.shared.corelib.system.platform.ndsys.Mutex m_LoginLock;
+                    uint32_t m_field528 @ 0x528;
+                    uint32_t m_field52c;
+                    uint32_t m_field530;
+                    uint32_t m_field534;
+                    void* m_RingBuffer;
+                    uint64_t m_numPackagesAwaitingUnload;
+                    bool m_filed4761 @ 0x4761;
+                    bool m_field4762;
                 } // package-mgr.cpp
             }
 

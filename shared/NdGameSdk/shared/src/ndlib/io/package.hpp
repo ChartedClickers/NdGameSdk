@@ -1,12 +1,13 @@
 #pragma once
 
-
-
 #include "NdGameSdk/sdk.hpp"
 
 #if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/ndlib/io/Package.hpp>
 #endif
+
+#include <Utility/helper.hpp>
+#include <Utility/function_ptr.hpp>
 
 namespace NdGameSdk::ndlib::io {
 #if defined(T2R)
@@ -98,19 +99,44 @@ namespace NdGameSdk::ndlib::io {
             COLLISION_DATA_FOREGROUND = SID("COLLISION_DATA_FOREGROUND")
         };
 
-
-        class PakHeader : public ISdkRegenny<regenny::shared::ndlib::io::Package::PakHeader> {
-
-        };
+        class PakHeader : public ISdkRegenny<regenny::shared::ndlib::io::Package::PakHeader> {};
 
         class ResItem : public ISdkRegenny<regenny::shared::ndlib::io::Package::ResItem> {
 
+			const char* GetResourceName() const;
+
+            size_t GetPageSize() const;
+            uint32_t GetMaxResources() const;
+
+			StringId64 GetResourceId() const;
+			StringId64 GetResourceTypeId() const;
+
+            ItemId GetResourceType() const;
+
         };
 
+		size_t GetSize() const;
+		size_t GetHdrSize() const;
+        size_t GetDataSize() const;
+		uint32_t GetNumAllocatedPages() const;
+		uint32_t GetNumPages() const;
+
+		void* GetVirtualMemoryAddressRange() const;
+
+		const char* GetName() const;
+		const char* GetPackPath() const;
+
+		StringId64 GetPackId() const;
+		StringId64 GetPackPathId() const;
+
+		Status GetStatus() const;
 
         inline static constexpr uint32_t kMaxSubPagesPerPackage = 0x258;
         inline static constexpr uint32_t kMaxNameLength = 0x80;
 	};
+
+    TYPEDEF_EXTERN_FUNCTION_PTR(Package::PakItem, PackageMgr_Package_ResolvePakItem, Package::ItemId ItemId);
+    TYPEDEF_EXTERN_FUNCTION_PTR(const char*, PackageMgr_Package_GetStatusString, Package::Status status);
 
 	static_assert(sizeof(Package) == 0x1b00, "Package size mismatch");
 	static_assert(sizeof(Package::PakHeader) == 0x98, "Package::PakHeader size mismatch");

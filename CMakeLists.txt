@@ -540,6 +540,7 @@ set(T2RSDK_SOURCES
 	"shared/NdGameSdk/regenny/t2r/shared/corelib/memory/Context.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/corelib/memory/MapId.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/corelib/memory/MemoryMapEntry.hpp"
+	"shared/NdGameSdk/regenny/t2r/shared/corelib/system/platform/ndsys.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/corelib/util/MsgCon.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/corelib/util/NameCache.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/gamelib/level/DataLoading.hpp"

@@ -29,7 +29,14 @@ struct PackageProcessingInfo {
 
     regenny::shared::ndlib::io::Package* m_package; // 0x0
     LoadingStatus m_status; // 0x8
-    private: char pad_c[0xa2c]; public:
+    private: char pad_c[0x204]; public:
+    uint64_t m_NumAsyncReadOps; // 0x210
+    uint64_t m_handle; // 0x218
+    private: char pad_220[0x10]; public:
+    uint64_t m_ChunkSize; // 0x230
+    private: char pad_238[0x7e0]; public:
+    uint64_t m_fielda18; // 0xa18
+    private: char pad_a20[0x18]; public:
     regenny::shared::ndlib::io::Package::PakHeader m_pakHdr; // 0xa38
 }; // Size: 0xad0
 #pragma pack(pop)

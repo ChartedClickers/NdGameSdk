@@ -115,7 +115,7 @@ struct Package {
         uint32_t m_hdrsizeleft; // 0x3c
         uint32_t m_field40; // 0x40
         uint32_t m_field44; // 0x44
-        private: char pad_48[0x8]; public:
+        uint64_t m_field48; // 0x48
         uint64_t m_field50; // 0x50
         uint64_t m_field58; // 0x58
         uint64_t m_field60; // 0x60
@@ -145,14 +145,18 @@ struct Package {
     uint64_t m_field8; // 0x8
     uint64_t m_size; // 0x10
     uint32_t m_numAllocatedPages; // 0x18
-    private: char pad_1c[0x964]; public:
+    uint32_t m_field1c; // 0x1c
+    private: char pad_20[0x960]; public:
     regenny::shared::ndlib::io::LoadingHeapMgr::LevelHeapType m_levelheaptype; // 0x980
     private: char pad_984[0x4]; public:
     uint64_t m_ChunkSize; // 0x988
     uint32_t m_hdrSize; // 0x990
     uint32_t m_pageCt; // 0x994
     uint32_t m_dataSize; // 0x998
-    private: char pad_99c[0x14]; public:
+    uint32_t m_field99c; // 0x99c
+    uint32_t m_field9a0; // 0x9a0
+    uint32_t m_field9a4; // 0x9a4
+    uint64_t m_VirtualMemoryAddressRange; // 0x9a8
     void* m_Level; // 0x9b0
     private: char pad_9b8[0x10]; public:
     // Metadata: utf8*
@@ -163,7 +167,8 @@ struct Package {
     char m_packfilepath[128]; // 0xa51
     private: char pad_ad1[0x7]; public:
     StringId64 m_packfilepathid; // 0xad8
-    private: char pad_ae0[0xc]; public:
+    uint64_t m_fieldae0; // 0xae0
+    uint32_t m_fieldae8; // 0xae8
     Status m_status; // 0xaec
     private: char pad_aed[0x1013]; public:
 }; // Size: 0x1b00

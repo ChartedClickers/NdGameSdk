@@ -689,7 +689,7 @@ namespace regenny {
                         int m_PagePointer + 0x6; // Only with menu component?
                         int m_MaxPagePointers;
                         uint64_t m_ExtraArg;
-                    }
+                    };
                 
                     // DMENU::Menu | DMENU::ItemSubmenu
                     struct Menu : Component 0x30 {
@@ -698,8 +698,8 @@ namespace regenny {
                         uint64_t m_pad;
                         int m_MaxDisplayItems @ 0xcc;
                         uint64_t Unk[0x2];
-                    }
-                
+                    };
+
                     // DMENU::MenuGroup
                     struct MenuGroup : Component 0x280 {
                         Menu* m_RootMenu;
@@ -707,7 +707,7 @@ namespace regenny {
                         bool m_Rendering;
                         uint16_t Unk[0x3];
                         uint64_t Unk2[0x4d];
-                    }
+                    };
 
                     // DMENU::KeyBoard*
                     struct KeyBoard : Component 0x838 {
@@ -721,26 +721,26 @@ namespace regenny {
                         char m_displayBuffer[0x400] [[utf8*]]
                         char* m_inputBufferPtr [[utf8*]];
                         uint64_t m_maxInputLength;
-                    }
+                    };
                 
                     // DMENU::Item (class_Dmenu::Item_vfTable)
                     struct Item : Component 0x8  {
                         struct VTable : DMENU.Component.VTable 0x48 {}
                         void* m_callbackFunct;
-                    }
+                    };
 
                     // DMENU::ItemSubmenu
                     struct ItemSubmenu : Item 0x10  {
                         Menu* m_pHeader; // Entry Pointer
                         uint64_t Unk[0x1];
-                    }
+                    };
 
                     // DMENU::ItemBool
                     // Component.m_data - ValuePtr
                     struct ItemBool : Item 0x8 {
                         bool m_status;
                         bool m_pad[0x7];
-                     }
+                    };
 
                     // DMENU::ItemDecimal* 
                     // Component.m_data - ValuePtr
@@ -755,7 +755,7 @@ namespace regenny {
                         uint64_t m_DoubleStepValue [[i64]];
                         char m_StringDisplayValue[0x20] @ 0x140 [[utf8*]];
                         uint64_t Unk[0x4];
-                    } 
+                    };
 
                     // DMENU::ItemFloat
                     // Component.m_data - ValuePtr
@@ -770,14 +770,14 @@ namespace regenny {
                         float m_DoubleStepValue;
                         char m_StringDisplayValue[0x20] @ 0x123 [[utf8*]];
                         char Unk[0x1d];
-                    }
+                    };
 
                     // DMENU::ItemFunction 
                     struct ItemFunction : Item 0x10  {
                         void* unkData; // probably for link key->value
                         bool m_isActive @ 0xc1;
                         bool m_pad[0x6];
-                    }
+                    };
 
                     // DMENU::ItemSelection*
                     struct ItemSelection : Item 0x38  {
@@ -785,21 +785,21 @@ namespace regenny {
                         void* m_callbackFormat;
                         uint64_t Unk2[0x3];
                         void* m_SelectionStruct @ 0xe8;
-                    } 
+                    };
 
                     // DMENU::ItemSubText*
-                    struct ItemSubText : Item {}
+                    struct ItemSubText : Item {};
 
                     // DMENU::String*
-                    struct String : Component {}
+                    struct String : Component {};
 
                     // DMENU::ItemPlaceHolder
                     struct ItemPlaceHolder : Component 0x400 {
                         char m_placeholder[0x400] [[utf8*]];
-                    }
+                    };
 
                     // DMENU::ItemLine*
-                    struct ItemLine : Component {}
+                    struct ItemLine : Component {};
 
                     void* vftable;
                     bool m_Text2DropShadows +0x8
@@ -820,7 +820,7 @@ namespace regenny {
                     MenuGroup* m_DevMenu [[u64]]
                     MenuGroup* m_FavoritesMenu [[u64]]
                     uint64_t Unk2[0xbc];
-                }
+                };
 
             }
 
@@ -997,7 +997,7 @@ namespace regenny {
                     bool m_field3b;
                     bool m_field3c;
                     bool m_requested;
-                }
+                };
 
 
                 // ScriptManager::ModuleInfo::Constructor
@@ -1018,7 +1018,7 @@ namespace regenny {
                     bool m_IsLocal;
                     bool m_DebugModule;
                     bool m_isLoaded;
-                }
+                };
 
                 struct LookupDcEntry 0x28 {
                     void* m_entryPtr; // DC::Entry.m_entryPtr
@@ -1270,8 +1270,8 @@ namespace regenny {
                         uint32_t m_numPointerFixUpPages;
                         uint32_t m_pointerFixUpTableOffset;
                         uint32_t m_dataSize;
-                        uint32_t m_field24;
-                        uint32_t m_field28;
+                        uint32_t m_LoginTableIdx;
+                        uint32_t m_VramTableOffset;
                         uint32_t m_field2c;
                         uint32_t m_field30;
                         uint32_t m_field34;
@@ -1302,6 +1302,10 @@ namespace regenny {
                         uint32_t m_MaxResources @ 0x30; // max number of resources in this package
                     };
 
+                    struct PakVramItemTable 0x10 {
+                        uint32_t m_nItems; // number of VRAM_DESC in the table
+                        ResItem* m_items @ 0x8; // array of abstract base class
+                    };
 
                     uint64_t m_field8 @ 0x8;
                     uint64_t m_size;
@@ -1321,7 +1325,7 @@ namespace regenny {
                     StringId64 m_packid @ 0xa48;
                     char m_packfilepath[0x80] + 0x1 [[utf8*]];
                     StringId64 m_packfilepathid @ 0xad8;
-                    uint64_t m_fieldae0;
+                    PakVramItemTable* m_VramItemTable;
                     uint32_t m_fieldae8;
                     Status m_status;
                 } // package.cpp
@@ -1370,7 +1374,7 @@ namespace regenny {
                         uint32_t m_allocationRingBufferSize;
                         regenny.shared.corelib.memory.Context m_memcontext @ 0xc;
                         void* m_GetGameFrameNumber @ 0x20; // function pointer
-                        uint64_t* m_PackageLoginResFunc @ 0x38; // function pointer
+                        uint64_t* m_PackageLoginResFuncs @ 0x38; // functions pointer
                         LoadingHeapMgr.LevelHeapType m_levelheaptype;
                     };
 
@@ -1407,7 +1411,7 @@ namespace regenny {
                         uint32_t m_overallrequested;
                         uint32_t m_numPackagesRequested;
                         uint32_t m_maxrequestlimit;
-                        PackageRequest* m_PackagesRequested;
+                        PackageRequest* m_PackagesRequested; // array of PackageRequest
                     };
 
                     uint32_t m_freepackageslots;
@@ -1415,7 +1419,7 @@ namespace regenny {
                     uint32_t m_field8;
                     regenny.shared.corelib.memory.Context m_memcontext;
                     void* m_field30 @ 0x30; // function pointer
-                    void* m_PackageLoginResFunc; // function pointer
+                    void* m_PackageLoginResFuncs; // functions pointer
                     LoadingHeapMgr.LevelHeapType m_levelheaptype;
                     uint32_t m_filed4c @ 0x4c;
                     PackageRequestInfo m_RequestInfo;
@@ -1433,7 +1437,7 @@ namespace regenny {
                     uint64_t m_filed108;
                     uint32_t m_filed130 @ 0x130;
                     uint32_t m_filed134;
-                    uint32_t m_numPackagesAwaitingLoad;
+                    uint32_t m_numPackagesAwaitingLogout;
                     uint32_t m_filed13c;
                     uint64_t m_filed140;
                     uint32_t m_filed148;

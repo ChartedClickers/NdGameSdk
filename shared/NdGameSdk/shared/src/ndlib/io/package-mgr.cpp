@@ -37,6 +37,90 @@ namespace NdGameSdk::ndlib::io {
 					SdkComponentEx::ErrorCode::PatternFailed };
 			}
 
+            findpattern = Patterns::PackageMgr_GetPackageById;
+            PackageMgr_GetPackageById = (PackageMgr_GetPackageById_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::PackageMgr_GetPackageById), findpattern.offset);
+
+            findpattern = Patterns::PackageMgr_GetPackageStatusById;
+            PackageMgr_GetPackageStatusById = (PackageMgr_GetPackageStatusById_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::PackageMgr_GetPackageStatusById), findpattern.offset);
+
+            findpattern = Patterns::PackageMgr_GetPackageByIndex;
+            PackageMgr_GetPackageByIndex = (PackageMgr_GetPackageByIndex_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::PackageMgr_GetPackageByIndex), findpattern.offset);
+
+            findpattern = Patterns::PackageMgr_UpdatePackageStatus;
+            PackageMgr_UpdatePackageStatus = (PackageMgr_UpdatePackageStatus_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::PackageMgr_UpdatePackageStatus), findpattern.offset);
+
+            findpattern = Patterns::PackageMgr_SetPackageStatus;
+            PackageMgr_SetPackageStatus = (PackageMgr_SetPackageStatus_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::PackageMgr_SetPackageStatus), findpattern.offset);
+
+            findpattern = Patterns::PackageMgr_PreparePackageForLoading;
+            PackageMgr_PreparePackageForLoading = (PackageMgr_PreparePackageForLoading_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::PackageMgr_PreparePackageForLoading), findpattern.offset);
+
+            findpattern = Patterns::PackageMgr_LogoutPackage;
+            PackageMgr_LogoutPackage = (PackageMgr_LogoutPackage_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::PackageMgr_LogoutPackage), findpattern.offset);
+
+            findpattern = Patterns::PackageMgr_PackageLoginResItem;
+            PackageMgr_PackageLoginResItem = (PackageMgr_PackageLoginResItem_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::PackageMgr_PackageLoginResItem), findpattern.offset);
+
+            findpattern = Patterns::PackageMgr_PackageQueuesIdle;
+            PackageMgr_PackageQueuesIdle = (PackageMgr_PackageQueuesIdle_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::PackageMgr_PackageQueuesIdle), findpattern.offset);
+
+            findpattern = Patterns::PackageMgr_RequestLoadPackage;
+            PackageMgr_RequestLoadPackage = (PackageMgr_RequestLoadPackage_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::PackageMgr_RequestLoadPackage), findpattern.offset);
+
+            findpattern = Patterns::PackageMgr_RequestLogoutPackage;
+            PackageMgr_RequestLogoutPackage = (PackageMgr_RequestLogoutPackage_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::PackageMgr_RequestLogoutPackage), findpattern.offset);
+
+            findpattern = Patterns::PackageMgr_RequestReloadPackage;
+            PackageMgr_RequestReloadPackage = (PackageMgr_RequestReloadPackage_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::PackageMgr_RequestReloadPackage), findpattern.offset);
+
+            findpattern = Patterns::PackageMgr_AddRequest;
+            PackageMgr_AddRequest = (PackageMgr_AddRequest_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::PackageMgr_AddRequest), findpattern.offset);
+
+			findpattern = Patterns::PackageMgr_PackageProcessingInfo_GetStatusString;
+			PackageMgr_PackageProcessingInfo_GetStatusString = (PackageMgr_PackageProcessingInfo_GetStatusString_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::PackageMgr_PackageProcessingInfo_GetStatusString), findpattern.offset);
+
+			findpattern = Patterns::PackageMgr_Package_ResolvePakItem;
+			PackageMgr_Package_ResolvePakItem = (PackageMgr_Package_ResolvePakItem_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::PackageMgr_Package_ResolvePakItem), findpattern.offset);
+
+			findpattern = Patterns::PackageMgr_Package_GetStatusString;
+			PackageMgr_Package_GetStatusString = (PackageMgr_Package_GetStatusString_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::PackageMgr_Package_GetStatusString), findpattern.offset);
+
+			if(!PackageMgr_GetPackageById ||
+				!PackageMgr_GetPackageStatusById ||
+				!PackageMgr_GetPackageByIndex ||
+				!PackageMgr_UpdatePackageStatus ||
+				!PackageMgr_SetPackageStatus ||
+				!PackageMgr_PreparePackageForLoading ||
+				!PackageMgr_LogoutPackage ||
+				!PackageMgr_PackageLoginResItem ||
+				!PackageMgr_PackageQueuesIdle ||
+				!PackageMgr_RequestLoadPackage ||
+				!PackageMgr_RequestLogoutPackage ||
+				!PackageMgr_RequestReloadPackage ||
+				!PackageMgr_AddRequest ||
+				!PackageMgr_PackageProcessingInfo_GetStatusString ||
+				!PackageMgr_Package_ResolvePakItem ||
+				!PackageMgr_Package_GetStatusString
+			) {
+				throw SdkComponentEx{ std::format("Failed to find {}:: game functions!", GetName()), SdkComponentEx::ErrorCode::PatternFailed };
+			}
+
 			m_PackageMgrInitHook = Utility::MakeSafetyHookInline(PackageMgrInit, Init,
 				wstr(Patterns::PackageMgr_Init), wstr(PackageManager::Init));
 
@@ -69,7 +153,7 @@ namespace NdGameSdk::ndlib::io {
 		auto PackageMgr = GetPackageMgr();
 		return PackageMgr->GetPackageRequestInfo().GetNumRequests() <= 0 &&
 			PackageMgr->GetProcessingCount() <= 0 &&
-			PackageMgr->GetNumAwaitingLoad() <= 0 &&
+			PackageMgr->GetNumAwaitingLogout() <= 0 &&
 			PackageMgr->GetNumAwaitingUpdate() <= 0 &&
 			PackageMgr->GetNumAwaitingUnload() <= 0;
 	#endif
@@ -148,10 +232,26 @@ namespace NdGameSdk::ndlib::io {
 
 	bool PackageManager::TestFunct(DMENU::ItemFunction& pFunction, DMENU::Message pMessage) {
 		if (pMessage == DMENU::Message::OnExecute) {
-			auto PackageMgrSdkComponent = reinterpret_cast<PackageManager*>(pFunction.Data());
-			if (PackageMgrSdkComponent) {
+			auto PackageMgr = reinterpret_cast<PackageManager*>(pFunction.Data());
+			if (PackageMgr) {
 				spdlog::info("TestFunct called!");
-				auto PackageMgr = PackageMgrSdkComponent->GetPackageMgr();
+
+				const char* packageName = "anim-dina-tired";
+
+				if (!PackageMgr->GetPackageById(SID(packageName))) {
+					spdlog::info("Package '{}' not found, requesting load...", packageName);
+					if (PackageMgr->RequestLoadPackage(packageName)) {
+						spdlog::info("Load request for package '{}' sent successfully.", packageName);
+					}
+					else {
+						spdlog::error("Failed to send load request for package '{}'.", packageName);
+					}
+				}
+				else {
+					spdlog::info("Package '{}' is already loaded.", packageName);
+					PackageMgr->RequestLogoutPackage(SID(packageName));
+					spdlog::info("Logout request for package '{}' sent successfully.", packageName);
+				}
 
 				return true;
 			}
@@ -204,8 +304,8 @@ namespace NdGameSdk::ndlib::io {
 		return this->Get()->m_LoadQueue;
 	}
 
-	uint64_t PackageMgr::GetNumAwaitingLoad() const {
-		return this->Get()->m_numPackagesAwaitingLoad;
+	uint64_t PackageMgr::GetNumAwaitingLogout() const {
+		return this->Get()->m_numPackagesAwaitingLogout;
 	}
 
 	uint64_t PackageMgr::GetNumAwaitingUpdate() const {

@@ -78,7 +78,7 @@ namespace NdGameSdk::ndlib::io {
 		int GetFreePackageSlots() const;
 		int GetAllocationRingBufferSize() const;
 		int GetProcessingCount() const;
-		uint64_t GetNumAwaitingLoad() const;
+		uint64_t GetNumAwaitingLogout() const;
 		uint64_t GetNumAwaitingUpdate() const;
 		uint64_t GetNumAwaitingUnload() const;
 		Memory::Context& GetMemoryContext() const;

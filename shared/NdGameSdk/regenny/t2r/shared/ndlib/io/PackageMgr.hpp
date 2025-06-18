@@ -93,7 +93,7 @@ struct PackageMgr {
     private: char pad_110[0x20]; public:
     uint32_t m_filed130; // 0x130
     uint32_t m_filed134; // 0x134
-    uint32_t m_numPackagesAwaitingLoad; // 0x138
+    uint32_t m_numPackagesAwaitingLogout; // 0x138
     uint32_t m_filed13c; // 0x13c
     uint64_t m_filed140; // 0x140
     uint32_t m_filed148; // 0x148

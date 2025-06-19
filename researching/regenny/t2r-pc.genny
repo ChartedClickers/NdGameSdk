@@ -36,6 +36,10 @@ namespace regenny {
         }
 
         namespace gamelib {
+            namespace level {
+                struct Level{};
+            }
+
             namespace state_script {
                 struct ScriptCFuncContext{};
             }
@@ -1260,7 +1264,7 @@ namespace regenny {
                         PackageStatusUnloading = 0x5
                     };
 
-                    struct PakHeader 0x98 {
+                    struct PakHeader 0x40 {
                         uint32_t m_magic;
                         uint32_t m_hdrSize;
                         uint32_t m_pakLoginTableIdx;
@@ -1277,14 +1281,6 @@ namespace regenny {
                         uint32_t m_field34;
                         uint32_t m_field38;
                         uint32_t m_hdrsizeleft;
-                        uint32_t m_field40;
-                        uint32_t m_field44;
-                        uint64_t m_field48;
-                        uint64_t m_field50;
-                        uint64_t m_field58;
-                        uint64_t m_field60;
-                        uint32_t m_field68;
-                        uint32_t m_LoggedResourcesCounter;
                     };
 
                     struct PakPageEntry 0xc {
@@ -1320,7 +1316,7 @@ namespace regenny {
                     uint32_t m_field9a0;
                     uint32_t m_field9a4;
                     uint64_t m_VirtualMemoryAddressRange;
-                    void* m_Level;
+                    gamelib.level.Level* m_Level;
                     char m_packname[0x80] @ 0x9c8 [[utf8*]];
                     StringId64 m_packid @ 0xa48;
                     char m_packfilepath[0x80] + 0x1 [[utf8*]];
@@ -1361,6 +1357,14 @@ namespace regenny {
                     uint64_t m_ChunkSize @ 0x230;
                     uint64_t m_fielda18 @ 0xa18;
                     Package.PakHeader m_pakHdr @ 0xa38;
+                    uint32_t m_field78;
+                    uint32_t m_field7c;
+                    uint64_t m_field80;
+                    uint64_t m_field88;
+                    uint64_t m_field90;
+                    uint64_t m_field98;
+                    uint32_t m_fielda0;
+                    uint32_t m_LoggedResourcesCounter;
 
                 } // package-mgr.cpp
 
@@ -1403,7 +1407,7 @@ namespace regenny {
                         char m_name[0x80] [[utf8*]];
                         uint32_t m_field90;
                         uint32_t m_field94;
-                        uint64_t m_Level;
+                        gamelib.level.Level* m_Level;
                     };
 
                     struct PackageRequestInfo 0x18 {
@@ -1441,7 +1445,7 @@ namespace regenny {
                     uint32_t m_filed13c;
                     uint64_t m_filed140;
                     uint32_t m_filed148;
-                    uint32_t m_filed14c;
+                    bool m_forceReleaseVirtualMemory; // Force reload package from disk
                     regenny.shared.corelib.system.platform.ndsys.Mutex m_LoadingLock @ 0x480;
                     regenny.shared.corelib.system.platform.ndsys.ConditionVariable m_ConditionVariable;
                     regenny.shared.corelib.system.platform.ndsys.Mutex m_LoginLock;
@@ -1463,6 +1467,7 @@ namespace regenny {
 
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\gamelib\level
             namespace level {
+
                 struct DataLoading {
                     struct Config 0x20 {
                         uint32_t m_memsize;
@@ -1475,6 +1480,36 @@ namespace regenny {
                         uint32_t m_field1c;
                     };
                 };
+
+                // Not Researched (placeholder yet)
+                struct LevelMgr 0x481f20 {
+
+                    struct Configuration 0x10 {
+                        uint32_t m_field0;
+                        uint32_t m_field4;
+                        uint32_t m_field8;
+                        uint32_t m_fieldc;
+                    };
+
+                    corelib.containers.FixedSizeHeap m_heap; // possibly for levels
+                    void* m_field60 @ 0x60;  
+                }; // level-mgr.cpp
+                
+                // Not Researched (placeholder yet)
+                struct Level 0xac0 {
+                    char* m_PackageName @ 0x48 [[utf8*]];
+                    StringId64 m_PackageId;
+                    void* m_pFgGeometry @ 0xf8;
+                    void* m_pEntitySpawners
+                    void* m_pEntitySpawners;
+                    void* m_field108;
+                    void* m_field110;
+                    void* m_ppLightTables;
+                    void* m_field120;
+                    void* m_field128;
+                    void* m_pBackground;
+                }; // level.cpp
+
             };
 
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\gamelib\state-script

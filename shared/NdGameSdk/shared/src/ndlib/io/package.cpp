@@ -26,6 +26,10 @@ namespace NdGameSdk::ndlib::io {
 		return reinterpret_cast<void*>(this->Get()->m_VirtualMemoryAddressRange);
 	}
 
+	Level* Package::GetLevel() const {
+		return reinterpret_cast<Level*>(this->Get()->m_Level);
+	}
+
 	const char* Package::GetName() const {
 		return this->Get()->m_packname;
 	}
@@ -44,6 +48,34 @@ namespace NdGameSdk::ndlib::io {
 
 	Package::Status Package::GetStatus() const {
 		return this->Get()->m_status;
+	}
+
+	std::string Package::GetStatusString() {
+		return GetStatusString(this->GetStatus());
+	}
+
+	std::string Package::GetStatusString(Status status) {
+	#if defined(T2R) || defined(T1X)
+		always_assert(PackageMgr_Package_GetStatusString == nullptr, "Function pointer was not set!");
+		return PackageMgr_Package_GetStatusString(status);
+	#else
+		switch (status) {
+		case Status::PackageStatusUnused:
+			return "Unused";
+		case Status::PackageStatusInvalid:
+			return "Invalid";
+		case Status::PackageStatusFailedOptionalFile:
+			return "FailedOptionalFile";
+		case Status::PackageStatusLoading:
+			return "Loading";
+		case Status::PackageStatusLoaded:
+			return "Loaded";
+		case Status::PackageStatusUnloading:
+			return "Unloading";
+		default:
+			return "Unknown";
+		}
+	#endif
 	}
 
 	const char* Package::ResItem::GetResourceName() const {

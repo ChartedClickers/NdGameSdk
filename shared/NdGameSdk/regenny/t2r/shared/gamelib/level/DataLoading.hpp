@@ -1,9 +1,14 @@
 #pragma once
 #include <NdGameSdk/components/SdkRegenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
+#include "..\..\ndlib\io\Package.hpp"
 namespace regenny::shared::gamelib::level {
 #pragma pack(push, 1)
 struct DataLoading {
+    struct PackageDataLoadingVTable {
+        virtual bool PackageLoginResItem(regenny::shared::ndlib::io::Package* pPackage, regenny::shared::ndlib::io::Package::ResItem* pResItem) = 0;
+    }; // Size: 0x8
+
     struct Config {
         uint32_t m_memsize; // 0x0
         uint32_t m_freepackageslots; // 0x4

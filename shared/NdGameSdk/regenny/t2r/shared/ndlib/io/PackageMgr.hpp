@@ -3,12 +3,16 @@
 #include <NdGameSdk/sdkstringid.hpp>
 #include "..\..\corelib\memory\Context.hpp"
 #include "..\..\corelib\system\platform\ndsys.hpp"
+#include "..\..\gamelib\level\DataLoading.hpp"
 #include "LoadingHeapMgr.hpp"
 namespace regenny::shared::ndlib::io {
 struct Package;
 }
 namespace regenny::shared::ndlib::io {
 struct PackageProcessingInfo;
+}
+namespace regenny::shared::gamelib::level {
+struct Level;
 }
 namespace regenny::shared::ndlib::io {
 #pragma pack(push, 1)
@@ -21,7 +25,7 @@ struct PackageMgr {
         private: char pad_10[0x10]; public:
         void* m_GetGameFrameNumber; // 0x20
         private: char pad_28[0x10]; public:
-        uint64_t* m_PackageLoginResFunc; // 0x38
+        uint64_t* m_PackageLoginResFuncs; // 0x38
         regenny::shared::ndlib::io::LoadingHeapMgr::LevelHeapType m_levelheaptype; // 0x40
         private: char pad_44[0xc]; public:
     }; // Size: 0x50
@@ -48,13 +52,19 @@ struct PackageMgr {
     }; // Size: 0x30
 
     struct PackageRequest {
-        uint64_t m_RequestType; // 0x0
+        enum RequestType : uint32_t {
+            Login = 0,
+            Logout = 1,
+        };
+
+        RequestType m_RequestType; // 0x0
+        private: char pad_4[0x4]; public:
         StringId64 m_packid; // 0x8
         // Metadata: utf8*
         char m_name[128]; // 0x10
         uint32_t m_field90; // 0x90
         uint32_t m_field94; // 0x94
-        uint64_t m_Level; // 0x98
+        regenny::shared::gamelib::level::Level* m_Level; // 0x98
     }; // Size: 0xa0
 
     struct PackageRequestInfo {
@@ -71,7 +81,7 @@ struct PackageMgr {
     regenny::shared::corelib::memory::Context m_memcontext; // 0xc
     private: char pad_10[0x20]; public:
     void* m_field30; // 0x30
-    void* m_PackageLoginResFunc; // 0x38
+    regenny::shared::gamelib::level::DataLoading::PackageDataLoadingVTable* m_PackageLoginResFuncs; // 0x38
     regenny::shared::ndlib::io::LoadingHeapMgr::LevelHeapType m_levelheaptype; // 0x40
     private: char pad_44[0x8]; public:
     uint32_t m_filed4c; // 0x4c
@@ -97,8 +107,8 @@ struct PackageMgr {
     uint32_t m_filed13c; // 0x13c
     uint64_t m_filed140; // 0x140
     uint32_t m_filed148; // 0x148
-    uint32_t m_filed14c; // 0x14c
-    private: char pad_150[0x330]; public:
+    bool m_forceReleaseVirtualMemory; // 0x14c
+    private: char pad_14d[0x333]; public:
     regenny::shared::corelib::system::platform::ndsys::Mutex m_LoadingLock; // 0x480
     regenny::shared::corelib::system::platform::ndsys::ConditionVariable m_ConditionVariable; // 0x4c0
     regenny::shared::corelib::system::platform::ndsys::Mutex m_LoginLock; // 0x4e0

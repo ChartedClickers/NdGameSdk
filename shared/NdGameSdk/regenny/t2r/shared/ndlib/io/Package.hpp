@@ -2,6 +2,9 @@
 #include <NdGameSdk/components/SdkRegenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
 #include "LoadingHeapMgr.hpp"
+namespace regenny::shared::gamelib::level {
+struct Level;
+}
 namespace regenny::shared::ndlib::io {
 #pragma pack(push, 1)
 struct Package {
@@ -106,23 +109,14 @@ struct Package {
         uint32_t m_numPointerFixUpPages; // 0x18
         uint32_t m_pointerFixUpTableOffset; // 0x1c
         uint32_t m_dataSize; // 0x20
-        uint32_t m_field24; // 0x24
-        uint32_t m_field28; // 0x28
+        uint32_t m_LoginTableIdx; // 0x24
+        uint32_t m_VramTableOffset; // 0x28
         uint32_t m_field2c; // 0x2c
         uint32_t m_field30; // 0x30
         uint32_t m_field34; // 0x34
         uint32_t m_field38; // 0x38
         uint32_t m_hdrsizeleft; // 0x3c
-        uint32_t m_field40; // 0x40
-        uint32_t m_field44; // 0x44
-        uint64_t m_field48; // 0x48
-        uint64_t m_field50; // 0x50
-        uint64_t m_field58; // 0x58
-        uint64_t m_field60; // 0x60
-        uint32_t m_field68; // 0x68
-        uint32_t m_LoggedResourcesCounter; // 0x6c
-        private: char pad_70[0x28]; public:
-    }; // Size: 0x98
+    }; // Size: 0x40
 
     struct PakPageEntry {
         uint32_t m_resPageOffset; // 0x0
@@ -141,6 +135,12 @@ struct Package {
         uint32_t m_MaxResources; // 0x30
     }; // Size: 0x34
 
+    struct PakVramItemTable {
+        uint32_t m_nVramItems; // 0x0
+        private: char pad_4[0x4]; public:
+        regenny::shared::ndlib::io::Package::ResItem* m_items; // 0x8
+    }; // Size: 0x10
+
     private: char pad_0[0x8]; public:
     uint64_t m_field8; // 0x8
     uint64_t m_size; // 0x10
@@ -157,7 +157,7 @@ struct Package {
     uint32_t m_field9a0; // 0x9a0
     uint32_t m_field9a4; // 0x9a4
     uint64_t m_VirtualMemoryAddressRange; // 0x9a8
-    void* m_Level; // 0x9b0
+    regenny::shared::gamelib::level::Level* m_Level; // 0x9b0
     private: char pad_9b8[0x10]; public:
     // Metadata: utf8*
     char m_packname[128]; // 0x9c8
@@ -167,7 +167,7 @@ struct Package {
     char m_packfilepath[128]; // 0xa51
     private: char pad_ad1[0x7]; public:
     StringId64 m_packfilepathid; // 0xad8
-    uint64_t m_fieldae0; // 0xae0
+    PakVramItemTable* m_VramItemTable; // 0xae0
     uint32_t m_fieldae8; // 0xae8
     Status m_status; // 0xaec
     private: char pad_aed[0x1013]; public:

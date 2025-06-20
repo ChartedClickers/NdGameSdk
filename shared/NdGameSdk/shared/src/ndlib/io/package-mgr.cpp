@@ -65,10 +65,6 @@ namespace NdGameSdk::ndlib::io {
             PackageMgr_LogoutPackage = (PackageMgr_LogoutPackage_ptr)Utility::FindAndPrintPattern(module,
                 findpattern.pattern, wstr(Patterns::PackageMgr_LogoutPackage), findpattern.offset);
 
-            findpattern = Patterns::PackageMgr_PackageLoginResItem;
-            PackageMgr_PackageLoginResItem = (PackageMgr_PackageLoginResItem_ptr)Utility::FindAndPrintPattern(module,
-                findpattern.pattern, wstr(Patterns::PackageMgr_PackageLoginResItem), findpattern.offset);
-
             findpattern = Patterns::PackageMgr_PackageQueuesIdle;
             PackageMgr_PackageQueuesIdle = (PackageMgr_PackageQueuesIdle_ptr)Utility::FindAndPrintPattern(module,
                 findpattern.pattern, wstr(Patterns::PackageMgr_PackageQueuesIdle), findpattern.offset);
@@ -108,7 +104,6 @@ namespace NdGameSdk::ndlib::io {
 				!PackageMgr_SetPackageStatus ||
 				!PackageMgr_PreparePackageForLoading ||
 				!PackageMgr_LogoutPackage ||
-				!PackageMgr_PackageLoginResItem ||
 				!PackageMgr_PackageQueuesIdle ||
 				!PackageMgr_RequestLoadPackage ||
 				!PackageMgr_RequestLogoutPackage ||
@@ -159,17 +154,17 @@ namespace NdGameSdk::ndlib::io {
 	#endif
 	}
 
-	bool PackageManager::RequestLoadPackage(const char* pPackageName) {
+	bool PackageManager::RequestLoadPackage(const char* pPackageName, Level* pLevel) {
 	#if defined(T2R) || defined(T1X)
 		always_assert(PackageMgr_RequestLoadPackage == nullptr, "Function pointer was not set!");
-		PackageMgr_RequestLoadPackage(GetPackageMgr(), pPackageName, 0x0, 0x0, 0x0);
+		PackageMgr_RequestLoadPackage(GetPackageMgr(), pPackageName, pLevel, 0x0, 0x0);
 		return true;
 	#else
 		PackageMgr::PackageRequest packageRequest {
-			0,
+			PackageMgr::PackageRequest::RequestType::Login,
 			SID(pPackageName),
 			pPackageName,
-			0x0
+			pLevel
 		};
 
 		return AddPackageRequest(&packageRequest);
@@ -185,10 +180,10 @@ namespace NdGameSdk::ndlib::io {
 		auto pPackage = GetPackageById(pPackId);
 		if (pPackage) {
 			PackageMgr::PackageRequest packageRequest{
-				0x1,
+				PackageMgr::PackageRequest::RequestType::Logout,
 				pPackage->GetPackId(),
 				pPackage->GetName(),
-				0x0
+				nullptr
 			};
 			return AddPackageRequest(&packageRequest);
 		}
@@ -205,7 +200,7 @@ namespace NdGameSdk::ndlib::io {
 		auto pPackage = GetPackageById(pPackId);
 		if (pPackage) {
 			PackageMgr::PackageRequest packageRequest{
-				0x1,
+				PackageMgr::PackageRequest::RequestType::Logout,
 				pPackage->GetPackId(),
 				pPackage->GetName(),
 				0x0
@@ -214,10 +209,10 @@ namespace NdGameSdk::ndlib::io {
 			AddPackageRequest(&packageRequest);
 
 			PackageMgr::PackageRequest packageRequest{
-				0x0,
+				PackageMgr::PackageRequest::RequestType::Login,
 				pPackage->GetPackId(),
 				pPackage->GetName(),
-				(uint64_t)pPackage->Get()->m_Level
+				pPackage->GetLevel()
 			};
 
 			AddPackageRequest(&packageRequest);
@@ -259,9 +254,64 @@ namespace NdGameSdk::ndlib::io {
 		return true;
 	}
 
+	bool PackageManager::TestFunct2(DMENU::ItemFunction& pFunction, DMENU::Message pMessage) {
+		if (pMessage == DMENU::Message::OnExecute) {
+			auto PackageMgr = reinterpret_cast<PackageManager*>(pFunction.Data());
+			if (PackageMgr) {
+				spdlog::info("TestFunct2 called!");
+
+				const char* packageName = "anim-dina-tired";
+
+				auto pPackage = PackageMgr->GetPackageById(SID(packageName));
+
+				if (pPackage) {
+					spdlog::info("Package '{}' found, fetching processing info...", packageName);
+					auto pProcessingInfo = PackageMgr->FetchPackageProcessingInfo(pPackage);
+					if (pProcessingInfo) {
+						spdlog::info("Processing info for package '{}': Status = {}", packageName, pProcessingInfo->GetStatusString());
+					}
+					else {
+						spdlog::error("Failed to fetch processing info for package '{}'.", packageName);
+					}
+				}
+				else {
+					spdlog::error("Package '{}' not found.", packageName);
+				}
+
+				return true;
+			}
+		}
+		return true;
+	}
+
 	Package* PackageManager::GetPackageById(StringId64 PackId) {
 		always_assert(PackageMgr_GetPackageById == nullptr, "Function pointer was not set!");
 		return PackageMgr_GetPackageById(GetPackageMgr(), PackId);
+	}
+
+	PackageProcessingInfo* PackageManager::FetchPackageProcessingInfo(Package* pPackage) {
+		if (!pPackage)
+			return nullptr;
+
+		auto PackageMgr = GetPackageMgr();
+
+		PackageProcessingInfo** ppBase = PackageMgr->GetProcessingArray();
+		int used = PackageMgr->GetProcessingCount();
+		int capacity = PackageMgr->GetFreePackageSlots();
+
+		for (std::size_t i = 0; i < used; ++i) {
+			auto* info = ppBase[i];
+			if (info && info->GetPackage() == pPackage)
+				return info; 
+		}
+
+		for (std::size_t i = used; i < capacity; ++i) {
+			auto* info = ppBase[i];
+			if (info && info->GetPackage() == pPackage)
+				return info;
+		}
+
+		return nullptr;
 	}
 
 	void PackageManager::Init(PackageMgr* pPackageMgr, PackageMgr::Configuration* pConfiguration) {
@@ -284,6 +334,8 @@ namespace NdGameSdk::ndlib::io {
 			if (PackageManagerMenu) {
 			#if SDK_DEBUG
                 pdmenu->Create_DMENU_ItemFunction("Test funct", PackageManagerMenu, &TestFunct, PackageManagerAddr, false, HeapArena_Source);
+				pdmenu->Create_DMENU_ItemFunction("Test funct2", PackageManagerMenu, &TestFunct2, PackageManagerAddr, false, HeapArena_Source);
+
             #endif
 				return pdmenu->Create_DMENU_ItemSubmenu(PackageManagerMenu->Name(),
 					pMenu, PackageManagerMenu, NULL, NULL, nullptr, HeapArena_Source);
@@ -352,6 +404,12 @@ namespace NdGameSdk::ndlib::io {
 		this->Get()->m_allocationRingBufferSize = size;
 	}
 
+	bool PackageMgr::PackageLoginResItem(Package* pPackage, Package::ResItem* pResItem) {
+		return this->Get()->m_PackageLoginResFuncs->PackageLoginResItem(
+			reinterpret_cast<regenny::shared::ndlib::io::Package*>(pPackage),
+			reinterpret_cast<regenny::shared::ndlib::io::Package::ResItem*>(pResItem));
+	}
+
 	Package* PackageProcessingInfo::GetPackage() const {
 		return reinterpret_cast<Package*>(this->Get()->m_package);
 	}
@@ -360,11 +418,65 @@ namespace NdGameSdk::ndlib::io {
 		return this->Get()->m_status;
 	}
 
+	std::string PackageProcessingInfo::GetStatusString() const {
+		return GetStatusString(this->GetStatus());
+	}
+
 	Package::PakHeader& PackageProcessingInfo::GetPakHeader() {
 		return reinterpret_cast<Package::PakHeader&>(this->Get()->m_pakHdr);
 	}
 
-	uint64_t PackageMgr::PackageRequest::GetRequestType() const {
+	std::string PackageProcessingInfo::GetStatusString(LoadingStatus status) {
+	#if defined(T2R) || defined(T1X)
+		always_assert(PackageMgr_PackageProcessingInfo_GetStatusString == nullptr, "Function pointer was not set!");
+		return PackageMgr_PackageProcessingInfo_GetStatusString(status);
+	#else
+		switch (status) {
+		case LoadingStatus::LoadingPackageStatusUnused:
+			return "Unused";
+		case LoadingStatus::LoadingPackageStatusError:
+			return "Error";
+		case LoadingStatus::LoadingPackageStatusInvalid:
+			return "Invalid";
+		case LoadingStatus::LoadingPackageStatusWanted:
+			return "Wanted";
+		case LoadingStatus::LoadingPackageStatusOpenFile:
+			return "OpenFile";
+		case LoadingStatus::LoadingPackageStatusLoadingPakHeader:
+			return "LoadingPakHeader";
+		case LoadingStatus::LoadingPackageStatusLoadingHeader:
+			return "LoadingHeader";
+		case LoadingStatus::LoadingPackageStatusLoadingPages:
+			return "LoadingPages";
+		case LoadingStatus::LoadingPackageStatusLoadingVram:
+			return "LoadingVram";
+		case LoadingStatus::LoadingPackageStatusWaitingForVramPages:
+			return "WaitingForVramPages";
+		case LoadingStatus::LoadingPackageStatusDataIsLoaded:
+			return "DataIsLoaded";
+		case LoadingStatus::LoadingPackageStatusWaitingForVramProcessing:
+			return "WaitingForVramProcessing";
+		case LoadingStatus::LoadingPackageStatusDoingLogin:
+			return "DoingLogin";
+		case LoadingStatus::LoadingPackageStatusFinalizing:
+			return "Finalizing";
+		case LoadingStatus::LoadingPackageStatusLoaded:
+			return "Loaded";
+		case LoadingStatus::LoadingPackageStatusWaitingForLogout:
+			return "WaitingForLogout";
+		case LoadingStatus::LoadingPackageStatusDoingLogout:
+			return "DoingLogout";
+		case LoadingStatus::LoadingPackageStatusWaitingForUnload:
+			return "WaitingForUnload";
+		case LoadingStatus::LoadingPackageStatusFailedOptionalFile:
+			return "FailedOptionalFile";
+		default:
+			return "Unknown";
+		}
+	#endif
+	}
+
+	PackageMgr::PackageRequest::RequestType PackageMgr::PackageRequest::GetRequestType() const {
 		return this->Get()->m_RequestType;
 	}
 

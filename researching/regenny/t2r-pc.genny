@@ -38,6 +38,9 @@ namespace regenny {
         namespace gamelib {
             namespace level {
                 struct Level{};
+                struct DataLoading{
+                    struct PackageDataLoadingVTable{};
+                };
             }
 
             namespace state_script {
@@ -1299,12 +1302,12 @@ namespace regenny {
                     };
 
                     struct PakVramItemTable 0x10 {
-                        uint32_t m_nItems; // number of VRAM_DESC in the table
+                        uint32_t m_nVramItems; // number of VRAM_DESC in the table
                         ResItem* m_items @ 0x8; // array of abstract base class
                     };
 
                     uint64_t m_field8 @ 0x8;
-                    uint64_t m_size;
+                    uint64_t m_size; // Chunk size
                     uint32_t m_numAllocatedPages;
                     uint32_t m_field1c;
                     LoadingHeapMgr.LevelHeapType m_levelheaptype @ 0x980;
@@ -1316,7 +1319,7 @@ namespace regenny {
                     uint32_t m_field9a0;
                     uint32_t m_field9a4;
                     uint64_t m_VirtualMemoryAddressRange;
-                    gamelib.level.Level* m_Level;
+                    gamelib.level.Level* m_Level; // level this package belongs to
                     char m_packname[0x80] @ 0x9c8 [[utf8*]];
                     StringId64 m_packid @ 0xa48;
                     char m_packfilepath[0x80] + 0x1 [[utf8*]];
@@ -1354,7 +1357,7 @@ namespace regenny {
                     LoadingStatus m_status;
                     uint64_t m_NumAsyncReadOps @ 0x210;
                     uint64_t m_handle;
-                    uint64_t m_ChunkSize @ 0x230;
+                    uint64_t* m_ChunkSizePtr @ 0x230; // m_package->m_size
                     uint64_t m_fielda18 @ 0xa18;
                     Package.PakHeader m_pakHdr @ 0xa38;
                     uint32_t m_field78;
@@ -1365,7 +1368,6 @@ namespace regenny {
                     uint64_t m_field98;
                     uint32_t m_fielda0;
                     uint32_t m_LoggedResourcesCounter;
-
                 } // package-mgr.cpp
 
                 struct PackageMgr 0x4f70 {
@@ -1402,10 +1404,16 @@ namespace regenny {
                     };
 
                     struct PackageRequest 0xa0 {
-                        uint64_t m_RequestType; // 0x0 - Login, 0x1 Logout
-                        StringId64 m_packid;
+
+                        enum RequestType : uint32_t {
+                            Login = 0x0,
+                            Logout = 0x1
+                        }; 
+
+                        RequestType m_RequestType;
+                        StringId64 m_packid @ 0x8;
                         char m_name[0x80] [[utf8*]];
-                        uint32_t m_field90;
+                        uint32_t m_field90; // Type of package?
                         uint32_t m_field94;
                         gamelib.level.Level* m_Level;
                     };
@@ -1423,7 +1431,7 @@ namespace regenny {
                     uint32_t m_field8;
                     regenny.shared.corelib.memory.Context m_memcontext;
                     void* m_field30 @ 0x30; // function pointer
-                    void* m_PackageLoginResFuncs; // functions pointer
+                    regenny.shared.gamelib.level.DataLoading.PackageDataLoadingVTable* m_PackageLoginResFuncs; // functions pointer
                     LoadingHeapMgr.LevelHeapType m_levelheaptype;
                     uint32_t m_filed4c @ 0x4c;
                     PackageRequestInfo m_RequestInfo;
@@ -1479,7 +1487,24 @@ namespace regenny {
                         uint32_t m_field18;
                         uint32_t m_field1c;
                     };
-                };
+
+                    struct PackageDataLoadingVTable {
+                        virtual bool PackageLoginResItem(ndlib.io.Package* pPackage, ndlib.io.Package.ResItem* pResItem) @ 0
+                        /*
+                        void* data_????????? = FinalizePackageLogin
+                        void* data_????????? = bool __cdecl PreparePackageForLogout(class PackageMgr *,class Package *)
+                        void* data_????????? = sub_?????????
+                        void* data_????????? = void __cdecl TextureMgrPub::Unload(class Package *,const struct PakVramItemTable *)
+                        void* data_????????? = sub_?????????
+                        void* data_????????? = bool __cdecl RunBeginVramLoadingCmd(struct PackageManagerCmd *)
+                        void* data_????????? = void __cdecl VramPageConsumed(void *)
+                        void* data_????????? = void __cdecl TextureMgrPub::Cmd(const struct PackageManagerCmd &)
+                        void* data_????????? = sub_?????????
+                        void* data_????????? = void __cdecl TextureMgrPub::UpdatePackageLoading(void)
+                        */
+                    } 
+
+                }; // data-loading.cpp
 
                 // Not Researched (placeholder yet)
                 struct LevelMgr 0x481f20 {
@@ -1500,7 +1525,6 @@ namespace regenny {
                     char* m_PackageName @ 0x48 [[utf8*]];
                     StringId64 m_PackageId;
                     void* m_pFgGeometry @ 0xf8;
-                    void* m_pEntitySpawners
                     void* m_pEntitySpawners;
                     void* m_field108;
                     void* m_field110;

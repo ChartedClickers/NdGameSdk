@@ -17,6 +17,7 @@ namespace NdGameSdk::ndlib { class EngineComponents; }
 
 using namespace NdGameSdk::corelib::memory;
 using namespace NdGameSdk::gamelib::debug;
+using namespace NdGameSdk::gamelib::level;
 using namespace NdGameSdk::ndlib::debug;
 
 namespace NdGameSdk::ndlib::io {
@@ -30,7 +31,10 @@ namespace NdGameSdk::ndlib::io {
 
 		Package* GetPackage() const;
 		LoadingStatus GetStatus() const;
+		std::string GetStatusString() const;
 		Package::PakHeader& GetPakHeader();
+
+		static std::string GetStatusString(LoadingStatus status);
 	};
 
 	class NdGameSdk_API PackageMgr : public ISdkRegenny<regenny::shared::ndlib::io::PackageMgr> {
@@ -47,22 +51,24 @@ namespace NdGameSdk::ndlib::io {
 
 		class PackageRequest : public ISdkRegenny<regenny::shared::ndlib::io::PackageMgr::PackageRequest> {
 		public:
+			using RequestType = regenny::shared::ndlib::io::PackageMgr::PackageRequest::RequestType;
+
 			PackageRequest() = default;
 
 			PackageRequest(
-				uint64_t requestType, 
+				RequestType requestType,
 				StringId64 packId, 
 				const char* name,
-				uint64_t level
+				Level* level
 			) {
 				auto self = this->Get();
 				self->m_RequestType = requestType;
 				self->m_packid = packId;
 				std::strncpy(self->m_name, name, sizeof(self->m_name) - 1);
-				self->m_Level = level;
+				self->m_Level = reinterpret_cast<regenny::shared::gamelib::level::Level*>(level);
 			}
 
-			uint64_t GetRequestType() const;
+			RequestType GetRequestType() const;
 			StringId64 GetPackId() const;
 		};
 
@@ -88,6 +94,9 @@ namespace NdGameSdk::ndlib::io {
 		PackageProcessingInfo** GetProcessingArray() const;
 
 		PackageRequestInfo& GetPackageRequestInfo();
+
+		/*Virtual Funcs*/
+		bool PackageLoginResItem(Package* pPackage, Package::ResItem* pResItem);
 
 		struct PackageIterator {
 			Package* base;
@@ -161,8 +170,9 @@ namespace NdGameSdk::ndlib::io {
 		SDK_DEPENDENCIES(ndlib::EngineComponents);
 		
 		Package* GetPackageById(StringId64 PackId);
+		PackageProcessingInfo* FetchPackageProcessingInfo(Package* pPackage);
 		bool ArePackageQueuesIdle() const;
-		bool RequestLoadPackage(const char* pPackageName);
+		bool RequestLoadPackage(const char* pPackageName, Level* pLevel = nullptr);
 		bool RequestLogoutPackage(StringId64 pPackId);
 		bool RequestReloadPackage(StringId64 pPackId);
 
@@ -170,10 +180,14 @@ namespace NdGameSdk::ndlib::io {
 		void Initialize() override;
 		void Awake() override;
 
-		static bool TestFunct(DMENU::ItemFunction& pFunction, DMENU::Message pMessage);
 
 		PackageMgr* GetPackageMgr() const;
 		bool AddPackageRequest(PackageMgr::PackageRequest* pPackageRequest);
+
+		
+
+		static bool TestFunct(DMENU::ItemFunction& pFunction, DMENU::Message pMessage);
+		static bool TestFunct2(DMENU::ItemFunction& pFunction, DMENU::Message pMessage);
 
 		static DMENU::ItemSubmenu* CreatePackageManagerMenu(NdDevMenu* pdmenu, DMENU::Menu* pMenu);
 
@@ -195,10 +209,9 @@ namespace NdGameSdk::ndlib::io {
 
 		MEMBER_FUNCTION_PTR(PackageProcessingInfo*, PackageMgr_PreparePackageForLoading, PackageMgr* pPackageMgr, const char* pPackageName, uint32_t arg3);
 		MEMBER_FUNCTION_PTR(uint32_t, PackageMgr_LogoutPackage, PackageMgr* pPackageMgr, PackageProcessingInfo* pPackageInfo);
-		MEMBER_FUNCTION_PTR(bool, PackageMgr_PackageLoginResItem, PackageMgr* pPackageMgr, Package* pPackage, Package::ResItem* pResItem);
 
 		MEMBER_FUNCTION_PTR(bool, PackageMgr_PackageQueuesIdle, PackageMgr* pPackageMgr);
-		MEMBER_FUNCTION_PTR(void, PackageMgr_RequestLoadPackage, PackageMgr* pPackageMgr, const char* pPackageName, uint64_t pLevel, uint32_t arg4, uint32_t arg5);
+		MEMBER_FUNCTION_PTR(void, PackageMgr_RequestLoadPackage, PackageMgr* pPackageMgr, const char* pPackageName, Level* pLevel, uint32_t arg4, uint32_t arg5);
 		MEMBER_FUNCTION_PTR(void, PackageMgr_RequestLogoutPackage, PackageMgr* pPackageMgr, StringId64 pPackId);
 		MEMBER_FUNCTION_PTR(void, PackageMgr_RequestReloadPackage, PackageMgr* pPackageMgr, StringId64 pPackId);
 		MEMBER_FUNCTION_PTR(void, PackageMgr_AddRequest, PackageMgr::PackageRequestInfo* pRequestInfo, PackageMgr::PackageRequest* pPackageRequest);

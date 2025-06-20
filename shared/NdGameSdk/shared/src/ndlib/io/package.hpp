@@ -2,12 +2,16 @@
 
 #include "NdGameSdk/sdk.hpp"
 
+#include <NdGameSdk/shared/src/gamelib/level/level.hpp>
+
 #if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/ndlib/io/Package.hpp>
 #endif
 
 #include <Utility/helper.hpp>
 #include <Utility/function_ptr.hpp>
+
+using namespace NdGameSdk::gamelib::level;
 
 namespace NdGameSdk::ndlib::io {
 #if defined(T2R)
@@ -122,6 +126,7 @@ namespace NdGameSdk::ndlib::io {
 		uint32_t GetNumPages() const;
 
 		void* GetVirtualMemoryAddressRange() const;
+		Level* GetLevel() const;
 
 		const char* GetName() const;
 		const char* GetPackPath() const;
@@ -130,6 +135,9 @@ namespace NdGameSdk::ndlib::io {
 		StringId64 GetPackPathId() const;
 
 		Status GetStatus() const;
+        std::string GetStatusString();
+
+        static std::string GetStatusString(Status status);
 
         inline static constexpr uint32_t kMaxSubPagesPerPackage = 0x258;
         inline static constexpr uint32_t kMaxNameLength = 0x80;
@@ -139,7 +147,7 @@ namespace NdGameSdk::ndlib::io {
     TYPEDEF_EXTERN_FUNCTION_PTR(const char*, PackageMgr_Package_GetStatusString, Package::Status status);
 
 	static_assert(sizeof(Package) == 0x1b00, "Package size mismatch");
-	static_assert(sizeof(Package::PakHeader) == 0x98, "Package::PakHeader size mismatch");
+	static_assert(sizeof(Package::PakHeader) == 0x40, "Package::PakHeader size mismatch");
 	static_assert(sizeof(Package::ResItem) == 0x34, "Package::ResItem size mismatch");
 #endif
 }

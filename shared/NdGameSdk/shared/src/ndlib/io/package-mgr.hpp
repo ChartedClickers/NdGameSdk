@@ -12,6 +12,7 @@
 #endif
 
 #include "package.hpp"
+#include "package-util.hpp"
 
 namespace NdGameSdk::ndlib { class EngineComponents; }
 
@@ -184,7 +185,7 @@ namespace NdGameSdk::ndlib::io {
 		PackageMgr* GetPackageMgr() const;
 		bool AddPackageRequest(PackageMgr::PackageRequest* pPackageRequest);
 
-		
+		void TestDumpResources(PackageProcessingInfo* ppi);
 
 		static bool TestFunct(DMENU::ItemFunction& pFunction, DMENU::Message pMessage);
 		static bool TestFunct2(DMENU::ItemFunction& pFunction, DMENU::Message pMessage);

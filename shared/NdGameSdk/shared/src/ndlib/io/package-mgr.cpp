@@ -1,4 +1,4 @@
-#include "package-mgr.hpp"
+﻿#include "package-mgr.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
 
@@ -97,6 +97,14 @@ namespace NdGameSdk::ndlib::io {
 			PackageMgr_Package_GetStatusString = (PackageMgr_Package_GetStatusString_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::PackageMgr_Package_GetStatusString), findpattern.offset);
 
+			findpattern = Patterns::PackageMgr_GetPakHdrPageEntry;
+			PackageMgr_GetPakHdrPageEntry = (PackageMgr_GetPakHdrPageEntry_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::PackageMgr_GetPakHdrPageEntry), findpattern.offset);
+
+			findpattern = Patterns::PackageMgr_ResolvePagePtr;
+			PackageMgr_ResolvePagePtr = (PackageMgr_ResolvePagePtr_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::PackageMgr_ResolvePagePtr), findpattern.offset);
+
 			if(!PackageMgr_GetPackageById ||
 				!PackageMgr_GetPackageStatusById ||
 				!PackageMgr_GetPackageByIndex ||
@@ -111,7 +119,9 @@ namespace NdGameSdk::ndlib::io {
 				!PackageMgr_AddRequest ||
 				!PackageMgr_PackageProcessingInfo_GetStatusString ||
 				!PackageMgr_Package_ResolvePakItem ||
-				!PackageMgr_Package_GetStatusString
+				!PackageMgr_Package_GetStatusString ||
+				!PackageMgr_GetPakHdrPageEntry ||
+				!PackageMgr_ResolvePagePtr
 			) {
 				throw SdkComponentEx{ std::format("Failed to find {}:: game functions!", GetName()), SdkComponentEx::ErrorCode::PatternFailed };
 			}
@@ -138,6 +148,54 @@ namespace NdGameSdk::ndlib::io {
 		always_assert(PackageMgr_AddRequest == nullptr, "Function pointer was not set!");
 		PackageMgr_AddRequest(&GetPackageMgr()->GetPackageRequestInfo(), pPackageRequest);
 		return true;
+	}
+
+	void PackageManager::TestDumpResources(PackageProcessingInfo* ppi) {
+
+		Package* pkg = ppi->GetPackage();
+		const auto& hdr = ppi->GetPakHeader(); 
+		PackageMgr* mgr = GetPackageMgr();
+
+		Package::ResPage* pResPage = PackageMgr_ResolvePagePtr(mgr, pkg, hdr->m_pakLoginTableIdx);
+
+		if (!pResPage) return;
+
+		PakLoginTableEntry* pPakLoginTable =
+			reinterpret_cast<PakLoginTableEntry*>(reinterpret_cast<std::byte*>(pResPage) + hdr->m_pakLoginTableOffset);
+
+		const uint32_t maxResources = (*pPakLoginTable)->m_MaxResources;
+
+		for (uint32_t i = 0; i < maxResources; ++i)
+		{
+			// -----------------------------------------------------------------
+			// pageIdx  = *(DWORD*)(loginHdr + 0x38 + i*8)
+			// itemOfs  = *(DWORD*)(loginHdr + 0x3C + i*8)
+			// -----------------------------------------------------------------
+
+			//uint32_t pageIdx = *reinterpret_cast<uint32_t*>(pPakLoginTable + 0x38 + (i * 8));
+			//uint32_t itemOfs = *reinterpret_cast<uint32_t*>(pPakLoginTable + 0x3C + (i * 8));
+
+			//uint32_t flags =
+			//	*reinterpret_cast<uint32_t*>(reinterpret_cast<std::byte*>(pkg)
+			//		+ 0x20
+			//		+ pageIdx * 4);
+
+			//if ((flags & 0x3) == 0x3
+			//	|| (flags & 0xC) == 0xC
+			//	|| (flags & 0xFFF0) == 0xFFF0
+			//	|| (flags & 0xFF0000) == 0x800000)
+			//	continue;
+
+			//std::byte* pageBase = static_cast<std::byte*>(
+			//	PackageMgr_ResolvePagePtr(mgr, pkg, pageIdx));
+
+			//if (!pageBase) continue;
+
+			//auto* res = reinterpret_cast<Package::ResItem*>(pageBase + itemOfs);
+
+			//std::printf("ResItem %4u : %p\n", i, static_cast<void*>(res));
+		}
+
 	}
 
 	bool PackageManager::ArePackageQueuesIdle() const {
@@ -269,6 +327,7 @@ namespace NdGameSdk::ndlib::io {
 					auto pProcessingInfo = PackageMgr->FetchPackageProcessingInfo(pPackage);
 					if (pProcessingInfo) {
 						spdlog::info("Processing info for package '{}': Status = {}", packageName, pProcessingInfo->GetStatusString());
+						PackageMgr->TestDumpResources(pProcessingInfo);
 					}
 					else {
 						spdlog::error("Failed to fetch processing info for package '{}'.", packageName);

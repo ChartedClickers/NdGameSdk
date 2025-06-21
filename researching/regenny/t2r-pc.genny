@@ -1292,13 +1292,23 @@ namespace regenny {
                         uint32_t m_owningPackageIndex;
                     };
 
+                    struct ResPage{};
+
                     // Base struct for all resources in a package
-                    struct ResItem 0x34 {
+                    struct ResItem 0x30 {
                         uint64_t m_resNameStrOffset;
                         uint32_t m_pageSize @ 0x10;
                         StringId64 m_ResourceId @ 0x18;
                         StringId64 m_resourceTypeId;
-                        uint32_t m_MaxResources @ 0x30; // max number of resources in this package
+                        uint32_t m_field28;
+                        uint32_t m_field2c;
+                    };
+
+                    struct PakLoginTableEntry : ResItem 0x10 {
+                        uint32_t m_MaxResources; // max number of resources in this package
+                        //uint32_t m_field4
+                        uint32_t m_wantedPage + 0x4;
+                        uint32_t m_resItemOffset;
                     };
 
                     struct PakVramItemTable 0x10 {
@@ -1310,6 +1320,7 @@ namespace regenny {
                     uint64_t m_size; // Chunk size
                     uint32_t m_numAllocatedPages;
                     uint32_t m_field1c;
+                    uint32_t m_LoginTableFlags[0x258]; 
                     LoadingHeapMgr.LevelHeapType m_levelheaptype @ 0x980;
                     uint64_t m_ChunkSize @ 0x988;
                     uint32_t m_hdrSize;

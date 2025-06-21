@@ -22,6 +22,7 @@ namespace NdGameSdk::ndlib::io {
         using Status = regenny::shared::ndlib::io::Package::Status;
 
         enum ItemId : StringId64 {
+			PAK_LOGIN_TABLE = SID("PAK_LOGIN_TABLE"),
             INTERACTIVE_BG_1 = SID("INTERACTIVE_BG_1"),
             NAV_MESH_1 = SID("NAV_MESH_1"),
             PATH_TRACING_1 = SID("PATH_TRACING_1"),
@@ -104,13 +105,15 @@ namespace NdGameSdk::ndlib::io {
         };
 
         class PakHeader : public ISdkRegenny<regenny::shared::ndlib::io::Package::PakHeader> {};
+        class PakPageEntry : public ISdkRegenny<regenny::shared::ndlib::io::Package::PakPageEntry> {};
+
+        class ResPage : public ISdkRegenny<regenny::shared::ndlib::io::Package::ResPage> {};
 
         class ResItem : public ISdkRegenny<regenny::shared::ndlib::io::Package::ResItem> {
 
 			const char* GetResourceName() const;
 
             size_t GetPageSize() const;
-            uint32_t GetMaxResources() const;
 
 			StringId64 GetResourceId() const;
 			StringId64 GetResourceTypeId() const;
@@ -143,11 +146,16 @@ namespace NdGameSdk::ndlib::io {
         inline static constexpr uint32_t kMaxNameLength = 0x80;
 	};
 
+    class PakLoginTableEntry : public ISdkRegenny<regenny::shared::ndlib::io::Package::PakLoginTableEntry, Package::ResItem> {
+
+    };
+
     TYPEDEF_EXTERN_FUNCTION_PTR(Package::PakItem, PackageMgr_Package_ResolvePakItem, Package::ItemId ItemId);
     TYPEDEF_EXTERN_FUNCTION_PTR(const char*, PackageMgr_Package_GetStatusString, Package::Status status);
 
 	static_assert(sizeof(Package) == 0x1b00, "Package size mismatch");
 	static_assert(sizeof(Package::PakHeader) == 0x40, "Package::PakHeader size mismatch");
-	static_assert(sizeof(Package::ResItem) == 0x34, "Package::ResItem size mismatch");
+	static_assert(sizeof(Package::ResItem) == 0x30, "Package::ResItem size mismatch");
+    //static_assert(sizeof(DMENU::Menu) == sizeof(DMENU::Component) + 0x30, "Size of DMENU::Menu is not correct.");
 #endif
 }

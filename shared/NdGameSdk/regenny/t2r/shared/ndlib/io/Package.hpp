@@ -124,6 +124,9 @@ struct Package {
         uint32_t m_owningPackageIndex; // 0x8
     }; // Size: 0xc
 
+    struct ResPage {
+    }; // Size: 0x0
+
     struct ResItem {
         uint64_t m_resNameStrOffset; // 0x0
         private: char pad_8[0x8]; public:
@@ -131,9 +134,16 @@ struct Package {
         private: char pad_14[0x4]; public:
         StringId64 m_ResourceId; // 0x18
         StringId64 m_resourceTypeId; // 0x20
-        private: char pad_28[0x8]; public:
+        uint32_t m_field28; // 0x28
+        uint32_t m_field2c; // 0x2c
+    }; // Size: 0x30
+
+    struct PakLoginTableEntry : public ResItem {
         uint32_t m_MaxResources; // 0x30
-    }; // Size: 0x34
+        private: char pad_34[0x4]; public:
+        uint32_t m_wantedPage; // 0x38
+        uint32_t m_resItemOffset; // 0x3c
+    }; // Size: 0x40
 
     struct PakVramItemTable {
         uint32_t m_nVramItems; // 0x0
@@ -146,7 +156,7 @@ struct Package {
     uint64_t m_size; // 0x10
     uint32_t m_numAllocatedPages; // 0x18
     uint32_t m_field1c; // 0x1c
-    private: char pad_20[0x960]; public:
+    uint32_t m_LoginTableFlags[600]; // 0x20
     regenny::shared::ndlib::io::LoadingHeapMgr::LevelHeapType m_levelheaptype; // 0x980
     private: char pad_984[0x4]; public:
     uint64_t m_ChunkSize; // 0x988

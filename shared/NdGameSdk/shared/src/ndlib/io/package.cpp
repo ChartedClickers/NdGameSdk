@@ -88,10 +88,6 @@ namespace NdGameSdk::ndlib::io {
 		return this->Get()->m_pageSize;
 	}
 
-	uint32_t Package::ResItem::GetMaxResources() const {
-		return this->Get()->m_MaxResources;
-	}
-
 	StringId64 Package::ResItem::GetResourceId() const {
 		return this->Get()->m_ResourceId;
 	}

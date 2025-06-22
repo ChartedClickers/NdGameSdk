@@ -100,6 +100,26 @@ namespace NdGameSdk::ndlib::io {
 		return static_cast<Package::ItemId>(this->Get()->m_resourceTypeId);
 	}
 
+	uint32_t PakLoginTableEntry::GetMaxResources() const {
+		return this->Get()->m_MaxResources;
+	}
+
+	PakLoginTableEntry::ResourcePair* PakLoginTableEntry::GetPairs() {
+		return reinterpret_cast<ResourcePair*>(&this->Get()->m_wantedPage);
+	}
+
+	const PakLoginTableEntry::ResourcePair* PakLoginTableEntry::GetPairs() const {
+		return reinterpret_cast<const ResourcePair*>(&this->Get()->m_wantedPage);
+	}
+
+	uint32_t PakLoginTableEntry::ResourcePair::GetPageIdx() const {
+		return this->Get()->m_pageIdx;
+	}
+
+	uint32_t PakLoginTableEntry::ResourcePair::GetItemOfs() const {
+		return this->Get()->m_itemOfs;
+	}
+
 	INIT_FUNCTION_PTR(PackageMgr_Package_ResolvePakItem);
 	INIT_FUNCTION_PTR(PackageMgr_Package_GetStatusString);
 

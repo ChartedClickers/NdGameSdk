@@ -570,6 +570,7 @@ set(T2RSDK_SOURCES
 	"shared/NdGameSdk/regenny/t2r/shared/ndlib/io/Package.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/ndlib/io/PackageMgr.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/ndlib/io/PackageProcessingInfo.hpp"
+	"shared/NdGameSdk/regenny/t2r/shared/ndlib/io/PakLoginTableEntry.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/ndlib/render/WindowContext.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/ndlib/render/WindowContextType.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/ndlib/render/text/DebugStringBase.hpp"

@@ -101,9 +101,9 @@ namespace NdGameSdk::ndlib::io {
 			PackageMgr_GetPakHdrPageEntry = (PackageMgr_GetPakHdrPageEntry_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::PackageMgr_GetPakHdrPageEntry), findpattern.offset);
 
-			findpattern = Patterns::PackageMgr_ResolvePagePtr;
-			PackageMgr_ResolvePagePtr = (PackageMgr_ResolvePagePtr_ptr)Utility::FindAndPrintPattern(module,
-				findpattern.pattern, wstr(Patterns::PackageMgr_ResolvePagePtr), findpattern.offset);
+			findpattern = Patterns::PackageMgr_ResolvePakPagePtr;
+			PackageMgr_ResolvePakPagePtr = (PackageMgr_ResolvePakPagePtr_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::PackageMgr_ResolvePakPagePtr), findpattern.offset);
 
 			if(!PackageMgr_GetPackageById ||
 				!PackageMgr_GetPackageStatusById ||
@@ -121,7 +121,7 @@ namespace NdGameSdk::ndlib::io {
 				!PackageMgr_Package_ResolvePakItem ||
 				!PackageMgr_Package_GetStatusString ||
 				!PackageMgr_GetPakHdrPageEntry ||
-				!PackageMgr_ResolvePagePtr
+				!PackageMgr_ResolvePakPagePtr
 			) {
 				throw SdkComponentEx{ std::format("Failed to find {}:: game functions!", GetName()), SdkComponentEx::ErrorCode::PatternFailed };
 			}
@@ -150,52 +150,61 @@ namespace NdGameSdk::ndlib::io {
 		return true;
 	}
 
-	void PackageManager::TestDumpResources(PackageProcessingInfo* ppi) {
+	std::vector<Package::ResItem*> PackageManager::ParseResources(PackageProcessingInfo* ppi) {
 
-		Package* pkg = ppi->GetPackage();
-		const auto& hdr = ppi->GetPakHeader(); 
 		PackageMgr* mgr = GetPackageMgr();
+		Package* pkg = ppi->GetPackage();
 
-		Package::ResPage* pResPage = PackageMgr_ResolvePagePtr(mgr, pkg, hdr->m_pakLoginTableIdx);
+		using LoadingStatus = PackageProcessingInfo::LoadingStatus;
+		static constexpr std::array<LoadingStatus, 3> allowedStatuses = {
+			LoadingStatus::LoadingPackageStatusLoaded,
+			LoadingStatus::LoadingPackageStatusDoingLogin,
+			LoadingStatus::LoadingPackageStatusFinalizing
+		};
 
-		if (!pResPage) return;
+		if (!pkg && std::none_of(allowedStatuses.begin(), allowedStatuses.end(),
+			[status = ppi->GetStatus()](LoadingStatus s) { return s == status; })) {
+			return {};
+		}
+
+		const Package::PakHeader& hdr = ppi->GetPakHeader();
+		Package::ResPage* pResPage = ResolvePakPage(mgr, pkg, hdr->m_pakLoginTableIdx);
+
+		if (!pResPage) return {};
 
 		PakLoginTableEntry* pPakLoginTable =
 			reinterpret_cast<PakLoginTableEntry*>(reinterpret_cast<std::byte*>(pResPage) + hdr->m_pakLoginTableOffset);
 
-		const uint32_t maxResources = (*pPakLoginTable)->m_MaxResources;
+		if (pPakLoginTable->GetResourceType() != Package::ItemId::PAK_LOGIN_TABLE) return {};
+
+		std::vector<Package::ResItem*> ResOut;
+		const uint32_t maxResources = pPakLoginTable->GetMaxResources();
+		PakLoginTableEntry::ResourcePair* pPairs = pPakLoginTable->GetPairs();
 
 		for (uint32_t i = 0; i < maxResources; ++i)
 		{
-			// -----------------------------------------------------------------
-			// pageIdx  = *(DWORD*)(loginHdr + 0x38 + i*8)
-			// itemOfs  = *(DWORD*)(loginHdr + 0x3C + i*8)
-			// -----------------------------------------------------------------
+			uint32_t pageIdx = pPairs[i].GetPageIdx();
+			uint32_t itemOfs = pPairs[i].GetItemOfs();
 
-			//uint32_t pageIdx = *reinterpret_cast<uint32_t*>(pPakLoginTable + 0x38 + (i * 8));
-			//uint32_t itemOfs = *reinterpret_cast<uint32_t*>(pPakLoginTable + 0x3C + (i * 8));
+			uint32_t flags = pkg->Get()->m_LoginTableFlags[pageIdx];
 
-			//uint32_t flags =
-			//	*reinterpret_cast<uint32_t*>(reinterpret_cast<std::byte*>(pkg)
-			//		+ 0x20
-			//		+ pageIdx * 4);
+			if ((flags & 0x3) == 0x3
+				|| (flags & 0xC) == 0xC
+				|| (flags & 0xFFF0) == 0xFFF0
+				|| (flags & 0xFF0000) == 0x800000)
+				continue;
 
-			//if ((flags & 0x3) == 0x3
-			//	|| (flags & 0xC) == 0xC
-			//	|| (flags & 0xFFF0) == 0xFFF0
-			//	|| (flags & 0xFF0000) == 0x800000)
-			//	continue;
+			Package::ResPage* pageBase = ResolvePakPage(mgr, pkg, pageIdx);
 
-			//std::byte* pageBase = static_cast<std::byte*>(
-			//	PackageMgr_ResolvePagePtr(mgr, pkg, pageIdx));
+			if (!pageBase) continue;
 
-			//if (!pageBase) continue;
+			Package::ResItem* res = reinterpret_cast<Package::ResItem*>(
+				reinterpret_cast<std::byte*>(pageBase) + itemOfs);
 
-			//auto* res = reinterpret_cast<Package::ResItem*>(pageBase + itemOfs);
-
-			//std::printf("ResItem %4u : %p\n", i, static_cast<void*>(res));
+			ResOut.push_back(res);
 		}
 
+		return ResOut;
 	}
 
 	bool PackageManager::ArePackageQueuesIdle() const {
@@ -212,17 +221,18 @@ namespace NdGameSdk::ndlib::io {
 	#endif
 	}
 
-	bool PackageManager::RequestLoadPackage(const char* pPackageName, Level* pLevel) {
+	bool PackageManager::RequestLoadPackage(const char* pPackageName, Level* pLevel, PackageMgr::PackageCategory pCategory) {
 	#if defined(T2R) || defined(T1X)
 		always_assert(PackageMgr_RequestLoadPackage == nullptr, "Function pointer was not set!");
-		PackageMgr_RequestLoadPackage(GetPackageMgr(), pPackageName, pLevel, 0x0, 0x0);
+		PackageMgr_RequestLoadPackage(GetPackageMgr(), pPackageName, pLevel, 0x0, pCategory);
 		return true;
 	#else
 		PackageMgr::PackageRequest packageRequest {
 			PackageMgr::PackageRequest::RequestType::Login,
 			SID(pPackageName),
 			pPackageName,
-			pLevel
+			pLevel,
+			pCategory
 		};
 
 		return AddPackageRequest(&packageRequest);
@@ -261,7 +271,7 @@ namespace NdGameSdk::ndlib::io {
 				PackageMgr::PackageRequest::RequestType::Logout,
 				pPackage->GetPackId(),
 				pPackage->GetName(),
-				0x0
+				nullptr
 			};
 
 			AddPackageRequest(&packageRequest);
@@ -289,11 +299,11 @@ namespace NdGameSdk::ndlib::io {
 			if (PackageMgr) {
 				spdlog::info("TestFunct called!");
 
-				const char* packageName = "anim-dina-tired";
+				const char* packageName = "world-patrol-jackson-ingame";
 
 				if (!PackageMgr->GetPackageById(SID(packageName))) {
 					spdlog::info("Package '{}' not found, requesting load...", packageName);
-					if (PackageMgr->RequestLoadPackage(packageName)) {
+					if (PackageMgr->RequestLoadPackage(packageName, nullptr, PackageMgr::PackageCategory::LevelPak)) {
 						spdlog::info("Load request for package '{}' sent successfully.", packageName);
 					}
 					else {
@@ -318,7 +328,7 @@ namespace NdGameSdk::ndlib::io {
 			if (PackageMgr) {
 				spdlog::info("TestFunct2 called!");
 
-				const char* packageName = "anim-dina-tired";
+				const char* packageName = "world-patrol-jackson-ingame";
 
 				auto pPackage = PackageMgr->GetPackageById(SID(packageName));
 
@@ -327,7 +337,19 @@ namespace NdGameSdk::ndlib::io {
 					auto pProcessingInfo = PackageMgr->FetchPackageProcessingInfo(pPackage);
 					if (pProcessingInfo) {
 						spdlog::info("Processing info for package '{}': Status = {}", packageName, pProcessingInfo->GetStatusString());
-						PackageMgr->TestDumpResources(pProcessingInfo);
+
+						if (pProcessingInfo->GetStatus() == PackageProcessingInfo::LoadingStatus::LoadingPackageStatusLoaded) {
+							auto res = PackageMgr->ParseResources(pProcessingInfo);
+							for (Package::ResItem* item : res) {
+								if (item) {
+									spdlog::info("Resource Item: Type = {}, Name = {}, Size = {} bytes",
+										item->GetResourceTypeId(), item->GetResourceName(), item->GetPageSize());
+								}
+								else {
+									spdlog::warn("Found a null resource item in package '{}'.", packageName);
+								}
+							}
+						}
 					}
 					else {
 						spdlog::error("Failed to fetch processing info for package '{}'.", packageName);

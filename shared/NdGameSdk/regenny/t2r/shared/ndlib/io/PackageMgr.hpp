@@ -17,6 +17,14 @@ struct Level;
 namespace regenny::shared::ndlib::io {
 #pragma pack(push, 1)
 struct PackageMgr {
+    enum PackageCategory : uint32_t {
+        Initial = 0,
+        GlobalPak = 1,
+        LevelPak = 2,
+        DictPak = 3,
+        PsoDictPak = 4,
+    };
+
     struct Configuration {
         uint32_t m_freepackageslots; // 0x0
         uint32_t m_allocationRingBufferSize; // 0x4
@@ -27,7 +35,10 @@ struct PackageMgr {
         private: char pad_28[0x10]; public:
         uint64_t* m_PackageLoginResFuncs; // 0x38
         regenny::shared::ndlib::io::LoadingHeapMgr::LevelHeapType m_levelheaptype; // 0x40
-        private: char pad_44[0xc]; public:
+        bool m_field44; // 0x44
+        bool m_AllowDebugPages; // 0x45
+        bool m_field46; // 0x46
+        private: char pad_47[0x9]; public:
     }; // Size: 0x50
 
     struct PkgNameLookupEntry {
@@ -62,7 +73,7 @@ struct PackageMgr {
         StringId64 m_packid; // 0x8
         // Metadata: utf8*
         char m_name[128]; // 0x10
-        uint32_t m_field90; // 0x90
+        regenny::shared::ndlib::io::PackageMgr::PackageCategory m_category; // 0x90
         uint32_t m_field94; // 0x94
         regenny::shared::gamelib::level::Level* m_Level; // 0x98
     }; // Size: 0xa0
@@ -83,7 +94,12 @@ struct PackageMgr {
     void* m_field30; // 0x30
     regenny::shared::gamelib::level::DataLoading::PackageDataLoadingVTable* m_PackageLoginResFuncs; // 0x38
     regenny::shared::ndlib::io::LoadingHeapMgr::LevelHeapType m_levelheaptype; // 0x40
-    private: char pad_44[0x8]; public:
+    bool m_field44; // 0x44
+    bool m_AllowDebugPages; // 0x45
+    bool m_field46; // 0x46
+    private: char pad_47[0x1]; public:
+    bool m_field48; // 0x48
+    private: char pad_49[0x3]; public:
     uint32_t m_filed4c; // 0x4c
     PackageRequestInfo m_RequestInfo; // 0x50
     regenny::shared::ndlib::io::Package* m_packages; // 0x68

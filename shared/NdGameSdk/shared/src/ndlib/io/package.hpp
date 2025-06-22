@@ -6,6 +6,7 @@
 
 #if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/ndlib/io/Package.hpp>
+#include <NdGameSdk/regenny/t2r/shared/ndlib/io/PakLoginTableEntry.hpp>
 #endif
 
 #include <Utility/helper.hpp>
@@ -110,7 +111,7 @@ namespace NdGameSdk::ndlib::io {
         class ResPage : public ISdkRegenny<regenny::shared::ndlib::io::Package::ResPage> {};
 
         class ResItem : public ISdkRegenny<regenny::shared::ndlib::io::Package::ResItem> {
-
+        public:
 			const char* GetResourceName() const;
 
             size_t GetPageSize() const;
@@ -146,8 +147,17 @@ namespace NdGameSdk::ndlib::io {
         inline static constexpr uint32_t kMaxNameLength = 0x80;
 	};
 
-    class PakLoginTableEntry : public ISdkRegenny<regenny::shared::ndlib::io::Package::PakLoginTableEntry, Package::ResItem> {
+    class PakLoginTableEntry : public ISdkRegenny<regenny::shared::ndlib::io::PakLoginTableEntry, Package::ResItem> {
+    public:
+        class ResourcePair : public ISdkRegenny<regenny::shared::ndlib::io::PakLoginTableEntry::ResourcePair> {
+        public:
+            uint32_t GetPageIdx() const;
+            uint32_t GetItemOfs() const;
+        };
 
+        uint32_t GetMaxResources() const;
+        ResourcePair* GetPairs();
+        const ResourcePair* GetPairs() const;
     };
 
     TYPEDEF_EXTERN_FUNCTION_PTR(Package::PakItem, PackageMgr_Package_ResolvePakItem, Package::ItemId ItemId);

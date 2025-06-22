@@ -40,6 +40,7 @@ namespace NdGameSdk::ndlib::io {
 
 	class NdGameSdk_API PackageMgr : public ISdkRegenny<regenny::shared::ndlib::io::PackageMgr> {
 	public:
+		using PackageCategory = regenny::shared::ndlib::io::PackageMgr::PackageCategory;
 
 		class Configuration : public ISdkRegenny<regenny::shared::ndlib::io::PackageMgr::Configuration>  {
 		public:
@@ -60,13 +61,15 @@ namespace NdGameSdk::ndlib::io {
 				RequestType requestType,
 				StringId64 packId, 
 				const char* name,
-				Level* level
+				Level* level = nullptr,
+				PackageCategory category = PackageCategory::Initial
 			) {
 				auto self = this->Get();
 				self->m_RequestType = requestType;
 				self->m_packid = packId;
 				std::strncpy(self->m_name, name, sizeof(self->m_name) - 1);
 				self->m_Level = reinterpret_cast<regenny::shared::gamelib::level::Level*>(level);
+				self->m_category = category;
 			}
 
 			RequestType GetRequestType() const;
@@ -173,7 +176,7 @@ namespace NdGameSdk::ndlib::io {
 		Package* GetPackageById(StringId64 PackId);
 		PackageProcessingInfo* FetchPackageProcessingInfo(Package* pPackage);
 		bool ArePackageQueuesIdle() const;
-		bool RequestLoadPackage(const char* pPackageName, Level* pLevel = nullptr);
+		bool RequestLoadPackage(const char* pPackageName, Level* pLevel = nullptr, PackageMgr::PackageCategory pCategory = PackageMgr::PackageCategory::Initial);
 		bool RequestLogoutPackage(StringId64 pPackId);
 		bool RequestReloadPackage(StringId64 pPackId);
 
@@ -185,7 +188,7 @@ namespace NdGameSdk::ndlib::io {
 		PackageMgr* GetPackageMgr() const;
 		bool AddPackageRequest(PackageMgr::PackageRequest* pPackageRequest);
 
-		void TestDumpResources(PackageProcessingInfo* ppi);
+		std::vector<Package::ResItem*> ParseResources(PackageProcessingInfo* ppi);
 
 		static bool TestFunct(DMENU::ItemFunction& pFunction, DMENU::Message pMessage);
 		static bool TestFunct2(DMENU::ItemFunction& pFunction, DMENU::Message pMessage);
@@ -212,7 +215,7 @@ namespace NdGameSdk::ndlib::io {
 		MEMBER_FUNCTION_PTR(uint32_t, PackageMgr_LogoutPackage, PackageMgr* pPackageMgr, PackageProcessingInfo* pPackageInfo);
 
 		MEMBER_FUNCTION_PTR(bool, PackageMgr_PackageQueuesIdle, PackageMgr* pPackageMgr);
-		MEMBER_FUNCTION_PTR(void, PackageMgr_RequestLoadPackage, PackageMgr* pPackageMgr, const char* pPackageName, Level* pLevel, uint32_t arg4, uint32_t arg5);
+		MEMBER_FUNCTION_PTR(void, PackageMgr_RequestLoadPackage, PackageMgr* pPackageMgr, const char* pPackageName, Level* pLevel, uint32_t arg4, PackageMgr::PackageCategory pCategory);
 		MEMBER_FUNCTION_PTR(void, PackageMgr_RequestLogoutPackage, PackageMgr* pPackageMgr, StringId64 pPackId);
 		MEMBER_FUNCTION_PTR(void, PackageMgr_RequestReloadPackage, PackageMgr* pPackageMgr, StringId64 pPackId);
 		MEMBER_FUNCTION_PTR(void, PackageMgr_AddRequest, PackageMgr::PackageRequestInfo* pRequestInfo, PackageMgr::PackageRequest* pPackageRequest);

@@ -10,8 +10,10 @@ namespace NdGameSdk::ndlib::io {
 
 	class PackageMgr;
 
-	TYPEDEF_EXTERN_FUNCTION_PTR(Package::PakPageEntry*, PackageMgr_GetPakHdrPageEntry, Package::PakHeader* pPakHdr, uint32_t* arg2, uint32_t index);
-	TYPEDEF_EXTERN_FUNCTION_PTR(Package::ResPage*, PackageMgr_ResolvePagePtr, PackageMgr* pPackageMgr, Package* pPackage, uint32_t LoginTableIdx);
+	Package::PakPageEntry* GetPakHdrPageEntry(Package::PakHeader* pPakHdr, uint32_t* arg2, uint32_t index);
+	Package::ResPage* ResolvePakPage(PackageMgr* pPackageMgr, Package* pPackage, uint32_t LoginTableIdx);
 
+	TYPEDEF_EXTERN_FUNCTION_PTR(Package::PakPageEntry*, PackageMgr_GetPakHdrPageEntry, Package::PakHeader* pPakHdr, uint32_t* arg2, uint32_t index);
+	TYPEDEF_EXTERN_FUNCTION_PTR(Package::ResPage*, PackageMgr_ResolvePakPagePtr, PackageMgr* pPackageMgr, Package* pPackage, uint32_t LoginTableIdx);
 #endif
 }

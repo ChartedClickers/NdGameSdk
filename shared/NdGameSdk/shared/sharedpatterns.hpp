@@ -83,7 +83,7 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern PackageMgr_Package_ResolvePakItem = { L"48 b8 d5 05 a8 19 5f 99 ?? ?? 48 3b c8 0f 87 ?? ?? ?? ?? 0f 84 ?? ?? ?? ?? 48 b8 3d d9 7d 83 ad dd ?? ?? 48 3b c8 0f 87 ?? ?? ?? ?? 0f 84 ?? ?? ?? ?? 48 b8 21 84" };
 	static inline const SdkPattern PackageMgr_Package_GetStatusString = { L"57 48 83 ec 30 0f b6 f9 40 80 ff 06 72 7b 48 89 5c 24 40 e8 ?? ?? ?? ff 48 8b d8 48 85 c0 74 04 b1 01 ff d3 e8 ?? ?? ?? ff 48 85 c0 74 02 ff d0 e8 ?? ?? ?? ff 48 85 c0 74 02 ff d0" };
 	static inline const SdkPattern PackageMgr_GetPakHdrPageEntry = { L"48 89 74 24 10 48 89 7c 24 18 41 56 48 83 ec 30 4c 8b f2 41 8b f8 48 8b f1 44 3b 41 10 72 7b 48 89 5c 24 40 e8 ?? ?? ?? ?? 48 8b d8 48 85 c0 74 04 b1 01 ff d3" };
-	static inline const SdkPattern PackageMgr_ResolvePagePtr = { L"48 83 ec 18 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 04 24 41 8b c0 8b 44 82 20 0f ba e0 18 73 26 44 2b 82 9c 09 00 00 41 c1 e0 15 49 63 c0 48" };
+	static inline const SdkPattern PackageMgr_ResolvePakPagePtr = { L"48 83 ec 18 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 04 24 41 8b c0 8b 44 82 20 0f ba e0 18 73 26 44 2b 82 9c 09 00 00 41 c1 e0 15 49 63 c0 48" };
 
 
 

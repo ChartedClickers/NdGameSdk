@@ -1304,13 +1304,6 @@ namespace regenny {
                         uint32_t m_field2c;
                     };
 
-                    struct PakLoginTableEntry : ResItem 0x10 {
-                        uint32_t m_MaxResources; // max number of resources in this package
-                        //uint32_t m_field4
-                        uint32_t m_wantedPage + 0x4;
-                        uint32_t m_resItemOffset;
-                    };
-
                     struct PakVramItemTable 0x10 {
                         uint32_t m_nVramItems; // number of VRAM_DESC in the table
                         ResItem* m_items @ 0x8; // array of abstract base class
@@ -1339,6 +1332,18 @@ namespace regenny {
                     uint32_t m_fieldae8;
                     Status m_status;
                 } // package.cpp
+
+                struct PakLoginTableEntry : Package.ResItem 0x10 {
+
+                    struct ResourcePair {
+                        uint32_t m_pageIdx;
+                        uint32_t m_itemOfs;
+                    };
+
+                    uint32_t m_MaxResources; // max number of resources in this package
+                    //uint32_t m_field4
+                    ResourcePair m_wantedPage + 0x4; 
+                };
 
                 // 0x1b8 - t1x
                 struct PackageProcessingInfo 0xad0 {
@@ -1386,6 +1391,14 @@ namespace regenny {
                     // kMaxNumPackagesAwaitingUnload = 0x800;
                     // kMaxSubPagesPerPackage = 0x258;
 
+                    enum PackageCategory : uint32_t {
+                        Initial = 0x0, // initial
+                        GlobalPak = 0x1, // "~DATABRANCH/"
+                        LevelPak = 0x2, // tied to the current level
+                        DictPak = 0x3, // "-dict[...].pak"
+                        PsoDictPak = 0x4 // "psodict-....pak"
+                    };
+
                     struct Configuration 0x50 { 
                         uint32_t m_freepackageslots;
                         uint32_t m_allocationRingBufferSize;
@@ -1393,6 +1406,9 @@ namespace regenny {
                         void* m_GetGameFrameNumber @ 0x20; // function pointer
                         uint64_t* m_PackageLoginResFuncs @ 0x38; // functions pointer
                         LoadingHeapMgr.LevelHeapType m_levelheaptype;
+                        bool m_field44;
+                        bool m_AllowDebugPages;
+                        bool m_field46;
                     };
 
                     struct PkgNameLookupEntry 0x38 {
@@ -1419,12 +1435,12 @@ namespace regenny {
                         enum RequestType : uint32_t {
                             Login = 0x0,
                             Logout = 0x1
-                        }; 
+                        };
 
                         RequestType m_RequestType;
                         StringId64 m_packid @ 0x8;
                         char m_name[0x80] [[utf8*]];
-                        uint32_t m_field90; // Type of package?
+                        PackageCategory m_category;
                         uint32_t m_field94;
                         gamelib.level.Level* m_Level;
                     };
@@ -1444,6 +1460,10 @@ namespace regenny {
                     void* m_field30 @ 0x30; // function pointer
                     regenny.shared.gamelib.level.DataLoading.PackageDataLoadingVTable* m_PackageLoginResFuncs; // functions pointer
                     LoadingHeapMgr.LevelHeapType m_levelheaptype;
+                    bool m_field44;
+                    bool m_AllowDebugPages;
+                    bool m_field46;
+                    bool m_field48 + 0x1;
                     uint32_t m_filed4c @ 0x4c;
                     PackageRequestInfo m_RequestInfo;
                     Package* m_packages; // array of Package

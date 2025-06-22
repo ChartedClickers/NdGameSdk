@@ -138,13 +138,6 @@ struct Package {
         uint32_t m_field2c; // 0x2c
     }; // Size: 0x30
 
-    struct PakLoginTableEntry : public ResItem {
-        uint32_t m_MaxResources; // 0x30
-        private: char pad_34[0x4]; public:
-        uint32_t m_wantedPage; // 0x38
-        uint32_t m_resItemOffset; // 0x3c
-    }; // Size: 0x40
-
     struct PakVramItemTable {
         uint32_t m_nVramItems; // 0x0
         private: char pad_4[0x4]; public:

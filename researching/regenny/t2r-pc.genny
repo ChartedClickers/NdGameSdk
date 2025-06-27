@@ -1441,7 +1441,7 @@ namespace regenny {
                         StringId64 m_packid @ 0x8;
                         char m_name[0x80] [[utf8*]];
                         PackageCategory m_category;
-                        uint32_t m_field94;
+                        uint32_t m_isNumberedPart;
                         gamelib.level.Level* m_Level;
                     };
 
@@ -1452,6 +1452,14 @@ namespace regenny {
                         uint32_t m_maxrequestlimit;
                         PackageRequest* m_PackagesRequested; // array of PackageRequest
                     };
+
+                    struct ProcessingRingBuffer 0x18 {
+                        uint32_t m_head;
+                        uint32_t m_tail;
+                        uint32_t m_numQueued;
+                        uint32_t m_capacity;
+                        PackageProcessingInfo** m_slots;
+                    }
 
                     uint32_t m_freepackageslots;
                     uint32_t m_allocationRingBufferSize;
@@ -1467,23 +1475,13 @@ namespace regenny {
                     uint32_t m_filed4c @ 0x4c;
                     PackageRequestInfo m_RequestInfo;
                     Package* m_packages; // array of Package
-                    uint64_t m_field70;
+                    PackageProcessingInfo* m_packageinfos; // array of PackageProcessingInfo
                     PkgNameLookupHdr m_pakNameLookup;
                     PkgNameLookupHdr m_nickNameLookup;
-                    uint32_t m_fielde0 @ 0xe0;
-                    uint32_t m_filede4;
-                    uint32_t m_LoadQueue;
-                    uint32_t m_filedec;
-                    PackageProcessingInfo** m_packageinfos; // array of PackageProcessingInfo
-                    uint32_t m_numPackagesAwaitingUpdate @ 0x100;
-                    uint32_t m_field104;
-                    uint64_t m_filed108;
-                    uint32_t m_filed130 @ 0x130;
-                    uint32_t m_filed134;
-                    uint32_t m_numPackagesAwaitingLogout;
-                    uint32_t m_filed13c;
-                    uint64_t m_filed140;
-                    uint32_t m_filed148;
+                    ProcessingRingBuffer m_processingLoadQueue @ 0xe0;
+                    ProcessingRingBuffer m_processingUpdateQueue;
+                    ProcessingRingBuffer m_processingUnloadQueue @ 0x130;
+                    uint32_t m_loginStageFence;
                     bool m_forceReleaseVirtualMemory; // Force reload package from disk
                     regenny.shared.corelib.system.platform.ndsys.Mutex m_LoadingLock @ 0x480;
                     regenny.shared.corelib.system.platform.ndsys.ConditionVariable m_ConditionVariable;
@@ -1493,7 +1491,8 @@ namespace regenny {
                     uint32_t m_field530;
                     uint32_t m_field534;
                     void* m_RingBuffer;
-                    uint64_t m_numPackagesAwaitingUnload;
+                    uint32_t m_PendingPackageVramReleaseCount;
+                    PackageProcessingInfo** m_PendingPackageVramRelease + 0x4;
                     bool m_filed4761 @ 0x4761;
                     bool m_field4762;
                 } // package-mgr.cpp

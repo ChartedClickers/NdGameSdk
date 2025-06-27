@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/components/SdkComponent.hpp"
@@ -85,19 +85,49 @@ namespace NdGameSdk::ndlib::io {
 			PackageRequest* GetRequests();
 		};
 
+		class ProcessingRingBuffer : public ISdkRegenny<regenny::shared::ndlib::io::PackageMgr::ProcessingRingBuffer> {
+		public:
+			int GetProcessingCount() const;
+			PackageProcessingInfo** GetSlotArray() const;
+			uint32_t Capacity()	const;
+			uint32_t Head()	const;
+
+			struct Iterator {
+				const ProcessingRingBuffer* ring;
+				uint32_t offset;
+
+				PackageProcessingInfo* operator*() const {
+					const uint32_t idx = (ring->Head() + offset) % ring->Capacity();
+					return ring->GetSlotArray()[idx];
+				}
+
+				Iterator& operator++() { ++offset; return *this; }
+				friend bool operator==(const Iterator& a, const Iterator& b) { return a.ring == b.ring && a.offset == b.offset; }
+				friend bool operator!=(const Iterator& a, const Iterator& b) { return !(a == b); }
+			};
+
+			Iterator begin() const { return { this,0u }; }
+			Iterator end() const { return { this,static_cast<uint32_t>(GetProcessingCount()) }; }
+			std::size_t size() const { return static_cast<std::size_t>(GetProcessingCount()); }
+		};
+
 		int GetFreePackageSlots() const;
 		int GetAllocationRingBufferSize() const;
-		int GetProcessingCount() const;
-		uint64_t GetNumAwaitingLogout() const;
-		uint64_t GetNumAwaitingUpdate() const;
-		uint64_t GetNumAwaitingUnload() const;
 		Memory::Context& GetMemoryContext() const;
 
 		Package* PackageHead();
 		const Package* PackageHead() const;
-		PackageProcessingInfo** GetProcessingArray() const;
+		PackageProcessingInfo* PackageHeadProcessingInfo();
+		const PackageProcessingInfo* PackageHeadProcessingInfo() const;
 
 		PackageRequestInfo& GetPackageRequestInfo();
+
+		ProcessingRingBuffer& GetProcessingLoadQueue() const;
+		ProcessingRingBuffer& GetProcessingUpdateQueue() const;
+		ProcessingRingBuffer& GetProcessingUnloadQueue() const;
+
+		int GetPackageReleaseVramCount();
+		PackageProcessingInfo** GetPendingPackageVramRelease();
 
 		/*Virtual Funcs*/
 		bool PackageLoginResItem(Package* pPackage, Package::ResItem* pResItem);
@@ -121,21 +151,28 @@ namespace NdGameSdk::ndlib::io {
 			PackageIterator end()   const { return end_it; }
 			std::size_t     size()  const { return end_it.idx; }
 		};
+
+		struct PackageProcessingIterator {
+			PackageProcessingInfo* base;
+			std::size_t idx;
+
+			PackageProcessingInfo* operator*() const {
+				auto p = reinterpret_cast<char*>(base);
+				return reinterpret_cast<PackageProcessingInfo*>(p + idx * sizeof(PackageProcessingInfo));
+			}
+
+			PackageProcessingIterator& operator++() { ++idx; return *this; }
+			bool operator!=(const PackageProcessingIterator& o) const { return idx != o.idx; }
+		};
+
+		struct PackageProcessingRange {
+			PackageProcessingIterator begin_it, end_it;
+
+			PackageProcessingIterator begin() const { return begin_it; }
+			PackageProcessingIterator end()   const { return end_it; }
+			std::size_t               size()  const { return end_it.idx; }
+		};
 		
-		struct ProcIt {
-			PackageProcessingInfo** ptr;
-			PackageProcessingInfo* operator*() const { return *ptr; }
-			ProcIt& operator++() { ++ptr; return *this; }
-			bool operator!=(ProcIt const& o) const { return ptr != o.ptr; }
-		};
-
-		struct ProcRange {
-			ProcIt begin_it, end_it;
-			ProcIt begin() const { return begin_it; }
-			ProcIt end()   const { return end_it; }
-			std::size_t size() const { return end_it.ptr - begin_it.ptr; }
-		};
-
 		PackageRange Packages() {
 			auto* head = PackageHead();
 			auto  count = static_cast<std::size_t>(GetFreePackageSlots());
@@ -148,17 +185,17 @@ namespace NdGameSdk::ndlib::io {
 			return { { head, 0 }, { head, count } };
 		}
 
-		ProcRange PackageProcessingQueue() const {
-			auto** base = GetProcessingArray();
-			auto   cnt = static_cast<std::size_t>(GetProcessingCount());
-			return { { base }, { base + cnt } };
-		};
+		PackageProcessingRange ProcessingInfos() {
+			auto* head = PackageHeadProcessingInfo();
+			auto  count = static_cast<std::size_t>(GetFreePackageSlots());
+			return { { head,0 }, { head,count } };
+		}
 
-		ProcRange PackageProcessing() const {
-			auto** base = GetProcessingArray();
-			auto   cnt = static_cast<std::size_t>(GetFreePackageSlots());
-			return { { base }, { base + cnt } };
-		};
+		PackageProcessingRange ProcessingInfos() const {
+			auto* head = const_cast<PackageMgr*>(this)->PackageHeadProcessingInfo();
+			auto  count = static_cast<std::size_t>(GetFreePackageSlots());
+			return { { head,0 }, { head,count } };
+		}
 
 		inline static constexpr uint32_t kMaxNumPackagesAwaitingUnload = 0x800;
 	};
@@ -184,11 +221,10 @@ namespace NdGameSdk::ndlib::io {
 		void Initialize() override;
 		void Awake() override;
 
-
 		PackageMgr* GetPackageMgr() const;
 		bool AddPackageRequest(PackageMgr::PackageRequest* pPackageRequest);
 
-		std::vector<Package::ResItem*> ParseResources(PackageProcessingInfo* ppi);
+		std::expected<std::vector<Package::ResItem*>, std::string> ParseResources(PackageProcessingInfo* ppi);
 
 		static bool TestFunct(DMENU::ItemFunction& pFunction, DMENU::Message pMessage);
 		static bool TestFunct2(DMENU::ItemFunction& pFunction, DMENU::Message pMessage);
@@ -215,7 +251,7 @@ namespace NdGameSdk::ndlib::io {
 		MEMBER_FUNCTION_PTR(uint32_t, PackageMgr_LogoutPackage, PackageMgr* pPackageMgr, PackageProcessingInfo* pPackageInfo);
 
 		MEMBER_FUNCTION_PTR(bool, PackageMgr_PackageQueuesIdle, PackageMgr* pPackageMgr);
-		MEMBER_FUNCTION_PTR(void, PackageMgr_RequestLoadPackage, PackageMgr* pPackageMgr, const char* pPackageName, Level* pLevel, uint32_t arg4, PackageMgr::PackageCategory pCategory);
+		MEMBER_FUNCTION_PTR(void, PackageMgr_RequestLoadPackage, PackageMgr* pPackageMgr, const char* pPackageName, Level* pLevel, uint32_t isNumberedPart, PackageMgr::PackageCategory pCategory);
 		MEMBER_FUNCTION_PTR(void, PackageMgr_RequestLogoutPackage, PackageMgr* pPackageMgr, StringId64 pPackId);
 		MEMBER_FUNCTION_PTR(void, PackageMgr_RequestReloadPackage, PackageMgr* pPackageMgr, StringId64 pPackId);
 		MEMBER_FUNCTION_PTR(void, PackageMgr_AddRequest, PackageMgr::PackageRequestInfo* pRequestInfo, PackageMgr::PackageRequest* pPackageRequest);

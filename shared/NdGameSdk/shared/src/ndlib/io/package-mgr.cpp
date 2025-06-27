@@ -150,10 +150,13 @@ namespace NdGameSdk::ndlib::io {
 		return true;
 	}
 
-	std::vector<Package::ResItem*> PackageManager::ParseResources(PackageProcessingInfo* ppi) {
+	std::expected<std::vector<Package::ResItem*>, std::string> 
+		PackageManager::ParseResources(PackageProcessingInfo* ppi) {
 
 		PackageMgr* mgr = GetPackageMgr();
 		Package* pkg = ppi->GetPackage();
+
+		always_assert(pkg == nullptr, "PackageProcessingInfo did not have a package set!");
 
 		using LoadingStatus = PackageProcessingInfo::LoadingStatus;
 		static constexpr std::array<LoadingStatus, 3> allowedStatuses = {
@@ -162,20 +165,24 @@ namespace NdGameSdk::ndlib::io {
 			LoadingStatus::LoadingPackageStatusFinalizing
 		};
 
-		if (!pkg && std::none_of(allowedStatuses.begin(), allowedStatuses.end(),
+		if (std::none_of(allowedStatuses.begin(), allowedStatuses.end(),
 			[status = ppi->GetStatus()](LoadingStatus s) { return s == status; })) {
-			return {};
+			return std::unexpected{ "Login package did not have a proper status" };
 		}
 
 		const Package::PakHeader& hdr = ppi->GetPakHeader();
 		Package::ResPage* pResPage = ResolvePakPage(mgr, pkg, hdr->m_pakLoginTableIdx);
 
-		if (!pResPage) return {};
+		if (!pResPage) {
+			return std::unexpected{ "failed to resolve login-table page" };
+		}
 
 		PakLoginTableEntry* pPakLoginTable =
 			reinterpret_cast<PakLoginTableEntry*>(reinterpret_cast<std::byte*>(pResPage) + hdr->m_pakLoginTableOffset);
 
-		if (pPakLoginTable->GetResourceType() != Package::ItemId::PAK_LOGIN_TABLE) return {};
+		if (pPakLoginTable->GetResourceType() != Package::ItemId::PAK_LOGIN_TABLE) {
+			return std::unexpected{ "pakLoginTable resource type was not PAK_LOGIN_TABLE" };
+		}
 
 		std::vector<Package::ResItem*> ResOut;
 		const uint32_t maxResources = pPakLoginTable->GetMaxResources();
@@ -211,13 +218,13 @@ namespace NdGameSdk::ndlib::io {
 	#if defined(T2R) || defined(T1X)
 		always_assert(PackageMgr_PackageQueuesIdle == nullptr, "Function pointer was not set!");
 		return PackageMgr_PackageQueuesIdle(GetPackageMgr());
-	#elif
+	#else
 		auto PackageMgr = GetPackageMgr();
 		return PackageMgr->GetPackageRequestInfo().GetNumRequests() <= 0 &&
-			PackageMgr->GetProcessingCount() <= 0 &&
-			PackageMgr->GetNumAwaitingLogout() <= 0 &&
-			PackageMgr->GetNumAwaitingUpdate() <= 0 &&
-			PackageMgr->GetNumAwaitingUnload() <= 0;
+			PackageMgr->GetProcessingLoadQueue().GetProcessingCount() <= 0 &&
+			PackageMgr->GetProcessingUpdateQueue().GetProcessingCount() <= 0 &&
+			PackageMgr->GetProcessingUnloadQueue().GetProcessingCount() <= 0 &&
+			PackageMgr->GetPackageReleaseVramCount() <= 0;
 	#endif
 	}
 
@@ -340,7 +347,7 @@ namespace NdGameSdk::ndlib::io {
 
 						if (pProcessingInfo->GetStatus() == PackageProcessingInfo::LoadingStatus::LoadingPackageStatusLoaded) {
 							auto res = PackageMgr->ParseResources(pProcessingInfo);
-							for (Package::ResItem* item : res) {
+							for (Package::ResItem* item : res.value_or({})) {
 								if (item) {
 									spdlog::info("Resource Item: Type = {}, Name = {}, Size = {} bytes",
 										item->GetResourceTypeId(), item->GetResourceName(), item->GetPageSize());
@@ -371,26 +378,14 @@ namespace NdGameSdk::ndlib::io {
 	}
 
 	PackageProcessingInfo* PackageManager::FetchPackageProcessingInfo(Package* pPackage) {
-		if (!pPackage)
-			return nullptr;
+		if (!pPackage) return nullptr;
 
-		auto PackageMgr = GetPackageMgr();
+		auto* mgr = GetPackageMgr();
+		auto range = mgr->ProcessingInfos();
 
-		PackageProcessingInfo** ppBase = PackageMgr->GetProcessingArray();
-		int used = PackageMgr->GetProcessingCount();
-		int capacity = PackageMgr->GetFreePackageSlots();
-
-		for (std::size_t i = 0; i < used; ++i) {
-			auto* info = ppBase[i];
-			if (info && info->GetPackage() == pPackage)
-				return info; 
-		}
-
-		for (std::size_t i = used; i < capacity; ++i) {
-			auto* info = ppBase[i];
+		for (auto* info : range)
 			if (info && info->GetPackage() == pPackage)
 				return info;
-		}
 
 		return nullptr;
 	}
@@ -433,22 +428,6 @@ namespace NdGameSdk::ndlib::io {
 		return this->Get()->m_allocationRingBufferSize;
 	}
 
-	int PackageMgr::GetProcessingCount() const {
-		return this->Get()->m_LoadQueue;
-	}
-
-	uint64_t PackageMgr::GetNumAwaitingLogout() const {
-		return this->Get()->m_numPackagesAwaitingLogout;
-	}
-
-	uint64_t PackageMgr::GetNumAwaitingUpdate() const {
-		return this->Get()->m_numPackagesAwaitingUpdate;
-	}
-
-	uint64_t PackageMgr::GetNumAwaitingUnload() const {
-		return this->Get()->m_numPackagesAwaitingUnload;
-	}
-
 	Memory::Context& PackageMgr::GetMemoryContext() const {
 		return this->Get()->m_memcontext;
 	}
@@ -457,16 +436,32 @@ namespace NdGameSdk::ndlib::io {
 		return reinterpret_cast<Package*>(this->Get()->m_packages);
 	}
 
-	const Package* PackageMgr::PackageHead()  const  {
+	const Package* PackageMgr::PackageHead() const {
 		return reinterpret_cast<const Package*>(this->Get()->m_packages);
 	}
 
-	PackageProcessingInfo** PackageMgr::GetProcessingArray() const {
-		return reinterpret_cast<PackageProcessingInfo**>(this->Get()->m_packageinfos);
+	PackageProcessingInfo* PackageMgr::PackageHeadProcessingInfo() {
+		return reinterpret_cast<PackageProcessingInfo*>(this->Get()->m_packageinfos);
+	}
+
+	const PackageProcessingInfo* PackageMgr::PackageHeadProcessingInfo() const {
+		return reinterpret_cast<const PackageProcessingInfo*>(this->Get()->m_packageinfos);
 	}
 
 	PackageMgr::PackageRequestInfo& PackageMgr::GetPackageRequestInfo() {
 		return reinterpret_cast<PackageRequestInfo&>(this->Get()->m_RequestInfo);
+	}
+
+	PackageMgr::ProcessingRingBuffer& PackageMgr::GetProcessingLoadQueue() const {
+		return reinterpret_cast<ProcessingRingBuffer&>(this->Get()->m_processingLoadQueue);
+	}
+
+	PackageMgr::ProcessingRingBuffer& PackageMgr::GetProcessingUpdateQueue() const {
+		return reinterpret_cast<ProcessingRingBuffer&>(this->Get()->m_processingUpdateQueue);
+	}
+
+	PackageMgr::ProcessingRingBuffer& PackageMgr::GetProcessingUnloadQueue() const {
+		return reinterpret_cast<ProcessingRingBuffer&>(this->Get()->m_processingUnloadQueue);
 	}
 
 	int PackageMgr::Configuration::GetFreePackageSlots() const {
@@ -483,6 +478,14 @@ namespace NdGameSdk::ndlib::io {
 
 	void PackageMgr::Configuration::SetAllocationRingBufferSize(int size) {
 		this->Get()->m_allocationRingBufferSize = size;
+	}
+
+	int PackageMgr::GetPackageReleaseVramCount() {
+		return this->Get()->m_PendingPackageVramReleaseCount;
+	}
+
+	PackageProcessingInfo** PackageMgr::GetPendingPackageVramRelease() {
+		return reinterpret_cast<PackageProcessingInfo**>(this->Get()->m_PendingPackageVramRelease);
 	}
 
 	bool PackageMgr::PackageLoginResItem(Package* pPackage, Package::ResItem* pResItem) {
@@ -583,6 +586,22 @@ namespace NdGameSdk::ndlib::io {
 
 	PackageMgr::PackageRequest* PackageMgr::PackageRequestInfo::GetRequests() {
 		return reinterpret_cast<PackageMgr::PackageRequest*>(this->Get()->m_PackagesRequested);
+	}
+
+	int PackageMgr::ProcessingRingBuffer::GetProcessingCount() const {
+		return this->Get()->m_numQueued;
+	}
+
+	PackageProcessingInfo** PackageMgr::ProcessingRingBuffer::GetSlotArray() const {
+		return reinterpret_cast<PackageProcessingInfo**>(this->Get()->m_slots);
+	}
+
+	uint32_t PackageMgr::ProcessingRingBuffer::Capacity() const {
+		return this->Get()->m_capacity;
+	}
+
+	uint32_t PackageMgr::ProcessingRingBuffer::Head() const {
+		return this->Get()->m_head;
 	}
 
 	INIT_FUNCTION_PTR(PackageMgr_PackageProcessingInfo_GetStatusString);

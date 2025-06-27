@@ -74,7 +74,7 @@ struct PackageMgr {
         // Metadata: utf8*
         char m_name[128]; // 0x10
         regenny::shared::ndlib::io::PackageMgr::PackageCategory m_category; // 0x90
-        uint32_t m_field94; // 0x94
+        uint32_t m_isNumberedPart; // 0x94
         regenny::shared::gamelib::level::Level* m_Level; // 0x98
     }; // Size: 0xa0
 
@@ -84,6 +84,14 @@ struct PackageMgr {
         uint32_t m_numPackagesRequested; // 0x8
         uint32_t m_maxrequestlimit; // 0xc
         regenny::shared::ndlib::io::PackageMgr::PackageRequest* m_PackagesRequested; // 0x10
+    }; // Size: 0x18
+
+    struct ProcessingRingBuffer {
+        uint32_t m_head; // 0x0
+        uint32_t m_tail; // 0x4
+        uint32_t m_numQueued; // 0x8
+        uint32_t m_capacity; // 0xc
+        regenny::shared::ndlib::io::PackageProcessingInfo** m_slots; // 0x10
     }; // Size: 0x18
 
     uint32_t m_freepackageslots; // 0x0
@@ -103,26 +111,15 @@ struct PackageMgr {
     uint32_t m_filed4c; // 0x4c
     PackageRequestInfo m_RequestInfo; // 0x50
     regenny::shared::ndlib::io::Package* m_packages; // 0x68
-    uint64_t m_field70; // 0x70
+    regenny::shared::ndlib::io::PackageProcessingInfo* m_packageinfos; // 0x70
     PkgNameLookupHdr m_pakNameLookup; // 0x78
     PkgNameLookupHdr m_nickNameLookup; // 0xa8
     private: char pad_d8[0x8]; public:
-    uint32_t m_fielde0; // 0xe0
-    uint32_t m_filede4; // 0xe4
-    uint32_t m_LoadQueue; // 0xe8
-    uint32_t m_filedec; // 0xec
-    regenny::shared::ndlib::io::PackageProcessingInfo** m_packageinfos; // 0xf0
-    private: char pad_f8[0x8]; public:
-    uint32_t m_numPackagesAwaitingUpdate; // 0x100
-    uint32_t m_field104; // 0x104
-    uint64_t m_filed108; // 0x108
+    ProcessingRingBuffer m_processingLoadQueue; // 0xe0
+    ProcessingRingBuffer m_processingUpdateQueue; // 0xf8
     private: char pad_110[0x20]; public:
-    uint32_t m_filed130; // 0x130
-    uint32_t m_filed134; // 0x134
-    uint32_t m_numPackagesAwaitingLogout; // 0x138
-    uint32_t m_filed13c; // 0x13c
-    uint64_t m_filed140; // 0x140
-    uint32_t m_filed148; // 0x148
+    ProcessingRingBuffer m_processingUnloadQueue; // 0x130
+    uint32_t m_loginStageFence; // 0x148
     bool m_forceReleaseVirtualMemory; // 0x14c
     private: char pad_14d[0x333]; public:
     regenny::shared::corelib::system::platform::ndsys::Mutex m_LoadingLock; // 0x480
@@ -134,8 +131,10 @@ struct PackageMgr {
     uint32_t m_field530; // 0x530
     uint32_t m_field534; // 0x534
     void* m_RingBuffer; // 0x538
-    uint64_t m_numPackagesAwaitingUnload; // 0x540
-    private: char pad_548[0x4219]; public:
+    uint32_t m_PendingPackageVramReleaseCount; // 0x540
+    private: char pad_544[0x4]; public:
+    regenny::shared::ndlib::io::PackageProcessingInfo** m_PendingPackageVramRelease; // 0x548
+    private: char pad_550[0x4211]; public:
     bool m_filed4761; // 0x4761
     bool m_field4762; // 0x4762
     private: char pad_4763[0x80d]; public:

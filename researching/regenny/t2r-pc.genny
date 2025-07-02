@@ -1545,8 +1545,8 @@ namespace regenny {
                         void* data_????????? = void __cdecl VramPageConsumed(void *)
                         void* data_????????? = void __cdecl TextureMgrPub::Cmd(const struct PackageManagerCmd &)
                         void* data_????????? = sub_?????????
-                        void* data_????????? = void __cdecl TextureMgrPub::UpdatePackageLoading(void)
                         */
+                        virtual void ReleaseLoadedVramPages() @ 10
                     } 
 
                 }; // data-loading.cpp

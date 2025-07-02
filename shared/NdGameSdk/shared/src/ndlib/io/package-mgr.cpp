@@ -41,6 +41,10 @@ namespace NdGameSdk::ndlib::io {
             PackageMgr_GetPackageById = (PackageMgr_GetPackageById_ptr)Utility::FindAndPrintPattern(module,
                 findpattern.pattern, wstr(Patterns::PackageMgr_GetPackageById), findpattern.offset);
 
+			findpattern = Patterns::PackageMgr_GetProcessingInfoFromPackage;
+			PackageMgr_GetProcessingInfoFromPackage = (PackageMgr_GetProcessingInfoFromPackage_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::PackageMgr_GetProcessingInfoFromPackage), findpattern.offset);
+
             findpattern = Patterns::PackageMgr_GetPackageStatusById;
             PackageMgr_GetPackageStatusById = (PackageMgr_GetPackageStatusById_ptr)Utility::FindAndPrintPattern(module,
                 findpattern.pattern, wstr(Patterns::PackageMgr_GetPackageStatusById), findpattern.offset);
@@ -56,6 +60,10 @@ namespace NdGameSdk::ndlib::io {
             findpattern = Patterns::PackageMgr_SetPackageStatus;
             PackageMgr_SetPackageStatus = (PackageMgr_SetPackageStatus_ptr)Utility::FindAndPrintPattern(module,
                 findpattern.pattern, wstr(Patterns::PackageMgr_SetPackageStatus), findpattern.offset);
+
+			findpattern = Patterns::PackageMgr_ProcessLoginQueue;
+			PackageMgr_ProcessLoginQueue = (PackageMgr_ProcessLoginQueue_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::PackageMgr_ProcessLoginQueue), findpattern.offset);
 
             findpattern = Patterns::PackageMgr_PreparePackageForLoading;
             PackageMgr_PreparePackageForLoading = (PackageMgr_PreparePackageForLoading_ptr)Utility::FindAndPrintPattern(module,
@@ -106,10 +114,12 @@ namespace NdGameSdk::ndlib::io {
 				findpattern.pattern, wstr(Patterns::PackageMgr_ResolvePakPagePtr), findpattern.offset);
 
 			if(!PackageMgr_GetPackageById ||
+				!PackageMgr_GetProcessingInfoFromPackage ||
 				!PackageMgr_GetPackageStatusById ||
 				!PackageMgr_GetPackageByIndex ||
 				!PackageMgr_UpdatePackageStatus ||
 				!PackageMgr_SetPackageStatus ||
+				!PackageMgr_ProcessLoginQueue ||
 				!PackageMgr_PreparePackageForLoading ||
 				!PackageMgr_LogoutPackage ||
 				!PackageMgr_PackageQueuesIdle ||
@@ -144,6 +154,11 @@ namespace NdGameSdk::ndlib::io {
 		return &m_EngineComponents->GetPackageMgr();
 	}
 
+	bool PackageManager::ProcessLoginQueue() {
+		always_assert(PackageMgr_ProcessLoginQueue == nullptr, "Function pointer was not set!");
+		return PackageMgr_ProcessLoginQueue(GetPackageMgr());
+	}
+
 	bool PackageManager::AddPackageRequest(PackageMgr::PackageRequest* pPackageRequest) {
 		always_assert(PackageMgr_AddRequest == nullptr, "Function pointer was not set!");
 		PackageMgr_AddRequest(&GetPackageMgr()->GetPackageRequestInfo(), pPackageRequest);
@@ -153,7 +168,7 @@ namespace NdGameSdk::ndlib::io {
 	std::expected<std::vector<Package::ResItem*>, std::string> 
 		PackageManager::ParseResources(PackageProcessingInfo* ppi) {
 
-		PackageMgr* mgr = GetPackageMgr();
+		PackageMgr* InternalMgr = GetPackageMgr();
 		Package* pkg = ppi->GetPackage();
 
 		always_assert(pkg == nullptr, "PackageProcessingInfo did not have a package set!");
@@ -171,7 +186,7 @@ namespace NdGameSdk::ndlib::io {
 		}
 
 		const Package::PakHeader& hdr = ppi->GetPakHeader();
-		Package::ResPage* pResPage = ResolvePakPage(mgr, pkg, hdr->m_pakLoginTableIdx);
+		Package::ResPage* pResPage = ResolvePakPage(InternalMgr, pkg, hdr->m_pakLoginTableIdx);
 
 		if (!pResPage) {
 			return std::unexpected{ "failed to resolve login-table page" };
@@ -201,7 +216,7 @@ namespace NdGameSdk::ndlib::io {
 				|| (flags & 0xFF0000) == 0x800000)
 				continue;
 
-			Package::ResPage* pageBase = ResolvePakPage(mgr, pkg, pageIdx);
+			Package::ResPage* pageBase = ResolvePakPage(InternalMgr, pkg, pageIdx);
 
 			if (!pageBase) continue;
 
@@ -214,17 +229,164 @@ namespace NdGameSdk::ndlib::io {
 		return ResOut;
 	}
 
+	// Should be working in T2R, but not tested.
+	// Perfectly it should work under custom Ndjob system for bypass TLS
+	std::future<std::expected<void, std::string>> 
+		PackageManager::DumpPackageResources(
+			std::span<const std::string> packages,
+			PackageLoginResItemCallback LoginResItem) 
+	{
+		return std::async(std::launch::async,
+			[this, packages, LoginResItem]() -> std::expected<void, std::string>
+			{
+				PackageMgr* InternalMgr = GetPackageMgr();
+
+				InternalMgr->ReleaseLoadedVramPages();
+				return {};
+
+				if (packages.empty())
+					return std::unexpected("No packages provided for dumping resources.");
+
+				if (!HasFreePackageSlot())
+					return std::unexpected("no free package slots!");
+
+				constexpr std::chrono::milliseconds kMaxWait{ 25'000 };
+
+				auto wait_queues_idle = [this, InternalMgr, kMaxWait](std::string_view what)
+					-> std::expected<void, std::string>
+					{
+						const auto t0 = std::chrono::steady_clock::now();
+						while (!ArePackageQueuesIdle()) {
+							if (std::chrono::steady_clock::now() - t0 > kMaxWait) {
+								return std::unexpected(std::string("timeout while waiting for ") + std::string(what));
+							}
+
+							InternalMgr->ReleaseLoadedVramPages();
+							this->ProcessLoginQueue();
+
+							std::this_thread::sleep_for(std::chrono::milliseconds{ 1 });
+						}
+						return {};
+					};
+
+				auto wait_slot_available = [this, kMaxWait]()->bool
+					{
+						const auto t0 = std::chrono::steady_clock::now();
+						while (GetNumFreePackageSlots() == 0) {
+							if (std::chrono::steady_clock::now() - t0 > kMaxWait)
+								return false;
+							std::this_thread::sleep_for(std::chrono::milliseconds{ 1 });
+						}
+						return true;
+					};
+
+				always_assert(LoginResItem == nullptr, "LoginResItem callback was not set!");
+
+				spdlog::info("[{}] Dumping {} package(s)…", GetName(), packages.size());
+
+				size_t cursor = 0;
+				while (cursor < packages.size()) {
+
+					bool locked = false;
+					if (InternalMgr->GetLoadingLock()->IsInitialized()) {
+						locked = InternalMgr->GetLoadingLock()->Lock();
+					}
+
+					if (!wait_slot_available()) {
+						if (locked) InternalMgr->GetLoadingLock()->Unlock();
+						return std::unexpected("timeout waiting for free package slot");
+					}
+
+					const size_t freeNow = static_cast<size_t>(GetNumFreePackageSlots());
+					const size_t batch = std::min<size_t>(freeNow, packages.size() - cursor);
+
+					/* queue login */
+					std::vector<StringId64> PackageRequestIds;
+					for (std::size_t i = 0; i < batch; ++i) {
+						const std::string& packageName = packages[cursor + i];
+						RequestLoadPackage(packageName.c_str(), nullptr, PackageMgr::PackageCategory::LevelPak);
+						PackageRequestIds.push_back(SID(packageName.c_str()));
+						spdlog::info("[{}] Queued package '{}' for loading.", GetName(), packageName);
+					}
+
+					spdlog::info("[{}] Waiting for login queue to process {} package(s)…", GetName(), batch);
+
+					InternalMgr->Get()->m_forceReleaseVirtualMemory = true;
+
+					if (auto Err = wait_queues_idle("login queue"); !Err) {
+
+						for (const auto& packId : PackageRequestIds)
+							RequestLogoutPackage(packId);
+
+						if (locked) InternalMgr->GetLoadingLock()->Unlock();
+						return Err;
+					}
+
+					for (const auto& packId : PackageRequestIds) {
+
+						Package* pPackage = GetPackageById(packId);
+						if (!pPackage) {
+							spdlog::error("[{}] Package with ID '{}' not found after login request.", GetName(), packId);
+							continue;
+						}
+
+						spdlog::info("[{}] Processing package '{}' for resource dumping.", GetName(), pPackage->GetName());
+
+						PackageProcessingInfo* ppi = FetchPackageProcessingInfo(pPackage);
+						auto status = ppi->GetStatus();
+						
+						if (ppi->GetStatus() == PackageProcessingInfo::LoadingStatus::LoadingPackageStatusError) {
+							spdlog::error("[{}] Package '{}' failed to load: {}", 
+								GetName(), ppi->GetPackage()->GetName(), ppi->GetStatusString());
+							continue;
+						}
+
+						auto resItems = ParseResources(ppi);
+						if (!resItems.has_value()) {
+							spdlog::error("[{}] Failed to parse resources for package '{}': {}", GetName(), pPackage->GetName(), resItems.error());
+							continue;
+						}
+
+						for (auto* resItem : *resItems) {
+							if (!LoginResItem(InternalMgr, pPackage, resItem))
+								spdlog::warn("[{}] LoginResItem callback failed for package '{}'.", GetName(), pPackage->GetName());
+						}
+
+						spdlog::info("[{}] Successfully processed package '{}' with {} resources.",
+							GetName(), pPackage->GetName(), resItems->size());
+
+						RequestLogoutPackage(packId);
+						spdlog::info("[{}] Queued package '{}' for logout.", GetName(), pPackage->GetName());
+					}
+
+					/* queue logout */
+					if (auto Err = wait_queues_idle("logout queue"); !Err) {
+						if (locked) InternalMgr->GetLoadingLock()->Unlock();
+						return Err;
+					}
+
+					cursor += batch;
+					InternalMgr->Get()->m_forceReleaseVirtualMemory = false;
+					if (locked) InternalMgr->GetLoadingLock()->Unlock();
+				}
+
+				spdlog::info("[{}] Successfully dumped resources for {} package(s).", GetName(), packages.size());
+
+				return {};
+			});
+	}
+
 	bool PackageManager::ArePackageQueuesIdle() const {
 	#if defined(T2R) || defined(T1X)
 		always_assert(PackageMgr_PackageQueuesIdle == nullptr, "Function pointer was not set!");
 		return PackageMgr_PackageQueuesIdle(GetPackageMgr());
 	#else
-		auto PackageMgr = GetPackageMgr();
-		return PackageMgr->GetPackageRequestInfo().GetNumRequests() <= 0 &&
-			PackageMgr->GetProcessingLoadQueue().GetProcessingCount() <= 0 &&
-			PackageMgr->GetProcessingUpdateQueue().GetProcessingCount() <= 0 &&
-			PackageMgr->GetProcessingUnloadQueue().GetProcessingCount() <= 0 &&
-			PackageMgr->GetPackageReleaseVramCount() <= 0;
+		auto InternalMgr = GetPackageMgr();
+		return InternalMgr->GetPackageRequestInfo().GetNumRequests() <= 0 &&
+			InternalMgr->GetProcessingLoadQueue().GetProcessingCount() <= 0 &&
+			InternalMgr->GetProcessingUpdateQueue().GetProcessingCount() <= 0 &&
+			InternalMgr->GetProcessingUnloadQueue().GetProcessingCount() <= 0 &&
+			InternalMgr->GetPackageReleaseVramCount() <= 0;
 	#endif
 	}
 
@@ -302,15 +464,45 @@ namespace NdGameSdk::ndlib::io {
 
 	bool PackageManager::TestFunct(DMENU::ItemFunction& pFunction, DMENU::Message pMessage) {
 		if (pMessage == DMENU::Message::OnExecute) {
-			auto PackageMgr = reinterpret_cast<PackageManager*>(pFunction.Data());
-			if (PackageMgr) {
+			auto pm = reinterpret_cast<PackageManager*>(pFunction.Data());
+			if (pm) {
 				spdlog::info("TestFunct called!");
+
+				/*spdlog::info("TestFunct : launching DumpPackageResources…");
+				static const std::vector<std::string> kPackages = {
+					"t2r-anim-ratking",
+					"t2r-anim-ellie-workbench",
+					"t2r-anim-nor-sewers",
+				};
+
+				auto cb = [](PackageMgr* mgr,
+					Package* pkg,
+					Package::ResItem* ri) -> bool
+					{
+						std::string_view name = ri->GetResourceName(); 
+						spdlog::info("[Dump]  {:<20}  {}", pkg->GetName(), name);
+						return true;
+					};
+
+				std::future<std::expected<void, std::string>> fut =
+					pm->DumpPackageResources(kPackages, cb);
+
+				std::thread watcher(
+					[f = std::move(fut)]() mutable
+					{
+						auto res = f.get();
+						if (!res)
+							spdlog::error("dump failed: {}", res.error());
+						else
+							spdlog::info("dump completed");
+					});
+				watcher.detach();*/
 
 				const char* packageName = "world-patrol-jackson-ingame";
 
-				if (!PackageMgr->GetPackageById(SID(packageName))) {
+				if (!pm->GetPackageById(SID(packageName))) {
 					spdlog::info("Package '{}' not found, requesting load...", packageName);
-					if (PackageMgr->RequestLoadPackage(packageName, nullptr, PackageMgr::PackageCategory::LevelPak)) {
+					if (pm->RequestLoadPackage(packageName, nullptr, PackageMgr::PackageCategory::LevelPak)) {
 						spdlog::info("Load request for package '{}' sent successfully.", packageName);
 					}
 					else {
@@ -319,7 +511,7 @@ namespace NdGameSdk::ndlib::io {
 				}
 				else {
 					spdlog::info("Package '{}' is already loaded.", packageName);
-					PackageMgr->RequestLogoutPackage(SID(packageName));
+					pm->RequestLogoutPackage(SID(packageName));
 					spdlog::info("Logout request for package '{}' sent successfully.", packageName);
 				}
 
@@ -379,15 +571,43 @@ namespace NdGameSdk::ndlib::io {
 
 	PackageProcessingInfo* PackageManager::FetchPackageProcessingInfo(Package* pPackage) {
 		if (!pPackage) return nullptr;
+		auto* InternalMgr = GetPackageMgr();
 
-		auto* mgr = GetPackageMgr();
-		auto range = mgr->ProcessingInfos();
+	#if defined(T2R) || defined(T1X)
+		always_assert(PackageMgr_GetProcessingInfoFromPackage == nullptr, "Function pointer was not set!");
+		return PackageMgr_GetProcessingInfoFromPackage(InternalMgr, pPackage);
+	#else
+		auto range = InternalMgr->ProcessingInfos();
 
 		for (auto* info : range)
 			if (info && info->GetPackage() == pPackage)
 				return info;
 
 		return nullptr;
+	#endif
+	}
+
+	int PackageManager::GetNumUsedPackageSlots() const {
+		auto* InternalMgr = GetPackageMgr();
+
+		const int capacity = InternalMgr->GetFreePackageSlots();
+		const Package* cur = InternalMgr->PackageHead();
+
+		int used = 0;
+		for (int i = 0; i < capacity; ++i, ++cur)
+			if (cur->GetStatus() != Package::Status::PackageStatusUnused)
+				++used;
+
+		return used;
+	}
+
+	int PackageManager::GetNumFreePackageSlots() const {
+		auto* InternalMgr = GetPackageMgr();
+		return InternalMgr->GetFreePackageSlots() - GetNumUsedPackageSlots();
+	}
+
+	bool PackageManager::HasFreePackageSlot() const {
+		return GetNumFreePackageSlots() > 0;
 	}
 
 	void PackageManager::Init(PackageMgr* pPackageMgr, PackageMgr::Configuration* pConfiguration) {
@@ -464,6 +684,14 @@ namespace NdGameSdk::ndlib::io {
 		return reinterpret_cast<ProcessingRingBuffer&>(this->Get()->m_processingUnloadQueue);
 	}
 
+	Mutex* PackageMgr::GetLoadingLock() const {
+		return reinterpret_cast<Mutex*>(&this->Get()->m_LoadingLock);
+	}
+
+	Mutex* PackageMgr::GetLoginLock() const {
+		return reinterpret_cast<Mutex*>(&this->Get()->m_LoginLock);
+	}
+
 	int PackageMgr::Configuration::GetFreePackageSlots() const {
 		return this->Get()->m_freepackageslots;
 	}
@@ -489,9 +717,11 @@ namespace NdGameSdk::ndlib::io {
 	}
 
 	bool PackageMgr::PackageLoginResItem(Package* pPackage, Package::ResItem* pResItem) {
-		return this->Get()->m_PackageLoginResFuncs->PackageLoginResItem(
-			reinterpret_cast<regenny::shared::ndlib::io::Package*>(pPackage),
-			reinterpret_cast<regenny::shared::ndlib::io::Package::ResItem*>(pResItem));
+		return this->Get()->m_PackageLoginResFuncs->PackageLoginResItem(pPackage->Get(), pResItem->Get());
+	}
+
+	void PackageMgr::ReleaseLoadedVramPages() {
+		this->Get()->m_PackageLoginResFuncs->ReleaseLoadedVramPages();
 	}
 
 	Package* PackageProcessingInfo::GetPackage() const {

@@ -3,6 +3,7 @@
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/components/SdkComponent.hpp"
 
+#include <NdGameSdk/shared/src/corelib/system/NdSystem.hpp>
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
 #include <NdGameSdk/shared/src/ndlib/debug/nd-dmenu.hpp>
 
@@ -11,11 +12,15 @@
 #include <NdGameSdk/regenny/t2r/shared/ndlib/io/PackageProcessingInfo.hpp>
 #endif
 
+#include <future>
+#include <boost/function.hpp>
+
 #include "package.hpp"
 #include "package-util.hpp"
 
 namespace NdGameSdk::ndlib { class EngineComponents; }
 
+using namespace NdGameSdk::corelib::system::platform;
 using namespace NdGameSdk::corelib::memory;
 using namespace NdGameSdk::gamelib::debug;
 using namespace NdGameSdk::gamelib::level;
@@ -126,11 +131,15 @@ namespace NdGameSdk::ndlib::io {
 		ProcessingRingBuffer& GetProcessingUpdateQueue() const;
 		ProcessingRingBuffer& GetProcessingUnloadQueue() const;
 
+		Mutex* GetLoadingLock() const;
+		Mutex* GetLoginLock() const;
+
 		int GetPackageReleaseVramCount();
 		PackageProcessingInfo** GetPendingPackageVramRelease();
 
 		/*Virtual Funcs*/
 		bool PackageLoginResItem(Package* pPackage, Package::ResItem* pResItem);
+		void ReleaseLoadedVramPages();
 
 		struct PackageIterator {
 			Package* base;
@@ -200,20 +209,24 @@ namespace NdGameSdk::ndlib::io {
 		inline static constexpr uint32_t kMaxNumPackagesAwaitingUnload = 0x800;
 	};
 
-
 	class NdGameSdk_API PackageManager : public ISdkComponent {
 	public:
+		using PackageLoginResItemCallback = boost::function<bool(PackageMgr*, Package*, Package::ResItem*)>;
 
 		PackageManager();
-
 		SdkEvent<PackageManager*> e_PackageManagerInitialized{true};
-
 		SDK_DEPENDENCIES(ndlib::EngineComponents);
 		
 		Package* GetPackageById(StringId64 PackId);
 		PackageProcessingInfo* FetchPackageProcessingInfo(Package* pPackage);
+
+		int GetNumUsedPackageSlots() const;
+		int GetNumFreePackageSlots() const;
+		bool HasFreePackageSlot() const;
 		bool ArePackageQueuesIdle() const;
-		bool RequestLoadPackage(const char* pPackageName, Level* pLevel = nullptr, PackageMgr::PackageCategory pCategory = PackageMgr::PackageCategory::Initial);
+
+		bool RequestLoadPackage(const char* pPackageName, Level* pLevel = nullptr,
+			PackageMgr::PackageCategory pCategory = PackageMgr::PackageCategory::Initial);
 		bool RequestLogoutPackage(StringId64 pPackId);
 		bool RequestReloadPackage(StringId64 pPackId);
 
@@ -222,9 +235,12 @@ namespace NdGameSdk::ndlib::io {
 		void Awake() override;
 
 		PackageMgr* GetPackageMgr() const;
+		bool ProcessLoginQueue();
 		bool AddPackageRequest(PackageMgr::PackageRequest* pPackageRequest);
 
 		std::expected<std::vector<Package::ResItem*>, std::string> ParseResources(PackageProcessingInfo* ppi);
+		std::future<std::expected<void, std::string>> DumpPackageResources(
+			std::span<const std::string> packages, PackageLoginResItemCallback LoginResItem);
 
 		static bool TestFunct(DMENU::ItemFunction& pFunction, DMENU::Message pMessage);
 		static bool TestFunct2(DMENU::ItemFunction& pFunction, DMENU::Message pMessage);
@@ -241,12 +257,14 @@ namespace NdGameSdk::ndlib::io {
 		MidHook m_PackageMgrInitReturnHook{};
 
 		MEMBER_FUNCTION_PTR(Package*, PackageMgr_GetPackageById, PackageMgr* pPackageMgr, StringId64 PackId);
+		MEMBER_FUNCTION_PTR(PackageProcessingInfo*, PackageMgr_GetProcessingInfoFromPackage, PackageMgr* pPackageMgr, Package* pPackage);
 		MEMBER_FUNCTION_PTR(Package::Status, PackageMgr_GetPackageStatusById, PackageMgr* pPackageMgr, StringId64 PackId);
 		MEMBER_FUNCTION_PTR(Package*, PackageMgr_GetPackageByIndex, PackageMgr* pPackageMgr, uint32_t index, bool MustBeLoaded);
 		
 		MEMBER_FUNCTION_PTR(void, PackageMgr_UpdatePackageStatus, PackageProcessingInfo* pPackageInfo, PackageProcessingInfo::LoadingStatus status);
 		MEMBER_FUNCTION_PTR(void, PackageMgr_SetPackageStatus, PackageProcessingInfo* pPackageInfo);
 
+		MEMBER_FUNCTION_PTR(bool, PackageMgr_ProcessLoginQueue, PackageMgr* pPackageMgr);
 		MEMBER_FUNCTION_PTR(PackageProcessingInfo*, PackageMgr_PreparePackageForLoading, PackageMgr* pPackageMgr, const char* pPackageName, uint32_t arg3);
 		MEMBER_FUNCTION_PTR(uint32_t, PackageMgr_LogoutPackage, PackageMgr* pPackageMgr, PackageProcessingInfo* pPackageInfo);
 

@@ -70,8 +70,10 @@ namespace NdGameSdk::Patterns {
 
 	static inline const SdkPattern PackageMgr_Init = { L"48 89 5c 24 10 48 89 74 24 18 48 89 7c 24 20 55 41 54 41 55 41 56 41 57 48 8d ac 24 ?? ?? ?? ?? 48 81 ec 70 02 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 85 60 01 00 00 48 8b fa 48 8b d9 48 81 c1 68 47 00 00 33 d2 41 b8 00 08 00" };
 	static inline const SdkPattern PackageMgr_InitReturn = { L"e8 ?? ?? ?? ?? 48 8b 4b 68 49 03 cf e8 ?? ?? ?? ?? 48 8b 83 d8 00 00 00 89 34 b8 41 ff c6 44 3b 33 72 ?? 48 8b c6 48 87 05 ?? ?? ?? ?? 89 75 c8 48 8d 15 ?? ?? ?? ?? 48 8d 4d c8 e8 ?? ?? ?? ?? 48 8d 93 80 04 00 00 48 8d 4d c8 e8 ?? ?? ?? ?? 33 d2 48 8d 4d 18 e8 ?? ?? ?? ?? 48 8d 93 c0 04", +0xe9 };
-	static inline const SdkPattern PackageMgr_ProcessLoginQueue = { L"e8 ?? ?? ?? ?? 49 2b c7 48 8b c8 e8 ?? ?? ?? ?? c5 f8 2f f0 77 ?? 3b af ?? ?? ?? ?? 0f 82 ?? ?? ?? ?? 48 8b 4f 30 48 85 c9 74 ?? 48 8b 01 0f b6 97 ?? ?? ?? ?? 0a 97 ?? ?? ?? ?? ff 50 18", +0x45 };
+	static inline const SdkPattern PackageMgr_ProcessLoginQueue = { L"48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 57 41 56 41 57 48 83 ec 60 c5 f8 29 74 24 50 c5 f8 28 f1 48 8b f9 33 ed 40 38 2d ?? ?? ?? ?? 0f 84 ?? ?? ?? ?? 8d 4d 02" };
+	static inline const SdkPattern PackageMgr_ProcessLoginQueueUpdate = { L"e8 ?? ?? ?? ?? 49 2b c7 48 8b c8 e8 ?? ?? ?? ?? c5 f8 2f f0 77 ?? 3b af ?? ?? ?? ?? 0f 82 ?? ?? ?? ?? 48 8b 4f 30 48 85 c9 74 ?? 48 8b 01 0f b6 97 ?? ?? ?? ?? 0a 97 ?? ?? ?? ?? ff 50 18", +0x45 };
 	static inline const SdkPattern PackageMgr_GetPackageById = { L"48 89 5c 24 18 48 89 54 24 10 55 56 57 48 8d 6c 24 ?? 48 81 ec ?? ?? ?? ?? c5 f9 ef c0 33 c0 4c 8d 45 ?? 48 8b f9 48 89 45 ?? c5 fc 11 45 b7 c5 f8 11 45 d7 48 8d 55 b7 48 83 c1 78 c5 f8 77" };
+	static inline const SdkPattern PackageMgr_GetProcessingInfoFromPackage = { L"48 85 d2 74 ?? 48 2b 51 68 48 b8" };
 	static inline const SdkPattern PackageMgr_GetPackageStatusById = { L"48 81 ec c8 00 00 00 8b 41 58 4c 8b d1 83 e8 01 78 ?? 44 8b 59 58 41 3b c3 7d" };
 	static inline const SdkPattern PackageMgr_GetPackageByIndex = { L"48 63 c2 48 69 d0 00 1b 00 00 48 03 51 ?? 0f b6 8a ?? ?? ?? ?? 83 e9 01 74 0f 83 e9 02 74 0a 83 e9 01 74 0a 83 f9 01 75 09 45 84 c0 75 04" };
 	static inline const SdkPattern PackageMgr_UpdatePackageStatus = { L"0f b6 c2 88 51 08 83 f8 12 77 ?? 4c 8d 05 ?? ?? ?? ??" };

@@ -2,7 +2,7 @@
 #include "NdGameSdk/components/SdkRegenny.hpp"
 
 #include <NdGameSdk/shared/src/corelib/memory/memory-map.hpp>
-#include <NdGameSdk/shared/src/corelib/system/platform/synchronized.hpp>
+#include <NdGameSdk/shared/src/corelib/system/synchronized.hpp>
 
 #if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/ndlib/script/ScriptModule.hpp>
@@ -17,7 +17,7 @@
 #include <Utility/helper.hpp>
 #include <Utility/function_ptr.hpp>
 
-using namespace NdGameSdk::corelib::system::platform;
+using namespace NdGameSdk::corelib::system;
 
 namespace NdGameSdk::ndlib::script {
 

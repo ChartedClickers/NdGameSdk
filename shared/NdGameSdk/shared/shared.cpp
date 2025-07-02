@@ -1,5 +1,6 @@
 #include "shared.hpp"
 
+#include "src/corelib/system/NdSystem.hpp"
 #include "src/corelib/memory/memory.hpp"
 #include "src/ndlib/engine-components.hpp"
 #include "src/ndlib/io/package-mgr.hpp"
@@ -15,8 +16,8 @@ namespace NdGameSdk {
 	{
 		auto SharedComponents = ISdkComponent::GetSharedComponents();
 
+		SharedComponents->AddComponent<corelib::system::NdSystem>();
 		auto MemComponent = SharedComponents->AddComponent<corelib::memory::Memory>(cfg.Memory);
-
 		SharedComponents->AddComponent<ndlib::EngineComponents>();
 		SharedComponents->AddComponent<ndlib::render::dev::DebugDrawCommon>();
 		SharedComponents->AddComponent<ndlib::script::ScriptManager>();

@@ -24,6 +24,10 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern SsManager_ErrorPrintF = { L"48 8d 05 ?? ?? ?? ?? 33 d2 4c 8d 05 ?? ?? ?? ?? 48 3b 08 75 03 48 89 10 48 83 c0 08 49 3b c0 7c ef c3", +0x70 };
 	static inline const SdkPattern ScriptManager_ErrorPrintF = { L"4d 8b cf 41 b8 ed 02 00 00 49 8b d6 48 8b cd c5 f8 77 e8 ?? ?? ?? ?? 90 c5 f8 77 48 8b 5c 24 60 48 8b 6c 24 68 48 8b 74 24 70 48 83 c4 40 41 5f 41 5e 5f c3", +0x3e };
 
+	static inline const SdkPattern NdSystem_Mutex_Lock = { L"48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 57 41 56 41 57 48 83 ec 40 44 8b f2 48 8b f9 85 d2 0f 85" };
+	static inline const SdkPattern NdSystem_Mutex_TryLock = { L"48 89 5c 24 10 48 89 6c 24 18 48 89 7c 24 20 41 56 48 83 ec 30 45 33 f6 48 8b d9 44 38 71 14 75 ?? e8 ?? ?? ?? ?? 48 8b f8 48 85 c0 74 ?? b1 01 ff d7 e8 ?? ?? ?? ?? 48 85 c0 74 ?? ff d0" };
+	static inline const SdkPattern NdSystem_Mutex_Unlock = { L"40 53 48 83 ec 30 80 79 14 00 48 8b d9 48 89 7c 24 40 75 71 e8 ?? ?? ?? ?? 48 8b f8 48 85 c0 74 04 b1 01 ff d7 e8 ?? ?? ?? ?? 48 85 c0 74 02 ff d0 e8 ?? ?? ?? ?? 48 85 c0 74 02 ff d0" };
+
 	static inline const SdkPattern Memory_AllocateMemoryMap = { L"48 83 ec 58 48 89 5c 24 60 48 89 6c 24 68 48 89 7c 24 50 4c 89 6c 24 40 4c 89 74 24 38 4c 8b f2 4c 63 e9 48 8d 15 ?? ?? ?? ?? 48 8d 0d ?? ?? ?? ?? 4c 89 7c 24 30", +0xaa };
 	static inline const SdkPattern Memory_ValidateContext = { L"4c 89 6c 24 28 4c 8d 0d ?? ?? ?? ?? 4c 8d 05 ?? ?? ?? ?? c7 44 24 20 27 00 00 00 48 8d", +0x30 };
 	static inline const SdkPattern Memory_ModifyMemoryMap = { L"48 89 5c 24 18 48 89 74 24 20 57 48 83 ec 30 48 b8 00 00 00 00 02 00 00 00 48 8b fa 8b f1 48 3b d0 0f 82 a9 00 00 00 48 89 6c 24 40" };
@@ -85,8 +89,6 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern PackageMgr_GetPakHdrPageEntry = { L"48 89 74 24 10 48 89 7c 24 18 41 56 48 83 ec 30 4c 8b f2 41 8b f8 48 8b f1 44 3b 41 10 72 7b 48 89 5c 24 40 e8 ?? ?? ?? ?? 48 8b d8 48 85 c0 74 04 b1 01 ff d3" };
 	static inline const SdkPattern PackageMgr_ResolvePakPagePtr = { L"48 83 ec 18 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 04 24 41 8b c0 8b 44 82 20 0f ba e0 18 73 26 44 2b 82 9c 09 00 00 41 c1 e0 15 49 63 c0 48" };
 
-
-
 	static inline const SdkPattern NdDevMenu_GameConfig_DevMode = { L"41 0f b6 8c 24 13 3f 00 00 84 c9 0f 94 c2 84 c9 0f 95 c1", +0xb };
 	static inline const SdkPattern NdDevMenu_NdDevMenuAppend_Particles = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 40 48 8b f1 33 c9 e8 ?? ?? ?? ?? 84 c0 0f 84 9d" };
 	static inline const SdkPattern NdDevMenu_DMENU_Component = { L"40 53 57 41 57 48 83 ec 30 45 33 ff c7 41 68 c8 c8 c8 ff 4c 89 b9 80 00 00 00 48 8d 05 ?? ?? ?? ?? 48 89 01 48 8b da 4c 89 79 30 48 8b f9 44 89 79 4e 4c 89 79 38 4c 89 79 40 44 89 79 48 66 44 89 79 4c 4c 89 79 58 4c 89 79 60 4c 89 b9 90 00 00 00 c7 41 6c ff ff 00 ff c7 41 70 b0 ff b0 ff 66 44 89 79 74 66 44 89 b9 98 00 00 00 4c 89 79 78 4c 89 b9 88 00 00 00 4c 89 79 08 48 85 d2" };
@@ -145,6 +147,10 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern SsManager_WarnPrintF = { L"4c 89 44 24 18 4c 89 4c 24 20 c3 cc 48 89 5c 24 08 57 48 83 ec 30" };
 	static inline const SdkPattern SsManager_ErrorPrintF = { L"48 89 54 24 10 4c 89 44 24 18 4c 89 4c 24 20 c3 48 89 54 24 10 4c 89 44 24 18 4c 89 4c 24 20 c3 48 89 5c 24 18 48 89 74 24 20 55 57 41 55 41 56 41 57 48 8d ac 24 60 fc ff ff" };
 	static inline const SdkPattern ScriptManager_ErrorPrintF = { L"48 8b c4 48 89 48 08 48 89 50 10 4c 89 40 18 4c 89 48 20 53 48 83 ec 20 8b ?? ?? ?? ?? ?? ?? 8d 58 10 e8 ?? ?? ?? ??" };
+
+	static inline const SdkPattern NdSystem_Mutex_Lock = { L"48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 48 89 7c 24 20 41 56 48 83 ec 40 44 8b f2 48 8b f9 85 d2 0f 85 ?? ?? ?? ?? e8 ?? ?? ?? ?? 48 8b d8 48 85 c0 74 04 b1 01 ff d3 e8 ?? ?? ?? ?? 48 85 c0 74 02" };
+	static inline const SdkPattern NdSystem_Mutex_TryLock = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 30 80 79 30 00 48 8b d9 75 ?? e8 ?? ?? ?? ?? 48 8b f8 48 85 c0 74 ?? b1 01 ff d7 e8 ?? ?? ?? ?? 48 85 c0 74 ?? ff d0" };
+	static inline const SdkPattern NdSystem_Mutex_Unlock = { L"48 89 5c 24 08 57 48 83 ec 30 80 79 30 00 48 8b d9 75 71 e8 ?? ?? ?? ?? 48 8b f8 48 85 c0 74 04 b1 01 ff d7 e8 ?? ?? ?? ?? 48 85 c0 74 02 ff d0" };
 
 	static inline const SdkPattern Memory_AllocateMemoryMap = { L"48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 41 56 41 57 48 83 EC 30 48 8B F2 8B F9 E8 ?? ?? ?? ?? 48 8B D6 8B", +0x42 };
 	static inline const SdkPattern Memory_ValidateContext = { L"c7 44 24 20 27 00 00 00 48 8d 15", +0x1d };
@@ -240,6 +246,10 @@ namespace NdGameSdk::Patterns {
 #endif
 
 #if defined(T2R) || defined(T1X) 
+
+	static inline const SdkPattern NdSystem_CreateThread = { L"40 53 55 56 57 41 56 48 81 ec 60 02 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 50 02 00 00 48 8d 44 24 30 48 8b fa 8b 12 48 8b e9 48 89 44 24 28 45 33 f6 33 c9 c7 44 24 20 04 00 00 00 44 89 74 24 30 e8 ?? ?? ?? ?? 48 8b f0 48 85 c0 75 6d" };
+	static inline const SdkPattern NdSystem_ReleaseThreadHandle = { L"48 89 6c 24 10 48 89 74 24 18 57 48 83 ec 40 48 8b 31 33 ed 48 8b f9 48 85 f6 75 77 48 89 5c 24 50 e8 ?? ?? ?? ?? 48 8b d8 48 85 c0 74 04 b1 01 ff d3 e8 ?? ?? ?? ?? 48 85 c0 74 02 ff d0 e8 ?? ?? ?? ?? 48 85 c0 74 02 ff d0 e8 ?? ?? ?? ?? 48 85 c0 74 2b 48 89 6c 24 28 4c 8d 0d" };
+	static inline const SdkPattern NdSystem_Thread_Join = { L"48 89 5c 24 18 56 48 83 ec 30 f6 41 0c 01 48 8b f1 48 89 7c 24 48 0f 85 ?? ?? ?? ??" };
 
 	static inline const SdkPattern Memory_s_MemoryMap = { L"01 00 00 00 02 00 00 00 00 00 ?? 00 00 00 00 00 00 00 10 00" };
 

@@ -104,11 +104,11 @@ namespace NdGameSdk::common {
 
 				auto DebugDraw = GetSharedComponents()->GetComponent<ndlib::render::dev::DebugDrawCommon>();
 
-				if (DebugDraw) {
+				findpattern = Patterns::CommonGame_PrimServer_Create;
+				auto PrimServerCreateJMP = (void*)Utility::FindAndPrintPattern(module
+					, findpattern.pattern, wstr(Patterns::CommonGame_PrimServer_Create), findpattern.offset);
 
-					findpattern = Patterns::CommonGame_PrimServer_Create;
-					auto PrimServerCreateJMP = (void*)Utility::FindAndPrintPattern(module
-						, findpattern.pattern, wstr(Patterns::CommonGame_PrimServer_Create), findpattern.offset);
+				if (DebugDraw && PrimServerCreateJMP) {
 
 					m_PrimServer_CreateHook = Utility::MakeMidHook(PrimServerCreateJMP,
 						[](SafetyHookContext& ctx)

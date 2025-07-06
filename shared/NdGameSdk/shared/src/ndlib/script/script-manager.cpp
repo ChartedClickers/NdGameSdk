@@ -190,7 +190,7 @@ namespace NdGameSdk::ndlib::script {
     void ScriptManager::ModuleIndexInitialized(SafetyHookContext& ctx) {
         ScriptManager* ScriptMgr = Instance<ScriptManager>();
 
-        ScriptMgr->PrintModuleInfos(true);
+        //ScriptMgr->PrintModuleInfos(true);
         ScriptMgr->InvokeSdkEvent(ScriptMgr->e_ModuleIndexInitialized);
         return;
     }

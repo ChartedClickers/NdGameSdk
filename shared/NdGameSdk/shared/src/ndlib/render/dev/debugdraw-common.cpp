@@ -105,6 +105,13 @@ namespace NdGameSdk::ndlib::render::dev {
 			auto DebugDrawSidJMP = (void*)Utility::FindAndPrintPattern(module
 				, findpattern.pattern, wstr(Patterns::GameDebugDraw_DebugDrawSid), findpattern.offset);
 
+			if (!GameDebugDrawJMP ||
+				!DebugDrawSidJMP
+				) {
+				throw SdkComponentEx{ std::format("Failed to find addresses!"),
+					SdkComponentEx::ErrorCode::PatternFailed };
+			}
+
 			m_DebugDrawHook = Utility::MakeMidHook(GameDebugDrawJMP,
 				DebugDraw, wstr(Patterns::GameDebugDraw_StaticContextHook), wstr(GameDebugDrawJMP));
 

@@ -136,9 +136,9 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern EngineComponents_s_ndConfig = { L"B8 04 00 00 00 48 8D ?? ?? ?? ?? ?? 8D 50 7C C5 F8 10 03 C5 F8 11 01 C5 F8 10 4B 10 C5 F8 11 49 10 C5 F8 10 43 20 C5 F8 11 41 20 C5 F8 10 4B 30 C5 F8 11 49 30 C5 F8 10 43 40 C5 F8 11 41 40 C5 F8 10 4B 50 C5 F8 11 49 50 C5 F8 10 43 60 C5 F8 11 41 60", +0x5 };
 
 	static inline const SdkPattern CommonGame_GameInit = { L"40 53 48 83 ec 40 80 3d ?? ?? ?? ?? 00 48 8b d9 74 0c 48 8d 4c 24 20 e8 ?? ?? ?? ?? eb 0a 48 8d 4c 24 30"};
-	static inline const SdkPattern CommonGame_PrimServer_Create = { L"41 ff 90 ?? ?? ?? ?? 48 83 65 ?? 00 48 8d 05 ?? ?? ?? ??" };
+	static inline const SdkPattern CommonGame_PrimServer_Create = { L"ff 90 b0 01 00 00 48 83 65 08 00 4c 8d 0d ?? ?? ?? ?? 44 89 64 24 40 4c 8d 45 08 48 83 4c 24 38 ff 48 8d 8d c0 00 00 00 c6 44 24 30 03 41" };
 	static inline const SdkPattern CommonGame_CommonGameLoop_GameLoopUpdate = { L"e8 ?? ?? ?? ?? 48 8b ?? ?? ?? ?? 05 e8 ?? ?? ?? ?? 48 8b 8d c0 00 00 00 48 33 cc e8 ?? ?? ?? ?? 4c 8d 9c 24 60 01 00 00 49 8b 5b 38 49 8b 73 40 49 8b 7b 48 49 8b", +0x11 };
-	static inline const SdkPattern CommonGame_CommonGameLoop_GameDebugUpdate = { L"48 8b 0d ?? ?? ?? ?? 48 8b 01 ff 90 a0 00 00 00 e8 ?? ?? ?? ?? e8 ?? ?? ?? ?? 33 d2 89 5c 24 30 4c 89 6c 24 28 4c 8d 0d ?? ?? ?? ?? 48 8d 0d ?? ?? ?? ?? c7 44 24 20 42 15 00 00 44 8d 42 03 e8 ?? ?? ?? ?? 44 38 3d ?? ?? ?? ?? 74 11", +0x8A };
+	static inline const SdkPattern CommonGame_CommonGameLoop_GameDebugUpdate = { L"48 8b 0d ?? ?? ?? ?? 48 8b 01 ff 90 a0 00 00 00 e8 ?? ?? ?? ?? e8 ?? ?? ?? ?? 33 d2 89 5c 24 30 4c 89 6c 24 28 4c 8d 0d ?? ?? ?? ?? 48 8d 0d", +0x8A };
 	static inline const SdkPattern CommonGame_CommonMainWin_SystemInit = { L"48 89 5c 24 20 55 56 57 41 54 41 56 48 83 ec 40 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 38 49 8b f0 89 15 ?? ?? ?? ?? 8b fa 4c 89 05 ?? ?? ?? ?? 4c 8b f1" };
 	static inline const SdkPattern CommonGame_CommonMainWin_SystemInitReturn = { L"48 83 63 20 00 48 8d 05 ?? ?? ?? ?? 48 89 03 eb 02 33 db 48 8b cb e8 ?? ?? ?? ?? 40 8a cd e8 ?? ?? ?? ?? 4c 8b ce 44 8b c7 40 8a d5 48 8b cb e8 ?? ?? ?? ?? 48 8b cb e8 ?? ?? ?? ?? 84 c0 74 10 c6 05 ?? ?? ?? ?? 00 c6 05", +0x6C };
 
@@ -150,9 +150,9 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern SsManager_ErrorPrintF = { L"48 89 54 24 10 4c 89 44 24 18 4c 89 4c 24 20 c3 48 89 54 24 10 4c 89 44 24 18 4c 89 4c 24 20 c3 48 89 5c 24 18 48 89 74 24 20 55 57 41 55 41 56 41 57 48 8d ac 24 60 fc ff ff" };
 	static inline const SdkPattern ScriptManager_ErrorPrintF = { L"48 8b c4 48 89 48 08 48 89 50 10 4c 89 40 18 4c 89 48 20 53 48 83 ec 20 8b ?? ?? ?? ?? ?? ?? 8d 58 10 e8 ?? ?? ?? ??" };
 
-	static inline const SdkPattern NdSystem_Mutex_Lock = { L"48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 48 89 7c 24 20 41 56 48 83 ec 40 44 8b f2 48 8b f9 85 d2 0f 85 ?? ?? ?? ?? e8 ?? ?? ?? ?? 48 8b d8 48 85 c0 74 04 b1 01 ff d3 e8 ?? ?? ?? ?? 48 85 c0 74 02" };
-	static inline const SdkPattern NdSystem_Mutex_TryLock = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 30 80 79 30 00 48 8b d9 75 ?? e8 ?? ?? ?? ?? 48 8b f8 48 85 c0 74 ?? b1 01 ff d7 e8 ?? ?? ?? ?? 48 85 c0 74 ?? ff d0" };
-	static inline const SdkPattern NdSystem_Mutex_Unlock = { L"48 89 5c 24 08 57 48 83 ec 30 80 79 30 00 48 8b d9 75 71 e8 ?? ?? ?? ?? 48 8b f8 48 85 c0 74 04 b1 01 ff d7 e8 ?? ?? ?? ?? 48 85 c0 74 02 ff d0" };
+	static inline const SdkPattern NdSystem_Mutex_Lock = { L"48 83 ec 40 44 8b f2 48 8b f9 85 d2 0f 85 ?? ?? ?? ?? e8 ?? ?? ?? ?? 48 8b d8 48 85 c0 74 04 b1 01 ff d3 e8 ?? ?? ?? ?? 48 85 c0 74 02 ff d0" -0x14 };
+	static inline const SdkPattern NdSystem_Mutex_TryLock = { L"40 57 48 83 ec 20 48 8b f9 4c 8b ca 48 83 c1 04 48 85 d2 74 ?? 48 89 5c 24 30 48 c7 c0 ff ff ff ff 48 ff c0 80 3c 02 00 75 ?? 83 f8 20 ba 1f 00 00 00 0f 4c d0 48 63 da 49 8b d1 4c 8b c3 e8 ?? ?? ?? ?? c6 44 3b 04 00 48 8b 5c 24 30 c5 f8 77 48 83 c4 20 5f c3", +0x70 };
+	static inline const SdkPattern NdSystem_Mutex_Unlock = { L"40 53 48 83 ec 30 80 79 14 00 48 8b d9 48 89 7c 24 40 75 ?? e8 ?? ?? ?? ?? 48 8b f8 48 85 c0 74 ?? b1 01 ff d7 e8 ?? ?? ?? ?? 48 85 c0 74 ?? ff d0 e8 ?? ?? ?? ?? 48 85 c0 74 ?? ff d0" };
 
 	static inline const SdkPattern Memory_AllocateMemoryMap = { L"48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 41 56 41 57 48 83 EC 30 48 8B F2 8B F9 E8 ?? ?? ?? ?? 48 8B D6 8B", +0x42 };
 	static inline const SdkPattern Memory_ValidateContext = { L"c7 44 24 20 27 00 00 00 48 8d 15", +0x1d };
@@ -195,7 +195,7 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern NdDevMenu_GameConfig_DevMode = { L"8a 8f ?? ?? ?? ?? 84 c9 0f 94 c2 84 c9 0f 95 c1" };
 	static inline const SdkPattern NdDevMenu_NdDevMenuAppend_Particles = { L"40 56 48 83 ec 30 48 8b f1 33 c9 e8 ?? ?? ?? ?? 84 c0 0f 84 ?? ?? ?? ?? 48 89 5c 24 40 4c 8d 0d ?? ?? ?? ??" };
 
-	static inline const SdkPattern NdDevMenu_DMENU_Component = { L"40 53 57 41 57 48 83 ec 30 45 33 ff c7 41 68 c8 c8 c8 ff 4c 89 b9 80 00 00 00 48 ?? ?? ?? ?? 56 02 48 ?? ?? ?? ?? da 4c 89 79 30 48 8b f9 44 89 79 4e 4c 89 79 38 4c 89" };
+	static inline const SdkPattern NdDevMenu_DMENU_Component = { L"40 53 57 41 57 48 83 ec 30 45 33 ff c7 41 68 c8 c8 c8 ff 4c 89 b9 80 00 00 00 48 ?? ?? ?? ?? ?? ?? 48 ?? ?? ?? ?? da 4c 89 79 30 48 8b f9 44 89 79 4e 4c 89 79 38 4c 89 79 40 44 89" };
 	static inline const SdkPattern NdDevMenu_DMENU_MenuGroup = { L"48 89 5c 24 08 57 48 83 ec 20 41 8b d8 48 8b f9 e8 ?? ?? ?? ?? 88 9f a0 00 00 00 48 ?? ?? ?? ?? 56 02 33 db 48 ?? ?? ?? ?? 9f c8 00 00 00 b9 00 10 00 00 48 89 9f 20 03 00 00 48 89 9f 28 03 00 00 48 89 9f a8 00 00 00 48 89 9f b0 00 00 00" };
 	static inline const SdkPattern NdDevMenu_DMENU_Menu = { L"48 89 5c 24 08 57 48 83 ec 20 41 8b d8 48 8b f9 e8 ?? ?? ?? ?? 48 ?? ?? ?? ?? 56 02 89 9f b8 00 00 00 48 ?? ?? ?? ?? 48 ?? ?? ?? ?? 48 89 87 a0 00 00 00 89 87 a8 00 00 00 48 89 87 b0 00 00 00 88 87 bc 00 00 00 48" };
 	static inline const SdkPattern NdDevMenu_DMENU_KeyBoard = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 30 48 8b 44 24 60 41 8b f1 45 33 c9 48 89 44 24 28 83" };
@@ -228,7 +228,7 @@ namespace NdGameSdk::Patterns {
 	/*DebugDraw*/
 	static inline const SdkPattern GameFramePreRenderUpdate = { L"48 8b c4 48 89 58 08 48 89 70 10 48 89 78 18 55 41 54 41 55 41 56 41 57 48 81 ec a0 03 00 00 48 8d a8 c8 fc ff ff 48 83 e5 c0 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 85 00 03 00 00" };
 	static inline const SdkPattern GameDebugDraw_StaticContextHook = { L"e8 ?? ?? ?? ?? 44 0f b6 cf 48 89 44 24 20 44 0f b6 c6 48 8b d5 48 8b cb e8 ?? ?? ?? ?? 48 8b 74 24 48", +0x32 };
-	static inline const SdkPattern GameDebugDraw_DebugDrawSid = { L"c5 fa 10 8d c0 01 00 00 c5 7a 10 64 24 78 45 33 ed eb 82 48 85 c0 0f 84 ba 00 00", +0x23 };
+	static inline const SdkPattern GameDebugDraw_DebugDrawSid = { L"c5 fa 10 8d 18 02 00 00 c5 7a 10 6c 24 78 eb ?? 48 85 c0 0f 84 ?? ?? ?? ?? 4c 8d", +0x20 };
 	static inline const SdkPattern WindowContext_WindowContext = { L"48 8b c4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 56 48 83 ec ?? 33 ff 49 8b f0 40 38 3d ?? ?? ?? ?? 8b ea 48 8b d9" };
 	static inline const SdkPattern FrameParams_GetFrameParams = { L"40 53 48 83 ec 20 e8 ?? ?? ?? ?? 8a d8 84 c0 74 1a 48 8d 54 24 30 b9 02 00 00 00 e8 ?? ?? ?? ?? 84 c0 74 07 48 8b 44 24 30 eb 6a e8 6c 00 00 00 4c 8b 05" };
 	static inline const SdkPattern Text_textPrintV = { L"4c 8b dc 48 83 ec 58 c5 fa 10 84 24 80 00 00 00 49 8d 43 40 49 89 43 f0 49 8b 43 38 49 89 43 e8 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 8b 84 24 88 00 00 00 89 44 24 28 c5 fa 11 44 24 20" };
@@ -237,8 +237,8 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern Msg_PrintToActiveMsgOutput = { L"48 8b c4 48 89 48 08 48 89 50 10 4c 89 40 18 4c 89 48 20 53 48 83 ec 30 48 85 c9 75 ?? 48 8b 1d ?? ?? ?? ?? 48 85 db 74 ?? b1 01 ff d3 48 8b 05 ?? ?? ?? ?? 48 85 c0 74 ??" };
 	static inline const SdkPattern Msg_MsgConDrawBuffersHook = { L"8a 4c 24 30 e8 ?? ?? ?? ?? 48 8b 4d ef 48 33 cc e8 ?? ?? ?? ??", +0x9 };
 
-	static inline const SdkPattern PrimServer_PrimServer = { L"48 8b ?? ?? ?? ?? ?? 48 8b d3 4c 8b 01 41 ff 90 b0 01 00 00 48 83 65 08" };
-	static inline const SdkPattern PrimServer_Create = { L"40 53 48 83 ec 30 48 8d 0d ?? ?? ?? ?? 48 8b da 48 8d 05 ?? ?? ?? ?? 48 8b d1 41 b9 60 0d 00 00" };
+	static inline const SdkPattern PrimServer_PrimServer = { L"48 8b ?? ?? ?? ?? ?? ?? 8b d3 ?? 8b 01 ?? 90 b0 01 00 00 48 83 65 08" };
+	static inline const SdkPattern PrimServer_Create = { L"40 53 48 83 ec 30 48 8b da 48 8d 05 ?? ?? ?? ?? 48 8d 15 ?? ?? ?? ?? 48 89 44 24 20 41 b9 60 0d 00 00 4c 8d 05 ?? ?? ?? ?? 48 8d 0d ?? ?? ?? ?? e8 ?? ?? ?? ?? 48 8b d3" };
 	static inline const SdkPattern PrimServer_TextPrintPosition = { L"4c 89 44 24 18 4c 89 4c 24 20 55 53 56 57 48 8d ac 24 48 fe ff ff 48 81 ec b8 02 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 85 ?? ?? ?? ?? 8b da 48 8d 85" };
 	static inline const SdkPattern PrimServer_GetDefaultPrimParams = { L"40 53 48 83 ec 20 48 8b d9 e8 ?? ?? ?? ?? 48 83 63 08 00 88 43 01 66 c7 43 02 00 01 e8 ?? ?? ?? ?? 48 83 63 08 00 88 03 48 8b c3 48 83 c4 20" };
 	static inline const SdkPattern PrimServer_DebugStringBaseHandler = { L"48 8b 05 ?? ?? ?? ?? 48 8d 4d 90 48 8b 10 48 8b b2 c8 00 00 00 48 8d 54 24 30 e8 ?? ?? ?? ?? c5 f8 10 07 c5 fa 10 0d ?? ?? ?? ?? 33 c9 89 5c 24 60 88 4c 24 68 48 8d 54 24 40 48 89 4c 24 6c 45 33 c9 48 8d 0d ?? ?? ?? ??", +0x42 };

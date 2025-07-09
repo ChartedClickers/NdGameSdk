@@ -5,7 +5,7 @@
 
 namespace NdGameSdk::corelib::memory {
 
-	Memory::Memory(MemoryCfg& cfg) : m_cfg { std::move(cfg) }, ISdkComponent(TOSTRING(Memory)) {}
+	Memory::Memory() : m_cfg { g_SdkConfig.Memory }, ISdkComponent(TOSTRING(Memory)) {}
 
 	uintptr_t Memory_Allocate_ReturnAddr = NULL;
 	void Memory_Allocate_CC();

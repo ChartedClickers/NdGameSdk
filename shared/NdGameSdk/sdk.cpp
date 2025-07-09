@@ -23,25 +23,27 @@
 #include <memory>
 
 namespace NdGameSdk {
-
+    
     HMODULE g_SdkModuleHandle{};
     bool g_SdkInitialized{};
+    SdkConfig SdkConfigInternal{};
+    const SdkConfig& g_SdkConfig = SdkConfigInternal;
 
     void InitializeSdk(const SdkConfig* cfg) {
 
         if (g_SdkInitialized) { return; }
+        if (cfg) { SdkConfigInternal = std::move(*cfg); }
 
         auto sdklogger = SdkLogger::GetLogger();
-        auto sdkcfg = cfg ? std::move(*cfg) : SdkConfig{};
 
         set_default_logger(sdklogger);
         NdGameSdk::DB::Init(SDK_NAME);
 
-        InitSharedComponents(sdkcfg);
-        InitNdGameComponents(sdkcfg);
+        InitSharedComponents();
+        InitNdGameComponents();
 
-        if (sdkcfg.Sidbase) {
-            Sidbase::InitSidbase(sdkcfg.SidbasePath.c_str());
+        if (g_SdkConfig.Sidbase) {
+            Sidbase::InitSidbase(g_SdkConfig.SidbasePath.c_str());
         }
 
         g_SdkInitialized = true;

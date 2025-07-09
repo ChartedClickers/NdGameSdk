@@ -217,8 +217,8 @@ namespace NdGameSdk {
         friend void InitializeSdk(const SdkConfig* cfg);
         friend void RegisterSdkModule(ISdkModule* SdkModule);
         friend void UnregisterSdkModule(ISdkModule* SdkModule);
-        friend void InitSharedComponents(SdkConfig& cfg);
-        friend void InitNdGameComponents(SdkConfig& cfg);
+        friend void InitSharedComponents();
+        friend void InitNdGameComponents();
     };
 
     class SdkComponentEx : public NdGameSdkException {

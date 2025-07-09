@@ -4,5 +4,5 @@
 #include "NdGameSdk/sdkconfig.hpp"
 
 namespace NdGameSdk {
-	void InitNdGameComponents(SdkConfig& cfg);
+	void InitNdGameComponents();
 }

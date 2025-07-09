@@ -41,7 +41,7 @@ namespace NdGameSdk::gamelib::debug {
 			ItemBool, ItemDecimal, ItemFloat, ItemFunction, ItemSelection, ItemSubText
 		};
 
-		NdDevMenu(NdDevMenuCfg& cfg);
+		NdDevMenu();
 		~NdDevMenu();
 
 		SdkEvent<NdDevMenu*, DMENU::MenuGroup*> e_AppendMenuGroup;

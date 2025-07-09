@@ -14,7 +14,7 @@ using namespace NdGameSdk::ndlib::render::dev;
 
 namespace NdGameSdk::gamelib::debug {
 
-	NdDevMenu::NdDevMenu(NdDevMenuCfg& cfg) : m_cfg{ std::move(cfg) }, ISdkComponent("DMENU") {
+	NdDevMenu::NdDevMenu() : m_cfg{ g_SdkConfig.NdDevMenu }, ISdkComponent("DMENU") {
 		DMENU::s_NdDevMenu = this;
 	}
 	
@@ -449,15 +449,7 @@ namespace NdGameSdk::gamelib::debug {
 			s_IsKeyboardSearchActive = reinterpret_cast<bool*>(IsKeyboardSearchActive);
 			s_IsKeyboardComponentActive = reinterpret_cast<bool*>(IsKeyboardComponentActive);
 
-			findpattern = Patterns::NdDevMenu_GameConfig_DevMode;
-			m_GameConfig_DevModePatch = Utility::WritePatchPattern(module, findpattern.pattern, m_DevMode_1, sizeof(m_DevMode_1),
-				wstr(Patterns::NdDevMenu_GameConfig_DevMode), findpattern.offset, m_cfg.GameDebugMenu);
-
-			if (!m_GameConfig_DevModePatch) {
-				throw SdkComponentEx{ "Failed to patch game functions!", SdkComponentEx::ErrorCode::PatchFailed };
-			}
-
-			if (m_GameConfig_DevModePatch->IsEnable()) {
+			if (IsGameDebugMenu()) {
 				spdlog::info("GameDebugMenu is enabled!");
 			}
 

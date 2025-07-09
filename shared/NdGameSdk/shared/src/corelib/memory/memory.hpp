@@ -24,7 +24,7 @@ namespace NdGameSdk::corelib::memory
 
 	class Memory : public ISdkComponent {
 	public:
-		Memory(MemoryCfg& cfg);
+		Memory();
 		SdkEvent<corelib::memory::Memory*> e_MemoryMapMapped{true};
 
 		using Context = MemoryContextType;

@@ -5,7 +5,7 @@
 
 namespace NdGameSdk {
 
-	void InitNdGameComponents(SdkConfig& cfg)
+	void InitNdGameComponents()
 	{
 		auto NdGameComponents = ISdkComponent::GetNdGameComponents();
 

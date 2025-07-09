@@ -67,6 +67,7 @@ namespace NdGameSdk::common {
 						// Rollback original cfg path to game path (Like it was in T1X)
 						strcpy(ndgameinfo->m_CfgPath, ndgameinfo->m_GamePath);
 					#endif
+						ndgameinfo->m_DevMode = g_SdkConfig.NdDevMenu.GameDebugMenu;
 						ndgameinfo->m_DevConfig = true;
 					}
 

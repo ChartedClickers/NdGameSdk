@@ -254,7 +254,7 @@ namespace NdGameSdk::common {
         va_end(args);
 
         auto logger = SdkLogger::GetNdGameLogger();
-        logger->warn("[SSMGR] {}", msg);
+		// logger->warn("[SSMGR] {}", msg); // Too noisy, temporarily disabled
     }
 
     void __fastcall CommonMainWin::SsManagerErrorPrintF(void* /*file*/, const char* fmt, void* argBuffer, void* /*unused*/) {

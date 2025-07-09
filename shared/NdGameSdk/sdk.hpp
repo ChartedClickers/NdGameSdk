@@ -16,6 +16,7 @@ namespace NdGameSdk {
 
 	extern HMODULE g_SdkModuleHandle;
 	extern bool g_SdkInitialized;
+	extern const SdkConfig& g_SdkConfig;
 
 	NdGameSdk_API void InitializeSdk(const SdkConfig* cfg = nullptr);
 	NdGameSdk_API void RegisterSdkModule(ISdkModule* SdkModule);

@@ -12,12 +12,12 @@
 
 namespace NdGameSdk {
 
-	void InitSharedComponents(SdkConfig& cfg)
+	void InitSharedComponents()
 	{
 		auto SharedComponents = ISdkComponent::GetSharedComponents();
 
 		SharedComponents->AddComponent<corelib::system::NdSystem>();
-		auto MemComponent = SharedComponents->AddComponent<corelib::memory::Memory>(cfg.Memory);
+		auto MemComponent = SharedComponents->AddComponent<corelib::memory::Memory>();
 		SharedComponents->AddComponent<ndlib::EngineComponents>();
 		SharedComponents->AddComponent<ndlib::render::dev::DebugDrawCommon>();
 		SharedComponents->AddComponent<ndlib::script::ScriptManager>();
@@ -29,7 +29,7 @@ namespace NdGameSdk {
 #endif
 
 		SharedComponents->AddComponent<common::CommonGame>();
-		auto DmenuComponent = SharedComponents->AddComponent<gamelib::debug::NdDevMenu>(cfg.NdDevMenu);
+		auto DmenuComponent = SharedComponents->AddComponent<gamelib::debug::NdDevMenu>();
 
 		SharedComponents->InitializeSdkComponents();
 

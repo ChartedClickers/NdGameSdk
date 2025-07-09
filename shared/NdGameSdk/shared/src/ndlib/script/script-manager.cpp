@@ -166,7 +166,9 @@ namespace NdGameSdk::ndlib::script {
 
         #endif
 
-            m_Memory->IncreaseMemoryMap(Memory::MapId::ALLOCATION_DMENU_LOWMEM, MemSize(6.2, SizeUnit::Megabytes));
+            if (m_Memory->IsDebugMemoryAvailable()) {
+                m_Memory->IncreaseMemoryMap(Memory::MapId::ALLOCATION_DMENU_LOWMEM, MemSize(6.2, SizeUnit::Megabytes));
+            }
 
 		});
 	}

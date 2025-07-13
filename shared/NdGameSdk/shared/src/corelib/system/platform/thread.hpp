@@ -10,19 +10,19 @@ namespace NdGameSdk::corelib::system::platform {
 		Thread() = default;
 
 		HANDLE* GetNativeThread() const {
-			return reinterpret_cast<HANDLE*>(this->Get()->nativeThread);
+			return reinterpret_cast<HANDLE*>(this->Get()->m_nativeThread);
 		}
 
 		uint32_t GetId() const {
-			return this->Get()->id;
+			return this->Get()->m_id;
 		}
 
 		bool IsJoinable() const {
-			return this->Get()->joinable != 0;
+			return this->Get()->m_joinable != 0;
 		}
 
 		void SetJoinable(bool joinable) {
-			this->Get()->joinable = joinable ? 1 : 0;
+			this->Get()->m_joinable = joinable ? 1 : 0;
 		}
 
 		void Join() {
@@ -41,32 +41,32 @@ namespace NdGameSdk::corelib::system::platform {
 	public:
 		ThreadDesc(uint64_t stackSize, uint32_t priority, uint32_t affinity, uint32_t flags, const char* name) {
 			auto self = this->Get();
-			self->stackSize = stackSize;
-			self->priority = priority;
-			self->affinity = affinity;
-			self->flags = flags;
-			std::strncpy(self->name, name, sizeof(self->name) - 1);
-			self->name[sizeof(self->name) - 1] = '\0'; // Ensure null-termination
+			self->m_stackSize = stackSize;
+			self->m_priority = priority;
+			self->m_affinity = affinity;
+			self->m_flags = flags;
+			std::strncpy(self->m_name, name, sizeof(self->m_name) - 1);
+			self->m_name[sizeof(self->m_name) - 1] = '\0'; // Ensure null-termination
 		}
 
 		uint64_t GetStackSize() const {
-			return this->Get()->stackSize;
+			return this->Get()->m_stackSize;
 		}
 
 		uint32_t GetPriority() const {
-			return this->Get()->priority;
+			return this->Get()->m_priority;
 		}
 
 		uint32_t GetAffinity() const {
-			return this->Get()->affinity;
+			return this->Get()->m_affinity;
 		}
 
 		uint32_t GetFlags() const {
-			return this->Get()->flags;
+			return this->Get()->m_flags;
 		}
 
 		const char* GetName() const {
-			return this->Get()->name;
+			return this->Get()->m_name;
 		}
 	};
 

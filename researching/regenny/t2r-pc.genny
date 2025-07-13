@@ -512,21 +512,26 @@ namespace regenny {
 
                     class ndsys {
 
-                        class Thread 0x10 {
-                            void* nativeThread;
-                            uint32_t id;
-                            uint32_t joinable;
+                        struct Thread 0x10 {
+                            void* m_nativeThread; // HANDLE*
+                            uint32_t m_id;
+                            uint32_t m_joinable;
                         } // thread.h
 
-                        class ThreadDesc 0x120 {
-                            uint64_t stackSize;
-                            uint32_t priority;
-                            uint32_t affinity;
-                            uint32_t flags;
-                            char name[0x100];
+                        struct ThreadDesc 0x120 {
+                            uint64_t m_stackSize;
+                            uint32_t m_priority;
+                            uint32_t m_affinity;
+                            uint32_t m_flags;
+                            char m_name[0x100];
                         }
 
-                        class Mutex 0x40 {
+                        struct Fiber 0x10 {
+                            void* m_nativeFiber;
+                            void* m_CtxBlock;
+                        } // thread.h
+
+                        struct Mutex 0x40 {
                             enum Type : uint32_t {
                                 MUTEX_RECURSIVE = 0x1
                             };
@@ -538,13 +543,134 @@ namespace regenny {
                             bool m_initialized;
                         } // mutex.h
 
-                        class ConditionVariable 0x20 {
-
+                        struct ConditionVariable 0x20 {
+                            void* m_ConditionVar; // CONDITION_VARIABLE*
+                            bool m_initialized;
                         } // condition-variable.h
                     }
                 }
             }
 
+            namespace job {
+
+                class ndjob {
+
+                    struct InitParams 0x78 {
+                        void* m_pMemoryBuffer;
+                        uint64_t m_memoryBufferSize;
+                        void* m_pDebugMemoryBuffer;
+                        uint64_t m_DebugMemoryBufferSize;
+                        uint64_t m_numCounters;
+                        uint64_t m_numJobArrays;
+                        uint64_t m_numWorkerThreads;
+                        void* m_field38;
+                        uint16_t m_flags;
+                        uint64_t m_field48 @ 0x48;
+                        uint64_t m_maxSmallJobFibers;
+                        uint64_t m_maxLargeJobFibers;
+                        uint64_t m_smallJobFiberStackSpace;
+                        uint64_t m_largeJobFiberStackSpace;
+                        bool m_field70;
+                    };
+
+                    struct WorkerThreadDesc 0x200 {
+                        void* m_listHead;
+                        void* m_listTail;
+                        void* m_next;
+                        void* m_prev;
+                        void* m_waitNext;
+                        void* m_waitPrev;
+                        void* m_tlsBlock;
+                        uint32_t m_flags;
+                        uint64_t m_context @ 0x78;
+                        uint8_t m_scheduler[0x80] @ 0xb8;
+                        void* m_nativeHandle;
+                        uint32_t m_threadId;
+                        uint32_t m_joinable;
+                        void* m_threadTLS;
+                        uint64_t m_waitCookie;
+                        uint8_t m_shuttingDown;
+                        uint8_t m_counters[0x20] @ 0x160;
+                        uint8_t m_stats[0x20];
+                    };
+
+                    struct WorkerInitContext 0x420 {
+                        regenny.shared.corelib.system.platform.ndsys.Thread m_Thread @ 0x30;
+                        WorkerThreadDesc m_WorkerThreadDesc @ 0x80;
+                        regenny.shared.corelib.system.platform.ndsys.Fiber* m_fiber;
+                        regenny.shared.corelib.system.platform.ndsys.ThreadDesc m_ThreadDesc;
+                        char m_longName[0x20] @ 0x400 [[utf8*]];
+                    };
+
+                    struct CounterHandle 0x40 {
+                        char* m_file [[utf8*]];
+                        uint32_t m_line + 0x4;
+                        char* m_function [[utf8*]];
+                        uint64_t m_timestampQPC;
+                        void* m_waitListHead;
+                        uint64_t m_field28;
+                        uint64_t m_field30;
+                        uint32_t m_field38;
+                    };
+
+                    struct JobDesc 0x80 {
+                        void* m_entry; // Entry function
+                        void* m_WorkData; // User data
+                        JobDesc* m_queueNext;
+                        JobDesc* m_queuePrev;
+                        JobDesc* m_waitNext;
+                        JobDesc* m_waitPrev;
+                        void* m_tlsBlock;
+                        uint32_t m_stateBits;
+                        uint64_t m_debugCookie;
+                    };
+
+                    struct JobArrayHeader 0x80 {
+                        uint32_t m_completedCount;
+                        uint32_t m_writeIndex;
+                        uint32_t m_issuedCount;
+                        uint32_t m_jobCapacity;
+                        void* m_jobStorage;
+                        JobDesc* m_jobArray;
+                        CounterHandle* m_counter;
+                        uint32_t m_priority;
+                        void* m_WorkData;
+                        void* m_jobStorageDup;
+                        uint8_t m_state;
+                        uint8_t m_category;
+                        uint8_t m_field44 @ 0x44;
+                        uint64_t m_field50 @ 0x50;
+                        uint8_t m_tlsCookie;
+                    };
+                    
+                    struct JobSysData 0x26d80 {
+                        void* m_memoryBuffer;
+                        corelib.containers.FixedSizeHeap m_jobHeap;
+                        uint64_t m_freeJobOffset;
+                        uint64_t m_freeJobInitialCap;
+                        uint64_t m_freeJobInitFlag;
+                        uint64_t m_field78;
+                        uint32_t m_readyWorkerCount;
+                        uint64_t m_field90 @ 0x90;
+                        uint64_t m_field98;
+                        uint64_t m_fielda0;
+                        uint64_t m_fielda8;
+                        uint64_t m_fieldb0;
+                        regenny.shared.corelib.system.platform.ndsys.Mutex m_freeJobMutex[0x18] @ 0xe0;
+                        regenny.shared.corelib.system.platform.ndsys.ConditionVariable m_cvFreeJob[0x18];
+                        regenny.shared.corelib.system.platform.ndsys.Thread m_workerThreads[0x18];
+                        uint64_t m_numWorkerThreads;
+                        void* m_hWorkerReadyEvent;
+                        uint64_t m_workerMaskLo;
+                        uint64_t m_workerMaskHi;
+                        WorkerThreadDesc m_workerInfo[0x18] @ 0xc00;
+                        regenny.shared.corelib.system.platform.ndsys.Mutex m_field5580 @ 0x5580;
+                        regenny.shared.corelib.system.platform.ndsys.Mutex m_CounterHandleLock @ 0x5800;
+                        regenny.shared.corelib.system.platform.ndsys.Mutex m_BeginJobArrayLock @ 0x5b00;
+                        void* m_WaitData @ 0x5e00;
+                    };
+                }
+            }
         }
 
         // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib
@@ -1609,9 +1735,9 @@ namespace regenny {
         // c:\branches\discbot??\t2r-pc-?.?.?\t2r\src\game
         namespace game {
 
-            struct GameInfo : shared.ndlib.NdGameInfo 0x570 {
-                bool m_enableNpTrophies +0x148  [[bool*]];
-                uint64_t Unk_4BC8 @ 0x4BC8;
+            struct GameInfo : shared.ndlib.NdGameInfo 0x580 {
+                bool m_enableNpTrophies + 0x148  [[bool*]];
+                uint64_t m_field4Bd8 @ 0x4bd8;
             }
 
             struct FrameState : shared.ndlib.NdFrameState 0x168 {

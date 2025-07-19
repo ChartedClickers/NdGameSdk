@@ -25,6 +25,19 @@ public:
         void* m_CtxBlock; // 0x8
     }; // Size: 0x10
 
+    struct FiberContext {
+        char m_field0[64]; // 0x0
+        char m_field40[64]; // 0x40
+        char m_field80[64]; // 0x80
+        char m_fieldc0[64]; // 0xc0
+        char m_field100[64]; // 0x100
+        char m_field140[64]; // 0x140
+        char m_field180[64]; // 0x180
+        char m_field1c0[64]; // 0x1c0
+        char m_field200[64]; // 0x200
+        char m_field240[64]; // 0x240
+    }; // Size: 0x280
+
     struct Mutex {
         enum Type : uint32_t {
             MUTEX_RECURSIVE = 1,

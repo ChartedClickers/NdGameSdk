@@ -531,6 +531,20 @@ namespace regenny {
                             void* m_CtxBlock;
                         } // thread.h
 
+                        struct FiberContext 0x280 {
+                            // Fiber context data
+                            char m_field0[0x40];
+                            char m_field40[0x40];
+                            char m_field80[0x40];
+                            char m_fieldc0[0x40];
+                            char m_field100[0x40];
+                            char m_field140[0x40];
+                            char m_field180[0x40];
+                            char m_field1c0[0x40];
+                            char m_field200[0x40];
+                            char m_field240[0x40];
+                        } // thread.h
+
                         struct Mutex 0x40 {
                             enum Type : uint32_t {
                                 MUTEX_RECURSIVE = 0x1
@@ -551,9 +565,54 @@ namespace regenny {
                 }
             }
 
+            // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib\job
             namespace job {
 
+                struct WorkerThreadDesc 0x200 {
+
+                    struct Config 0x30 {
+                       uint64_t m_workerPriority @ 0x8;
+                    }
+
+                    void* m_listHead;
+                    void* m_listTail;
+                    void* m_next;
+                    void* m_prev;
+                    void* m_waitNext;
+                    void* m_waitPrev;
+                    void* m_tlsBlock;
+                    uint32_t m_flags;
+                    uint64_t m_context @ 0x78;
+                    Config m_config;
+                    uint8_t m_scheduler[0x80] @ 0xb8;
+                    void* m_nativeHandle;
+                    uint32_t m_threadId;
+                    uint32_t m_joinable;
+                    void* m_threadTLS;
+                    uint64_t m_waitCookie;
+                    uint8_t m_shuttingDown;
+                };
+                
+                struct WorkerInitContext 0x420 {
+                    regenny.shared.corelib.system.platform.ndsys.Thread m_Thread @ 0x30;
+                    WorkerThreadDesc m_WorkerThreadDesc @ 0x80;
+                    regenny.shared.corelib.system.platform.ndsys.Fiber* m_fiber;
+                    regenny.shared.corelib.system.platform.ndsys.ThreadDesc m_ThreadDesc;
+                    char m_longName[0x20] @ 0x400 [[utf8*]];
+                };
+
+                struct JobHeap 0x98 {
+                    corelib.containers.FixedSizeHeap m_Heap;
+                    uint64_t m_field88 @ 0x88;
+                    uint32_t m_field90;
+                    uint32_t m_field94;
+                };
+
                 class ndjob {
+
+                    enum Priority : uint64_t {
+                        KInvalid = 0xff
+                    };
 
                     struct InitParams 0x78 {
                         void* m_pMemoryBuffer;
@@ -573,90 +632,115 @@ namespace regenny {
                         bool m_field70;
                     };
 
-                    struct WorkerThreadDesc 0x200 {
-                        void* m_listHead;
-                        void* m_listTail;
-                        void* m_next;
-                        void* m_prev;
-                        void* m_waitNext;
-                        void* m_waitPrev;
-                        void* m_tlsBlock;
-                        uint32_t m_flags;
-                        uint64_t m_context @ 0x78;
-                        uint8_t m_scheduler[0x80] @ 0xb8;
-                        void* m_nativeHandle;
-                        uint32_t m_threadId;
-                        uint32_t m_joinable;
-                        void* m_threadTLS;
-                        uint64_t m_waitCookie;
-                        uint8_t m_shuttingDown;
-                        uint8_t m_counters[0x20] @ 0x160;
-                        uint8_t m_stats[0x20];
-                    };
-
-                    struct WorkerInitContext 0x420 {
-                        regenny.shared.corelib.system.platform.ndsys.Thread m_Thread @ 0x30;
-                        WorkerThreadDesc m_WorkerThreadDesc @ 0x80;
-                        regenny.shared.corelib.system.platform.ndsys.Fiber* m_fiber;
-                        regenny.shared.corelib.system.platform.ndsys.ThreadDesc m_ThreadDesc;
-                        char m_longName[0x20] @ 0x400 [[utf8*]];
-                    };
-
                     struct CounterHandle 0x40 {
                         char* m_file [[utf8*]];
-                        uint32_t m_line + 0x4;
+                        uint32_t m_line;
                         char* m_function [[utf8*]];
                         uint64_t m_timestampQPC;
                         void* m_waitListHead;
                         uint64_t m_field28;
-                        uint64_t m_field30;
-                        uint32_t m_field38;
+                        uint64_t m_CountJobArrays;
+                        bool m_field38;
                     };
 
-                    struct JobDesc 0x80 {
+                    struct JobHeader 0x100 {
                         void* m_entry; // Entry function
                         void* m_WorkData; // User data
-                        JobDesc* m_queueNext;
-                        JobDesc* m_queuePrev;
-                        JobDesc* m_waitNext;
-                        JobDesc* m_waitPrev;
-                        void* m_tlsBlock;
+                        CounterHandle* m_Counter;
+                        CounterHandle* m_queuePrev;
+                        CounterHandle* m_waitNext;
+                        void* m_tlsBlock @ 0x30;
                         uint32_t m_stateBits;
-                        uint64_t m_debugCookie;
+                        uint64_t m_flags;
                     };
 
-                    struct JobArrayHeader 0x80 {
+                    struct JobArrayHeader 0x100 {
                         uint32_t m_completedCount;
                         uint32_t m_writeIndex;
                         uint32_t m_issuedCount;
                         uint32_t m_jobCapacity;
-                        void* m_jobStorage;
-                        JobDesc* m_jobArray;
-                        CounterHandle* m_counter;
-                        uint32_t m_priority;
+                        JobHeader* m_JobStorage; // array of JobHeader
+                        CounterHandle* m_JobCounter;
+                        uint64_t m_field20;
+                        Priority m_priority;
                         void* m_WorkData;
-                        void* m_jobStorageDup;
+                        void* m_heapBlock;
                         uint8_t m_state;
-                        uint8_t m_category;
-                        uint8_t m_field44 @ 0x44;
-                        uint64_t m_field50 @ 0x50;
-                        uint8_t m_tlsCookie;
+                        uint64_t m_field44 @ 0x44;
+                        uint64_t m_QueryPerformance;
+                        uint64_t m_tlsCookie;
                     };
-                    
+
+                    // Notice: Be careful with the offsets in the Data structures,
+                    // they too sensitive to changes
+                    struct SysData 0xc0 {
+                        bool m_Initialized;
+                        char m_field1[0xbf];
+                    };
+
+                    struct CounterData : SysData 0x180 {
+                        uint64_t m_fieldf8 + 0xf8;
+                        CounterHandle* m_Counters;
+                        uint32_t m_maxSlots;
+                        uint32_t m_nextFree;
+                        uint32_t m_initialized;
+                        void* m_heapBlock + 0x2c;
+                    };
+
+                    struct JobArrayData : SysData 0x200 {
+                        uint64_t m_fieldf8 + 0xf8;
+                        JobArrayHeader* m_JobArrays;
+                        uint32_t m_maxHeaders;
+                        uint32_t m_topIndex;
+                        uint32_t m_initialized;
+                        void* m_heapBlock + 0x1c;
+                    };
+
+                    struct FiberData : SysData 0x100 {
+                        regenny.shared.corelib.system.platform.ndsys.FiberContext* m_FiberCtx;
+                        regenny.shared.corelib.system.platform.ndsys.Fiber* m_smallFiberPool;
+                        regenny.shared.corelib.system.platform.ndsys.Fiber* m_largeFiberPool;
+                    };
+
+                    struct WaitData : SysData 0x80 {
+                        void* m_field8 + 0x8;
+                        uint32_t m_field10;
+                        uint32_t m_flags;
+                        bool m_Initialized;
+                        JobArrayHeader** m_JobStorage + 0x7; // array of JobArrayHeader*
+                        JobArrayHeader* m_WaitingJobs;
+                        JobArrayHeader* m_field30;
+                        uint64_t m_numWaitingJobs;
+                    };
+
+                    struct WakeUpData : SysData 0x20280 {
+                        // Not analyzed in detail
+                        char m_field0[0x20204];
+                        char m_field20204[4];
+                        char m_field20208[4];
+                        char m_field2020c[4];
+                        char m_field20210[0xc];
+                        char m_field2021c[4];
+                        char m_field20220[4];
+                        char m_field20224[4];
+                        char m_field20228[0x18];
+                        char m_field20240[0x40];
+                    };
+
+                    struct SchedData : SysData 0x100 {
+                        JobHeader* m_JobsSheduled;
+                    };
+
                     struct JobSysData 0x26d80 {
-                        void* m_memoryBuffer;
-                        corelib.containers.FixedSizeHeap m_jobHeap;
-                        uint64_t m_freeJobOffset;
-                        uint64_t m_freeJobInitialCap;
-                        uint64_t m_freeJobInitFlag;
-                        uint64_t m_field78;
-                        uint32_t m_readyWorkerCount;
+                        InitParams m_initParams;
+                        bool m_IsQuit;
+                        uint32_t m_readyWorkerCount @ 0x80;
                         uint64_t m_field90 @ 0x90;
                         uint64_t m_field98;
                         uint64_t m_fielda0;
                         uint64_t m_fielda8;
                         uint64_t m_fieldb0;
-                        regenny.shared.corelib.system.platform.ndsys.Mutex m_freeJobMutex[0x18] @ 0xe0;
+                        regenny.shared.corelib.system.platform.ndsys.Mutex m_PowerSaveLocks[0x18] @ 0xe0;
                         regenny.shared.corelib.system.platform.ndsys.ConditionVariable m_cvFreeJob[0x18];
                         regenny.shared.corelib.system.platform.ndsys.Thread m_workerThreads[0x18];
                         uint64_t m_numWorkerThreads;
@@ -664,10 +748,20 @@ namespace regenny {
                         uint64_t m_workerMaskLo;
                         uint64_t m_workerMaskHi;
                         WorkerThreadDesc m_workerInfo[0x18] @ 0xc00;
-                        regenny.shared.corelib.system.platform.ndsys.Mutex m_field5580 @ 0x5580;
-                        regenny.shared.corelib.system.platform.ndsys.Mutex m_CounterHandleLock @ 0x5800;
-                        regenny.shared.corelib.system.platform.ndsys.Mutex m_BeginJobArrayLock @ 0x5b00;
-                        void* m_WaitData @ 0x5e00;
+                        SysData m_SysStatsData @ 0x54c0;
+                        regenny.shared.corelib.system.platform.ndsys.Mutex m_StatsDataLock @ 0x5580;  
+                        CounterData m_CounterData;
+                        regenny.shared.corelib.system.platform.ndsys.Mutex m_CounterDataLock @ 0x5800;
+                        JobArrayData m_JobArrayData;
+                        regenny.shared.corelib.system.platform.ndsys.Mutex m_JobArrayDataLock @ 0x5b00;
+                        FiberData m_FiberData;
+                        regenny.shared.corelib.system.platform.ndsys.Mutex m_FiberDataLock @ 0x5d00;
+                        WaitData m_WaitData;
+                        regenny.shared.corelib.system.platform.ndsys.Mutex m_WaitDataLock @ 0x5e80;
+                        WakeUpData m_WakeUpData;
+                        regenny.shared.corelib.system.platform.ndsys.Mutex m_WakeUpDataLock @ 0x026200;
+                        SchedData m_SchedData;
+                        regenny.shared.corelib.system.platform.ndsys.Mutex m_SchedDataLock[0x9] @ 0x026400;
                     };
                 }
             }

@@ -3,8 +3,7 @@
 #include <NdGameSdk/sdkstringid.hpp>
 namespace regenny::shared::corelib::system::platform {
 #pragma pack(push, 1)
-class ndsys {
-public:
+struct ndsys {
     struct Thread {
         void* m_nativeThread; // 0x0
         uint32_t m_id; // 0x8

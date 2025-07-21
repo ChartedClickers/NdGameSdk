@@ -6,6 +6,12 @@
 #include <Windows.h>
 #include <Utility/function_ptr.hpp>
 
+#if defined(T2R)
+#include <NdGameSdk/regenny/t2r/shared/corelib/memory/HeapAllocator.hpp>
+#elif defined(T1X)
+#include <NdGameSdk/regenny/t1x/shared/corelib/memory/HeapAllocator.hpp>
+#endif
+
 namespace NdGameSdk::corelib::memory
 {
 	namespace HeapAllocator
@@ -15,14 +21,12 @@ namespace NdGameSdk::corelib::memory
 
 		class HeapArena {
 		public:
-			template <typename ClassType = void>
-			NdGameSdk_API ClassType* Allocate(size_t heap_size, MemoryContextType heap_alignmemt, const char* func, int line, const char* file) {
-				always_assert(Memory_HeapArena_Allocate == nullptr, "Function pointer was not set!");
-				return (ClassType*)Memory_HeapArena_Allocate(heap_size, heap_alignmemt, func, line, file);
-			}
+			//class NdGameSdk_API HeapAllocator : public ISdkRegenny<regenny::shared::corelib::memory::HeapAllocator, regenny::shared::corelib::memory::Allocator> {};
 		private:
 			friend class Memory;
-			MEMBER_FUNCTION_PTR(void*, Memory_HeapArena_Allocate, size_t heap_size, MemoryContextType heap_alignmemt, const char* func, int line, const char* file);
+			MEMBER_FUNCTION_PTR(void, Memory_HeapAllocator_PushAllocator, void* pHeapAllocator, void* pData, size_t heap_size, const char* file, int line, const char* func, bool arg7);
+			// MEMBER_FUNCTION_PTR(void* Memory_HeapAllocator_Allocate);
 		};
+
 	}
 }

@@ -67,7 +67,7 @@ namespace NdGameSdk::gamelib::render::particle {
 						auto particlemanager = GetSharedComponents()->GetComponent<ParticleManager>();
 
 						constexpr uint64_t heap_size = 0xb8; //TODO: Make struct for this
-						void* pParticleDebug_mem = particlemanager->m_Memory->m_HeapArena.Allocate(heap_size, MemoryContextType::kAllocParticleManager, __FUNCSIG__, __LINE__, __FILE__);
+						void* pParticleDebug_mem = particlemanager->m_Memory->AllocateAtContext(heap_size, 0x10, MemoryContextType::kAllocParticleManager);
 
 						if (pParticleDebug_mem) {
 

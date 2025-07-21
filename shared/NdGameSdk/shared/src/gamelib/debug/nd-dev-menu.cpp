@@ -47,8 +47,7 @@ namespace NdGameSdk::gamelib::debug {
 	}
 
 	DMENU::Menu* NdDevMenu::Create_DMENU_Menu(std::string pName, HeapArena_Args) {
-		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::Menu>
-			(sizeof(DMENU::Menu), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
+		auto HeapAllocator = m_Memory->Allocate<DMENU::Menu>(sizeof(DMENU::Menu), 0x10, source_func, source_line, source_file);
 		DMENU::Menu* MenuPtr{};
 		if (HeapAllocator) {
 			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::Menu));
@@ -61,8 +60,7 @@ namespace NdGameSdk::gamelib::debug {
 	}
 
 	DMENU::String* NdDevMenu::Create_DMENU_String(std::string string, DMENU::Menu* pMenu, const char* pDescription, HeapArena_Args) {
-		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::String>
-			(sizeof(DMENU::String), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
+		auto HeapAllocator = m_Memory->Allocate<DMENU::String>(sizeof(DMENU::String), 0x10, source_func, source_line, source_file);
 		DMENU::String* StringPtr{};
 		if (HeapAllocator) {
 			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::String));
@@ -76,8 +74,8 @@ namespace NdGameSdk::gamelib::debug {
 	}
 
 	DMENU::KeyBoard* NdDevMenu::Create_DMENU_KeyBoard(std::string pName, DMENU::Menu* pMenu, const char* inputBufferPtr, uint64_t maxInputLength, const char* pDescription, HeapArena_Args) {
-		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::KeyBoard>
-			(sizeof(DMENU::KeyBoard), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
+		auto HeapAllocator = m_Memory->Allocate<DMENU::KeyBoard>
+			(sizeof(DMENU::KeyBoard), 0x10, source_func, source_line, source_file);
 		DMENU::KeyBoard* KeyBoardPtr{};
 		if (HeapAllocator) {
 			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::KeyBoard));
@@ -105,8 +103,7 @@ namespace NdGameSdk::gamelib::debug {
 	}
 
 	DMENU::ItemPlaceHolder* NdDevMenu::Create_DMENU_ItemPlaceHolder(std::string pName, DMENU::Menu* pMenu, const char* pPlaceHolder, HeapArena_Args) {
-		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::ItemPlaceHolder>
-			(sizeof(DMENU::ItemPlaceHolder), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
+		auto HeapAllocator = m_Memory->Allocate<DMENU::ItemPlaceHolder>(sizeof(DMENU::ItemPlaceHolder), 0x10, source_func, source_line, source_file);
 		DMENU::ItemPlaceHolder* ItemPlaceHolder{};
 		if (HeapAllocator) {
 			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::ItemPlaceHolder));
@@ -124,8 +121,7 @@ namespace NdGameSdk::gamelib::debug {
 	}
 
 	DMENU::ItemLine* NdDevMenu::Create_DMENU_ItemLine(DMENU::Menu* pMenu, HeapArena_Args) {
-		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::ItemLine>
-			(sizeof(DMENU::ItemLine), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
+		auto HeapAllocator = m_Memory->Allocate<DMENU::ItemLine>(sizeof(DMENU::ItemLine), 0x10, source_func, source_line, source_file);
 		DMENU::ItemLine* LinePtr{};
 		if (HeapAllocator) {
 			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::ItemLine));
@@ -139,8 +135,7 @@ namespace NdGameSdk::gamelib::debug {
 	}
 
 	DMENU::ItemSubText* NdDevMenu::Create_DMENU_ItemSubText(std::string pName, DMENU::Menu* pMenu, HeapArena_Args) {
-		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::ItemSubText>
-			(sizeof(DMENU::ItemSubText), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
+		auto HeapAllocator = m_Memory->Allocate<DMENU::ItemSubText>(sizeof(DMENU::ItemSubText), 0x10, source_func, source_line, source_file);
 		DMENU::ItemSubText* SubTextPtr{};
 		if (HeapAllocator) {
 			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::ItemSubText));
@@ -154,8 +149,7 @@ namespace NdGameSdk::gamelib::debug {
 	}
 
 	DMENU::ItemSubmenu* NdDevMenu::Create_DMENU_ItemSubmenu(std::string pName, DMENU::Menu* pRootMenu, DMENU::Menu* pSubmenu, DMENU::ItemSubmenu::SubmenuCallback pCallbackFunct, uint64_t pData, const char* pDescription, HeapArena_Args) {
-		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::ItemSubmenu>
-			(sizeof(DMENU::ItemSubmenu), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
+		auto HeapAllocator = m_Memory->Allocate<DMENU::ItemSubmenu>(sizeof(DMENU::ItemSubmenu), 0x10, source_func, source_line, source_file);
 		DMENU::ItemSubmenu* SubmenuPtr{};
 		if (HeapAllocator) {
 			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::ItemSubmenu));
@@ -176,8 +170,7 @@ namespace NdGameSdk::gamelib::debug {
 	}
 
 	DMENU::ItemBool* NdDevMenu::Create_DMENU_ItemBool(std::string pName, DMENU::Menu* pMenu, bool* pData, const char* pDescription, HeapArena_Args) {
-		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::ItemBool>
-			(sizeof(DMENU::ItemBool), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
+		auto HeapAllocator = m_Memory->Allocate<DMENU::ItemBool>(sizeof(DMENU::ItemBool), 0x10, source_func, source_line, source_file);
 		DMENU::ItemBool* BoolPtr{};
 		if (HeapAllocator) {
 			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::ItemBool));
@@ -193,8 +186,7 @@ namespace NdGameSdk::gamelib::debug {
 
 	DMENU::ItemDecimal* NdDevMenu::Create_DMENU_ItemDecimal(std::string pName, DMENU::Menu* pMenu, int* pData,
 		DMENU::ItemDecimal::ValueParams pValueParams, DMENU::ItemDecimal::StepParams pStepParams, const char* pDescription, HeapArena_Args) {
-		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::ItemDecimal>
-			(sizeof(DMENU::ItemDecimal), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
+		auto HeapAllocator = m_Memory->Allocate<DMENU::ItemDecimal>(sizeof(DMENU::ItemDecimal), 0x10, source_func, source_line, source_file);
 		DMENU::ItemDecimal* DoublePtr{};
 		if (HeapAllocator) {
 			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::ItemDecimal));
@@ -217,8 +209,7 @@ namespace NdGameSdk::gamelib::debug {
 
 
 	DMENU::ItemFloat* NdDevMenu::Create_DMENU_ItemFloat(std::string pName, DMENU::Menu* pMenu, float* pData, DMENU::ItemFloat::ValueParams pValueParams, DMENU::ItemFloat::StepParams pStepParams, const char* pDescription, HeapArena_Args) {
-		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::ItemFloat>
-			(sizeof(DMENU::ItemFloat), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
+		auto HeapAllocator = m_Memory->Allocate<DMENU::ItemFloat>(sizeof(DMENU::ItemFloat), 0x10, source_func, source_line, source_file);
 		DMENU::ItemFloat* FloatPtr{};
 		if (HeapAllocator) {
 			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::ItemFloat));
@@ -240,8 +231,7 @@ namespace NdGameSdk::gamelib::debug {
 	}
 
 	DMENU::ItemFunction* NdDevMenu::Create_DMENU_ItemFunction(std::string pName, DMENU::Menu* pMenu, DMENU::ItemFunction::FunctionCallback pFunction, uint64_t args, bool pIsActive, HeapArena_Args) {
-		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::ItemFunction>
-			(sizeof(DMENU::ItemFunction), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
+		auto HeapAllocator = m_Memory->Allocate<DMENU::ItemFunction>(sizeof(DMENU::ItemFunction), 0x10, source_func, source_line, source_file);
 		DMENU::ItemFunction* FunctionPtr{};
 		if (HeapAllocator) {
 			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::ItemFunction));
@@ -262,8 +252,7 @@ namespace NdGameSdk::gamelib::debug {
 	}
 
 	DMENU::ItemSelection* NdDevMenu::Create_DMENU_ItemSelection(std::string pName, DMENU::Menu* pMenu, DMENU::ItemSelection::Item_selection* pItemSelection, DMENU::ItemSelection::SelectionHandler pCallback, uint64_t* pData, const char* pDescription, HeapArena_Args) {
-		auto HeapAllocator = m_Memory->m_HeapArena.Allocate<DMENU::ItemSelection>
-			(sizeof(DMENU::ItemSelection), MemoryContextType::kAllocDebugDevMenu, source_func, source_line, source_file);
+		auto HeapAllocator = m_Memory->Allocate<DMENU::ItemSelection>(sizeof(DMENU::ItemSelection), 0x10, source_func, source_line, source_file);
 		DMENU::ItemSelection* SelectionPtr{};
 		if (HeapAllocator) {
 			memset((void*)HeapAllocator, 0x0, sizeof(DMENU::ItemSelection));

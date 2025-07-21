@@ -22,6 +22,14 @@ namespace NdGameSdk::corelib::memory
 {
 	#define Memory_Source __FILE__, __LINE__, __func__
 
+	/* Extern classes */
+	class NdGameSdk_API BaseAllocator : public ISdkRegenny<regenny::shared::corelib::memory::BaseAllocator> {
+	public:
+		const char* GetName() const;
+		StringId64 GetHash() const;
+		bool IsInitialized() const;
+	};
+
 	class Memory : public ISdkComponent {
 	public:
 		Memory();
@@ -30,8 +38,26 @@ namespace NdGameSdk::corelib::memory
 		using Context = MemoryContextType;
 		using MapId = MemoryMapId;
 
-		class NdGameSdk_API Allocator : public ISdkRegenny<regenny::shared::corelib::memory::Allocator> 
-		{
+		/* Extern classes */
+		class NdGameSdk_API Allocator : public ISdkRegenny<regenny::shared::corelib::memory::Allocator, BaseAllocator> {
+		public:
+			using VTable = regenny::shared::corelib::memory::Allocator::VTable;
+
+			size_t GetHeapSize();
+			
+			template <typename ClassType = void>
+			ClassType* PostAllocate(size_t heap_size, uint64_t heap_alignmemt, const char* func, int line, const char* file) {
+				auto* pAllocator = this->Get();
+				return (ClassType*)reinterpret_cast<VTable*>(&pAllocator->vftable)->PostAllocate(
+					heap_size,
+					heap_alignmemt,
+					const_cast<char*>(func),
+					static_cast<uint32_t>(line),
+					const_cast<char*>(file)
+				);
+			}
+
+		private:
 			void PrintDebugAllocatorInfo();
 		};
 
@@ -45,6 +71,38 @@ namespace NdGameSdk::corelib::memory
 		NdGameSdk_API void ModifyMemoryMap(MemoryMapEntry* MapEntry, MemSize newSizeForId);
 		NdGameSdk_API void ModifyMemoryMap(MemoryMapId MapId, MemSize newSizeForId);
 		NdGameSdk_API void IncreaseMemoryMap(MemoryMapId MapId, MemSize AddSizeForId);
+
+		// Always use PushAllocator and PopAllocator for allocationg memory.
+		template <typename ClassType = void>
+		NdGameSdk_API ClassType* Allocate(size_t heap_size, uint64_t heap_alignmemt, const char* func, int line, const char* file) {
+			always_assert(Memory_Allocate == nullptr, "Function pointer was not set!");
+			spdlog::debug("Allocating memory for ClassType: {}, Size: {}, Alignment: {}, File: {}, Line: {}, Function: {}",
+				typeid(ClassType).name(), heap_size, heap_alignmemt, file, line, func);
+			return (ClassType*)Memory_Allocate(heap_size, heap_alignmemt, file, line, func);
+		}
+
+		NdGameSdk_API void Free(void* pData, const char* func, int line, const char* file) {
+			always_assert(Memory_Free == nullptr, "Function pointer was not set!");
+			spdlog::debug("Freeing memory at address: {}, File: {}, Line: {}, Function: {}",
+				reinterpret_cast<uintptr_t>(pData), file, line, func);
+			Memory_Free(pData, file, line, func);
+		}
+
+		template <typename ClassType = void>
+		NdGameSdk_API ClassType* AllocateAtContext(size_t heap_size, uint64_t heap_alignmemt, MemoryContextType memory_context) {
+		#if defined(T2R) || defined(T1X)
+			always_assert(Memory_AllocateAtContext == nullptr, "Function pointer was not set!");
+			spdlog::debug("Allocating memory at context: {}, ClassType: {}, Size: {}, Alignment: {}",
+				static_cast<int>(memory_context), typeid(ClassType).name(), heap_size, heap_alignmemt);
+			return (ClassType*)Memory_AllocateAtContext(heap_size, &memory_context, heap_alignmemt);
+		#else 
+			Allocator* pAllocator = GetAllocator(memory_context);
+			always_assert(pAllocator == nullptr, "Invalid Memory Context Type!");
+			spdlog::debug("Allocating memory at context: {}, ClassType: {}, Size: {}, Alignment: {}",
+				static_cast<int>(memory_context), typeid(ClassType).name(), heap_size, heap_alignmemt);
+			return pAllocator->PostAllocate<ClassType>(heap_size, heap_alignmemt, Memory_Source);
+		#endif
+		}
 
 		NdGameSdk_API void PushAllocator(MemoryContextType context_type, const char* file, int line_num, const char* func);
 		NdGameSdk_API void PopAllocator();
@@ -71,7 +129,10 @@ namespace NdGameSdk::corelib::memory
 		Patch::Ptr m_ValidateContextPatch{};
 		Patch::Ptr m_IsDebugMemoryAvailablePatch{};
 
-		MEMBER_FUNCTION_PTR(void*, Memory_Allocate, size_t heap_size, MemoryContextType* memory_context, size_t align);
+		MEMBER_FUNCTION_PTR(void*, Memory_Allocate, size_t heap_size, uint64_t heap_alignmemt, const char* file, int line, const char* func);
+		MEMBER_FUNCTION_PTR(void*, Memory_AllocateAtContext, size_t heap_size, MemoryContextType* memory_context, size_t heap_alignmemt);
+		MEMBER_FUNCTION_PTR(void, Memory_Free, void* pData, const char* file, int line, const char* func);
+
 		MEMBER_FUNCTION_PTR(uintptr_t*, Memory_ModifyMemoryMap, MemoryMapId MapId, uint64_t newSizeForId);
 		MEMBER_FUNCTION_PTR(uint64_t, Memory_GetSize, MemoryMapId MapId);
 		MEMBER_FUNCTION_PTR(uint64_t, Memory_PushAllocator, MemoryContextType* memory_context, const char* file, int line_num, const char* func);
@@ -83,4 +144,5 @@ namespace NdGameSdk::corelib::memory
 #endif
 
 	};
+
 }

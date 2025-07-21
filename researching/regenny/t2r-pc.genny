@@ -176,7 +176,7 @@ namespace regenny {
                     kAllocDoubleGpuRing = 0x76,
                     kAllocDevGpuRing = 0x77,
                     kAllocDevRenderResourceRing = 0x78
-                }
+                };
 
                 enum MapId : uint32_t {
                     ALLOCATION_PRX_DIRECT_MEM = 0x01,
@@ -419,7 +419,7 @@ namespace regenny {
                     ALLOCATION_OVERFLOW_DYNAMIC_BUFFER = 0xFE,
                     ALLOCATION_DEV_GPU_UNACCOUNTED = 0x1E,
                     ALLOCATION_DEV_GPU_FREE = 0x1F
-                }
+                };
 
                 struct MemoryMapEntry 0x20 {
                     MapId m_id
@@ -427,16 +427,32 @@ namespace regenny {
                     uint64_t m_size
                     uint64_t m_aligned
                     char* m_name [[utf8*]]
-                }
+                };
 
-                struct Allocator 0x78 {
+                struct BaseAllocator 0x58 {
                     void* vftable;
-                    char* m_context_name + 0x38 [[utf8*]]
-                    StringId64 m_context_hash
-                    uintptr_t m_start_addr + 0x10
-                    uintptr_t m_end_addr
-                    size_t m_heap_size
-                }
+                    void* m_pTracker @ 0x38;
+                    char* m_context_name;
+                    StringId64 m_context_hash;
+                    bool m_Initialized;
+                };
+
+                struct Allocator : BaseAllocator 0xa8 {
+
+                    struct VTable {
+                        virtual uint64_t PostAllocate(uint64_t pSize, uint64_t pAlignment, char* pFunction, uint32_t pLine, char* pFilePath) @ 7;
+                    };
+                    
+                    void* m_Data @ 0xb0;
+                    uint64_t m_size @ 0xc8;
+                };
+
+                struct HeapAllocator : Allocator 0x20 {
+                    char* m_file @ 0x100 [[utf8*]];
+                    char* m_function [[utf8*]];
+                    uint32_t m_line;
+                    bool m_field114;
+                };
 
             }
 
@@ -510,7 +526,7 @@ namespace regenny {
                 // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib\system\platform
                 namespace platform {
 
-                    class ndsys {
+                    struct ndsys {
 
                         struct Thread 0x10 {
                             void* m_nativeThread; // HANDLE*
@@ -608,9 +624,9 @@ namespace regenny {
                     uint32_t m_field94;
                 };
 
-                class ndjob {
+                struct ndjob {
 
-                    enum Priority : uint64_t {
+                    enum Priority : uint32_t {
                         KInvalid = 0xff
                     };
 
@@ -663,7 +679,7 @@ namespace regenny {
                         CounterHandle* m_JobCounter;
                         uint64_t m_field20;
                         Priority m_priority;
-                        void* m_WorkData;
+                        void* m_WorkData + 0x4;
                         void* m_heapBlock;
                         uint8_t m_state;
                         uint64_t m_field44 @ 0x44;
@@ -739,7 +755,7 @@ namespace regenny {
                         uint64_t m_field98;
                         uint64_t m_fielda0;
                         uint64_t m_fielda8;
-                        uint64_t m_fieldb0;
+                        bool m_IsPowerSaveMode;
                         regenny.shared.corelib.system.platform.ndsys.Mutex m_PowerSaveLocks[0x18] @ 0xe0;
                         regenny.shared.corelib.system.platform.ndsys.ConditionVariable m_cvFreeJob[0x18];
                         regenny.shared.corelib.system.platform.ndsys.Thread m_workerThreads[0x18];

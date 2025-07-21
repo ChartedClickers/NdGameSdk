@@ -5,9 +5,9 @@
 #include "..\system\platform\ndsys.hpp"
 namespace regenny::shared::corelib::job {
 #pragma pack(push, 1)
-class ndjob {
-public:
-    enum Priority : uint64_t {
+struct ndjob {
+    enum Priority : uint32_t {
+        KInvalid = 255,
     };
 
     struct InitParams {
@@ -66,6 +66,7 @@ public:
         regenny::shared::corelib::job::ndjob::CounterHandle* m_JobCounter; // 0x18
         uint64_t m_field20; // 0x20
         regenny::shared::corelib::job::ndjob::Priority m_priority; // 0x28
+        private: char pad_2c[0x4]; public:
         void* m_WorkData; // 0x30
         void* m_heapBlock; // 0x38
         uint8_t m_state; // 0x40
@@ -151,8 +152,8 @@ public:
         uint64_t m_field98; // 0x98
         uint64_t m_fielda0; // 0xa0
         uint64_t m_fielda8; // 0xa8
-        uint64_t m_fieldb0; // 0xb0
-        private: char pad_b8[0x28]; public:
+        bool m_IsPowerSaveMode; // 0xb0
+        private: char pad_b1[0x2f]; public:
         regenny::shared::corelib::system::platform::ndsys::Mutex m_PowerSaveLocks[24]; // 0xe0
         regenny::shared::corelib::system::platform::ndsys::ConditionVariable m_cvFreeJob[24]; // 0x6e0
         regenny::shared::corelib::system::platform::ndsys::Thread m_workerThreads[24]; // 0x9e0

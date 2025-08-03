@@ -72,7 +72,7 @@ namespace NdGameSdk::corelib::memory
 		NdGameSdk_API void ModifyMemoryMap(MemoryMapId MapId, MemSize newSizeForId);
 		NdGameSdk_API void IncreaseMemoryMap(MemoryMapId MapId, MemSize AddSizeForId);
 
-		// Always use PushAllocator and PopAllocator for allocationg memory.
+		// Always use PushAllocator and PopAllocator for allocation memory.
 		template <typename ClassType = void>
 		NdGameSdk_API ClassType* Allocate(size_t heap_size, uint64_t heap_alignmemt, const char* func, int line, const char* file) {
 			always_assert(Memory_Allocate == nullptr, "Function pointer was not set!");

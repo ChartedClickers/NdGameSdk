@@ -1,7 +1,7 @@
 ﻿#include "debugdraw-common.hpp"
-
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
+#include <NdGameSdk/shared/src/ndlib/profiling/profile-ctrl.hpp>
 namespace NdGameSdk::ndlib::render::dev {
 
 	DebugDrawCommon::DebugDrawCommon() : ISdkComponent("DebugDraw") {}
@@ -119,6 +119,46 @@ namespace NdGameSdk::ndlib::render::dev {
 				DebugDrawSid, wstr(Patterns::GameDebugDraw_DebugDrawSid), wstr(GameDeDebugDrawSidJMPbugDrawJMP));
 
 			_snprintf_s(this->debug_primtext, sizeof(this->debug_primtext), "I'm primitive, beautiful, and in full bloom within DebugMem.");
+
+		#if defined(T2R)
+
+			if (m_Memory->IsDebugMemoryAvailable()) {
+				findpattern = Patterns::GameDebugDraw_StaticContext_ProfilingHook;
+				auto ProfileCtrl = GetSharedComponents()->GetComponent<ndlib::profiling::ProfileController>();
+				auto ProfilingHookJMP = (void*)Utility::FindAndPrintPattern(module
+					, findpattern.pattern, wstr(Patterns::GameDebugDraw_StaticContext_ProfilingHook), findpattern.offset);
+
+				if (ProfileCtrl && ProfilingHookJMP) {
+					auto static ProfilingHook = Utility::MakeMidHook(ProfilingHookJMP,
+						[](SafetyHookContext& ctx)
+						{
+							using namespace ndlib::profiling;
+							DebugDrawCommon* DebugDraw = DebugDrawCommon::Instance<DebugDrawCommon>();
+							auto static ProfileMgr = GetSharedComponents()->GetComponent<ProfileController>()->GetSubComponent<ProfileManager>();
+
+							if (ProfileMgr) {
+
+								static std::once_flag DrawGraphMemAlloc;
+								std::call_once(DrawGraphMemAlloc, [DebugDraw, ctx] {
+									void* newBlock = DebugDraw->m_Memory->AllocateAtContext<void>(0x60, 0x10, Memory::Context::kAllocDevCpu);
+									if (newBlock) {
+										*reinterpret_cast<void**>(ctx.rcx) = newBlock;
+										std::memset(newBlock, 0, 0x60);
+									}
+								});
+
+								ProfileMgr->DrawProfiler(ctx.rcx, true);
+							}
+
+						}, wstr(Patterns::GameDebugDraw_StaticContext_ProfilingHook), wstr(ProfilingHookJMP));
+
+					if (!ProfilingHook) {
+						throw SdkComponentEx{ std::format("Failed to create hook {:s} in {:s}!", TOSTRING(ProfilingHook), GetName()),
+							SdkComponentEx::ErrorCode::PatchFailed };
+					}
+				}
+			}
+		#endif
 
 		});
 	}

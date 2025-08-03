@@ -11,7 +11,6 @@
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
 #include <NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp>
 
-
 #include "../window-context.hpp"
 #include "../frame-params.hpp"
 #include "../util/text.hpp"

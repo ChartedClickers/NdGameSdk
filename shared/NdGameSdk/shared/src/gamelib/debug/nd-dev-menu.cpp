@@ -4,6 +4,7 @@
 #include <NdGameSdk/shared/src/ndlib/render/dev/debugdraw-common.hpp>
 #include <NdGameSdk/shared/src/ndlib/script/script-manager.hpp>
 #include <NdGameSdk/shared/src/ndlib/io/package-mgr.hpp>
+#include <NdGameSdk/shared/src/ndlib/profiling/profile-ctrl.hpp>
 
 #include <cstddef> 
 
@@ -710,6 +711,20 @@ namespace NdGameSdk::gamelib::debug {
 					DMENU::Menu* Menu = reinterpret_cast<DMENU::Menu*>(ctx.rbx);
 
 					if (MenuGroup == NdDevMenu) {
+
+					#if defined(T2R)
+						auto ProfileCtrl = GetSharedComponents()->GetComponent<ndlib::profiling::ProfileController>();
+						if (ProfileCtrl) {
+							DMENU::Menu* ProfileCtrlMenu = NdDevMenuComponent->Create_DMENU_Menu(ProfileCtrl->GetName().data(), HeapArena_Source);
+
+							if (ProfileCtrlMenu) {
+								ndlib::profiling::InitProfileMenu(ProfileCtrlMenu);
+								NdDevMenuComponent->Create_DMENU_ItemSubmenu(ProfileCtrlMenu->Name(), MenuGroup->RootMenu(),
+									ProfileCtrlMenu, NULL, NULL, nullptr, HeapArena_Source);
+							}
+						}
+					#endif
+
 						DMENU::Menu* NdGameSdkMenu = NdDevMenuComponent->CreateNdGameSdkMenu();
 						NdDevMenuComponent->m_NdGameSdkMenu = NdDevMenuComponent->Create_DMENU_ItemSubmenu(NdGameSdkMenu->Name(), MenuGroup->RootMenu(),
 							NdGameSdkMenu, NULL, NULL, nullptr, HeapArena_Source)->MenuEntry();

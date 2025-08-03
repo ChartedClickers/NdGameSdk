@@ -2,6 +2,7 @@
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
 #include <NdGameSdk/shared/src/ndlib/render/dev/debugdraw-common.hpp>
+#include <NdGameSdk/shared/src/ndlib/profiling/profile-ctrl.hpp>
 
 namespace NdGameSdk::common {
 
@@ -98,6 +99,29 @@ namespace NdGameSdk::common {
 
 			if (!m_NxAppHooks.m_StdHandleHook) {
 				spdlog::warn("Failed to patch {:s}! Logs may not work!", TOSTRING(Patterns::CommonGame_NIXXES_StdHandle));
+			}
+
+			if (m_Memory->IsDebugMemoryAvailable()) {
+				auto ProfileCtrl = GetSharedComponents()->GetComponent<ndlib::profiling::ProfileController>();
+
+				findpattern = Patterns::CommonGame_ProfileCtrl_Initialize;
+				auto ProfileCtrlInitJMP = (void*)Utility::FindAndPrintPattern(module
+					, findpattern.pattern, wstr(Patterns::CommonGame_ProfileCtrl_Initialize), findpattern.offset);
+
+				if (ProfileCtrl && ProfileCtrlInitJMP) {
+					auto static ProfileCtrlInitHook = Utility::MakeMidHook(ProfileCtrlInitJMP,
+						[](SafetyHookContext& ctx)
+						{
+							auto profileCtrl = GetSharedComponents()->GetComponent<ndlib::profiling::ProfileController>();
+							profileCtrl->InternalInitialize();
+
+						}, wstr(Patterns::CommonGame_ProfileCtrl_Initialize), wstr(ProfileCtrlInitJMP));
+
+					if (!ProfileCtrlInitHook) {
+						throw SdkComponentEx{ std::format("Failed to create hook {:s} in {:s}!", TOSTRING(ProfileCtrlInitHook), GetName()),
+							SdkComponentEx::ErrorCode::PatchFailed, false };
+					}
+				}
 			}
 
 	#elif defined(T1X)

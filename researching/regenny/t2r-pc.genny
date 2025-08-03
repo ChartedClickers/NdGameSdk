@@ -454,6 +454,11 @@ namespace regenny {
                     bool m_field114;
                 };
 
+                struct AllocStack 0x50 {
+                    void* m_StackPool;
+                    bool m_field30 @ 0x30;
+                }; // s_AllocStack
+
             }
 
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib\util
@@ -822,6 +827,7 @@ namespace regenny {
                     NameCache = 0x7, // m_pNameCache
                     BUILD_NUMBER = 0x1e,
                     GameTitle = 0x20,
+                    Profiling = 0xd1,
                     IsGameConfigured = 0xd2
                 }; // nd-config.hpp
             }
@@ -1149,6 +1155,26 @@ namespace regenny {
                         VTable* vftable;
                     }
                 }
+            }
+
+            // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\profiling
+            namespace profiling {
+                struct ProfileCtrl 0x70 {};
+                struct ProfileMgr 0x1e50 {
+                    uint64_t m_numWorkerThreads @ 0x420;
+                    corelib.containers.FixedSizeHeap m_FixedSizeHeap @ 0x1db8;
+                }; // s_ProfileMgr
+            }
+
+            // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\util
+            namespace util {
+                struct BitReader 0x18 {
+                    uint64_t m_FixUpTable;
+                    uint32_t m_bitIndex;
+                    uint32_t m_byteIndex;
+                    uint32_t m_size;
+                    uint32_t field_14;
+                }; // bit-reader.h
             }
             
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\script

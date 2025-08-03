@@ -2,6 +2,8 @@
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
 #include <NdGameSdk/shared/src/ndlib/profiling/profile-ctrl.hpp>
+#include <NdGameSdk/shared/src/corelib/job/job-system.hpp>
+
 namespace NdGameSdk::ndlib::render::dev {
 
 	DebugDrawCommon::DebugDrawCommon() : ISdkComponent("DebugDraw") {}
@@ -167,6 +169,12 @@ namespace NdGameSdk::ndlib::render::dev {
 
 		DebugDrawCommon* DebugDraw = DebugDrawCommon::Instance<DebugDrawCommon>();
 		if (!DebugDraw) return;
+
+		static auto ndjob = GetSharedComponents()->GetComponent<corelib::job::NdJob>();
+
+		if (ndjob) {
+			ndjob->DisplayJobSystemData();
+		}
 
 		auto* frame = DebugDraw->m_RenderFrameParams.GetRenderFrameParams();
 		if (frame) {

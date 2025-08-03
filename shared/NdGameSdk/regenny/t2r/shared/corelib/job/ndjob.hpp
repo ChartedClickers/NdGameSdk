@@ -54,8 +54,8 @@ struct ndjob {
         void* m_tlsBlock; // 0x30
         uint32_t m_stateBits; // 0x38
         uint64_t m_flags; // 0x3c
-        private: char pad_44[0xbc]; public:
-    }; // Size: 0x100
+        private: char pad_44[0x3c]; public:
+    }; // Size: 0x80
 
     struct JobArrayHeader {
         uint32_t m_completedCount; // 0x0

@@ -166,6 +166,5 @@ namespace NdGameSdk::ndlib::io {
 	static_assert(sizeof(Package) == 0x1b00, "Package size mismatch");
 	static_assert(sizeof(Package::PakHeader) == 0x40, "Package::PakHeader size mismatch");
 	static_assert(sizeof(Package::ResItem) == 0x30, "Package::ResItem size mismatch");
-    //static_assert(sizeof(DMENU::Menu) == sizeof(DMENU::Component) + 0x30, "Size of DMENU::Menu is not correct.");
 #endif
 }

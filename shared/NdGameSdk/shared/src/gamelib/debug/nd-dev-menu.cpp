@@ -1,6 +1,7 @@
 #include "nd-dev-menu.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
+#include <NdGameSdk/shared/src/corelib/job/job-system.hpp>
 #include <NdGameSdk/shared/src/ndlib/render/dev/debugdraw-common.hpp>
 #include <NdGameSdk/shared/src/ndlib/script/script-manager.hpp>
 #include <NdGameSdk/shared/src/ndlib/io/package-mgr.hpp>
@@ -9,6 +10,7 @@
 #include <cstddef> 
 
 using namespace boost::placeholders;
+using namespace NdGameSdk::corelib::job;
 using namespace NdGameSdk::ndlib::script;
 using namespace NdGameSdk::ndlib::io;
 using namespace NdGameSdk::ndlib::render::dev;
@@ -340,6 +342,7 @@ namespace NdGameSdk::gamelib::debug {
 
 		DebugDrawCommon::CreateDebugDrawMenu(this, NdGameSdkMenu);
 		ScriptManager::CreateScriptManagerMenu(this, NdGameSdkMenu);
+		NdJob::CreateJobSystemMenu(this, NdGameSdkMenu);
 #if defined(T2R)
 		PackageManager::CreatePackageManagerMenu(this, NdGameSdkMenu);
 #endif

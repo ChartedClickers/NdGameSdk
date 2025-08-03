@@ -598,6 +598,15 @@ namespace regenny {
                     uint32_t m_field94;
                 };
 
+                struct JobSystem 0x10 {
+                    bool m_EnableStackChecking @ 0x8;
+                    bool m_field9;
+                    bool m_PrintJobSysDataStats;
+                    bool m_EnableValidation;
+                    bool m_EnablePerfCounters;
+                    bool m_EnableDeadlockDetection @ 0xe;
+                }; // s_JobSystem
+
                 struct ndjob {
 
                     enum Priority : uint32_t {
@@ -633,7 +642,7 @@ namespace regenny {
                         bool m_field38;
                     };
 
-                    struct JobHeader 0x100 {
+                    struct JobHeader 0x80 {
                         void* m_entry; // Entry function
                         void* m_WorkData; // User data
                         CounterHandle* m_Counter;

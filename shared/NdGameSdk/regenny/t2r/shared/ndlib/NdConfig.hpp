@@ -11,6 +11,7 @@ struct NdConfig {
         NameCache = 7,
         BUILD_NUMBER = 30,
         GameTitle = 32,
+        Profiling = 209,
         IsGameConfigured = 210,
     };
 

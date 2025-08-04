@@ -37,7 +37,8 @@ namespace NdGameSdk::ndlib::profiling {
 
 	void ProfileController::InternalInitialize() {
 		always_assert(ProfileCtrl_Initialize == nullptr, "Function pointer was not set!");
-		ProfileCtrl_Initialize();
+		static ProfileCtrl profileCtrl{};
+		ProfileCtrl_Initialize(&profileCtrl);
 	}
 
 #endif

@@ -53,119 +53,107 @@ namespace NdGameSdk {
 		return CachedComponents;
 	}
 
+    void SdkComponentFactory::InitializeSdkComponents() {
+        for (auto id : m_orderedSdkComponents)
+            m_sdkcomponents[id]->Awake();
 
+        std::size_t progress;
+        std::unordered_set<std::type_index> failed;
 
-	SdkComponentFactory::~SdkComponentFactory() {
-		for (auto it = m_orderedSdkComponents.rbegin(); it != m_orderedSdkComponents.rend(); ++it) {
-			ISdkComponent* ptr = *it;
-			if (!ptr) continue;
-			auto found = std::find_if(
-				m_sdkcomponents.begin(), m_sdkcomponents.end(),
-				[ptr](const auto& kv) { return kv.second.get() == ptr; });
-			if (found != m_sdkcomponents.end()) {
-				found->second.reset();
-			}
-		}
+        auto depSatisfied = [&](std::type_index dep) -> bool {
+            for (auto* f : { this,
+                             &ISdkComponent::s_SharedComponents,
+                             &ISdkComponent::s_NdGameComponents }) {
+                auto it = f->m_sdkcomponents.find(dep);
+                if (it != f->m_sdkcomponents.end() && it->second->IsInitialized())
+                    return true;
+            }
+            return false;
+            };
 
-		m_orderedSdkComponents.clear();
-		m_sdkcomponents.clear();
-	}
+        auto isReady = [&](ISdkComponent* comp) {
+            return std::all_of(comp->Dependencies().begin(),
+                comp->Dependencies().end(),
+                depSatisfied);
+            };
 
-	void SdkComponentFactory::InitializeSdkComponents() {
+        do {
+            progress = 0;
+            for (auto id : m_orderedSdkComponents) {
 
-		for (auto& comp : m_orderedSdkComponents)
-			comp->Awake();
+                auto& comp = m_sdkcomponents[id];
 
-		std::size_t progress;
-		std::unordered_set<std::type_index> failed;
+                if (!comp || comp->IsInitialized() || failed.contains(id))
+                    continue;
 
-		do {
+                if (!isReady(comp.get()))
+                    continue;
 
-			progress = 0;
+                try {
+                    spdlog::info("Initialize {}", comp->GetName());
+                    comp->Initialize();
+                    comp->m_Initialized = true;
+                    ++progress;
+                }
+                catch (const SdkComponentEx& ex) {
+                    if (ex.IsCritical()) {
+                        spdlog::critical("Critical initialization error in {}: {}", comp->GetName(), ex.what());
+                        throw;
+                    }
+                    spdlog::error("Init failed for {}: {}", comp->GetName(), ex.what());
+                    failed.insert(id);
+                }
+                catch (const std::exception& ex) {
+                    spdlog::error("Error initialize {}: {}", comp->GetName(), ex.what());
+                    failed.insert(id);
+                }
+                catch (...) {
+                    spdlog::error("Error initialize: {}", comp->GetName());
+                    failed.insert(id);
+                }
+            }
+        } while (progress > 0);
 
-			for (auto& comp : m_orderedSdkComponents)
-			{
-				std::type_index id{ typeid(*comp) };
-				if (comp->IsInitialized() || failed.count(id))
-					continue;
+        std::deque<std::type_index> queue{ failed.begin(), failed.end() };
+        while (!queue.empty()) {
+            auto bad = queue.front(); queue.pop_front();
+            for (auto& [cid, compPtr] : m_sdkcomponents) {
+                if (compPtr->IsInitialized() || failed.contains(cid))
+                    continue;
+                auto deps = compPtr->Dependencies();
+                if (std::find(deps.begin(), deps.end(), bad) != deps.end()) {
+                    failed.insert(cid);
+                    queue.push_back(cid);
+                }
+            }
+        }
 
-				bool ready = std::all_of(
-					comp->Dependencies().begin(),
-					comp->Dependencies().end(),
-					[&](auto const& d) {
-						auto it = m_sdkcomponents.find(d);
-						if (it != m_sdkcomponents.end())
-							return it->second->IsInitialized();
+        std::vector<std::pair<std::type_index, std::vector<std::type_index>>> missingDeps;
+        for (auto const& [cid, uptr] : m_sdkcomponents) {
+            if (!uptr->IsInitialized() && !failed.contains(cid)) {
+                std::vector<std::type_index> depsMissing;
+                for (auto dep : uptr->Dependencies())
+                    if (!depSatisfied(dep))
+                        depsMissing.push_back(dep);
+                missingDeps.emplace_back(cid, std::move(depsMissing));
+            }
+        }
 
-						if (this != &ISdkComponent::s_SharedComponents) {
-							const auto& shared = ISdkComponent::s_SharedComponents.GetSdkComponents();
-							auto it_shared = shared.find(d);
-							return it_shared != shared.end() && it_shared->second->IsInitialized();
-						}
+        std::erase_if(m_sdkcomponents, [&](auto const& kv) {
+            return !kv.second->IsInitialized() || failed.contains(kv.first);
+            });
 
-						return false;
-					});
+        for (auto cid : failed)
+            spdlog::warn("Component {} permanently failed", cid.name());
 
-
-				if (!ready)
-					continue;
-
-				try {
-					spdlog::info("Initialize {}", comp->GetName());
-					comp->Initialize();
-					comp->m_Initialized = true;
-					++progress;
-				}
-				catch (const SdkComponentEx& ex) {
-					if (ex.IsCritical()) {
-						spdlog::critical("Critical initialization error in {}: {}", comp->GetName(), ex.what());
-						throw;
-					}
-
-					spdlog::error("Init failed for {}: {}", comp->GetName(), ex.what());
-					failed.insert(id);  
-				}
-				catch (const std::exception& ex) {
-					spdlog::error("Error initialize {}: {}", comp->GetName(), ex.what());
-					failed.insert(id);
-				}
-				catch (...) {
-					spdlog::error("Error initialize: {}", comp->GetName());
-					failed.insert(id);
-				}
-			}
-
-		} while (progress > 0);
-
-		{
-			std::deque<std::type_index> queue{ failed.begin(), failed.end() };
-			while (!queue.empty()) {
-				auto bad = queue.front(); queue.pop_front();
-
-				for (auto& [cid, compPtr] : m_sdkcomponents) {
-					if (compPtr->IsInitialized() || failed.count(cid))
-						continue;
-
-					auto deps = compPtr->Dependencies();
-					if (std::find(deps.begin(), deps.end(), bad) != deps.end()) {
-						failed.insert(cid);
-						queue.push_back(cid);
-					}
-				}
-			}
-		}
-
-		std::erase_if(m_sdkcomponents,
-			[&](auto const& kv) {
-				auto& ptr = kv.second;
-				auto  cid = kv.first;
-				return !ptr->IsInitialized() || failed.count(cid);
-			});
-
-		for (auto const& cid : failed) {
-			spdlog::warn("Component {} permanently failed", cid.name());
-		}
-	}
+        for (auto& [cid, deps] : missingDeps) {
+            std::vector<std::string> depNames;
+            depNames.reserve(deps.size());
+            for (auto d : deps)
+                depNames.emplace_back(d.name());
+            spdlog::warn("Component {} skipped (missing deps: {})", cid.name(), fmt::join(depNames, ", "));
+        }
+    }
 
 	void ISdkComponent::InitSubComponents() {
 

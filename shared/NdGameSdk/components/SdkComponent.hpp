@@ -35,19 +35,31 @@ namespace NdGameSdk {
     class SdkComponentFactory final {
     public:
         SdkComponentFactory() = default;
-        ~SdkComponentFactory();
+        ~SdkComponentFactory() = default;
 
         void InitializeSdkComponents();
         const std::unordered_map<std::type_index, std::unique_ptr<ISdkComponent>>& GetSdkComponents() const;
 
         template <typename ComponentType, typename... Args>
         ComponentType* AddComponent(Args&&... args) {
-            static_assert(SdkDerived::is_derived_from_ISdkComponent<ComponentType>::value, "ComponentType must be derived from ISdkComponent");
+            static_assert(SdkDerived::is_derived_from_ISdkComponent<ComponentType>::value,
+                "ComponentType must be derived from ISdkComponent");
+
+            auto id = std::type_index(typeid(ComponentType));
             auto sdkcomponent = std::make_unique<ComponentType>(std::forward<Args>(args)...);
-            auto rawPtr = sdkcomponent.get();
-            m_orderedSdkComponents.push_back(rawPtr);
-            m_sdkcomponents[typeid(ComponentType)] = std::move(sdkcomponent);
-            return static_cast<ComponentType*>(rawPtr);
+            auto rawcomponent = sdkcomponent.get();
+
+            if (m_sdkcomponents.contains(id))
+                spdlog::warn("Component {} already exists – replacing.", id.name());
+
+            m_sdkcomponents[id] = std::move(sdkcomponent);
+
+            if (std::find(m_orderedSdkComponents.begin(), m_orderedSdkComponents.end(), id)
+                == m_orderedSdkComponents.end()) {
+                m_orderedSdkComponents.push_back(id);
+            }
+
+            return static_cast<ComponentType*>(rawcomponent);
         }
 
         template <typename ComponentType>
@@ -59,13 +71,13 @@ namespace NdGameSdk {
 
     private:
         std::unordered_map<std::type_index, std::unique_ptr<ISdkComponent>> m_sdkcomponents{};
-        std::deque<ISdkComponent*> m_orderedSdkComponents{};
+        std::vector<std::type_index> m_orderedSdkComponents{};
     };
 
     class ISdkComponent {
     public:
         virtual ~ISdkComponent() = default;
-        
+
         ISdkComponent(ISdkComponent const&) = delete;
         ISdkComponent& operator=(ISdkComponent const&) = delete;
         ISdkComponent(ISdkComponent&&) = delete;
@@ -121,7 +133,7 @@ namespace NdGameSdk {
             if (sdkcomponent) {
                 if constexpr (!std::is_same_v<ClassType, void>)
                     return (sdkcomponent->*event).Subscribe(Instance, memberFunc, OneTimeInvoke);
-                else 
+                else
                     return (sdkcomponent->*event).Subscribe(*memberFunc, OneTimeInvoke);
             }
             return {};

@@ -8,11 +8,11 @@
 namespace regenny::shared::ndlib::io {
 struct Package;
 }
-namespace regenny::shared::gamelib::level {
-struct Level;
-}
 namespace regenny::shared::ndlib::io {
 struct PackageProcessingInfo;
+}
+namespace regenny::shared::gamelib::level {
+struct Level;
 }
 namespace regenny::shared::ndlib::io {
 #pragma pack(push, 1)

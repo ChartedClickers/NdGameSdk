@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/components/SdkComponent.hpp"
@@ -11,10 +11,16 @@
 #include <NdGameSdk/regenny/t2r/shared/corelib/job/ndjob.hpp>
 #include <NdGameSdk/regenny/t2r/shared/corelib/job/JobHeap.hpp>
 #include <NdGameSdk/regenny/t2r/shared/corelib/job/JobSystem.hpp>
+#include <NdGameSdk/regenny/t2r/shared/corelib/job/JlsContext.hpp>
+#include <NdGameSdk/regenny/t2r/shared/corelib/job/JlsEntry.hpp>
+#include <NdGameSdk/regenny/t2r/shared/corelib/job/JlsBlock.hpp>
 #elif defined(T1X)
 #include <NdGameSdk/regenny/t1x/shared/corelib/job/ndjob.hpp>
 #include <NdGameSdk/regenny/t1x/shared/corelib/job/JobHeap.hpp>
 #include <NdGameSdk/regenny/t1x/shared/corelib/job/JobSystem.hpp>
+#include <NdGameSdk/regenny/t1x/shared/corelib/job/JlsContext.hpp>
+#include <NdGameSdk/regenny/t1x/shared/corelib/job/JlsEntry.hpp>
+#include <NdGameSdk/regenny/t1x/shared/corelib/job/JlsBlock.hpp>
 #endif
 
 using namespace NdGameSdk::corelib::memory;
@@ -22,6 +28,8 @@ using namespace NdGameSdk::corelib::memory;
 namespace NdGameSdk::corelib::job {
 
 	/* Extern classes */
+	using JlsContext = regenny::shared::corelib::job::JlsContext;
+
 	class JobSysData : public ISdkRegenny<regenny::shared::corelib::job::ndjob::JobSysData> {
 	public:
 		class InitParams : public ISdkRegenny<regenny::shared::corelib::job::ndjob::InitParams> {
@@ -50,7 +58,11 @@ namespace NdGameSdk::corelib::job {
 	class JobHeader;
 	class CounterHandle;
 
-	class NdJob : public ISdkComponent {
+	template <typename T = void>
+	struct JlsEntry;
+	struct JlsBlock;
+
+	class NdGameSdk_API NdJob : public ISdkComponent {
 	public:
 		using InitParams = JobSysData::InitParams;
 		using Priority = ::regenny::shared::corelib::job::ndjob::Priority;
@@ -61,6 +73,9 @@ namespace NdGameSdk::corelib::job {
 		bool IsWorkerThread();
 		bool IsGameFrameJob();
 
+		const uint64_t TryGetWorkerThreadIndex();
+		const uint64_t GetActiveJobId();
+
 		void RunJobAndWait(void* pEntry, void* pWorkData, HeapArena_Args, int64_t pFlags = 0);
 
 	private:
@@ -68,6 +83,10 @@ namespace NdGameSdk::corelib::job {
 		void Awake() override;
 
 		void DisplayJobSystemData();
+
+#if defined(_MSC_VER) && defined(_M_X64)
+		inline const JlsBlock* GetJobTls();
+#endif
 
 		static DMENU::ItemSubmenu* CreateJobSystemMenu(NdDevMenu* pdmenu, DMENU::Menu* pMenu);
 		/*Extern Functs*/
@@ -85,17 +104,25 @@ namespace NdGameSdk::corelib::job {
 
 		MEMBER_FUNCTION_PTR(void, NdJob_DisplayJobSystemData);
 		MEMBER_FUNCTION_PTR(void, NdJob_WaitForCounter, CounterHandle* pCounter, uint64_t pCountJobArray, uint32_t arg3);
-		MEMBER_FUNCTION_PTR(void*, NdJob_TryGetTlsBlock);
+		MEMBER_FUNCTION_PTR(uint64_t, NdJob_TryGetWorkerThreadIndex);
 		MEMBER_FUNCTION_PTR(void, NdJob_SetJobLocalStorage, uint64_t arg1, uint64_t pSlotIndexes);
-		MEMBER_FUNCTION_PTR(void, NdJob_RunJobAndWait, void* pEntry, void* pWorkData, int64_t pFlags, char const* pFile, uint32_t pLine, char const* pFunc);
-		MEMBER_FUNCTION_PTR(void, NdJob_RegisterJobArray, JobHeader* pJobHeaders, int64_t pCountJobArrays, CounterHandle* pCounter,
+		MEMBER_FUNCTION_PTR(void, NdJob_RunJobAndWait, void* pEntry, void* pWorkData, uint64_t pFlags, char const* pFile, uint32_t pLine, char const* pFunc);
+		MEMBER_FUNCTION_PTR(void, NdJob_RegisterJobArray, JobHeader* pJobHeaders, uint64_t pCountJobArrays, CounterHandle* pCounter,
 			char const* pFile, uint32_t pLine, char const* pFunc, uint64_t arg7, uint64_t arg8, uint64_t arg9);
 		MEMBER_FUNCTION_PTR(JobHeader*, NdJob_MakeJobHeader, JobHeader* pJobHeaders, void* pEntry, void* pWorkData);
-		MEMBER_FUNCTION_PTR(bool, NdJob_IsWorkerThread);
 		MEMBER_FUNCTION_PTR(bool, NdJob_IsGameFrameJob);
+		MEMBER_FUNCTION_PTR(bool, NdJob_IsWorkerThread);
 		MEMBER_FUNCTION_PTR(Priority, NdJob_GetCurrentWorkerPriority);
+		MEMBER_FUNCTION_PTR(uint64_t, NdJob_GetCurrentWorkerThreadIndex);
 		MEMBER_FUNCTION_PTR(void, NdJob_Yield);
+		MEMBER_FUNCTION_PTR(bool, NdJob_TryGetJlsSlot, uint32_t index, void* outValue);
+#if defined (T2R)
 		MEMBER_FUNCTION_PTR(uint64_t, NdJob_GetActiveJobId);
+		MEMBER_FUNCTION_PTR(bool, NdJob_JlsValueWrite, uint32_t index, StringId64 hash, void* Value);
+		MEMBER_FUNCTION_PTR(bool, NdJob_GetJlsValueByIndex, int32_t index, void* outValue);
+		MEMBER_FUNCTION_PTR(bool, NdJob_ClearJlsValueByIndex, int32_t index);
+		MEMBER_FUNCTION_PTR(bool, NdJob_DoesJobLocalStorageIdExist, uint32_t index);
+#endif
 
 		friend class ndlib::render::dev::DebugDrawCommon;
 		friend class NdDevMenu;
@@ -130,5 +157,76 @@ namespace NdGameSdk::corelib::job {
 			self->m_stateBits &= ~0xfffffff0;
 			self->m_flags &= 0xf000000000000000;
 		}
+	};
+
+	template <typename T>
+	struct JlsEntry : public ISdkRegenny<regenny::shared::corelib::job::JlsEntry> {
+
+		JlsEntry() = default;
+
+		JlsEntry(StringId64 ctx, T val) {
+			auto* self = this->Get();
+			self->m_contextid = ctx;
+			self->m_payload = reinterpret_cast<uint64_t>(val);
+		}
+
+		[[nodiscard]] StringId64 key() const noexcept { return this->Get()->m_contextid; }
+
+		[[nodiscard]] T value() noexcept {
+			if constexpr (std::is_pointer_v<T>)
+				return reinterpret_cast<T>(this->Get()->m_payload);
+			else
+				return static_cast<T>(this->Get()->m_payload);
+		}
+
+		[[nodiscard]] const T value() const noexcept {
+			if constexpr (std::is_pointer_v<T>)
+				return reinterpret_cast<const T>(this->Get()->m_payload);
+			else
+				return static_cast<T>(this->Get()->m_payload);
+		}
+	};
+
+	struct JlsBlock : public ISdkRegenny<regenny::shared::corelib::job::JlsBlock> {
+		using Raw = regenny::shared::corelib::job::JlsBlock;
+		using RawEntry = regenny::shared::corelib::job::JlsEntry;
+
+		static constexpr std::size_t kSlots = sizeof(Raw::slots) / sizeof(Raw::slots[0]);
+
+		template<class T = void>
+		JlsEntry<T>& slot(std::size_t i) {
+			return *reinterpret_cast<JlsEntry<T>*>(&this->Get()->slots[i]);
+		}
+
+		template<class T = void>
+		const JlsEntry<const T>& slot(std::size_t i) const {
+			return *reinterpret_cast<const JlsEntry<const T>*>(&this->Get()->slots[i]);
+		}
+
+		template<class T = void>
+		JlsEntry<T>& slot(JlsContext c) { return slot<T>(static_cast<std::size_t>(c)); }
+		template<class T = void>
+		const JlsEntry<const T>& slot(JlsContext c) const { return slot<const T>(static_cast<std::size_t>(c)); }
+
+		template<class T = void>
+		JlsEntry<T>* find(StringId64 ctx) {
+			for (std::size_t i = 0; i < kSlots; ++i) {
+				auto& e = slot<T>(i);
+				if (e.key() == ctx) return &e;
+			}
+			return nullptr;
+		}
+
+		struct Iterator {
+			RawEntry* cur{};
+			RawEntry* end{};
+			void advance() { while (cur != end && cur->m_contextid == 0) ++cur; }
+			Iterator& operator++() { ++cur; advance(); return *this; }
+			bool operator!=(Iterator const& o) const { return cur != o.cur; }
+			JlsEntry<uint64_t>& operator*() { return *reinterpret_cast<JlsEntry<uint64_t>*>(cur); }
+		};
+
+		Iterator begin() { auto* b = &this->Get()->slots[0]; auto* e = b + kSlots; Iterator it{ b,e }; it.advance(); return it; }
+		Iterator end() { auto* e = &this->Get()->slots[kSlots]; return { e,e }; }
 	};
 }

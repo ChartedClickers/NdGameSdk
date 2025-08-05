@@ -558,6 +558,28 @@ namespace regenny {
             // c:\branches\discbot??\t1x-pc-?.?.?\shared\src\corelib\job
             namespace job {
 
+                enum JlsContext : uint32_t {
+                    jobId = 0x0,
+                    workerThreadIndex = 0x1,
+                    renderFrameParams = 0x2,
+                    CurrentAllocator = 0x3,
+                    ScriptStackFrame = 0x6,
+                    ScriptCFuncContext = 0x12,
+                    ContextProcess = 0xc,
+                    ContextPlayer = 0xe
+                };
+
+                // 16 bytes
+                struct JlsEntry 0x10 {
+                    StringId64 m_contextid;
+                    uint64_t m_payload;
+                };
+
+                // 0x20 × 16 B = 512 B
+                struct JlsBlock {
+	                JlsEntry slots[0x20];
+                };
+
                 struct WorkerThreadDesc 0x200 {
 
                     struct Config 0x30 {

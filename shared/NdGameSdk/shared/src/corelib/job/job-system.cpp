@@ -59,9 +59,9 @@ namespace NdGameSdk::corelib::job {
 			NdJob_WaitForCounter = (NdJob_WaitForCounter_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::NdJob_WaitForCounter), findpattern.offset);
 
-			findpattern = Patterns::NdJob_TryGetTlsBlock;
-			NdJob_TryGetTlsBlock = (NdJob_TryGetTlsBlock_ptr)Utility::FindAndPrintPattern(module,
-				findpattern.pattern, wstr(Patterns::NdJob_TryGetTlsBlock), findpattern.offset);
+			findpattern = Patterns::NdJob_TryGetWorkerThreadIndex;
+			NdJob_TryGetWorkerThreadIndex = (NdJob_TryGetWorkerThreadIndex_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdJob_TryGetWorkerThreadIndex), findpattern.offset);
 
 			findpattern = Patterns::NdJob_SetJobLocalStorage;
 			NdJob_SetJobLocalStorage = (NdJob_SetJobLocalStorage_ptr)Utility::FindAndPrintPattern(module,
@@ -91,19 +91,43 @@ namespace NdGameSdk::corelib::job {
 			NdJob_GetCurrentWorkerPriority = (NdJob_GetCurrentWorkerPriority_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::NdJob_GetCurrentWorkerPriority), findpattern.offset);
 
+			findpattern = Patterns::NdJob_GetCurrentWorkerThreadIndex;
+			NdJob_GetCurrentWorkerThreadIndex = (NdJob_GetCurrentWorkerThreadIndex_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdJob_GetCurrentWorkerThreadIndex), findpattern.offset);
+
 			findpattern = Patterns::NdJob_Yield;
 			NdJob_Yield = (NdJob_Yield_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::NdJob_Yield), findpattern.offset);
+
+			findpattern = Patterns::NdJob_TryGetJlsSlot;
+			NdJob_TryGetJlsSlot = (NdJob_TryGetJlsSlot_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdJob_TryGetJlsSlot), findpattern.offset);
 
 	#if defined(T2R)
 			findpattern = Patterns::NdJob_GetActiveJobId;
 			NdJob_GetActiveJobId = (NdJob_GetActiveJobId_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::NdJob_GetActiveJobId), findpattern.offset);
+
+			findpattern = Patterns::NdJob_JlsValueWrite;
+			NdJob_JlsValueWrite = (NdJob_JlsValueWrite_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdJob_JlsValueWrite), findpattern.offset);
+
+			findpattern = Patterns::NdJob_GetJlsValueByIndex;
+			NdJob_GetJlsValueByIndex = (NdJob_GetJlsValueByIndex_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdJob_GetJlsValueByIndex), findpattern.offset);
+
+			findpattern = Patterns::NdJob_ClearJlsValueByIndex;
+			NdJob_ClearJlsValueByIndex = (NdJob_ClearJlsValueByIndex_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdJob_ClearJlsValueByIndex), findpattern.offset);
+
+			findpattern = Patterns::NdJob_DoesJobLocalStorageIdExist;
+			NdJob_DoesJobLocalStorageIdExist = (NdJob_DoesJobLocalStorageIdExist_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdJob_DoesJobLocalStorageIdExist), findpattern.offset);
 	#endif
 
 			if (!NdJob_DisplayJobSystemData ||
 				!NdJob_WaitForCounter ||
-				!NdJob_TryGetTlsBlock ||
+				!NdJob_TryGetWorkerThreadIndex ||
 				!NdJob_SetJobLocalStorage ||
 				!NdJob_RunJobAndWait ||
 				!NdJob_RegisterJobArray ||
@@ -111,9 +135,15 @@ namespace NdGameSdk::corelib::job {
 				!NdJob_IsWorkerThread ||
 				!NdJob_IsGameFrameJob ||
 				!NdJob_GetCurrentWorkerPriority ||
-				!NdJob_Yield
+				!NdJob_GetCurrentWorkerThreadIndex ||
+				!NdJob_Yield ||
+				!NdJob_TryGetJlsSlot
 			#if defined(T2R)
-				|| !NdJob_GetActiveJobId
+				|| !NdJob_GetActiveJobId ||
+				!NdJob_JlsValueWrite ||
+				!NdJob_GetJlsValueByIndex ||
+				!NdJob_ClearJlsValueByIndex ||
+				!NdJob_DoesJobLocalStorageIdExist
 			#endif
 				) {
 				throw SdkComponentEx{ std::format("Failed to find {}:: game function!", GetName()), SdkComponentEx::ErrorCode::PatternFailed };
@@ -139,8 +169,12 @@ namespace NdGameSdk::corelib::job {
 	}
 
 	bool NdJob::IsWorkerThread() {
+	#if defined(T2R) || defined(T1X)
 		always_assert(NdJob_IsWorkerThread == nullptr, "Function pointer was not set!");
 		return NdJob_IsWorkerThread();
+	#else
+		return TryGetWorkerThreadIndex() < 0x18;
+	#endif
 	}
 
 	bool NdJob::IsGameFrameJob() {
@@ -148,11 +182,37 @@ namespace NdGameSdk::corelib::job {
 		return NdJob_IsGameFrameJob();
 	}
 
+	const uint64_t NdJob::TryGetWorkerThreadIndex() {
+		always_assert(NdJob_TryGetWorkerThreadIndex == nullptr, "Function pointer was not set!");
+		return NdJob_TryGetWorkerThreadIndex();
+	}
+
+	const uint64_t NdJob::GetActiveJobId() {
+	#if defined(T2R)
+		always_assert(NdJob_GetActiveJobId == nullptr, "Function pointer was not set!");
+		return NdJob_GetActiveJobId();
+	#else
+		return GetJobTls()->slot<uint64_t>(JlsContext::jobId).value();
+	#endif
+	}
+
 	void NdJob::RunJobAndWait(void* pEntry, void* pWorkData, HeapArena_Args, int64_t pFlags) {
 		always_assert(NdJob_RunJobAndWait == nullptr, "Function pointer was not set!");
-		spdlog::debug("Running job and waiting for completion: Entry: {}, WorkData: {}, Flags: {}", pEntry, pWorkData, pFlags);
+		spdlog::debug("Running job with entry: {}, work data: {}, flags: {}, source file: {}, source line: {}, source function: {}",
+			pEntry, pWorkData, pFlags, source_file, source_line, source_func);
 		NdJob_RunJobAndWait(pEntry, pWorkData, pFlags, source_file, source_line, source_func);
 	}
+
+#if defined(_MSC_VER) && defined(_M_X64)
+	inline const JlsBlock* NdJob::GetJobTls() {
+		const auto tlsRecList = __readgsqword(0x20);
+		if (!tlsRecList)
+			return nullptr;
+
+		const auto slotPtr = *reinterpret_cast<void**>(tlsRecList);
+		return static_cast<const JlsBlock*>(slotPtr);
+	}
+#endif
 
 	DMENU::ItemSubmenu* NdJob::CreateJobSystemMenu(NdDevMenu* pdmenu, DMENU::Menu* pMenu) {
 		auto NdJobSystem = Instance<NdJob>();
@@ -161,22 +221,16 @@ namespace NdGameSdk::corelib::job {
 			DMENU::Menu* NdJobSystemMenu = pdmenu->Create_DMENU_Menu(NdJobSystem->GetName().data(), HeapArena_Source);
 			if (NdJobSystemMenu) {
 			#if SDK_DEBUG
-				pdmenu->Create_DMENU_ItemFunction("Run function in the native NdJobWorkerThread", NdJobSystemMenu, +[](DMENU::ItemFunction& pFunction, DMENU::Message pMessage)->bool {
+				pdmenu->Create_DMENU_ItemFunction("Run function in the native NdJobWorkerThread", NdJobSystemMenu, 
+					+[](DMENU::ItemFunction& pFunction, DMENU::Message pMessage)->bool {
 					if (pMessage == DMENU::Message::OnExecute) {
 						auto NdJobSystem = reinterpret_cast<NdJob*>(pFunction.Data());
 						NdJobSystem->s_JobSystem->Get()->m_PrintJobSysDataStats = true;
 						spdlog::info("Test function executed in JobSystem menu!");
 
-						NdJobSystem->RunJobAndWait(
-							+[](void* pData) {
-								spdlog::info("Job executed with data: {}", pData);
-								spdlog::info("I am a function running under native NdJobWorkerThread!");
-							},
-							(void*)0x12345678, // Example work data
-							HeapArena_Source
-						);
+						auto jobid = NdJobSystem->GetActiveJobId();
+						spdlog::log(spdlog::level::info, "Active Job ID: {}", jobid);
 
-						spdlog::info("JobSystem menu test function completed!");
 
 					}
 					return true;

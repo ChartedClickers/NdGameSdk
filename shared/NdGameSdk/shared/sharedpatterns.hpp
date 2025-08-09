@@ -69,7 +69,7 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern NdJob_GetCurrentWorkerThreadIndex = { L"48 83 ec 28 e8 ?? ?? ?? ?? 48 83 f8 18 72 ?? b8 18 00 00 00 48 83 c4 28 c3" };
 	static inline const SdkPattern NdJob_Yield = { L"41 56 48 83 ec 40 e8 ?? ?? ?? ?? 4c 8b f0 e8 ?? ?? ?? ?? 84 c0 0f 85" };
 	static inline const SdkPattern NdJob_GetActiveJobId = { L"65 48 8b 04 25 ?? ?? ?? ?? 48 8b 00 48 8b 40 08 c3" };
-	static inline const SdkPattern NdJob_TryGetJlsSlot = { L"65 48 8b 04 25 20 00 00 00 4c 63 c1 49 c1 e0 04 4c 03 00 49 83 38 00 74 0a 49 8b 40 08 48 89 02 b0 01 c3 32 c0 c3" };
+	static inline const SdkPattern NdJob_TryGetJlsSlotValue = { L"65 48 8b 04 25 20 00 00 00 4c 63 c1 49 c1 e0 04 4c 03 00 49 83 38 00 74 0a 49 8b 40 08 48 89 02 b0 01 c3 32 c0 c3" };
 	static inline const SdkPattern NdJob_JlsValueWrite = { L"65 48 8b 04 25 20 00 00 00 4c 63 c9 49 c1 e1 04 4c 03 08 49 89 11 4d 89 41 08 c3" };
 	static inline const SdkPattern NdJob_GetJlsValueByIndex = { L"65 48 8b 04 25 20 00 00 00 48 63 c9 48 03 c9 48 8b 00 48 8b 4c c8 08 48 89 0a c3" };
 	static inline const SdkPattern NdJob_ClearJlsValueByIndex = { L"65 48 8b 04 25 20 00 00 00 48 63 d1 48 c1 e2 04 48 03 10 33 c0 48 89 02 48 89 42 08 c3" };
@@ -227,7 +227,7 @@ namespace NdGameSdk::Patterns {
     static inline const SdkPattern NdJob_GetCurrentWorkerPriority = { L"48 83 ec 28 e8 ?? ?? ?? ?? 48 8b c8 48 83 f8 18 73 14 48 8b 05" };
 	static inline const SdkPattern NdJob_GetCurrentWorkerThreadIndex = { L"48 83 ec 28 e8 ?? ?? ?? ?? 84 c0 75 07 b8 18 00 00 00 eb 35 48 83 64 24 30 00 48 8d 54 24 30 b9 01 00 00 00 e8 ?? ?? ?? ?? 84 c0 74 07 48 8b 44 24 30 eb 15" };
 	static inline const SdkPattern NdJob_Yield = { L"48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 57 48 83 ec 30 e8 ?? ?? ?? ?? 48 8b e8 e8 ?? ?? ?? ?? 84 c0 0f 85" };
-	static inline const SdkPattern NdJob_TryGetJlsSlot = { L"65 48 8b 04 25 20 00 00 00 4c 63 c1 49 c1 e0 04 4c 03 00" };
+	static inline const SdkPattern NdJob_TryGetJlsSlotValue = { L"65 48 8b 04 25 20 00 00 00 4c 63 c1 49 c1 e0 04 4c 03 00" };
 
 	static inline const SdkPattern ScriptManager_g_ScriptManagerGlobals = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 20 48 8b d9 48 63 fa 48 ?? ?? ?? ?? ?? ?? 45 33 c9 4c 89 49", +0x15 };
 	static inline const SdkPattern ScriptManager_InitializeReturn = { L"4c 8d 0d ?? ?? ?? ?? 4c 8b c3 49 8b d6 48 8b cf e8 ?? ?? ?? ?? 4c 8b c3 44 89 64 24 40 48 8d 54 24 40 48 8b cb e8 ?? ?? ?? ?? 48 85 c0 74 10 48 89 38 44 89 70 08 48 89 05 ?? ?? ?? ?? eb 08 48 83 25 ?? ?? ?? ?? 00", +0x68 };

@@ -210,6 +210,85 @@ namespace NdGameSdk::corelib::job {
 	#endif
 	}
 
+	const NdJob::Priority NdJob::GetCurrentWorkerPriority() {
+		always_assert(NdJob_GetCurrentWorkerPriority == nullptr, "Function pointer was not set!");
+		return NdJob_GetCurrentWorkerPriority();
+	}
+
+	void NdJob::MakeJobHeader(JobHeader* dst, void* entry, void* workData) {
+		always_assert(NdJob_MakeJobHeader == nullptr, "NdJob_MakeJobHeader not set");
+		NdJob_MakeJobHeader(dst, entry, workData);
+	}
+
+	void NdJob::RegisterJobArray(JobHeader* headers, uint64_t count, CounterHandle** pCounter, HeapArena_Args,
+		uint64_t arg7, uint64_t arg8, uint64_t arg9) {
+		always_assert(NdJob_RegisterJobArray == nullptr, "NdJob_RegisterJobArray not set");
+		NdJob_RegisterJobArray(
+			headers,
+			count,
+			pCounter,
+			source_file, source_line, source_func,
+			arg7, arg8, arg9
+		);
+	}
+
+	void NdJob::SubmitJobArray(void* entry, void* const* workItems, uint64_t count,
+		Priority prio, HeapArena_Args, CounterHandle** outCounter, uint64_t flagsLow60, bool wait) {
+
+		if (count == 0) return;
+
+		// 32 headers * 0x80 = 4KB.
+		static constexpr size_t kStackBytesMax = 0x1000; // 4 KiB
+
+		const size_t bytes = count * sizeof(JobHeader);
+		JobHeader* headers = nullptr;
+		void* rawStack = nullptr;
+		bool usedHeap = false;
+
+		if (bytes <= kStackBytesMax) {
+			rawStack = _alloca(bytes + 0x3F);
+			headers = reinterpret_cast<JobHeader*>((reinterpret_cast<uintptr_t>(rawStack) + 0x3F) & ~uintptr_t(0x3F));
+		}
+		else {
+			headers = m_Memory->AllocateAtContext<JobHeader>(bytes, 0x40, Memory::Context::kAllocAppCpu);
+			usedHeap = true;
+
+			if (!headers) {
+				spdlog::error("SubmitJobArray: header alloc failed ({} bytes)", bytes);
+				return;
+			}
+		}
+
+		std::memset(headers, 0, bytes);
+
+		for (uint64_t i = 0; i < count; ++i) {
+			MakeJobHeader(&headers[i], entry, workItems ? workItems[i] : nullptr);
+			headers[i].Get()->m_flags |= (flagsLow60 & 0x0FFFFFFFFFFFFFFF);
+		}
+
+		RegisterJobArray(headers, count, 
+			outCounter,
+			source_func, source_line, source_file,
+			1, ~0ull, static_cast<uint64_t>(prio));
+
+		if (outCounter && wait) {
+			WaitForCounter(outCounter, 0, 0);
+		}
+
+		if (usedHeap) {
+			m_Memory->Free(headers, source_func, source_line, source_file);
+		}
+	}
+
+	void NdJob::SubmitJobArray(void* entry, void* workData, uint64_t count, Priority prio, HeapArena_Args, 
+		CounterHandle** outCounter, uint64_t flagsLow60, bool wait) {
+		if (count == 0) return;
+		std::unique_ptr<void* []> items(new void* [count]);
+		for (uint64_t i = 0; i < count; ++i) items[i] = workData;
+		NdJob::SubmitJobArray(entry, items.get(), count, prio, source_func, source_line, source_file, outCounter, flagsLow60, wait);
+	}
+
+
 	void NdJob::RunJobAndWait(void* pEntry, void* pWorkData, HeapArena_Args, int64_t pFlags) {
 		always_assert(NdJob_RunJobAndWait == nullptr, "Function pointer was not set!");
 		spdlog::debug("Running job with entry: {}, work data: {}, flags: {}, source file: {}, source line: {}, source function: {}",
@@ -217,10 +296,14 @@ namespace NdGameSdk::corelib::job {
 		NdJob_RunJobAndWait(pEntry, pWorkData, pFlags, source_file, source_line, source_func);
 	}
 
+	void NdJob::WaitForCounter(CounterHandle** pCounter, uint64_t pCountJobArray, uint32_t arg3) {
+		always_assert(NdJob_WaitForCounter == nullptr, "Function pointer was not set!");
+		NdJob_WaitForCounter(pCounter, pCountJobArray, arg3);
+	}
+
 	
 	void NdJob::JobYield() {
 		always_assert(NdJob_Yield == nullptr, "Function pointer was not set!");
-		spdlog::debug("Yielding job execution for Job ID: {}", GetActiveJobId());
 		NdJob_Yield();
 	}
 
@@ -242,15 +325,199 @@ namespace NdGameSdk::corelib::job {
 			DMENU::Menu* NdJobSystemMenu = pdmenu->Create_DMENU_Menu(NdJobSystem->GetName().data(), HeapArena_Source);
 			if (NdJobSystemMenu) {
 			#if SDK_DEBUG
-				pdmenu->Create_DMENU_ItemFunction("Run function in the native NdJobWorkerThread", NdJobSystemMenu, 
+				pdmenu->Create_DMENU_ItemFunction("NdJobWorkerThread Status", NdJobSystemMenu, 
 					+[](DMENU::ItemFunction& pFunction, DMENU::Message pMessage)->bool {
 					if (pMessage == DMENU::Message::OnExecute) {
 						auto NdJobSystem = reinterpret_cast<NdJob*>(pFunction.Data());
 						NdJobSystem->s_JobSystem->Get()->m_PrintJobSysDataStats = true;
+
+						for (auto& e : *NdJobSystem->GetJobTls()) {
+							const auto ctx = e.key();
+							const auto payload = e.value();
+							spdlog::info("JLS ctx=0x{:016x} payload=0x{:016x}",
+								static_cast<uint64_t>(ctx), payload);
+						}
+
 						spdlog::info("Test function executed in JobSystem menu!");
 					}
 					return true;
 				}, NdJobSystemAddr, false, HeapArena_Source);
+
+				struct Ctx {
+					uint32_t id;
+					uint64_t begin;
+					uint64_t end;
+					uint64_t durationTicks;
+					uint64_t* out;
+				};
+
+				struct HeavyBatchState {
+					bool active{ false };
+					uint32_t jobs{ 0 };
+					CounterHandle* counter{};
+					Ctx* ctx{ nullptr };
+					void** work{ nullptr };
+					uint64_t* partial{ nullptr };
+					uint64_t totalIters{ 0 };
+				};
+				static HeavyBatchState s{};
+
+				static bool wait_job = false;
+				static bool set_counter = true;
+
+				pdmenu->Create_DMENU_ItemBool("wait for completion", NdJobSystemMenu, &wait_job, 0x0, HeapArena_Source);
+				pdmenu->Create_DMENU_ItemBool("set counter", NdJobSystemMenu, &set_counter, 0x0, HeapArena_Source);
+
+
+				pdmenu->Create_DMENU_ItemFunction("Heavy batch (15s/jobs): dispatch", NdJobSystemMenu,
+					+[](DMENU::ItemFunction& f, DMENU::Message m)->bool {
+						if (m == DMENU::Message::OnExecute) {
+
+							auto heavyEntry = +[](uint64_t arg) {
+								auto* c = reinterpret_cast<Ctx*>(arg);
+
+								LARGE_INTEGER freq{}, start{}, now{};
+								QueryPerformanceFrequency(&freq);
+								QueryPerformanceCounter(&start);
+
+								const uint64_t threeSec = static_cast<uint64_t>(freq.QuadPart) * 3ull;
+								const uint64_t stopTick = static_cast<uint64_t>(start.QuadPart) + c->durationTicks;
+								uint64_t nextLog = static_cast<uint64_t>(start.QuadPart) + threeSec;
+
+								uint64_t acc = 0xcbf29ce484222325ull;
+								uint64_t i = c->begin;
+
+								spdlog::info("[Job #{:02}] start", c->id);
+
+								if (c->id == 0x0) {
+									return;
+								}
+
+								for (;;) {
+
+									// Do a chunk of CPU work
+									for (int inner = 0; inner < (1 << 18); ++inner, ++i) {
+										acc ^= i;
+										acc *= 0x100000001b3ull;
+									}
+
+									// Cooperatively yield to the scheduler
+									if (auto* sys = Instance<NdJob>()) sys->JobYield();
+
+									QueryPerformanceCounter(&now);
+									const uint64_t nowTick = static_cast<uint64_t>(now.QuadPart);
+
+									// Heartbeat every ~3 seconds
+									if (nowTick >= nextLog) {
+										const double elapsed = double(nowTick - static_cast<uint64_t>(start.QuadPart)) / double(freq.QuadPart);
+										spdlog::info("[Job #{:02}] heartbeat ~{:.1f}s", c->id, elapsed);
+										do { nextLog += threeSec; } while (nowTick >= nextLog);
+									}
+
+									// Done after ~durationTicks
+									if (nowTick >= stopTick) break;
+								}
+
+								::QueryPerformanceCounter(&now);
+								const double total = double(static_cast<uint64_t>(now.QuadPart) - static_cast<uint64_t>(start.QuadPart)) / double(freq.QuadPart);
+								spdlog::info("[Job #{:02}] finished ~{:.2f}s", c->id, total);
+
+								*c->out = acc;
+								};
+
+							auto* js = reinterpret_cast<NdJob*>(f.Data());
+							if (s.active) {
+								spdlog::warn("Heavy batch already active; poll/collect first.");
+								return true;
+							}
+
+							constexpr uint32_t kJobs = 8;
+							const uint64_t kTotalIters = 50'000'000ull;
+							const uint64_t chunk = (kTotalIters + kJobs - 1) / kJobs;
+
+							// duration per job: ~15 seconds
+							LARGE_INTEGER freq{};
+							::QueryPerformanceFrequency(&freq);
+							const uint64_t durationTicks = static_cast<uint64_t>(freq.QuadPart) * 15ull;
+
+							// Allocate persistent buffers with game allocator
+							s.ctx = js->m_Memory->AllocateAtContext<Ctx>(sizeof(Ctx) * kJobs, 0x10, Memory::Context::kAllocAppCpu);
+							s.work = js->m_Memory->AllocateAtContext<void*>(sizeof(void*) * kJobs, 0x10, Memory::Context::kAllocAppCpu);
+							s.partial = js->m_Memory->AllocateAtContext<uint64_t>(sizeof(uint64_t) * kJobs, 0x10, Memory::Context::kAllocAppCpu);
+							if (!s.ctx || !s.work || !s.partial) {
+								spdlog::error("Heavy batch alloc failed; ctx={}, work={}, partial={}", (void*)s.ctx, (void*)s.work, (void*)s.partial);
+								if (s.ctx)     js->m_Memory->Free(s.ctx, __func__, __LINE__, __FILE__);
+								if (s.work)    js->m_Memory->Free(s.work, __func__, __LINE__, __FILE__);
+								if (s.partial) js->m_Memory->Free(s.partial, __func__, __LINE__, __FILE__);
+								s = HeavyBatchState{};
+								return false;
+							}
+
+							for (uint32_t i = 0; i < kJobs; ++i) s.partial[i] = 0;
+
+							for (uint32_t i = 0; i < kJobs; ++i) {
+								const uint64_t begin = i * chunk;
+								const uint64_t end = std::min<uint64_t>(kTotalIters, begin + chunk);
+								s.ctx[i] = Ctx{ i, begin, end, durationTicks, &s.partial[i] };
+								s.work[i] = &s.ctx[i];
+							}
+
+
+							s.counter = nullptr;
+							js->SubmitJobArray(
+								reinterpret_cast<void*>(heavyEntry),
+								s.work, kJobs,
+								NdJob::Priority(0),
+								HeapArena_Source,
+								set_counter ? &s.counter : nullptr,
+								0,
+								wait_job);
+
+							s.active = true;
+							s.jobs = kJobs;
+							s.totalIters = kTotalIters;
+
+							spdlog::info("Heavy batch dispatched: jobs={}, target ~15s/job (no wait)", s.jobs);
+						}
+						return true;
+					}, NdJobSystemAddr, false, HeapArena_Source);
+
+
+				pdmenu->Create_DMENU_ItemFunction("Heavy batch: poll/collect", NdJobSystemMenu,
+					+[](DMENU::ItemFunction& f, DMENU::Message m)->bool {
+						if (m == DMENU::Message::OnExecute) {
+							auto* js = reinterpret_cast<NdJob*>(f.Data());
+
+
+							if (!s.active) {
+								spdlog::info("No active heavy batch to collect.");
+								return false;
+							}
+
+							if (s.counter) {
+								const uint32_t remaining = s.counter->GetCountJobArrays();
+								if (remaining != 0) {
+									spdlog::info("Heavy batch still running... remaining arrays={}", remaining);
+									return false;
+								}
+							}
+							else {
+								spdlog::warn("No counter set for heavy batch, cannot poll/collect.");
+							}
+
+							uint64_t reduced = 0;
+							for (uint32_t i = 0; i < s.jobs; ++i) reduced ^= s.partial[i];
+
+							spdlog::info("Heavy batch finished: jobs={}, reduced=0x{:016x}", s.jobs, reduced);
+
+							if (s.ctx)     js->m_Memory->Free(s.ctx, __func__, __LINE__, __FILE__);
+							if (s.work)    js->m_Memory->Free(s.work, __func__, __LINE__, __FILE__);
+							if (s.partial) js->m_Memory->Free(s.partial, __func__, __LINE__, __FILE__);
+							s = HeavyBatchState{};
+						}
+						return true;
+					}, NdJobSystemAddr, false, HeapArena_Source);
+
 
 			#endif
 				return pdmenu->Create_DMENU_ItemSubmenu(NdJobSystemMenu->Name(),
@@ -352,7 +619,7 @@ namespace NdGameSdk::corelib::job {
 		return this->Get()->m_timestampQPC;
 	}
 
-	uint64_t CounterHandle::GetCountJobArrays() const {
+	uint32_t CounterHandle::GetCountJobArrays() const {
 		return this->Get()->m_CountJobArrays;
 	}
 

@@ -34,14 +34,16 @@ struct ndjob {
         // Metadata: utf8*
         char* m_file; // 0x0
         uint32_t m_line; // 0x8
+        private: char pad_c[0x4]; public:
         // Metadata: utf8*
-        char* m_function; // 0xc
-        uint64_t m_timestampQPC; // 0x14
-        void* m_waitListHead; // 0x1c
-        uint64_t m_field28; // 0x24
-        uint64_t m_CountJobArrays; // 0x2c
-        bool m_field38; // 0x34
-        private: char pad_35[0xb]; public:
+        char* m_function; // 0x10
+        uint64_t m_timestampQPC; // 0x18
+        void* m_waitListHead; // 0x20
+        uint64_t m_field28; // 0x28
+        uint32_t m_CountJobArrays; // 0x30
+        private: char pad_34[0x4]; public:
+        bool m_field38; // 0x38
+        private: char pad_39[0x7]; public:
     }; // Size: 0x40
 
     struct JobHeader {
@@ -53,8 +55,9 @@ struct ndjob {
         private: char pad_28[0x8]; public:
         void* m_tlsBlock; // 0x30
         uint32_t m_stateBits; // 0x38
-        uint64_t m_flags; // 0x3c
-        private: char pad_44[0x3c]; public:
+        private: char pad_3c[0x4]; public:
+        uint64_t m_flags; // 0x40
+        private: char pad_48[0x38]; public:
     }; // Size: 0x80
 
     struct JobArrayHeader {
@@ -72,9 +75,10 @@ struct ndjob {
         uint8_t m_state; // 0x40
         private: char pad_41[0x3]; public:
         uint64_t m_field44; // 0x44
-        uint64_t m_QueryPerformance; // 0x4c
-        uint64_t m_tlsCookie; // 0x54
-        private: char pad_5c[0xa4]; public:
+        private: char pad_4c[0x4]; public:
+        uint64_t m_QueryPerformance; // 0x50
+        uint64_t m_tlsCookie; // 0x58
+        private: char pad_60[0xa0]; public:
     }; // Size: 0x100
 
     struct SysData {

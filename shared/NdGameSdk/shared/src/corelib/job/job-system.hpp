@@ -179,8 +179,7 @@ namespace NdGameSdk::corelib::job {
 		}
 
 		struct Iterator {
-			RawEntry* cur{};
-			RawEntry* end{};
+			RawEntry* cur{}; RawEntry* end{};
 			void advance() { while (cur != end && cur->m_contextid == 0) ++cur; }
 			Iterator& operator++() { ++cur; advance(); return *this; }
 			bool operator!=(Iterator const& o) const { return cur != o.cur; }
@@ -189,6 +188,9 @@ namespace NdGameSdk::corelib::job {
 
 		Iterator begin() { auto* b = &this->Get()->slots[0]; auto* e = b + kSlots; Iterator it{ b,e }; it.advance(); return it; }
 		Iterator end() { auto* e = &this->Get()->slots[kSlots]; return { e,e }; }
+
+		Iterator begin() const { auto* b = const_cast<RawEntry*>(&this->Get()->slots[0]); auto* e = b + kSlots; Iterator it{ b,e }; it.advance(); return it; }
+		Iterator end()   const { auto* e = const_cast<RawEntry*>(&this->Get()->slots[kSlots]); return { e,e }; }
 	};
 
 	class NdGameSdk_API NdJob : public ISdkComponent {
@@ -205,6 +207,7 @@ namespace NdGameSdk::corelib::job {
 		const uint64_t TryGetWorkerThreadIndex();
 		const uint64_t GetCurrentWorkerThreadIndex();
 		const uint64_t GetActiveJobId();
+		const Priority GetCurrentWorkerPriority();
 
 		template <typename T>
 		bool TryGetJlsSlotValue(JlsContext index, T* outValue) {
@@ -267,7 +270,20 @@ namespace NdGameSdk::corelib::job {
 		#endif
 		}
 
+		void MakeJobHeader(JobHeader* dst, void* entry, void* workData);
+		void RegisterJobArray(JobHeader* headers, uint64_t count, CounterHandle** pCounter, HeapArena_Args,
+			uint64_t arg7 = 1, uint64_t arg8 = ~0ull, uint64_t arg9 = 0);
+
+		void SubmitJobArray(void* entry, void* const* workItems, uint64_t count,
+			Priority prio, HeapArena_Args, CounterHandle** pCounter = nullptr,
+			uint64_t flagsLow60 = 0, bool wait = false);
+
+		void SubmitJobArray(void* entry, void* workData, uint64_t count,
+			Priority prio, HeapArena_Args, CounterHandle** pCounter = nullptr,
+			uint64_t flagsLow60 = 0, bool wait = false);
+
 		void RunJobAndWait(void* pEntry, void* pWorkData, HeapArena_Args, int64_t pFlags = 0);
+		void WaitForCounter(CounterHandle** pCounter, uint64_t pCountJobArray = 0, uint32_t arg3 = 0);
 
 		// This function is used to yield the current job execution, 
 		// allowing other jobs to run.
@@ -298,13 +314,13 @@ namespace NdGameSdk::corelib::job {
 		JobHeap* g_pJobHeap{};
 
 		MEMBER_FUNCTION_PTR(void, NdJob_DisplayJobSystemData);
-		MEMBER_FUNCTION_PTR(void, NdJob_WaitForCounter, CounterHandle* pCounter, uint64_t pCountJobArray, uint32_t arg3);
+		MEMBER_FUNCTION_PTR(void, NdJob_WaitForCounter, CounterHandle** pCounter, uint64_t pCountJobArray, uint32_t arg3);
 		MEMBER_FUNCTION_PTR(uint64_t, NdJob_TryGetWorkerThreadIndex);
 		MEMBER_FUNCTION_PTR(void, NdJob_SetJobLocalStorage, uint64_t arg1, uint64_t pSlotIndexes);
 		MEMBER_FUNCTION_PTR(void, NdJob_RunJobAndWait, void* pEntry, void* pWorkData, uint64_t pFlags, char const* pFile, uint32_t pLine, char const* pFunc);
-		MEMBER_FUNCTION_PTR(void, NdJob_RegisterJobArray, JobHeader* pJobHeaders, uint64_t pCountJobArrays, CounterHandle* pCounter,
+		MEMBER_FUNCTION_PTR(void, NdJob_RegisterJobArray, JobHeader* pJobHeaders, uint64_t pCountJobArrays, CounterHandle** pCounter,
 			char const* pFile, uint32_t pLine, char const* pFunc, uint64_t arg7, uint64_t arg8, uint64_t arg9);
-		MEMBER_FUNCTION_PTR(JobHeader*, NdJob_MakeJobHeader, JobHeader* pJobHeaders, void* pEntry, void* pWorkData);
+		MEMBER_FUNCTION_PTR(void, NdJob_MakeJobHeader, JobHeader* pJobHeaders, void* pEntry, void* pWorkData);
 		MEMBER_FUNCTION_PTR(bool, NdJob_IsGameFrameJob);
 		MEMBER_FUNCTION_PTR(bool, NdJob_IsWorkerThread);
 		MEMBER_FUNCTION_PTR(Priority, NdJob_GetCurrentWorkerPriority);
@@ -332,7 +348,7 @@ namespace NdGameSdk::corelib::job {
 		uint32_t GetLine() const;
 
 		uint64_t GetTimestampQPC() const;
-		uint64_t GetCountJobArrays() const;
+		uint32_t GetCountJobArrays() const;
 	};
 
 	class JobHeap : public ISdkRegenny<regenny::shared::corelib::job::JobHeap> {};

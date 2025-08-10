@@ -656,12 +656,12 @@ namespace regenny {
                     struct CounterHandle 0x40 {
                         char* m_file [[utf8*]];
                         uint32_t m_line;
-                        char* m_function [[utf8*]];
+                        char* m_function  @ 0x10 [[utf8*]];
                         uint64_t m_timestampQPC;
                         void* m_waitListHead;
                         uint64_t m_field28;
-                        uint64_t m_CountJobArrays;
-                        bool m_field38;
+                        uint32_t m_CountJobArrays @ 0x30;
+                        bool m_field38 @ 0x38;
                     };
 
                     struct JobHeader 0x80 {
@@ -672,7 +672,7 @@ namespace regenny {
                         CounterHandle* m_waitNext;
                         void* m_tlsBlock @ 0x30;
                         uint32_t m_stateBits;
-                        uint64_t m_flags;
+                        uint64_t m_flags @ 0x40;
                     };
 
                     struct JobArrayHeader 0x100 {
@@ -688,7 +688,7 @@ namespace regenny {
                         void* m_heapBlock;
                         uint8_t m_state;
                         uint64_t m_field44 @ 0x44;
-                        uint64_t m_QueryPerformance;
+                        uint64_t m_QueryPerformance @ 0x50;
                         uint64_t m_tlsCookie;
                     };
 

@@ -284,6 +284,8 @@ namespace NdGameSdk::corelib::job {
 
 		void RunJobAndWait(void* pEntry, void* pWorkData, HeapArena_Args, int64_t pFlags = 0);
 		void WaitForCounter(CounterHandle** pCounter, uint64_t pCountJobArray = 0, uint32_t arg3 = 0);
+		void WaitAndFreeCounter(CounterHandle** pCounter, uint64_t pCountJobArray = 0, uint32_t arg3 = 0);
+		void FreeCounter(CounterHandle** pCounter);
 
 		// This function is used to yield the current job execution, 
 		// allowing other jobs to run.
@@ -315,6 +317,7 @@ namespace NdGameSdk::corelib::job {
 
 		MEMBER_FUNCTION_PTR(void, NdJob_DisplayJobSystemData);
 		MEMBER_FUNCTION_PTR(void, NdJob_WaitForCounter, CounterHandle** pCounter, uint64_t pCountJobArray, uint32_t arg3);
+		MEMBER_FUNCTION_PTR(void, NdJob_WaitAndFreeCounter, CounterHandle** pCounter, uint64_t pCountJobArray, uint32_t arg3);
 		MEMBER_FUNCTION_PTR(uint64_t, NdJob_TryGetWorkerThreadIndex);
 		MEMBER_FUNCTION_PTR(void, NdJob_SetJobLocalStorage, uint64_t arg1, uint64_t pSlotIndexes);
 		MEMBER_FUNCTION_PTR(void, NdJob_RunJobAndWait, void* pEntry, void* pWorkData, uint64_t pFlags, char const* pFile, uint32_t pLine, char const* pFunc);
@@ -328,11 +331,14 @@ namespace NdGameSdk::corelib::job {
 		MEMBER_FUNCTION_PTR(void, NdJob_Yield);
 		MEMBER_FUNCTION_PTR(bool, NdJob_TryGetJlsSlotValue, uint32_t index, void* outValue);
 #if defined (T2R)
+		MEMBER_FUNCTION_PTR(void, NdJob_FreeCounter, CounterHandle** pCounter);
 		MEMBER_FUNCTION_PTR(uint64_t, NdJob_GetActiveJobId);
 		MEMBER_FUNCTION_PTR(bool, NdJob_JlsValueWrite, uint32_t index, StringId64 hash, void* Value);
 		MEMBER_FUNCTION_PTR(bool, NdJob_GetJlsValueByIndex, int32_t index, void* outValue);
 		MEMBER_FUNCTION_PTR(bool, NdJob_ClearJlsValueByIndex, int32_t index);
 		MEMBER_FUNCTION_PTR(bool, NdJob_DoesJobLocalStorageIdExist, uint32_t index);
+#elif defined (T1X)
+		MEMBER_FUNCTION_PTR(void, NdJob_FreeCounter, CounterHandle** pCounter, uint64_t arg2);
 #endif
 
 		friend class ndlib::render::dev::DebugDrawCommon;
@@ -349,6 +355,9 @@ namespace NdGameSdk::corelib::job {
 
 		uint64_t GetTimestampQPC() const;
 		uint32_t GetCountJobArrays() const;
+
+		bool IsValid() const;
+		bool IsFree() const;
 	};
 
 	class JobHeap : public ISdkRegenny<regenny::shared::corelib::job::JobHeap> {};

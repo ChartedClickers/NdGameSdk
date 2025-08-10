@@ -42,7 +42,7 @@ struct ndjob {
         uint64_t m_field28; // 0x28
         uint32_t m_CountJobArrays; // 0x30
         private: char pad_34[0x4]; public:
-        bool m_field38; // 0x38
+        bool m_IsFree; // 0x38
         private: char pad_39[0x7]; public:
     }; // Size: 0x40
 

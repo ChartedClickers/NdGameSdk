@@ -103,6 +103,14 @@ namespace NdGameSdk::corelib::job {
 			NdJob_TryGetJlsSlotValue = (NdJob_TryGetJlsSlotValue_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::NdJob_TryGetJlsSlotValue), findpattern.offset);
 
+			findpattern = Patterns::NdJob_WaitAndFreeCounter;
+			NdJob_WaitAndFreeCounter = (NdJob_WaitAndFreeCounter_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdJob_WaitAndFreeCounter), findpattern.offset);
+
+			findpattern = Patterns::NdJob_FreeCounter;
+			NdJob_FreeCounter = (NdJob_FreeCounter_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdJob_FreeCounter), findpattern.offset);
+
 	#if defined(T2R)
 			findpattern = Patterns::NdJob_GetActiveJobId;
 			NdJob_GetActiveJobId = (NdJob_GetActiveJobId_ptr)Utility::FindAndPrintPattern(module,
@@ -137,7 +145,9 @@ namespace NdGameSdk::corelib::job {
 				!NdJob_GetCurrentWorkerPriority ||
 				!NdJob_GetCurrentWorkerThreadIndex ||
 				!NdJob_Yield ||
-				!NdJob_TryGetJlsSlotValue
+				!NdJob_TryGetJlsSlotValue ||
+				!NdJob_WaitAndFreeCounter ||
+				!NdJob_FreeCounter
 			#if defined(T2R)
 				|| !NdJob_GetActiveJobId ||
 				!NdJob_JlsValueWrite ||
@@ -272,7 +282,7 @@ namespace NdGameSdk::corelib::job {
 			1, ~0ull, static_cast<uint64_t>(prio));
 
 		if (outCounter && wait) {
-			WaitForCounter(outCounter, 0, 0);
+			WaitAndFreeCounter(outCounter, 0, 0);
 		}
 
 		if (usedHeap) {
@@ -299,6 +309,20 @@ namespace NdGameSdk::corelib::job {
 	void NdJob::WaitForCounter(CounterHandle** pCounter, uint64_t pCountJobArray, uint32_t arg3) {
 		always_assert(NdJob_WaitForCounter == nullptr, "Function pointer was not set!");
 		NdJob_WaitForCounter(pCounter, pCountJobArray, arg3);
+	}
+
+	void NdJob::WaitAndFreeCounter(CounterHandle** pCounter, uint64_t pCountJobArray, uint32_t arg3) {
+		always_assert(NdJob_WaitAndFreeCounter == nullptr, "Function pointer was not set!");
+		NdJob_WaitAndFreeCounter(pCounter, pCountJobArray, arg3);
+	}
+
+	void NdJob::FreeCounter(CounterHandle** pCounter) {
+		always_assert(NdJob_FreeCounter == nullptr, "Function pointer was not set!");
+	#if defined(T1X)
+		NdJob_FreeCounter(pCounter, 0);
+	#else
+		NdJob_FreeCounter(pCounter);
+	#endif
 	}
 
 	
@@ -513,6 +537,12 @@ namespace NdGameSdk::corelib::job {
 							if (s.ctx)     js->m_Memory->Free(s.ctx, __func__, __LINE__, __FILE__);
 							if (s.work)    js->m_Memory->Free(s.work, __func__, __LINE__, __FILE__);
 							if (s.partial) js->m_Memory->Free(s.partial, __func__, __LINE__, __FILE__);
+
+							if (s.counter && !s.counter->IsFree()) {
+								js->FreeCounter(&s.counter);
+								spdlog::warn("Heavy batch counter freed.");
+							}
+
 							s = HeavyBatchState{};
 						}
 						return true;
@@ -621,6 +651,14 @@ namespace NdGameSdk::corelib::job {
 
 	uint32_t CounterHandle::GetCountJobArrays() const {
 		return this->Get()->m_CountJobArrays;
+	}
+
+	bool CounterHandle::IsValid() const {
+		return !this->Get()->m_IsFree && this->Get()->m_CountJobArrays > 0;
+	}
+
+	bool CounterHandle::IsFree() const {
+		return this->Get()->m_IsFree;
 	}
 
 	bool JobSystem::PrintJobSysDataStats() const {

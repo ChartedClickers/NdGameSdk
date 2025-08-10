@@ -661,7 +661,7 @@ namespace regenny {
                         void* m_waitListHead;
                         uint64_t m_field28;
                         uint32_t m_CountJobArrays @ 0x30;
-                        bool m_field38 @ 0x38;
+                        bool m_IsFree @ 0x38;
                     };
 
                     struct JobHeader 0x80 {

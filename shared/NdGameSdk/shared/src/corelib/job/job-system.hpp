@@ -23,7 +23,28 @@
 #include <NdGameSdk/regenny/t1x/shared/corelib/job/JlsBlock.hpp>
 #endif
 
+#include <type_traits> 
+
 using namespace NdGameSdk::corelib::memory;
+
+namespace regenny::shared::corelib::job {
+	using JobFlag = ndjob::JobFlag;
+
+	constexpr JobFlag operator|(JobFlag a, JobFlag b) noexcept {
+		using U = std::underlying_type_t<JobFlag>;
+		return static_cast<JobFlag>(static_cast<U>(a) | static_cast<U>(b));
+	}
+	constexpr JobFlag operator&(JobFlag a, JobFlag b) noexcept {
+		using U = std::underlying_type_t<JobFlag>;
+		return static_cast<JobFlag>(static_cast<U>(a) & static_cast<U>(b));
+	}
+	constexpr JobFlag operator~(JobFlag a) noexcept {
+		using U = std::underlying_type_t<JobFlag>;
+		return static_cast<JobFlag>(~static_cast<U>(a));
+	}
+	inline JobFlag& operator|=(JobFlag& a, JobFlag b) noexcept { a = a | b; return a; }
+	inline JobFlag& operator&=(JobFlag& a, JobFlag b) noexcept { a = a & b; return a; }
+}
 
 namespace NdGameSdk::corelib::job {
 
@@ -197,6 +218,8 @@ namespace NdGameSdk::corelib::job {
 	public:
 		using InitParams = JobSysData::InitParams;
 		using Priority = ::regenny::shared::corelib::job::ndjob::Priority;
+		using JobFlag = ::regenny::shared::corelib::job::ndjob::JobFlag;
+
 		SDK_DEPENDENCIES(Memory);
 
 		NdJob();
@@ -271,20 +294,21 @@ namespace NdGameSdk::corelib::job {
 		}
 
 		void MakeJobHeader(JobHeader* dst, void* entry, void* workData);
-		void RegisterJobArray(JobHeader* headers, uint64_t count, CounterHandle** pCounter, HeapArena_Args,
-			uint64_t arg7 = 1, uint64_t arg8 = ~0ull, uint64_t arg9 = 0);
+		void RegisterJobArray(JobHeader* headers, uint64_t count, CounterHandle** pCounter, HeapArena_Args, Priority pPriority = Priority::KLow);
 
 		void SubmitJobArray(void* entry, void* const* workItems, uint64_t count,
 			Priority prio, HeapArena_Args, CounterHandle** pCounter = nullptr,
-			uint64_t flagsLow60 = 0, bool wait = false);
+			JobFlag flags = JobFlag::None, bool wait = false);
 
 		void SubmitJobArray(void* entry, void* workData, uint64_t count,
 			Priority prio, HeapArena_Args, CounterHandle** pCounter = nullptr,
-			uint64_t flagsLow60 = 0, bool wait = false);
+			JobFlag flags = JobFlag::None, bool wait = false);
 
 		void RunJobAndWait(void* pEntry, void* pWorkData, HeapArena_Args, int64_t pFlags = 0);
-		void WaitForCounter(CounterHandle** pCounter, uint64_t pCountJobArray = 0, uint32_t arg3 = 0);
-		void WaitAndFreeCounter(CounterHandle** pCounter, uint64_t pCountJobArray = 0, uint32_t arg3 = 0);
+
+		void AllocateCounter(CounterHandle** pCounter, HeapArena_Args, uint64_t pCountJobArray = 0);
+		void WaitForCounter(CounterHandle** pCounter, uint64_t pCountJobArray = 0);
+		void WaitAndFreeCounter(CounterHandle** pCounter, uint64_t pCountJobArray = 0);
 		void FreeCounter(CounterHandle** pCounter);
 
 		// This function is used to yield the current job execution, 
@@ -316,13 +340,14 @@ namespace NdGameSdk::corelib::job {
 		JobHeap* g_pJobHeap{};
 
 		MEMBER_FUNCTION_PTR(void, NdJob_DisplayJobSystemData);
+		MEMBER_FUNCTION_PTR(void, NdJob_AllocateCounter, CounterHandle** pCounter, char const* pFile, uint32_t pLine, char const* pFunc, uint64_t pCountJobArray, uint32_t arg6);
 		MEMBER_FUNCTION_PTR(void, NdJob_WaitForCounter, CounterHandle** pCounter, uint64_t pCountJobArray, uint32_t arg3);
 		MEMBER_FUNCTION_PTR(void, NdJob_WaitAndFreeCounter, CounterHandle** pCounter, uint64_t pCountJobArray, uint32_t arg3);
 		MEMBER_FUNCTION_PTR(uint64_t, NdJob_TryGetWorkerThreadIndex);
 		MEMBER_FUNCTION_PTR(void, NdJob_SetJobLocalStorage, uint64_t arg1, uint64_t pSlotIndexes);
 		MEMBER_FUNCTION_PTR(void, NdJob_RunJobAndWait, void* pEntry, void* pWorkData, uint64_t pFlags, char const* pFile, uint32_t pLine, char const* pFunc);
 		MEMBER_FUNCTION_PTR(void, NdJob_RegisterJobArray, JobHeader* pJobHeaders, uint64_t pCountJobArrays, CounterHandle** pCounter,
-			char const* pFile, uint32_t pLine, char const* pFunc, uint64_t arg7, uint64_t arg8, uint64_t arg9);
+			char const* pFile, uint32_t pLine, char const* pFunc, Priority pPriority, uint64_t arg8, uint64_t arg9);
 		MEMBER_FUNCTION_PTR(void, NdJob_MakeJobHeader, JobHeader* pJobHeaders, void* pEntry, void* pWorkData);
 		MEMBER_FUNCTION_PTR(bool, NdJob_IsGameFrameJob);
 		MEMBER_FUNCTION_PTR(bool, NdJob_IsWorkerThread);
@@ -369,13 +394,40 @@ namespace NdGameSdk::corelib::job {
 
 	class JobHeader : public ISdkRegenny<regenny::shared::corelib::job::ndjob::JobHeader> {
 	public:
+		using JobFlag = ::regenny::shared::corelib::job::ndjob::JobFlag;
+
 		JobHeader() = default;
 		JobHeader(void* pEntry, void* pWorkData) {
 			auto self = this->Get();
 			self->m_entry = pEntry;
 			self->m_WorkData = pWorkData;
-			self->m_stateBits &= ~0xfffffff0;
-			self->m_flags &= 0xf000000000000000;
+			self->m_stateBits &= 0xfffffff0u;
+			self->m_flags &= kFlagsHighMask;
 		}
+
+		void set_flags(JobFlag f) {
+			auto self = this->Get();
+			const uint64_t low = static_cast<uint64_t>(f) & kFlagsLowMask;
+			self->m_flags = (self->m_flags & kFlagsHighMask) | low;
+		}
+
+		void add_flags(JobFlag f) {
+			this->Get()->m_flags |= (static_cast<uint64_t>(f) & kFlagsLowMask);
+		}
+
+		void clear_flags(JobFlag f) {
+			this->Get()->m_flags &= ~(static_cast<uint64_t>(f) & kFlagsLowMask);
+		}
+
+		bool has_flags(JobFlag f) const {
+			const uint64_t low = static_cast<uint64_t>(f) & kFlagsLowMask;
+			return (this->Get()->m_flags & low) != 0;
+		}
+
+		uint64_t raw_flags() const { return this->Get()->m_flags; }
+		uint64_t low_flags() const { return this->Get()->m_flags & kFlagsLowMask; }
+
+		static constexpr uint64_t kFlagsHighMask = 0xF000000000000000ull;
+		static constexpr uint64_t kFlagsLowMask = 0x0FFFFFFFFFFFFFFFull;
 	};
 }

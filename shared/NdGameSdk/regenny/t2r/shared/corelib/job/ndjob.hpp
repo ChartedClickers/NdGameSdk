@@ -8,6 +8,17 @@ namespace regenny::shared::corelib::job {
 struct ndjob {
     enum Priority : uint32_t {
         KInvalid = 255,
+        KHigh = 1,
+        KNormal = 2,
+        KLow = 3,
+    };
+
+    enum JobFlag : uint32_t {
+        None = 0,
+        SkipTiming = 128,
+        PinToCurrentWorker = 32,
+        Bit0_TBD_ArrayHeader = 1,
+        Bit6_TBD_Spawner = 64,
     };
 
     struct InitParams {
@@ -68,16 +79,16 @@ struct ndjob {
         regenny::shared::corelib::job::ndjob::JobHeader* m_JobStorage; // 0x10
         regenny::shared::corelib::job::ndjob::CounterHandle* m_JobCounter; // 0x18
         uint64_t m_field20; // 0x20
-        regenny::shared::corelib::job::ndjob::Priority m_priority; // 0x28
+        uint32_t m_field28; // 0x28
         private: char pad_2c[0x4]; public:
         void* m_WorkData; // 0x30
         void* m_heapBlock; // 0x38
         uint8_t m_state; // 0x40
         private: char pad_41[0x3]; public:
-        uint64_t m_field44; // 0x44
-        private: char pad_4c[0x4]; public:
+        regenny::shared::corelib::job::ndjob::Priority m_priority; // 0x44
+        private: char pad_48[0x8]; public:
         uint64_t m_QueryPerformance; // 0x50
-        uint64_t m_tlsCookie; // 0x58
+        uint64_t m_WorkerThreadIndex; // 0x58
         private: char pad_60[0xa0]; public:
     }; // Size: 0x100
 

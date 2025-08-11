@@ -663,7 +663,22 @@ namespace regenny {
                 struct ndjob {
 
                     enum Priority : uint32_t {
-                        KInvalid = 0xff
+                        KInvalid = 0xff,
+                        KHigh = 0x1,
+                        KNormal = 0x2,
+                        KLow = 0x3
+                    };
+
+                    enum JobFlag : uint32_t {
+                        None = 0x0,
+                        // skip perf timestamping at start/end
+                        SkipTiming = 0x80,
+                        // if set, engine writes a per-worker mask to [slot+0x80];
+                        PinToCurrentWorker = 0x20, 
+                        // set on GameToRenderFrameJobs header (array path). Semantics TBD.
+                        Bit0_TBD_ArrayHeader = 0x01, 
+                        // set on FrameSpawnerJob. Semantics TBD (spawn/root/system?).
+                        Bit6_TBD_Spawner = 0x40, 
                     };
 
                     struct InitParams 0x78 {
@@ -714,13 +729,13 @@ namespace regenny {
                         JobHeader* m_JobStorage; // array of JobHeader
                         CounterHandle* m_JobCounter;
                         uint64_t m_field20;
-                        Priority m_priority;
+                        uint32_t m_field28;
                         void* m_WorkData + 0x4;
                         void* m_heapBlock;
                         uint8_t m_state;
-                        uint64_t m_field44 @ 0x44;
+                        Priority m_priority @ 0x44;
                         uint64_t m_QueryPerformance @ 0x50;
-                        uint64_t m_tlsCookie;
+                        uint64_t m_WorkerThreadIndex;
                     };
 
                     // Notice: Be careful with the offsets in the Data structures,

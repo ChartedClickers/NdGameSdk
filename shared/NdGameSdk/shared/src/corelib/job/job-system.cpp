@@ -55,6 +55,10 @@ namespace NdGameSdk::corelib::job {
 			NdJob_DisplayJobSystemData = (NdJob_DisplayJobSystemData_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::NdJob_DisplayJobSystemData), findpattern.offset);
 
+			findpattern = Patterns::NdJob_AllocateCounter;
+			NdJob_AllocateCounter = (NdJob_AllocateCounter_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdJob_AllocateCounter), findpattern.offset);
+
 			findpattern = Patterns::NdJob_WaitForCounter;
 			NdJob_WaitForCounter = (NdJob_WaitForCounter_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::NdJob_WaitForCounter), findpattern.offset);
@@ -135,6 +139,7 @@ namespace NdGameSdk::corelib::job {
 
 			if (!NdJob_DisplayJobSystemData ||
 				!NdJob_WaitForCounter ||
+				!NdJob_AllocateCounter ||
 				!NdJob_TryGetWorkerThreadIndex ||
 				!NdJob_SetJobLocalStorage ||
 				!NdJob_RunJobAndWait ||
@@ -230,20 +235,13 @@ namespace NdGameSdk::corelib::job {
 		NdJob_MakeJobHeader(dst, entry, workData);
 	}
 
-	void NdJob::RegisterJobArray(JobHeader* headers, uint64_t count, CounterHandle** pCounter, HeapArena_Args,
-		uint64_t arg7, uint64_t arg8, uint64_t arg9) {
+	void NdJob::RegisterJobArray(JobHeader* headers, uint64_t count, CounterHandle** pCounter, HeapArena_Args, Priority pPriority) {
 		always_assert(NdJob_RegisterJobArray == nullptr, "NdJob_RegisterJobArray not set");
-		NdJob_RegisterJobArray(
-			headers,
-			count,
-			pCounter,
-			source_file, source_line, source_func,
-			arg7, arg8, arg9
-		);
+		NdJob_RegisterJobArray(headers, count, pCounter, source_file, source_line, source_func, pPriority, -1, -1);
 	}
 
 	void NdJob::SubmitJobArray(void* entry, void* const* workItems, uint64_t count,
-		Priority prio, HeapArena_Args, CounterHandle** outCounter, uint64_t flagsLow60, bool wait) {
+		Priority prio, HeapArena_Args, CounterHandle** pCounter, JobFlag flags, bool wait) {
 
 		if (count == 0) return;
 
@@ -273,16 +271,14 @@ namespace NdGameSdk::corelib::job {
 
 		for (uint64_t i = 0; i < count; ++i) {
 			MakeJobHeader(&headers[i], entry, workItems ? workItems[i] : nullptr);
-			headers[i].Get()->m_flags |= (flagsLow60 & 0x0FFFFFFFFFFFFFFF);
+			headers[i].Get()->m_flags |= (static_cast<uint64_t>(flags) & JobHeader::kFlagsLowMask);
 		}
 
-		RegisterJobArray(headers, count, 
-			outCounter,
-			source_func, source_line, source_file,
-			1, ~0ull, static_cast<uint64_t>(prio));
+		RegisterJobArray(headers, count, pCounter,
+			source_func, source_line, source_file, prio);
 
-		if (outCounter && wait) {
-			WaitAndFreeCounter(outCounter, 0, 0);
+		if (pCounter && wait) {
+			WaitAndFreeCounter(pCounter, 0);
 		}
 
 		if (usedHeap) {
@@ -290,12 +286,12 @@ namespace NdGameSdk::corelib::job {
 		}
 	}
 
-	void NdJob::SubmitJobArray(void* entry, void* workData, uint64_t count, Priority prio, HeapArena_Args, 
-		CounterHandle** outCounter, uint64_t flagsLow60, bool wait) {
+	void NdJob::SubmitJobArray(void* entry, void* workData, uint64_t count,
+		Priority prio, HeapArena_Args, CounterHandle** pCounter, JobFlag flags, bool wait) {
 		if (count == 0) return;
 		std::unique_ptr<void* []> items(new void* [count]);
 		for (uint64_t i = 0; i < count; ++i) items[i] = workData;
-		NdJob::SubmitJobArray(entry, items.get(), count, prio, source_func, source_line, source_file, outCounter, flagsLow60, wait);
+		NdJob::SubmitJobArray(entry, items.get(), count, prio, source_func, source_line, source_file, pCounter, flags, wait);
 	}
 
 
@@ -306,14 +302,19 @@ namespace NdGameSdk::corelib::job {
 		NdJob_RunJobAndWait(pEntry, pWorkData, pFlags, source_file, source_line, source_func);
 	}
 
-	void NdJob::WaitForCounter(CounterHandle** pCounter, uint64_t pCountJobArray, uint32_t arg3) {
-		always_assert(NdJob_WaitForCounter == nullptr, "Function pointer was not set!");
-		NdJob_WaitForCounter(pCounter, pCountJobArray, arg3);
+	void NdJob::AllocateCounter(CounterHandle** pCounter, HeapArena_Args, uint64_t pCountJobArray) {
+		always_assert(NdJob_AllocateCounter == nullptr, "Function pointer was not set!");
+		NdJob_AllocateCounter(pCounter, source_file, source_line, source_func, pCountJobArray, 0);
 	}
 
-	void NdJob::WaitAndFreeCounter(CounterHandle** pCounter, uint64_t pCountJobArray, uint32_t arg3) {
+	void NdJob::WaitForCounter(CounterHandle** pCounter, uint64_t pCountJobArray) {
+		always_assert(NdJob_WaitForCounter == nullptr, "Function pointer was not set!");
+		NdJob_WaitForCounter(pCounter, pCountJobArray, 0);
+	}
+
+	void NdJob::WaitAndFreeCounter(CounterHandle** pCounter, uint64_t pCountJobArray) {
 		always_assert(NdJob_WaitAndFreeCounter == nullptr, "Function pointer was not set!");
-		NdJob_WaitAndFreeCounter(pCounter, pCountJobArray, arg3);
+		NdJob_WaitAndFreeCounter(pCounter, pCountJobArray, 0);
 	}
 
 	void NdJob::FreeCounter(CounterHandle** pCounter) {
@@ -491,10 +492,10 @@ namespace NdGameSdk::corelib::job {
 							js->SubmitJobArray(
 								reinterpret_cast<void*>(heavyEntry),
 								s.work, kJobs,
-								NdJob::Priority(0),
+								NdJob::Priority::KLow,
 								HeapArena_Source,
 								set_counter ? &s.counter : nullptr,
-								0,
+								NdJob::JobFlag::None,
 								wait_job);
 
 							s.active = true;

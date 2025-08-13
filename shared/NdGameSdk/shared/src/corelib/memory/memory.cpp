@@ -354,6 +354,7 @@ namespace NdGameSdk::corelib::memory {
 				}
 
 				Memory_Allocate_ReturnAddr = m_AllocateHook->get_original();		
+
 			#endif
 			}
 	#endif
@@ -363,6 +364,16 @@ namespace NdGameSdk::corelib::memory {
 				m_ValidateContextPatch = Utility::WritePatchNop(module, findpattern.pattern, 0x1,
 					wstr(Patterns::Memory_ValidateContext), findpattern.offset);
 			}
+
+		#if defined(T1X)
+			findpattern = Patterns::Memory_BootstrapAppHeaps;
+			m_BootstrapAppHeapsPatch = Utility::WritePatchNop(module, findpattern.pattern, 0x18,
+				wstr(Patterns::Memory_BootstrapAppHeaps), findpattern.offset);
+
+			if (!m_BootstrapAppHeapsPatch) {
+				throw SdkComponentEx{ "Failed to prevent BootstrapAppHeaps!",
+					SdkComponentEx::ErrorCode::PatchFailed, false }; }
+		#endif
 
 		});
 	}
@@ -401,14 +412,16 @@ namespace NdGameSdk::corelib::memory {
 		__asm
 		{
 			mov eax, [rdx];
-			// code by infogram
-			cmp eax, MemoryContextType::kAllocDebugDevMenu;
+			cmp eax, MemoryContextType::kAllocDebugDevMenu; 
 			je retail_memory_type;
-			// extra check
 			cmp eax, MemoryContextType::kAllocDevCpu;
+			je retail_memory_type;
+			cmp eax, MemoryContextType::kAllocDevCpuLargePage;
+			je retail_memory_type;
+			cmp eax, MemoryContextType::kAllocDevCpuAlways;
 			jnz code_exit;
 		retail_memory_type:;
-			mov eax, MemoryContextType::kAllocScriptData;
+			mov eax, MemoryContextType::kAllocAppCpuLargePage;
 			mov[rdx], eax;
 		code_exit:;
 			jmp[rip + Memory_Allocate_ReturnAddr];

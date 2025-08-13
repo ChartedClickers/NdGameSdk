@@ -202,11 +202,12 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern Memory_PushAllocator = { L"40 53 55 56 57 41 54 41 56 41 57 48 83 ec ?? 8b 01" };
 	static inline const SdkPattern Memory_PopAllocator = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 30 e8 ?? ?? ?? ?? 33 db 48 8b f8 48 85" };
 	static inline const SdkPattern Memory_Allocate = { L"48 89 5c 24 ?? 48 89 6c 24 ?? 48 89 74 24 ?? 57 48 83 ec 30 48 85 c9 bf 01 00 00 00 41 8b f1 49 8b e8 48 0f 45 f9 48 8b da e8 ?? ?? 00 00 84 c0 ??" };
-	static inline const SdkPattern Memory_AllocateAtContext = { L"48 89 5c 24 08 57 48 83 ec 30 8b 02 48 8b f9 48 8d 4c 24 60 89 44 24 60 49 8b d8 ?? ?? ?? ??" };
+	static inline const SdkPattern Memory_AllocateAtContext = { L"48 89 5c 24 08 57 48 83 ec 30 8b 02 48 8b f9 48 8d 4c 24" };
 	static inline const SdkPattern Memory_Free = { L"48 85 c9 74 66 48 89 5c 24 10 48 89 6c 24 18 48 89 74 24 20 57 48 83 ec 30 49 8b f9 41 8b f0 48 8b ea 48 8b d9 e8 ?? ?? ?? ?? 48 8b cb 85 c0 0f 85 ?? ?? ?? ?? e8 ?? ?? ?? ?? 48 85 c0 74 ?? 4c 8b 10" };
 	static inline const SdkPattern Memory_GetAllocator = { L"48 83 ec 28 8b 01 83 f8 70" };
 	static inline const SdkPattern Memory_HeapAllocator_PushAllocator = { L"48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 57 41 56 41 57 48 83 ec 20 48 8b ea 4d 8b f1 33 d2 49 8b f0 4c 8b f9 e8 ?? ?? ?? ?? 8a 44 24 70 4c 8b c6 48 8b 7c 24 68 48 8b d5 8b 5c 24 60 49 8b cf 41 88 87" };
 	static inline const SdkPattern Memory_Area_clargnodebugmem = { L"b3 01 45 85 ff 74 ?? 48 8b 0f", +0x1 };
+	static inline const SdkPattern Memory_BootstrapAppHeaps = { L"b9 19 00 00 00 e8 ?? ?? ?? ?? 48 85 c0 74 06 48 8b 78 08 eb 02 33 ff 4d 85 c9 74 1b 41 b8 04 00 00 00 c7 44 24 40 05 00 00 00 48 8d 54 24 40 49 8b c9", +0x57 };
 	static inline const SdkPattern Memory_FixedSizeHeap_FreeIndex = { L"48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 57 48 83 ec 30 48 8b 41 10 48 8b f9 48 63 ea b1 01 48 8b f5 83 e5 3f 48 c1" };
 	static inline const SdkPattern Memory_FixedSizeHeap_Copy = { L"48 89 5c 24 08 48 89 74 24 10 48 89 7c 24 18 41 56 48 83 ec 30 48 83 79 30 00 4c 8b f2 48 8b d9 0f 85 91 00 00 00 48 8b 3d ?? ?? ?? ?? 48 85 ff 74 04 b1 01 ff d7 48 8b 05 ?? ?? ?? ?? 48 85 c0 74 02 ff d0 48 8b 05" };
 	static inline const SdkPattern Memory_FixedSizeHeap_AddIndex = { L"48 89 5c 24 08 57 48 83 ec 20 48 8b d9 48 83 c1 10 e8 ?? ?? ?? ?? 4c 8b d0 48 83 f8 ff 74 3e 48 3b 43 30 73 38 48 ff 43 40 49 8b d2 48 0f af 43 38 4c 8b 43 10 4d 8b ca 48 03 03 83" };

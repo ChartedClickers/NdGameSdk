@@ -129,6 +129,10 @@ namespace NdGameSdk::corelib::memory
 		Patch::Ptr m_ValidateContextPatch{};
 		Patch::Ptr m_IsDebugMemoryAvailablePatch{};
 
+#if defined(T1X)
+		Patch::Ptr m_BootstrapAppHeapsPatch{};
+#endif
+
 		MEMBER_FUNCTION_PTR(void*, Memory_Allocate, size_t heap_size, uint64_t heap_alignmemt, const char* file, int line, const char* func);
 		MEMBER_FUNCTION_PTR(void*, Memory_AllocateAtContext, size_t heap_size, MemoryContextType* memory_context, size_t heap_alignmemt);
 		MEMBER_FUNCTION_PTR(void, Memory_Free, void* pData, const char* file, int line, const char* func);

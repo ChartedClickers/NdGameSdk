@@ -42,8 +42,10 @@ namespace regenny::shared::corelib::job {
 		using U = std::underlying_type_t<JobFlag>;
 		return static_cast<JobFlag>(~static_cast<U>(a));
 	}
+
 	inline JobFlag& operator|=(JobFlag& a, JobFlag b) noexcept { a = a | b; return a; }
 	inline JobFlag& operator&=(JobFlag& a, JobFlag b) noexcept { a = a & b; return a; }
+
 }
 
 namespace NdGameSdk::corelib::job {
@@ -304,11 +306,11 @@ namespace NdGameSdk::corelib::job {
 			Priority prio, HeapArena_Args, CounterHandle** pCounter = nullptr,
 			JobFlag flags = JobFlag::None, bool wait = false);
 
-		void RunJobAndWait(void* pEntry, void* pWorkData, HeapArena_Args, int64_t pFlags = 0);
+		void RunJobAndWait(void* pEntry, void* pWorkData, HeapArena_Args, JobFlag pFlags = JobFlag::None);
 
 		void AllocateCounter(CounterHandle** pCounter, HeapArena_Args, uint64_t pCountJobArray = 0);
 		void WaitForCounter(CounterHandle** pCounter, uint64_t pCountJobArray = 0);
-		void WaitAndFreeCounter(CounterHandle** pCounter, uint64_t pCountJobArray = 0);
+		void WaitForCounterAndFree(CounterHandle** pCounter, uint64_t pCountJobArray = 0);
 		void FreeCounter(CounterHandle** pCounter);
 
 		// This function is used to yield the current job execution, 
@@ -342,7 +344,7 @@ namespace NdGameSdk::corelib::job {
 		MEMBER_FUNCTION_PTR(void, NdJob_DisplayJobSystemData);
 		MEMBER_FUNCTION_PTR(void, NdJob_AllocateCounter, CounterHandle** pCounter, char const* pFile, uint32_t pLine, char const* pFunc, uint64_t pCountJobArray, uint32_t arg6);
 		MEMBER_FUNCTION_PTR(void, NdJob_WaitForCounter, CounterHandle** pCounter, uint64_t pCountJobArray, uint32_t arg3);
-		MEMBER_FUNCTION_PTR(void, NdJob_WaitAndFreeCounter, CounterHandle** pCounter, uint64_t pCountJobArray, uint32_t arg3);
+		MEMBER_FUNCTION_PTR(void, NdJob_WaitForCounterAndFree, CounterHandle** pCounter, uint64_t pCountJobArray, uint32_t arg3);
 		MEMBER_FUNCTION_PTR(uint64_t, NdJob_TryGetWorkerThreadIndex);
 		MEMBER_FUNCTION_PTR(void, NdJob_SetJobLocalStorage, uint64_t arg1, uint64_t pSlotIndexes);
 		MEMBER_FUNCTION_PTR(void, NdJob_RunJobAndWait, void* pEntry, void* pWorkData, uint64_t pFlags, char const* pFile, uint32_t pLine, char const* pFunc);
@@ -429,5 +431,7 @@ namespace NdGameSdk::corelib::job {
 
 		static constexpr uint64_t kFlagsHighMask = 0xF000000000000000ull;
 		static constexpr uint64_t kFlagsLowMask = 0x0FFFFFFFFFFFFFFFull;
+		static constexpr JobFlag GameLoopUpdate_RunFlags =
+			JobFlag::ArrayRoot | JobFlag::GameFramePhase | JobFlag::FrameSpawner;
 	};
 }

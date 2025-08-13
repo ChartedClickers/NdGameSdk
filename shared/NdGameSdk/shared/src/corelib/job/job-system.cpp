@@ -1,4 +1,4 @@
-#include "job-system.hpp"
+﻿#include "job-system.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
 #include <Utility/helper.hpp>
@@ -107,9 +107,9 @@ namespace NdGameSdk::corelib::job {
 			NdJob_TryGetJlsSlotValue = (NdJob_TryGetJlsSlotValue_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::NdJob_TryGetJlsSlotValue), findpattern.offset);
 
-			findpattern = Patterns::NdJob_WaitAndFreeCounter;
-			NdJob_WaitAndFreeCounter = (NdJob_WaitAndFreeCounter_ptr)Utility::FindAndPrintPattern(module,
-				findpattern.pattern, wstr(Patterns::NdJob_WaitAndFreeCounter), findpattern.offset);
+			findpattern = Patterns::NdJob_WaitForCounterAndFree;
+			NdJob_WaitForCounterAndFree = (NdJob_WaitForCounterAndFree_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdJob_WaitForCounterAndFree), findpattern.offset);
 
 			findpattern = Patterns::NdJob_FreeCounter;
 			NdJob_FreeCounter = (NdJob_FreeCounter_ptr)Utility::FindAndPrintPattern(module,
@@ -151,7 +151,7 @@ namespace NdGameSdk::corelib::job {
 				!NdJob_GetCurrentWorkerThreadIndex ||
 				!NdJob_Yield ||
 				!NdJob_TryGetJlsSlotValue ||
-				!NdJob_WaitAndFreeCounter ||
+				!NdJob_WaitForCounterAndFree ||
 				!NdJob_FreeCounter
 			#if defined(T2R)
 				|| !NdJob_GetActiveJobId ||
@@ -237,7 +237,7 @@ namespace NdGameSdk::corelib::job {
 
 	void NdJob::RegisterJobArray(JobHeader* headers, uint64_t count, CounterHandle** pCounter, HeapArena_Args, Priority pPriority) {
 		always_assert(NdJob_RegisterJobArray == nullptr, "NdJob_RegisterJobArray not set");
-		NdJob_RegisterJobArray(headers, count, pCounter, source_file, source_line, source_func, pPriority, -1, -1);
+		NdJob_RegisterJobArray(headers, count, pCounter, source_file, source_line, source_func, pPriority, 1, 1);
 	}
 
 	void NdJob::SubmitJobArray(void* entry, void* const* workItems, uint64_t count,
@@ -271,14 +271,14 @@ namespace NdGameSdk::corelib::job {
 
 		for (uint64_t i = 0; i < count; ++i) {
 			MakeJobHeader(&headers[i], entry, workItems ? workItems[i] : nullptr);
-			headers[i].Get()->m_flags |= (static_cast<uint64_t>(flags) & JobHeader::kFlagsLowMask);
+			headers[i].set_flags(flags);
 		}
 
 		RegisterJobArray(headers, count, pCounter,
 			source_func, source_line, source_file, prio);
 
 		if (pCounter && wait) {
-			WaitAndFreeCounter(pCounter, 0);
+			WaitForCounterAndFree(pCounter, 0);
 		}
 
 		if (usedHeap) {
@@ -295,11 +295,10 @@ namespace NdGameSdk::corelib::job {
 	}
 
 
-	void NdJob::RunJobAndWait(void* pEntry, void* pWorkData, HeapArena_Args, int64_t pFlags) {
+	void NdJob::RunJobAndWait(void* pEntry, void* pWorkData, HeapArena_Args, JobFlag pFlags) {
 		always_assert(NdJob_RunJobAndWait == nullptr, "Function pointer was not set!");
-		spdlog::debug("Running job with entry: {}, work data: {}, flags: {}, source file: {}, source line: {}, source function: {}",
-			pEntry, pWorkData, pFlags, source_file, source_line, source_func);
-		NdJob_RunJobAndWait(pEntry, pWorkData, pFlags, source_file, source_line, source_func);
+		const auto flags_u64 = static_cast<uint64_t>(pFlags);
+		NdJob_RunJobAndWait(pEntry, pWorkData, flags_u64, source_file, source_line, source_func);
 	}
 
 	void NdJob::AllocateCounter(CounterHandle** pCounter, HeapArena_Args, uint64_t pCountJobArray) {
@@ -312,9 +311,9 @@ namespace NdGameSdk::corelib::job {
 		NdJob_WaitForCounter(pCounter, pCountJobArray, 0);
 	}
 
-	void NdJob::WaitAndFreeCounter(CounterHandle** pCounter, uint64_t pCountJobArray) {
-		always_assert(NdJob_WaitAndFreeCounter == nullptr, "Function pointer was not set!");
-		NdJob_WaitAndFreeCounter(pCounter, pCountJobArray, 0);
+	void NdJob::WaitForCounterAndFree(CounterHandle** pCounter, uint64_t pCountJobArray) {
+		always_assert(NdJob_WaitForCounterAndFree == nullptr, "Function pointer was not set!");
+		NdJob_WaitForCounterAndFree(pCounter, pCountJobArray, 0);
 	}
 
 	void NdJob::FreeCounter(CounterHandle** pCounter) {
@@ -560,7 +559,84 @@ namespace NdGameSdk::corelib::job {
 
 	int32_t* NdJob::NdJobInitialize(int32_t* Err, NdJob::InitParams* pParams) {
 		auto pNdJob = Instance<NdJob>();
-		return pNdJob->m_JobSysDataInitHook.thiscall<int32_t*>(Err, pParams);
+		int32_t* ret = pNdJob->m_JobSysDataInitHook.thiscall<int32_t*>(Err, pParams);
+
+		const int32_t code = ret ? *ret : 0;
+
+		if (code <= 0) {
+	#if SDK_DEBUG
+			static std::once_flag started;
+			std::call_once(started, [pNdJob] {
+
+				struct WrapperCtx {
+					NdJob* js{};
+					std::atomic<bool> stop{ false };
+					void* update_entry{};
+					void* update_arg{}; 
+				};
+
+				auto myUpdate = +[](uint64_t work) {
+					(void)work;
+
+					static uint64_t s_count = 0;
+					if ((++s_count & 0x3FFull) == 0) {
+						spdlog::debug("[MySdkUpdate] tick={}", s_count);
+					}
+
+					};
+
+				void* myArg = nullptr;
+
+				auto* ctx = pNdJob->m_Memory->AllocateAtContext<WrapperCtx>(
+					sizeof(WrapperCtx), 0x10, Memory::Context::kAllocAppCpu);
+
+				if (!ctx) {
+					spdlog::error("[{}] MySdkLoopFiber: ctx alloc failed", pNdJob->GetName());
+					return;
+				}
+
+				std::memset(ctx, 0, sizeof(WrapperCtx));
+
+				ctx->js = pNdJob;
+				ctx->update_entry = myUpdate;
+				ctx->update_arg = myArg;
+
+				auto spawner = +[](uint64_t arg) {
+					auto* c = reinterpret_cast<WrapperCtx*>(arg);
+					spdlog::info("[MySdkFrameSpawner] started");
+
+					while (!c->stop.load(std::memory_order_relaxed)) {
+				
+						c->js->RunJobAndWait(c->update_entry, c->update_arg,
+							HeapArena_Source,
+							JobHeader::GameLoopUpdate_RunFlags);
+
+						Sleep(16); 
+					}
+
+					spdlog::info("[MySdkFrameSpawner] stopping");
+					};
+
+				pNdJob->SubmitJobArray(
+					reinterpret_cast<void*>(spawner),
+					ctx,
+					1,
+					NdJob::Priority::KLow,
+					HeapArena_Source,
+					/*pCounter=*/nullptr,
+					NdJob::JobFlag::FrameSpawner,
+					/*wait=*/false
+				);
+
+				spdlog::info("[{}] MySdkFrameSpawner submitted.", pNdJob->GetName());
+
+				});
+	#endif
+		} else {
+			spdlog::error("[{}] Init FAILED (Err={})", pNdJob->GetName(), code);
+		}
+
+		return ret;
 	}
 
 	void NdJob::DisplayJobSystemData() {

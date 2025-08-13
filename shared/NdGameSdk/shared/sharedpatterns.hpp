@@ -58,7 +58,7 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern NdJob_DisplayJobSystemData = { L"40 53 48 83 ec 20 b9 02 00 00 00 e8 ?? ?? ?? ?? 48 8d 0d ?? ?? ?? ?? e8 ?? ?? ?? ?? b9 02 00 00 00 e8 ?? ?? ?? ?? 48 8b 05 ?? ?? ?? ?? 33 db 44 8b cb 8b d3 44 8b 80 88 57 00 00 4c 8d 90 80 56 00 00 0f 1f 40 00 66 66 0f 1f 84" };
 	static inline const SdkPattern NdJob_AllocateCounter = { L"48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 57 41 54 41 55 41 56 41 57 48 83 ec 30 48 8b 1d ?? ?? ?? ?? 4c 8b ea 48 8b f1 45 8b e0 48 81 c3 80 56 00 00 48 8d 15 ?? ?? ?? ?? 48 8b cb 4d 8b f9 e8 ?? ?? ?? ?? 44 8b b3" };
 	static inline const SdkPattern NdJob_WaitForCounter = { L"40 53 56 57 48 83 ec 60 4c 89 6c 24 50 41 8b f0 48 8b fa 48 8b d9 e8 ?? ?? ?? ?? 4c 8b e8 48 83 f8 18 0f 83 25 01" };
-	static inline const SdkPattern NdJob_WaitAndFreeCounter = { L"48 89 5c 24 10 48 89 74 24 18 57 48 83 ec 20 48 8b 01 48 8b d9 48 8d 4c 24 30 48 89 44 24 30 e8 ?? ?? ?? ?? 48 8b 3b" };
+	static inline const SdkPattern NdJob_WaitForCounterAndFree = { L"48 89 5c 24 10 48 89 74 24 18 57 48 83 ec 20 48 8b 01 48 8b d9 48 8d 4c 24 30 48 89 44 24 30 e8 ?? ?? ?? ?? 48 8b 3b" };
 	static inline const SdkPattern NdJob_FreeCounter = { L"48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 57 48 83 ec 20 48 8b 39 48 8b f1 e8 ?? ?? ?? ?? 48 83 f8 18 48 8d 4f 20 0f 93 c2 e8 ?? ?? ?? ?? 33 ed 48 8d 4f 20 48 89 6f 30" };
 	static inline const SdkPattern NdJob_TryGetWorkerThreadIndex = { L"65 48 8b 0c 25 58 00 00 00 8b 05 ?? ?? ?? ?? ba 40 00 00 00 48 8b 04 c1 48 8b 14 02 48 c7 c0 ff ff ff ff 48 8b ca 48 0f ba f9 0f 48 0f ba e2 0f 48 0f 42 c1 c3" };
 	static inline const SdkPattern NdJob_SetJobLocalStorage = { L"48 89 6c 24 18 48 89 74 24 20 41 56 48 83 ec 30 65 48 8b 04 25 20 00 00 00 4c 8b f2 48 8b e9 48 8b 30 48 85 f6 0f 84 e2" };
@@ -219,7 +219,7 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern NdJob_DisplayJobSystemData = { L"40 53 48 83 ec 20 bb 02 00 00 00 8b cb e8 ?? ?? ?? ?? 48 8d 0d ?? ?? ?? ?? e8 ?? ?? ?? ?? 8b cb e8 ?? ?? ?? ?? 4c 8b 15 ?? ?? ?? ?? 49 8d 8a 80 56" };
 	static inline const SdkPattern NdJob_AllocateCounter = { L"48 89 5c 24 10 48 89 74 24 18 57 41 56 41 57 48 83 ec 40 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 38 4c 8b f1 41 8b f0 48 8b 0d ?? ?? ?? ?? 4c 8b fa 83 ca ff 49 8b f9 48 8d 99 80 56 00 00 48 81 c1 00 58 00 00 e8 ?? ?? ?? ?? 48 8b cb" };
 	static inline const SdkPattern NdJob_WaitForCounter = { L"40 53 55 56 57 41 55 41 56 41 57 48 83 ec 40 41 8b f0 48 8b fa 4c 8b f1 e8 ?? ?? ?? ?? 4c 8b e8 48 83 f8 18" };
-	static inline const SdkPattern NdJob_WaitAndFreeCounter = { L"40 53 48 83 ec 20 48 8b 01 48 8b d9 48 8d 4c 24 30 48 89 44 24 30 e8 ?? ?? ?? ?? 48 8b 03 48 8d 4c 24 30 48 89 44 24 30 e8 ?? ?? ?? ?? 48 83 c4 20 5b c3" };
+	static inline const SdkPattern NdJob_WaitForCounterAndFree = { L"40 53 48 83 ec 20 48 8b 01 48 8b d9 48 8d 4c 24 30 48 89 44 24 30 e8 ?? ?? ?? ?? 48 8b 03 48 8d 4c 24 30 48 89 44 24 30 e8 ?? ?? ?? ?? 48 83 c4 20 5b c3" };
 	static inline const SdkPattern NdJob_FreeCounter = { L"40 53 48 83 ec 20 48 8b d9 33 d2 48 8b 09 e8 ?? ?? ?? ?? 48 8b 0d ?? ?? ?? ?? 83 ca ff 48 81 c1 00 58" };
 	static inline const SdkPattern NdJob_TryGetWorkerThreadIndex = { L"65 48 8b 0c 25 ?? ?? ?? ?? 8b 05 ?? ?? ?? ?? ba 48 00 00 00 48 8b 04 c1 48 8b 14 02 48 c7 c0" };
 	static inline const SdkPattern NdJob_SetJobLocalStorage = { L"48 8b c4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 56 48 83 ec 30 65 48 8b 04 25 ?? ?? ?? ?? 48 8b ea 4c 8b f1 48 8b 38 48 85 ff 0f 84" };

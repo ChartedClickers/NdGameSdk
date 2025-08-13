@@ -652,6 +652,11 @@ namespace regenny {
                         SkipTiming = 0x80
                     };
 
+                    enum CounterWakePolicy : uint32_t {
+                        WakeOnEveryDecrement = 0x0,
+                        WakeOnlyAtZero = 0x1, 
+                    };
+
                     struct InitParams 0x78 {
                         void* m_pMemoryBuffer;
                         uint64_t m_memoryBufferSize;
@@ -678,7 +683,7 @@ namespace regenny {
                         void* m_waitListHead;
                         uint64_t m_field28;
                         uint32_t m_CountJobArrays @ 0x30;
-                        bool m_IsFree @ 0x38;
+                        CounterWakePolicy m_wakeFlags @ 0x38;
                     };
 
                     struct JobHeader 0x80 {
@@ -701,12 +706,17 @@ namespace regenny {
                         CounterHandle* m_JobCounter;
                         uint64_t m_field20;
                         uint32_t m_field28;
-                        void* m_WorkData + 0x4;
+                        uint64_t m_allowedWorkersMask + 0x4;
                         void* m_heapBlock;
                         uint8_t m_state;
                         Priority m_priority @ 0x44;
                         uint64_t m_QueryPerformance @ 0x50;
                         uint64_t m_WorkerThreadIndex;
+                    };
+
+                    struct SchedLane 0x4080 {
+                        JobArrayHeader* m_slots[0x800];
+                        uint64_t m_count;
                     };
 
                     // Notice: Be careful with the offsets in the Data structures,
@@ -765,7 +775,7 @@ namespace regenny {
                     };
 
                     struct SchedData : SysData 0x100 {
-                        JobHeader* m_JobsSheduled;
+                        SchedLane* m_lanes;
                     };
 
                     struct JobSysData 0x26d00 {

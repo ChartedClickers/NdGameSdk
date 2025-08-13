@@ -76,10 +76,20 @@ namespace NdGameSdk::corelib::job {
 			void SetMaxLargeJobFibers(uint64_t count);
 		};
 	};
-	class JobHeap;
-	class JobSystem;
-	class JobHeader;
-	class CounterHandle;
+
+	class CounterHandle : public ISdkRegenny<regenny::shared::corelib::job::ndjob::CounterHandle> {
+	public:
+		using CounterWakePolicy = regenny::shared::corelib::job::ndjob::CounterWakePolicy;
+		CounterHandle() = default;
+
+		std::string GetFilePath() const;
+		std::string GetFunctionName() const;
+		uint32_t GetLine() const;
+
+		uint64_t GetTimestampQPC() const;
+		uint32_t GetCountJobArrays() const;
+		CounterWakePolicy GetWakePolicy() const;
+	};
 
 	template <typename T>
 	struct JlsEntry : public ISdkRegenny<regenny::shared::corelib::job::JlsEntry> {
@@ -216,9 +226,14 @@ namespace NdGameSdk::corelib::job {
 		Iterator end()   const { auto* e = const_cast<RawEntry*>(&this->Get()->slots[kSlots]); return { e,e }; }
 	};
 
+	class JobHeap;
+	class JobSystem;
+	class JobHeader;
+
 	class NdGameSdk_API NdJob : public ISdkComponent {
 	public:
 		using InitParams = JobSysData::InitParams;
+		using WorkerMask = uint64_t;
 		using Priority = ::regenny::shared::corelib::job::ndjob::Priority;
 		using JobFlag = ::regenny::shared::corelib::job::ndjob::JobFlag;
 
@@ -296,15 +311,17 @@ namespace NdGameSdk::corelib::job {
 		}
 
 		void MakeJobHeader(JobHeader* dst, void* entry, void* workData);
-		void RegisterJobArray(JobHeader* headers, uint64_t count, CounterHandle** pCounter, HeapArena_Args, Priority pPriority = Priority::KLow);
+		void RegisterJobArray(JobHeader* headers, uint64_t count, CounterHandle** pCounter, HeapArena_Args, 
+			Priority pPriority = Priority::KLow, WorkerMask workerAffinityMask = -1, 
+			CounterHandle::CounterWakePolicy counterWakeFlags = CounterHandle::CounterWakePolicy::WakeOnlyAtZero);
 
 		void SubmitJobArray(void* entry, void* const* workItems, uint64_t count,
 			Priority prio, HeapArena_Args, CounterHandle** pCounter = nullptr,
-			JobFlag flags = JobFlag::None, bool wait = false);
+			JobFlag flags = JobFlag::None, WorkerMask workerAffinityMask = -1, bool wait = false);
 
 		void SubmitJobArray(void* entry, void* workData, uint64_t count,
 			Priority prio, HeapArena_Args, CounterHandle** pCounter = nullptr,
-			JobFlag flags = JobFlag::None, bool wait = false);
+			JobFlag flags = JobFlag::None, WorkerMask workerAffinityMask = -1, bool wait = false);
 
 		void RunJobAndWait(void* pEntry, void* pWorkData, HeapArena_Args, JobFlag pFlags = JobFlag::None);
 
@@ -317,6 +334,11 @@ namespace NdGameSdk::corelib::job {
 		// allowing other jobs to run.
 		void JobYield();
 
+		static constexpr WorkerMask WorkerBit(unsigned idx) {
+			return WorkerMask{1} << idx;
+		}
+
+		static constexpr WorkerMask kAllWorkers = ~WorkerMask{ 0 };
 	private:
 		void Initialize() override;
 		void Awake() override;
@@ -343,13 +365,13 @@ namespace NdGameSdk::corelib::job {
 
 		MEMBER_FUNCTION_PTR(void, NdJob_DisplayJobSystemData);
 		MEMBER_FUNCTION_PTR(void, NdJob_AllocateCounter, CounterHandle** pCounter, char const* pFile, uint32_t pLine, char const* pFunc, uint64_t pCountJobArray, uint32_t arg6);
-		MEMBER_FUNCTION_PTR(void, NdJob_WaitForCounter, CounterHandle** pCounter, uint64_t pCountJobArray, uint32_t arg3);
-		MEMBER_FUNCTION_PTR(void, NdJob_WaitForCounterAndFree, CounterHandle** pCounter, uint64_t pCountJobArray, uint32_t arg3);
+		MEMBER_FUNCTION_PTR(void, NdJob_WaitForCounter, CounterHandle** pCounter, uint64_t pCountJobArray, uint32_t CounterWakeMode);
+		MEMBER_FUNCTION_PTR(void, NdJob_WaitForCounterAndFree, CounterHandle** pCounter, uint64_t pCountJobArray, uint32_t CounterWakeMode);
 		MEMBER_FUNCTION_PTR(uint64_t, NdJob_TryGetWorkerThreadIndex);
 		MEMBER_FUNCTION_PTR(void, NdJob_SetJobLocalStorage, uint64_t arg1, uint64_t pSlotIndexes);
 		MEMBER_FUNCTION_PTR(void, NdJob_RunJobAndWait, void* pEntry, void* pWorkData, uint64_t pFlags, char const* pFile, uint32_t pLine, char const* pFunc);
 		MEMBER_FUNCTION_PTR(void, NdJob_RegisterJobArray, JobHeader* pJobHeaders, uint64_t pCountJobArrays, CounterHandle** pCounter,
-			char const* pFile, uint32_t pLine, char const* pFunc, Priority pPriority, uint64_t arg8, uint64_t arg9);
+			char const* pFile, uint32_t pLine, char const* pFunc, Priority pPriority, uint64_t allowedWorkersMask, uint64_t CounterWakeFlags);
 		MEMBER_FUNCTION_PTR(void, NdJob_MakeJobHeader, JobHeader* pJobHeaders, void* pEntry, void* pWorkData);
 		MEMBER_FUNCTION_PTR(bool, NdJob_IsGameFrameJob);
 		MEMBER_FUNCTION_PTR(bool, NdJob_IsWorkerThread);
@@ -370,21 +392,6 @@ namespace NdGameSdk::corelib::job {
 
 		friend class ndlib::render::dev::DebugDrawCommon;
 		friend class NdDevMenu;
-	};
-
-	class CounterHandle : public ISdkRegenny<regenny::shared::corelib::job::ndjob::CounterHandle> {
-	public:
-		CounterHandle() = default;
-
-		std::string GetFilePath() const;
-		std::string GetFunctionName() const;
-		uint32_t GetLine() const;
-
-		uint64_t GetTimestampQPC() const;
-		uint32_t GetCountJobArrays() const;
-
-		bool IsValid() const;
-		bool IsFree() const;
 	};
 
 	class JobHeap : public ISdkRegenny<regenny::shared::corelib::job::JobHeap> {};

@@ -22,6 +22,11 @@ struct ndjob {
         SkipTiming = 128,
     };
 
+    enum CounterWakePolicy : uint32_t {
+        WakeOnEveryDecrement = 0,
+        WakeOnlyAtZero = 1,
+    };
+
     struct InitParams {
         void* m_pMemoryBuffer; // 0x0
         uint64_t m_memoryBufferSize; // 0x8
@@ -54,8 +59,8 @@ struct ndjob {
         uint64_t m_field28; // 0x28
         uint32_t m_CountJobArrays; // 0x30
         private: char pad_34[0x4]; public:
-        bool m_IsFree; // 0x38
-        private: char pad_39[0x7]; public:
+        regenny::shared::corelib::job::ndjob::CounterWakePolicy m_wakeFlags; // 0x38
+        private: char pad_3c[0x4]; public:
     }; // Size: 0x40
 
     struct JobHeader {
@@ -82,7 +87,7 @@ struct ndjob {
         uint64_t m_field20; // 0x20
         uint32_t m_field28; // 0x28
         private: char pad_2c[0x4]; public:
-        void* m_WorkData; // 0x30
+        uint64_t m_allowedWorkersMask; // 0x30
         void* m_heapBlock; // 0x38
         uint8_t m_state; // 0x40
         private: char pad_41[0x3]; public:
@@ -92,6 +97,12 @@ struct ndjob {
         uint64_t m_WorkerThreadIndex; // 0x58
         private: char pad_60[0xa0]; public:
     }; // Size: 0x100
+
+    struct SchedLane {
+        regenny::shared::corelib::job::ndjob::JobArrayHeader* m_slots[2048]; // 0x0
+        uint64_t m_count; // 0x4000
+        private: char pad_4008[0x78]; public:
+    }; // Size: 0x4080
 
     struct SysData {
         bool m_Initialized; // 0x0
@@ -155,7 +166,7 @@ struct ndjob {
     }; // Size: 0x20340
 
     struct SchedData : public SysData {
-        regenny::shared::corelib::job::ndjob::JobHeader* m_JobsSheduled; // 0xc0
+        regenny::shared::corelib::job::ndjob::SchedLane* m_lanes; // 0xc0
         private: char pad_c8[0x38]; public:
     }; // Size: 0x100
 

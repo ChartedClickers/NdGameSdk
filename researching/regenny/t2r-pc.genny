@@ -670,15 +670,17 @@ namespace regenny {
                     };
 
                     enum JobFlag : uint32_t {
-                        None = 0x0,
-                        // skip perf timestamping at start/end
-                        SkipTiming = 0x80,
-                        // if set, engine writes a per-worker mask to [slot+0x80];
-                        PinToCurrentWorker = 0x20, 
-                        // set on GameToRenderFrameJobs header (array path). Semantics TBD.
-                        Bit0_TBD_ArrayHeader = 0x01, 
-                        // set on FrameSpawnerJob. Semantics TBD (spawn/root/system?).
-                        Bit6_TBD_Spawner = 0x40, 
+                        None = 0x00,
+                        // Set on headers submitted via RegisterJobArray (root of a batched submission).
+                        ArrayRoot = 0x01,
+                        // Marks job as part of the per-frame pipeline (seen on header & RunJobAndWait).
+                        GameFramePhase = 0x04,
+                        // Writes a per-worker mask to [slot+0x80].
+                        PinToCurrentWorker = 0x20,
+                        // Used on the FrameSpawner job (root/system spawner).
+                        FrameSpawner = 0x40,
+                        // Skip perf timestamping at start/end.
+                        SkipTiming = 0x80
                     };
 
                     struct InitParams 0x78 {
@@ -942,8 +944,11 @@ namespace regenny {
                 };
 
                 void* vftable;
-                uint64_t m_gameFrameNumber @ 0x40
-                bool m_KeyboardDevMode @ 0xe5c0
+                uint32_t m_TargetFramerate @ 0x20;
+                uint32_t m_MinimumFramerate @ 0x28;
+                uint32_t m_speed;
+                uint64_t m_gameFrameNumber @ 0x40;
+                bool m_KeyboardDevMode @ 0xe5c0;
                 NdKeyboardLayer m_IMEKeyboard @ 0x10a10;
                 NdKeyboardLayer m_kbdLayer1;
                 NdKeyboardLayer m_kbdLayer2;

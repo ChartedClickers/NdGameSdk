@@ -31,7 +31,12 @@ struct NdFrameState {
     }; // Size: 0x1a60
 
     void* vftable; // 0x0
-    private: char pad_8[0x38]; public:
+    private: char pad_8[0x18]; public:
+    uint32_t m_TargetFramerate; // 0x20
+    private: char pad_24[0x4]; public:
+    uint32_t m_MinimumFramerate; // 0x28
+    uint32_t m_speed; // 0x2c
+    private: char pad_30[0x10]; public:
     uint64_t m_gameFrameNumber; // 0x40
     private: char pad_48[0x4d2]; public:
     bool m_KeyboardDevMode; // 0x51a

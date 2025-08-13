@@ -15,10 +15,11 @@ struct ndjob {
 
     enum JobFlag : uint32_t {
         None = 0,
-        SkipTiming = 128,
+        ArrayRoot = 1,
+        GameFramePhase = 4,
         PinToCurrentWorker = 32,
-        Bit0_TBD_ArrayHeader = 1,
-        Bit6_TBD_Spawner = 64,
+        FrameSpawner = 64,
+        SkipTiming = 128,
     };
 
     struct InitParams {

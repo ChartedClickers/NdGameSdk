@@ -256,34 +256,30 @@ namespace NdGameSdk::corelib::job {
 		}
 
 		template <typename T>
-		bool JlsValueWrite(JlsContext index, StringId64 hash, T value) {
+		void JlsValueWrite(JlsContext index, StringId64 hash, T value) {
 		#if defined(T2R)
 			always_assert(NdJob_JlsValueWrite == nullptr, "Function pointer was not set!");
-			return NdJob_JlsValueWrite(index, hash, JlsEntry<T>::jls_payload(value));
+			NdJob_JlsValueWrite(index, hash, JlsEntry<T>::jls_payload(value));
 		#else
 			if (auto* jobTls = GetJobTls()) {
 				const JlsEntry<T> entry{ hash, value };
 				jobTls->write<T>(index, entry);
-				return true;
 			}
-			return false;
 		#endif
 		}
 
 		template <typename T>
-		bool GetJlsValueByIndex(JlsContext index, T* outValue) {
+		void GetJlsValueByIndex(JlsContext index, T* outValue) {
 		#if defined(T2R)
 			always_assert(NdJob_GetJlsValueByIndex == nullptr, "Function pointer was not set!");
-			return NdJob_GetJlsValueByIndex(index, outValue);
+			NdJob_GetJlsValueByIndex(index, outValue);
 		#else
 			if (auto* jobTls = GetJobTls()) {
 				const JlsEntry<const T>& entry = jobTls->slot<T>(index);
-				if (entry.key() != 0) {
+				if(entry.key() != 0) {
 					*outValue = entry.value();
 				}
-				return true;
 			}
-			return false;
 		#endif
 		}
 
@@ -382,9 +378,9 @@ namespace NdGameSdk::corelib::job {
 #if defined (T2R)
 		MEMBER_FUNCTION_PTR(void, NdJob_FreeCounter, CounterHandle** pCounter);
 		MEMBER_FUNCTION_PTR(uint64_t, NdJob_GetActiveJobId);
-		MEMBER_FUNCTION_PTR(bool, NdJob_JlsValueWrite, uint32_t index, StringId64 hash, void* Value);
-		MEMBER_FUNCTION_PTR(bool, NdJob_GetJlsValueByIndex, int32_t index, void* outValue);
-		MEMBER_FUNCTION_PTR(bool, NdJob_ClearJlsValueByIndex, int32_t index);
+		MEMBER_FUNCTION_PTR(void, NdJob_JlsValueWrite, uint32_t index, StringId64 hash, void* Value);
+		MEMBER_FUNCTION_PTR(void, NdJob_GetJlsValueByIndex, int32_t index, void* outValue);
+		MEMBER_FUNCTION_PTR(void, NdJob_ClearJlsValueByIndex, int32_t index);
 		MEMBER_FUNCTION_PTR(bool, NdJob_DoesJobLocalStorageIdExist, uint32_t index);
 #elif defined (T1X)
 		MEMBER_FUNCTION_PTR(void, NdJob_FreeCounter, CounterHandle** pCounter, uint64_t arg2);

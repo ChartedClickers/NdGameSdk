@@ -2,6 +2,7 @@
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
 #include <Utility/helper.hpp>
+#include <NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp>
 
 namespace NdGameSdk::corelib::job {
 

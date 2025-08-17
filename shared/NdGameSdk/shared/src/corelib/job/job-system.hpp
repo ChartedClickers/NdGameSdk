@@ -4,7 +4,7 @@
 #include "NdGameSdk/components/SdkComponent.hpp"
 
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
-#include <NdGameSdk/shared/src/ndlib/render/dev/debugdraw-common.hpp>
+#include <NdGameSdk/shared/src/corelib/system/NdSystem.hpp>
 #include <NdGameSdk/shared/src/ndlib/debug/nd-dmenu.hpp>
 
 #if defined(T2R)
@@ -26,6 +26,9 @@
 #include <type_traits> 
 
 using namespace NdGameSdk::corelib::memory;
+using namespace NdGameSdk::corelib::system;
+using namespace NdGameSdk::gamelib::debug;
+using namespace NdGameSdk::ndlib::debug;
 
 namespace regenny::shared::corelib::job {
 	using JobFlag = ndjob::JobFlag;
@@ -237,7 +240,7 @@ namespace NdGameSdk::corelib::job {
 		using Priority = ::regenny::shared::corelib::job::ndjob::Priority;
 		using JobFlag = ::regenny::shared::corelib::job::ndjob::JobFlag;
 
-		SDK_DEPENDENCIES(Memory);
+		SDK_DEPENDENCIES(NdSystem, Memory);
 
 		NdJob();
 

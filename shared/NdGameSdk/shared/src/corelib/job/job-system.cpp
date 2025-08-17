@@ -197,6 +197,15 @@ namespace NdGameSdk::corelib::job {
 	#endif
 	}
 
+	bool NdJob::IsGameFrameJob() {
+		JobHeader hdr{};
+		if (!TryGetCurrentJobHeader(&hdr) ||
+			!hdr.has_flags(JobFlag::GameFramePhase))
+			return false;
+
+		return true;
+	}
+
 	bool NdJob::IsRenderFrameJob() {
 	#if defined(T2R)
 		always_assert(NdJob_IsRenderFrameJob == nullptr, "Function pointer was not set!");

@@ -245,6 +245,7 @@ namespace NdGameSdk::corelib::job {
 		NdJob();
 
 		bool IsWorkerThread();
+		bool IsGameFrameJob();
 		bool IsRenderFrameJob();
 
 		const uint64_t TryGetWorkerThreadIndex();

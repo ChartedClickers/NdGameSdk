@@ -92,10 +92,6 @@ namespace NdGameSdk::ndlib::debug {
 		this->Get()->m_ItemLeftPad = leftPad;
 	}
 
-	uint64_t DMENU::Component::Data() {
-		return this->Get()->m_data;
-	}
-
 	DMENU::MenuGroup* DMENU::Component::MenuGroup() {
 		return reinterpret_cast<DMENU::MenuGroup*>(this->Get()->m_MenuGroup);
 	}

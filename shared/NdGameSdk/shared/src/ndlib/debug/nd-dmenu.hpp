@@ -51,7 +51,8 @@ namespace NdGameSdk::ndlib::debug {
 			long GetLeftPad();
 			void SetLeftPad(long leftPad);
 
-			uint64_t Data();
+			template<typename T = uint64_t>
+			T Data() { return this->Get()->m_data; }
 
 			MenuGroup* MenuGroup();
 	        

@@ -642,8 +642,10 @@ namespace regenny {
                         None = 0x00,
                         // Set on headers submitted via RegisterJobArray (root of a batched submission).
                         ArrayRoot = 0x01,
-                        // Marks job as part of the per-frame pipeline (seen on header & RunJobAndWait).
+                        // Marks job as part of the per-frame pipeline (logic/update side).
                         GameFramePhase = 0x04,
+                        // Marks job as part of the render-frame pipeline (graphics side).
+                        RenderFramePhase = 0x08,
                         // Writes a per-worker mask to [slot+0x80].
                         PinToCurrentWorker = 0x20,
                         // Used on the FrameSpawner job (root/system spawner).

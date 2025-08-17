@@ -245,9 +245,10 @@ namespace NdGameSdk::corelib::job {
 		NdJob();
 
 		bool IsWorkerThread();
-		bool IsGameFrameJob();
+		bool IsRenderFrameJob();
 
 		const uint64_t TryGetWorkerThreadIndex();
+		const bool TryGetCurrentJobHeader(JobHeader* outHeader);
 		const uint64_t GetCurrentWorkerThreadIndex();
 		const uint64_t GetActiveJobId();
 		const Priority GetCurrentWorkerPriority();
@@ -372,12 +373,12 @@ namespace NdGameSdk::corelib::job {
 		MEMBER_FUNCTION_PTR(void, NdJob_RegisterJobArray, JobHeader* pJobHeaders, uint64_t pCountJobArrays, CounterHandle** pCounter,
 			char const* pFile, uint32_t pLine, char const* pFunc, Priority pPriority, uint64_t allowedWorkersMask, uint64_t CounterWakeFlags);
 		MEMBER_FUNCTION_PTR(void, NdJob_MakeJobHeader, JobHeader* pJobHeaders, void* pEntry, void* pWorkData);
-		MEMBER_FUNCTION_PTR(bool, NdJob_IsGameFrameJob);
 		MEMBER_FUNCTION_PTR(bool, NdJob_IsWorkerThread);
 		MEMBER_FUNCTION_PTR(Priority, NdJob_GetCurrentWorkerPriority);
 		MEMBER_FUNCTION_PTR(uint64_t, NdJob_GetCurrentWorkerThreadIndex);
 		MEMBER_FUNCTION_PTR(void, NdJob_Yield);
 		MEMBER_FUNCTION_PTR(bool, NdJob_TryGetJlsSlotValue, uint32_t index, void* outValue);
+		MEMBER_FUNCTION_PTR(bool, NdJob_TryGetCurrentJobHeader, JobHeader* outHeader);
 #if defined (T2R)
 		MEMBER_FUNCTION_PTR(void, NdJob_FreeCounter, CounterHandle** pCounter);
 		MEMBER_FUNCTION_PTR(uint64_t, NdJob_GetActiveJobId);
@@ -385,6 +386,7 @@ namespace NdGameSdk::corelib::job {
 		MEMBER_FUNCTION_PTR(void, NdJob_GetJlsValueByIndex, int32_t index, void* outValue);
 		MEMBER_FUNCTION_PTR(void, NdJob_ClearJlsValueByIndex, int32_t index);
 		MEMBER_FUNCTION_PTR(bool, NdJob_DoesJobLocalStorageIdExist, uint32_t index);
+		MEMBER_FUNCTION_PTR(bool, NdJob_IsRenderFrameJob);
 #elif defined (T1X)
 		MEMBER_FUNCTION_PTR(void, NdJob_FreeCounter, CounterHandle** pCounter, uint64_t arg2);
 #endif

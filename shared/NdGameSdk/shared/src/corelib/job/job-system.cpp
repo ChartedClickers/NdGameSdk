@@ -88,10 +88,6 @@ namespace NdGameSdk::corelib::job {
 			NdJob_IsWorkerThread = (NdJob_IsWorkerThread_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::NdJob_IsWorkerThread), findpattern.offset);
 
-			findpattern = Patterns::NdJob_IsGameFrameJob;
-			NdJob_IsGameFrameJob = (NdJob_IsGameFrameJob_ptr)Utility::FindAndPrintPattern(module,
-				findpattern.pattern, wstr(Patterns::NdJob_IsGameFrameJob), findpattern.offset);
-
 			findpattern = Patterns::NdJob_GetCurrentWorkerPriority;
 			NdJob_GetCurrentWorkerPriority = (NdJob_GetCurrentWorkerPriority_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::NdJob_GetCurrentWorkerPriority), findpattern.offset);
@@ -116,6 +112,10 @@ namespace NdGameSdk::corelib::job {
 			NdJob_FreeCounter = (NdJob_FreeCounter_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::NdJob_FreeCounter), findpattern.offset);
 
+			findpattern = Patterns::NdJob_TryGetCurrentJobHeader;
+			NdJob_TryGetCurrentJobHeader = (NdJob_TryGetCurrentJobHeader_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdJob_TryGetCurrentJobHeader), findpattern.offset);
+
 	#if defined(T2R)
 			findpattern = Patterns::NdJob_GetActiveJobId;
 			NdJob_GetActiveJobId = (NdJob_GetActiveJobId_ptr)Utility::FindAndPrintPattern(module,
@@ -136,6 +136,10 @@ namespace NdGameSdk::corelib::job {
 			findpattern = Patterns::NdJob_DoesJobLocalStorageIdExist;
 			NdJob_DoesJobLocalStorageIdExist = (NdJob_DoesJobLocalStorageIdExist_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::NdJob_DoesJobLocalStorageIdExist), findpattern.offset);
+
+			findpattern = Patterns::NdJob_IsRenderFrameJob;
+			NdJob_IsRenderFrameJob = (NdJob_IsRenderFrameJob_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::NdJob_IsRenderFrameJob), findpattern.offset);
 	#endif
 
 			if (!NdJob_DisplayJobSystemData ||
@@ -147,7 +151,6 @@ namespace NdGameSdk::corelib::job {
 				!NdJob_RegisterJobArray ||
 				!NdJob_MakeJobHeader ||
 				!NdJob_IsWorkerThread ||
-				!NdJob_IsGameFrameJob ||
 				!NdJob_GetCurrentWorkerPriority ||
 				!NdJob_GetCurrentWorkerThreadIndex ||
 				!NdJob_Yield ||
@@ -159,7 +162,8 @@ namespace NdGameSdk::corelib::job {
 				!NdJob_JlsValueWrite ||
 				!NdJob_GetJlsValueByIndex ||
 				!NdJob_ClearJlsValueByIndex ||
-				!NdJob_DoesJobLocalStorageIdExist
+				!NdJob_DoesJobLocalStorageIdExist ||
+				!NdJob_IsRenderFrameJob
 			#endif
 				) {
 				throw SdkComponentEx{ std::format("Failed to find {}:: game function!", GetName()), SdkComponentEx::ErrorCode::PatternFailed };
@@ -193,14 +197,28 @@ namespace NdGameSdk::corelib::job {
 	#endif
 	}
 
-	bool NdJob::IsGameFrameJob() {
-		always_assert(NdJob_IsGameFrameJob == nullptr, "Function pointer was not set!");
-		return NdJob_IsGameFrameJob();
+	bool NdJob::IsRenderFrameJob() {
+	#if defined(T2R)
+		always_assert(NdJob_IsRenderFrameJob == nullptr, "Function pointer was not set!");
+		return NdJob_IsRenderFrameJob();
+	#else
+		JobHeader hdr{};
+		if (!TryGetCurrentJobHeader(&hdr) || 
+			!hdr.has_flags(JobFlag::RenderFramePhase))
+			return false;
+
+		return true;
+	#endif
 	}
 
 	const uint64_t NdJob::TryGetWorkerThreadIndex() {
 		always_assert(NdJob_TryGetWorkerThreadIndex == nullptr, "Function pointer was not set!");
 		return NdJob_TryGetWorkerThreadIndex();
+	}
+
+	const bool NdJob::TryGetCurrentJobHeader(JobHeader* outHeader) {
+		always_assert(NdJob_TryGetCurrentJobHeader == nullptr, "Function pointer wa s not set!");
+		return NdJob_TryGetCurrentJobHeader(outHeader);
 	}
 
 	const uint64_t NdJob::GetCurrentWorkerThreadIndex() {

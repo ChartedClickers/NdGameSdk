@@ -17,6 +17,7 @@ struct ndjob {
         None = 0,
         ArrayRoot = 1,
         GameFramePhase = 4,
+        RenderFramePhase = 8,
         PinToCurrentWorker = 32,
         FrameSpawner = 64,
         SkipTiming = 128,

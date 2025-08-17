@@ -66,7 +66,7 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern NdJob_RegisterJobArray = { L"48 89 5c 24 08 48 89 74 24 10 48 89 7c 24 18 4c 89 64 24 20 55 41 56 41 57 48 81 ec 30 01 00 00 48 8d" };
 	static inline const SdkPattern NdJob_MakeJobHeader = { L"83 61 38 f0 33 c0 48 89 41 10 48 89 41 18 48 89 41 20 48 89 41 28 48 89 41 30 48 b8 ?? ?? ?? ?? ?? ?? ?? f0 48 21 41 40 48 8b c1 48 89 11 4c 89 41 08 c3" };
 	static inline const SdkPattern NdJob_IsWorkerThread = { L"48 83 ec ?? e8 ?? ?? ?? ?? 48 83 f8 18 0f 92 c0 48 83 c4 ?? c3" };
-	static inline const SdkPattern NdJob_IsGameFrameJob = { L"53 48 83 ec 20 48 8b d9 e8 ?? ?? ?? ?? 48 83 f8 18 73 75" };
+	static inline const SdkPattern NdJob_IsRenderFrameJob = { L"40 55 48 81 ec f0 00 00 00 48 8d 6c 24 60 48 83 e5 c0 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 85 80 00 00 00 c5 f9 ef c0 c5 fc 11 45 00 c5 fc 11 45 20 c5 fc 11 45 40 c5 fc 11 45 60 48 8d 4d 00 c5 f8 77 e8 ?? ?? ?? ?? 48 8d 4d 00 e8 ?? ?? ?? ?? 84 c0 74 ?? f6 45 40 08 74" };
 	static inline const SdkPattern NdJob_GetCurrentWorkerPriority = { L"48 83 ec 28 e8 ?? ?? ?? ?? 48 83 f8 18 73 49 65 48 8b 04 25 20 00 00 00 48 8b 08 48 83 79 10 00 74 06 48 8b 49 18 eb 12 e8 ?? ?? ?? ?? 48 83 f8 ff b9 18 00 00 00 48 0f 45 c8 48 83 f9 18 73 18 48 8b 05 ?? ?? ?? ?? 48 c1 e1 09 0f b6 84 01 88 0c" };
 	static inline const SdkPattern NdJob_GetCurrentWorkerThreadIndex = { L"48 83 ec 28 e8 ?? ?? ?? ?? 48 83 f8 18 72 ?? b8 18 00 00 00 48 83 c4 28 c3" };
 	static inline const SdkPattern NdJob_Yield = { L"41 56 48 83 ec 40 e8 ?? ?? ?? ?? 4c 8b f0 e8 ?? ?? ?? ?? 84 c0 0f 85" };
@@ -76,6 +76,7 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern NdJob_GetJlsValueByIndex = { L"65 48 8b 04 25 20 00 00 00 48 63 c9 48 03 c9 48 8b 00 48 8b 4c c8 08 48 89 0a c3" };
 	static inline const SdkPattern NdJob_ClearJlsValueByIndex = { L"65 48 8b 04 25 20 00 00 00 48 63 d1 48 c1 e2 04 48 03 10 33 c0 48 89 02 48 89 42 08 c3" };
 	static inline const SdkPattern NdJob_DoesJobLocalStorageIdExist = { L"65 48 8b 04 25 20 00 00 00 48 63 d1 48 03 d2 48 8b 00 48 83 3c d0 00 0f 95 c0 c3" };
+	static inline const SdkPattern NdJob_TryGetCurrentJobHeader = { L"40 53 48 83 ec 20 48 8b d9 e8 ?? ?? ?? ?? 48 83 f8 18 73 ?? 65 48 8b 04 25 20 00 00 00 48 8b 10 48 83 7a 10 00 74 ?? 48 8b 4a 18" };
 
 	static inline const SdkPattern ProfileCtrl_Initialize = { L"40 53 48 83 ec 30 48 8b d9 e8 ?? ?? ?? ?? 48 8b c8 e8 ?? ?? ?? ?? 33 c9 e8 ?? ?? ?? ?? 84 c0 74 ?? c7 44 24 48 0b 00 00 00 4c 8d 0d ?? ?? ?? ?? 41 b8 2e 00 00 00 48 8d" };
 	static inline const SdkPattern ProfileCtrl_InitProfileMenu = { L"48 8b c4 55 53 56 57 41 56 48 8d 68 a1 48 81 ec c0 00 00 00 c5 f8 29 70 c8 c5 f8 29 78 b8 c5 78 29 40 a8 c5 78 29 48 98 c5 78 29 50 88 c5 78 29 5c 24 60 48 8b f9 33 c9 e8 ?? ?? ?? ?? 84 c0 0f 84" };
@@ -228,11 +229,12 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern NdJob_RegisterJobArray = { L"40 53 55 56 57 41 56 48 83 ec 40 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 38 48 8b 84 24 a8" };
     static inline const SdkPattern NdJob_MakeJobHeader = { L"83 61 38 f0 33 c0 48 89 41 10 48 89 41 18 48 89 41 20 48 89 41 28 48 89 41 30 48 b8" };
     static inline const SdkPattern NdJob_IsWorkerThread = { L"48 83 ec 28 e8 ?? ?? ?? ?? 48 83 f8 18 0f 92 c0 48 83 c4 28 c3" };
-    static inline const SdkPattern NdJob_IsGameFrameJob = { L"40 53 48 83 ec 20 48 8b d9 e8 ?? ?? ?? ?? 48 83 f8 18 0f 82 ?? ?? ?? ?? 32 c0 c5 f8 77 48 83 c4 20 5b c3" };
     static inline const SdkPattern NdJob_GetCurrentWorkerPriority = { L"48 83 ec 28 e8 ?? ?? ?? ?? 48 8b c8 48 83 f8 18 73 14 48 8b 05" };
 	static inline const SdkPattern NdJob_GetCurrentWorkerThreadIndex = { L"48 83 ec 28 e8 ?? ?? ?? ?? 84 c0 75 07 b8 18 00 00 00 eb 35 48 83 64 24 30 00 48 8d 54 24 30 b9 01 00 00 00 e8 ?? ?? ?? ?? 84 c0 74 07 48 8b 44 24 30 eb 15" };
 	static inline const SdkPattern NdJob_Yield = { L"48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 57 48 83 ec 30 e8 ?? ?? ?? ?? 48 8b e8 e8 ?? ?? ?? ?? 84 c0 0f 85" };
 	static inline const SdkPattern NdJob_TryGetJlsSlotValue = { L"65 48 8b 04 25 20 00 00 00 4c 63 c1 49 c1 e0 04 4c 03 00" };
+	static inline const SdkPattern NdJob_TryGetCurrentJobHeader = { L"40 53 48 83 ec 20 48 8b d9 e8 ?? ?? ?? ?? 48 83 f8 18 0f 82 ?? ?? ?? ?? 32 c0 c5 f8 77 48 83 c4 20 5b c3" };
+
 
 	static inline const SdkPattern ScriptManager_g_ScriptManagerGlobals = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 20 48 8b d9 48 63 fa 48 ?? ?? ?? ?? ?? ?? 45 33 c9 4c 89 49", +0x15 };
 	static inline const SdkPattern ScriptManager_InitializeReturn = { L"4c 8d 0d ?? ?? ?? ?? 4c 8b c3 49 8b d6 48 8b cf e8 ?? ?? ?? ?? 4c 8b c3 44 89 64 24 40 48 8d 54 24 40 48 8b cb e8 ?? ?? ?? ?? 48 85 c0 74 10 48 89 38 44 89 70 08 48 89 05 ?? ?? ?? ?? eb 08 48 83 25 ?? ?? ?? ?? 00", +0x68 };

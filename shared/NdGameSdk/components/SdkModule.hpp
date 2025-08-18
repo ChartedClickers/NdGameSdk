@@ -17,9 +17,9 @@
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
 #include <NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp>
 #include <NdGameSdk/shared/src/ndlib/render/dev/debugdraw-common.hpp>
-#include <NdGameSdk/shared/src/ndlib/render/frame-params.hpp>
+#include <NdGameSdk/shared/src/ndlib/frame-params.hpp>
 
-namespace NdGameSdk::ndlib::render::dev { class DebugDrawCommon; }
+namespace NdGameSdk::ndlib { class FrameParams; }
 
 namespace NdGameSdk {
     
@@ -89,7 +89,7 @@ namespace NdGameSdk {
         virtual void OnModuleRegistered() = 0;
         virtual void OnGameInitialized(bool status) {};
         virtual void OnMemoryMapped(corelib::memory::Memory* Memory) {};
-        virtual void DebugDraw(FrameParams* frame) {};
+        virtual void DebugDraw(ndlib::FrameParams* frame) {};
         virtual void OnAppendSdkDevMenu(gamelib::debug::NdDevMenu* NdDevMenu, gamelib::debug::NdDevMenu::AppendSdkSubMenusCallback AppendSdkDevMenu) {};
 
         static std::unordered_map<HMODULE, ISdkModule*>* GetSdkModules();

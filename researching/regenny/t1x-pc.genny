@@ -1142,10 +1142,24 @@ namespace regenny {
                 NdKeyboardLayer m_kbdLayer5;
             }
         
-            struct FrameParams 0x1a3180 {
-                uint64_t m_frameNumber
-                void* m_DynamicRenderContext @ 0x6a80
-            }
+            struct FrameParams 0x17580 {
+
+                struct InitParams {
+                    FrameParams* m_ringBase;
+                    uint64_t m_poolSlice0;
+                    uint64_t m_poolSlice1;
+                    uint64_t m_poolSlice2;
+                    uint64_t m_poolSlice3;
+                    uint64_t m_poolSlice4;
+                    uint64_t m_poolSlice5;
+                }; // s_FrameParams
+
+                uint64_t m_frameNumber;
+                void* m_gfxEopTick @ 0x50;
+                void* m_DynamicRenderContext @ 0x6a80;
+                void* m_pRenderCamera @ 0x13758;
+                void* m_pUploadQueue @ 0x14eb8;
+            } // frame-params.cpp
         
             // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\debug
             namespace debug {

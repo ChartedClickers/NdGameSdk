@@ -1,6 +1,5 @@
 #include "msg-con-draw.hpp"
 #include "../dev/debugdraw-common.hpp"
-#include "../frame-params.hpp"
 
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
@@ -69,9 +68,11 @@ namespace NdGameSdk::ndlib::render::util {
 	void MsgConDraw::MsgConDrawBuffers(const char* msgcon_buffer)
 	{
 		auto DebugDraw = GetSharedComponents()->GetComponent<DebugDrawCommon>();
+		auto FrameParams = GetSharedComponents()->GetComponent<RenderFrameParams>();
+
 		WindowContext ctx{};
 		WindowContext::GetWindowContext(&ctx, WindowContext::ContextType::Context4,
-			DebugDraw->m_RenderFrameParams.GetRenderFrameParams()->m_DynamicRenderContext);
+			FrameParams->GetRenderFrameParams()->Get()->m_DynamicRenderContext);
 
 		auto MsgCon_view = DebugDraw->GetMsgCon()->Get();
 		StateScriptConsoleInfo Console

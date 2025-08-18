@@ -969,9 +969,27 @@ namespace regenny {
                 NdKeyboardLayer m_kbdLayer5;
             } // nd-frame-state.hpp
 
-            struct FrameParams 0x1a8280 {
+            struct FrameParams 0x17900 {
+                
+                // kFrameParamsCount = 0x12;
+
+                struct InitParams 0x368 {
+                    FrameParams* m_ringBase; // [kFrameParamsCount]
+                    uint64_t m_poolSlice0;
+                    uint64_t m_poolSlice1;
+                    uint64_t m_poolSlice2;
+                    uint64_t m_poolSlice3;
+                    uint64_t m_poolSlice4;
+                    uint64_t m_poolSlice5;
+                }; // s_FrameParams
+
                 uint64_t m_frameNumber;
-                void* m_DynamicRenderContext @ 0x6a80
+                void* m_gfxEopTick @ 0x58;
+                void* m_DynamicRenderContext @ 0x6a80;
+                void* m_pExposureMapComputeContext @ 0x134f0;
+                void* m_pExposureMapLastLabel;
+                void* m_pRenderCamera @ 0x13530;
+                void* m_pUploadQueue @ 0x15240;
             } // frame-params.cpp
 
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\debug

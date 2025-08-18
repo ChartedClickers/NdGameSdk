@@ -9,16 +9,17 @@
 
 #include <NdGameSdk/shared/src/ndlib/engine-components.hpp>
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
+#include <NdGameSdk/shared/src/ndlib/frame-params.hpp>
 #include <NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp>
 
 #include "../window-context.hpp"
-#include "../frame-params.hpp"
 #include "../util/text.hpp"
 #include "../util/msg.hpp"
 #include "../util/prim.hpp"
 #include "../util/msg-con-draw.hpp"
 
 using namespace NdGameSdk::gamelib::debug;
+using namespace NdGameSdk::ndlib;
 using namespace NdGameSdk::ndlib::render;
 using namespace NdGameSdk::ndlib::render::util;
 using namespace NdGameSdk::ndlib::render::text;
@@ -37,7 +38,7 @@ namespace NdGameSdk::ndlib::render::dev {
 		DebugDrawCommon();
 		~DebugDrawCommon();
 
-		SDK_DEPENDENCIES(EngineComponents, Memory);
+		SDK_DEPENDENCIES(EngineComponents, Memory, RenderFrameParams);
 
 		MsgCon* GetMsgCon();
 		void TextPrintV(WindowContext* ctx, const TextLayout& layout, const char* fmt, ...);
@@ -46,7 +47,6 @@ namespace NdGameSdk::ndlib::render::dev {
 		void PrimTextPrint(DebugStringBase& DebugString);
 		void PrimTextPrint(glm::vec4 pos, Color color, float scale, const char* pStr);
 
-		RenderFrameParams m_RenderFrameParams{};
 	private:
 		void Awake() override;
 		void Initialize() override;
@@ -74,6 +74,7 @@ namespace NdGameSdk::ndlib::render::dev {
 
 		EngineComponents* m_EngineComponents;
 		Memory* m_Memory;
+		RenderFrameParams* m_RenderFrameParams;
 
 		MsgConDraw* m_MsgConDraw;
 		PrimServerManager* m_PrimServerMgr;

@@ -4,6 +4,7 @@
 #include "src/corelib/memory/memory.hpp"
 #include "src/corelib/job/job-system.hpp"
 #include "src/ndlib/engine-components.hpp"
+#include "src/ndlib/frame-params.hpp"
 #include "src/ndlib/io/package-mgr.hpp"
 #include "src/ndlib/script/script-manager.hpp"
 #include "src/ndlib/render/dev/debugdraw-common.hpp"
@@ -21,6 +22,7 @@ namespace NdGameSdk {
 		SharedComponents->AddComponent<corelib::system::NdSystem>();
 		auto MemComponent = SharedComponents->AddComponent<corelib::memory::Memory>();
 		SharedComponents->AddComponent<ndlib::EngineComponents>();
+		SharedComponents->AddComponent<ndlib::RenderFrameParams>();
 		SharedComponents->AddComponent<corelib::job::NdJob>();
 		SharedComponents->AddComponent<ndlib::render::dev::DebugDrawCommon>();
 		SharedComponents->AddComponent<ndlib::script::ScriptManager>();

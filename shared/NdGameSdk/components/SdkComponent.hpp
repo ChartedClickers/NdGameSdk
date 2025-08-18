@@ -14,6 +14,7 @@
 #include <numeric>
 #include <spdlog/spdlog.h>
 #include <Utility/helper.hpp>
+#include <Utility/assertion/assert.hpp>
 
 #include <NdGameSdk/sdk.hpp>
 #include <NdGameSdk/sdkconfig.hpp>
@@ -22,10 +23,8 @@
 #include <NdGameSdk/components/SdkSubComponent.hpp>
 #include <NdGameSdk/components/event/SdkEvent.hpp>
 
-#include <NdGameSdk/shared/src/ndlib/render/frame-params.hpp>
-
-
 namespace NdGameSdk::ndlib::render::dev { class DebugDrawCommon; }
+namespace NdGameSdk::ndlib { class FrameParams; }
 
 namespace NdGameSdk {
 
@@ -209,7 +208,7 @@ namespace NdGameSdk {
     private:
         virtual void Awake() {};
         virtual void Initialize() = 0;
-        virtual void DebugDraw(FrameParams* frame) {};
+        virtual void DebugDraw(ndlib::FrameParams* frame) {};
 
         std::string m_name;
         bool m_Initialized;

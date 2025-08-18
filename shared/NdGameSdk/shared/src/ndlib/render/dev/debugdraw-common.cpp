@@ -42,6 +42,7 @@ namespace NdGameSdk::ndlib::render::dev {
 		auto SharedComponents = ISdkComponent::GetSharedComponents();
 		m_EngineComponents = GetDependencyComponent<EngineComponents>(SharedComponents);
 		m_Memory = GetDependencyComponent<Memory>(SharedComponents);
+		m_RenderFrameParams = GetDependencyComponent<RenderFrameParams>(SharedComponents);
 
 		m_MsgConDraw = AddSubComponent<MsgConDraw>();
 		m_PrimServerMgr = AddSubComponent<PrimServerManager>();
@@ -72,10 +73,6 @@ namespace NdGameSdk::ndlib::render::dev {
 			WindowContext_WindowContext = (WindowContext_WindowContext_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::WindowContext_WindowContext), findpattern.offset);
 
-			findpattern = Patterns::FrameParams_GetFrameParams;
-			m_RenderFrameParams.FrameParams_GetFrameParams = (RenderFrameParams::FrameParams_GetFrameParams_ptr)Utility::FindAndPrintPattern(module,
-				findpattern.pattern, wstr(Patterns::FrameParams_GetFrameParams), findpattern.offset);
-
 			findpattern = Patterns::Text_textPrintV;
 			m_Text.Text_textPrintV = (Text::Text_textPrintV_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::Text_textPrintV), findpattern.offset);
@@ -89,7 +86,6 @@ namespace NdGameSdk::ndlib::render::dev {
 				findpattern.pattern, wstr(Patterns::Msg_PrintToActiveMsgOutput), findpattern.offset);
 
 			if (!WindowContext_WindowContext ||
-				!m_RenderFrameParams.FrameParams_GetFrameParams ||
 				!m_Text.Text_textPrintV ||
 				!m_Text.Text2_GetTextWidthHeight ||
 				!m_Msg.Msg_PrintToActiveMsgOutput
@@ -176,12 +172,12 @@ namespace NdGameSdk::ndlib::render::dev {
 			ndjob->DisplayJobSystemData();
 		}
 
-		auto* frame = DebugDraw->m_RenderFrameParams.GetRenderFrameParams();
+		auto* frame = DebugDraw->m_RenderFrameParams->GetRenderFrameParams();
 		if (frame) {
 
 			if (DebugDraw->m_DebugTextPrintV) {
 				WindowContext ctx{};
-				WindowContext::GetWindowContext(&ctx, WindowContext::ContextType::Context4, frame->m_DynamicRenderContext);
+				WindowContext::GetWindowContext(&ctx, WindowContext::ContextType::Context4, frame->Get()->m_DynamicRenderContext);
 
 				const auto& layout = DebugDraw->m_DebugTextLayout;
 				char debug_text[256]{};

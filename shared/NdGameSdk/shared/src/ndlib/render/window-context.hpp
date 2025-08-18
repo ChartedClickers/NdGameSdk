@@ -1,7 +1,5 @@
 #pragma once
 
-
-
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/components/SdkRegenny.hpp"
 
@@ -13,8 +11,6 @@
 #elif defined(T1X)
 #include <NdGameSdk/regenny/t1x/shared/ndlib/render/WindowContext.hpp>
 #endif
-
-#include "frame-params.hpp"
 
 namespace NdGameSdk::ndlib::render::dev {
 	class DebugDrawCommon;

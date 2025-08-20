@@ -995,6 +995,7 @@ namespace regenny {
                 void* m_pExposureMapLastLabel;
                 void* m_pRenderCamera @ 0x13530;
                 void* m_pUploadQueue @ 0x15240;
+                bool m_ArePackageQueuesBusy @ 0x17848;
             } // frame-params.cpp
 
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\debug

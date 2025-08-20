@@ -27,7 +27,9 @@ struct FrameParams {
     void* m_pRenderCamera; // 0x13530
     private: char pad_13538[0x1d08]; public:
     void* m_pUploadQueue; // 0x15240
-    private: char pad_15248[0x26b8]; public:
+    private: char pad_15248[0x2600]; public:
+    bool m_ArePackageQueuesBusy; // 0x17848
+    private: char pad_17849[0xb7]; public:
 }; // Size: 0x17900
 #pragma pack(pop)
 }

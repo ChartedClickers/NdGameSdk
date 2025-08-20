@@ -5,6 +5,8 @@
 
 #include <NdGameSdk/shared/src/corelib/system/NdSystem.hpp>
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
+#include <NdGameSdk/shared/src/corelib/job/job-system.hpp>
+#include <NdGameSdk/shared/src/ndlib/frame-params.hpp>
 #include <NdGameSdk/shared/src/ndlib/debug/nd-dmenu.hpp>
 
 #if defined(T2R)
@@ -22,8 +24,10 @@ namespace NdGameSdk::ndlib { class EngineComponents; }
 
 using namespace NdGameSdk::corelib::system::platform;
 using namespace NdGameSdk::corelib::memory;
+using namespace NdGameSdk::corelib::job;
 using namespace NdGameSdk::gamelib::debug;
 using namespace NdGameSdk::gamelib::level;
+using namespace NdGameSdk::ndlib;
 using namespace NdGameSdk::ndlib::debug;
 
 namespace NdGameSdk::ndlib::io {
@@ -118,6 +122,7 @@ namespace NdGameSdk::ndlib::io {
 
 		int GetFreePackageSlots() const;
 		int GetAllocationRingBufferSize() const;
+		Memory::Context& GetRingBufferContext() const;
 		Memory::Context& GetMemoryContext() const;
 
 		Package* PackageHead();
@@ -215,8 +220,13 @@ namespace NdGameSdk::ndlib::io {
 
 		PackageManager();
 		SdkEvent<PackageManager*> e_PackageManagerInitialized{true};
-		SDK_DEPENDENCIES(ndlib::EngineComponents);
+		SDK_DEPENDENCIES(EngineComponents, Memory, RenderFrameParams, NdJob);
 		
+		struct DumpHandle {
+			CounterHandle* counter{ nullptr };
+			uint32_t totalPackages{ 0 };
+		};
+
 		Package* GetPackageById(StringId64 PackId);
 		PackageProcessingInfo* FetchPackageProcessingInfo(Package* pPackage);
 
@@ -235,15 +245,43 @@ namespace NdGameSdk::ndlib::io {
 		void Awake() override;
 
 		PackageMgr* GetPackageMgr() const;
-		bool ProcessLoginQueue();
+		bool ProcessLoginQueue(float budgetSec = 0x3f800000);
 		bool AddPackageRequest(PackageMgr::PackageRequest* pPackageRequest);
 
 		std::expected<std::vector<Package::ResItem*>, std::string> ParseResources(PackageProcessingInfo* ppi);
-		std::future<std::expected<void, std::string>> DumpPackageResources(
-			std::span<const std::string> packages, PackageLoginResItemCallback LoginResItem);
+		DumpHandle DumpPackageResourcesAsync(
+			std::span<const std::string> packages, PackageLoginResItemCallback onResItem,
+			uint32_t maxConcurrentLogins = 10, bool wait = false);
 
-		static bool TestFunct(DMENU::ItemFunction& pFunction, DMENU::Message pMessage);
-		static bool TestFunct2(DMENU::ItemFunction& pFunction, DMENU::Message pMessage);
+		struct Dumper {
+			struct Ctx {
+				PackageLoginResItemCallback cb{};
+				uint32_t count{ 0 };
+				char* namesRaw{};
+				char** names{};
+				StringId64* ids{};
+				StringId64* batchIds{};
+				uint32_t maxConcurrent{ 8 };
+				bool selfFree{ true };
+			};
+
+			struct ResWork {
+				Package* pkg{};
+				Package::ResItem* res{};
+				PackageLoginResItemCallback cb{};
+			};
+
+			static void __cdecl Coordinator(Ctx* ctx);
+			static void __cdecl ResEntry(uint64_t arg);
+			static void FreeCtx(Ctx* c);
+
+			static Mutex s_DumperMutex;
+		};
+
+
+		static bool TestDumpPackages(DMENU::ItemFunction& pFunction, DMENU::Message pMessage);
+		static bool TestLoginPackage(DMENU::ItemFunction& pFunction, DMENU::Message pMessage);
+		static bool TestParseResources(DMENU::ItemFunction& pFunction, DMENU::Message pMessage);
 
 		static DMENU::ItemSubmenu* CreatePackageManagerMenu(NdDevMenu* pdmenu, DMENU::Menu* pMenu);
 
@@ -251,7 +289,10 @@ namespace NdGameSdk::ndlib::io {
 		static void Init(PackageMgr* pPackageMgr, PackageMgr::Configuration* pConfiguration);
 		static void PackageManagerInitialized(SafetyHookContext& ctx);
 
-		ndlib::EngineComponents* m_EngineComponents;
+		EngineComponents* m_EngineComponents;
+		RenderFrameParams* m_RenderFrameParams;
+		Memory* m_Memory;
+		NdJob* m_JobSystem;
 
 		InlineHook m_PackageMgrInitHook{};
 		MidHook m_PackageMgrInitReturnHook{};
@@ -264,7 +305,7 @@ namespace NdGameSdk::ndlib::io {
 		MEMBER_FUNCTION_PTR(void, PackageMgr_UpdatePackageStatus, PackageProcessingInfo* pPackageInfo, PackageProcessingInfo::LoadingStatus status);
 		MEMBER_FUNCTION_PTR(void, PackageMgr_SetPackageStatus, PackageProcessingInfo* pPackageInfo);
 
-		MEMBER_FUNCTION_PTR(bool, PackageMgr_ProcessLoginQueue, PackageMgr* pPackageMgr);
+		MEMBER_FUNCTION_PTR(bool, PackageMgr_ProcessLoginQueue, PackageMgr* pPackageMgr, float budgetSec);
 		MEMBER_FUNCTION_PTR(PackageProcessingInfo*, PackageMgr_PreparePackageForLoading, PackageMgr* pPackageMgr, const char* pPackageName, uint32_t arg3);
 		MEMBER_FUNCTION_PTR(uint32_t, PackageMgr_LogoutPackage, PackageMgr* pPackageMgr, PackageProcessingInfo* pPackageInfo);
 

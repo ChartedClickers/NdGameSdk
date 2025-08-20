@@ -22,6 +22,10 @@ namespace NdGameSdk::ndlib::io {
 		return this->Get()->m_pageCt;
 	}
 
+	uint32_t Package::GetNumRequests() const {
+		return this->Get()->m_numRequests;
+	}
+
 	void* Package::GetVirtualMemoryAddressRange() const {
 		return reinterpret_cast<void*>(this->Get()->m_VirtualMemoryAddressRange);
 	}

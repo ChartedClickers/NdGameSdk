@@ -28,8 +28,8 @@ struct PackageMgr {
     struct Configuration {
         uint32_t m_freepackageslots; // 0x0
         uint32_t m_allocationRingBufferSize; // 0x4
-        private: char pad_8[0x4]; public:
-        regenny::shared::corelib::memory::Context m_memcontext; // 0xc
+        regenny::shared::corelib::memory::Context m_RingBufferContext; // 0x8
+        regenny::shared::corelib::memory::Context m_memoryContext; // 0xc
         private: char pad_10[0x10]; public:
         void* m_GetGameFrameNumber; // 0x20
         private: char pad_28[0x10]; public:
@@ -96,8 +96,8 @@ struct PackageMgr {
 
     uint32_t m_freepackageslots; // 0x0
     uint32_t m_allocationRingBufferSize; // 0x4
-    uint32_t m_field8; // 0x8
-    regenny::shared::corelib::memory::Context m_memcontext; // 0xc
+    regenny::shared::corelib::memory::Context m_RingBufferContext; // 0x8
+    regenny::shared::corelib::memory::Context m_memoryContext; // 0xc
     private: char pad_10[0x20]; public:
     void* m_field30; // 0x30
     regenny::shared::gamelib::level::DataLoading::PackageDataLoadingVTable* m_PackageLoginResFuncs; // 0x38

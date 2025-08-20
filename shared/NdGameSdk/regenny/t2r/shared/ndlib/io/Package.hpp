@@ -171,7 +171,7 @@ struct Package {
     private: char pad_ad1[0x7]; public:
     StringId64 m_packfilepathid; // 0xad8
     PakVramItemTable* m_VramItemTable; // 0xae0
-    uint32_t m_fieldae8; // 0xae8
+    uint32_t m_numRequests; // 0xae8
     Status m_status; // 0xaec
     private: char pad_aed[0x1013]; public:
 }; // Size: 0x1b00

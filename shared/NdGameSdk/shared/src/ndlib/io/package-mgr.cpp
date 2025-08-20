@@ -12,7 +12,10 @@ namespace NdGameSdk::ndlib::io {
 
 	void PackageManager::Awake() {
 		auto SharedComponents = ISdkComponent::GetSharedComponents();
-		m_EngineComponents = GetDependencyComponent<ndlib::EngineComponents>(SharedComponents);
+		m_EngineComponents = GetDependencyComponent<EngineComponents>(SharedComponents);
+		m_Memory = GetDependencyComponent<Memory>(SharedComponents);
+		m_RenderFrameParams = GetDependencyComponent<RenderFrameParams>(SharedComponents);
+		m_JobSystem = GetDependencyComponent<NdJob>(SharedComponents);
 	}
 
 	void PackageManager::Initialize() {
@@ -154,9 +157,9 @@ namespace NdGameSdk::ndlib::io {
 		return &m_EngineComponents->GetPackageMgr();
 	}
 
-	bool PackageManager::ProcessLoginQueue() {
+	bool PackageManager::ProcessLoginQueue(float budgetSec) {
 		always_assert(PackageMgr_ProcessLoginQueue == nullptr, "Function pointer was not set!");
-		return PackageMgr_ProcessLoginQueue(GetPackageMgr());
+		return PackageMgr_ProcessLoginQueue(GetPackageMgr(), budgetSec);
 	}
 
 	bool PackageManager::AddPackageRequest(PackageMgr::PackageRequest* pPackageRequest) {
@@ -174,15 +177,16 @@ namespace NdGameSdk::ndlib::io {
 		always_assert(pkg == nullptr, "PackageProcessingInfo did not have a package set!");
 
 		using LoadingStatus = PackageProcessingInfo::LoadingStatus;
-		static constexpr std::array<LoadingStatus, 3> allowedStatuses = {
-			LoadingStatus::LoadingPackageStatusLoaded,
+		static constexpr std::array<LoadingStatus, 4> allowedStatuses = {
 			LoadingStatus::LoadingPackageStatusDoingLogin,
-			LoadingStatus::LoadingPackageStatusFinalizing
+			LoadingStatus::LoadingPackageStatusFinalizing,
+			LoadingStatus::LoadingPackageStatusLoaded,
+			LoadingStatus::LoadingPackageStatusWaitingForLogout
 		};
 
 		if (std::none_of(allowedStatuses.begin(), allowedStatuses.end(),
 			[status = ppi->GetStatus()](LoadingStatus s) { return s == status; })) {
-			return std::unexpected{ "Login package did not have a proper status" };
+			return std::unexpected{ std::format("Login package did not have a proper status: {}", ppi->GetStatusString()) };
 		}
 
 		const Package::PakHeader& hdr = ppi->GetPakHeader();
@@ -203,8 +207,7 @@ namespace NdGameSdk::ndlib::io {
 		const uint32_t maxResources = pPakLoginTable->GetMaxResources();
 		PakLoginTableEntry::ResourcePair* pPairs = pPakLoginTable->GetPairs();
 
-		for (uint32_t i = 0; i < maxResources; ++i)
-		{
+		for (uint32_t i = 0; i < maxResources; ++i) {
 			uint32_t pageIdx = pPairs[i].GetPageIdx();
 			uint32_t itemOfs = pPairs[i].GetItemOfs();
 
@@ -218,162 +221,62 @@ namespace NdGameSdk::ndlib::io {
 
 			Package::ResPage* pageBase = ResolvePakPage(InternalMgr, pkg, pageIdx);
 
-			if (!pageBase) continue;
+			if (pageBase) {
+				Package::ResItem* res = reinterpret_cast<Package::ResItem*>(
+					reinterpret_cast<std::byte*>(pageBase) + itemOfs);
+				ResOut.push_back(res);
+			}
 
-			Package::ResItem* res = reinterpret_cast<Package::ResItem*>(
-				reinterpret_cast<std::byte*>(pageBase) + itemOfs);
-
-			ResOut.push_back(res);
 		}
 
 		return ResOut;
 	}
 
-	// Should be working in T2R, but not tested.
-	// Perfectly it should work under custom Ndjob system for bypass TLS
-	std::future<std::expected<void, std::string>> 
-		PackageManager::DumpPackageResources(
-			std::span<const std::string> packages,
-			PackageLoginResItemCallback LoginResItem) 
-	{
-		return std::async(std::launch::async,
-			[this, packages, LoginResItem]() -> std::expected<void, std::string>
-			{
-				PackageMgr* InternalMgr = GetPackageMgr();
+	PackageManager::DumpHandle PackageManager::DumpPackageResourcesAsync(
+	std::span<const std::string> packages, PackageLoginResItemCallback onResItem,
+	uint32_t maxConcurrentLogins, bool wait) {
+		DumpHandle out{};
+		if (packages.empty()) 
+			return out;
 
-				InternalMgr->ReleaseLoadedVramPages();
-				return {};
+		PackageMgr* InternalMgr = GetPackageMgr();
 
-				if (packages.empty())
-					return std::unexpected("No packages provided for dumping resources.");
+		auto* ctx = m_Memory->AllocateAtContext<Dumper::Ctx>(sizeof(Dumper::Ctx), 0x10, InternalMgr->GetMemoryContext());
+		if (!ctx) return out;
+		std::memset(ctx, 0, sizeof(*ctx));
 
-				if (!HasFreePackageSlot())
-					return std::unexpected("no free package slots!");
+		ctx->cb = onResItem;
+		ctx->count = packages.size();
+		ctx->maxConcurrent = std::max<uint32_t>(1, maxConcurrentLogins);
+		ctx->selfFree = !wait;
 
-				constexpr std::chrono::milliseconds kMaxWait{ 25'000 };
+		const size_t namesBytes = size_t(ctx->count) * Package::kMaxNameLength;
+		ctx->namesRaw = m_Memory->AllocateAtContext<char>(namesBytes, 0x10, InternalMgr->GetMemoryContext());
+		ctx->names = m_Memory->AllocateAtContext<char*>(sizeof(char*) * ctx->count, 0x10, InternalMgr->GetMemoryContext());
+		ctx->ids = m_Memory->AllocateAtContext<StringId64>(sizeof(StringId64) * ctx->count, 0x10, InternalMgr->GetMemoryContext());
+		ctx->batchIds = m_Memory->AllocateAtContext<StringId64>(sizeof(StringId64) * ctx->count, 0x10, InternalMgr->GetMemoryContext());
 
-				auto wait_queues_idle = [this, InternalMgr, kMaxWait](std::string_view what)
-					-> std::expected<void, std::string>
-					{
-						const auto t0 = std::chrono::steady_clock::now();
-						while (!ArePackageQueuesIdle()) {
-							if (std::chrono::steady_clock::now() - t0 > kMaxWait) {
-								return std::unexpected(std::string("timeout while waiting for ") + std::string(what));
-							}
+		for (uint32_t i = 0; i < ctx->count; ++i) {
+			char* slot = ctx->namesRaw + size_t(i) * Package::kMaxNameLength;
+			std::memset(slot, 0, Package::kMaxNameLength);
+			std::strncpy(slot, packages[i].c_str(), Package::kMaxNameLength - 1);
+			ctx->names[i] = slot;
+			ctx->ids[i] = SID(slot);
+		}
 
-							InternalMgr->ReleaseLoadedVramPages();
-							this->ProcessLoginQueue();
+		CounterHandle* ctr = nullptr;
+		m_JobSystem->SubmitJobArray(reinterpret_cast<void*>(Dumper::Coordinator),
+			ctx, 1, NdJob::Priority::KNormal, HeapArena_Source, &ctr, NdJob::JobFlag::ArrayRoot);
 
-							std::this_thread::sleep_for(std::chrono::milliseconds{ 1 });
-						}
-						return {};
-					};
+		out.counter = ctr;
+		out.totalPackages = ctx->count;
 
-				auto wait_slot_available = [this, kMaxWait]()->bool
-					{
-						const auto t0 = std::chrono::steady_clock::now();
-						while (GetNumFreePackageSlots() == 0) {
-							if (std::chrono::steady_clock::now() - t0 > kMaxWait)
-								return false;
-							std::this_thread::sleep_for(std::chrono::milliseconds{ 1 });
-						}
-						return true;
-					};
+		if (wait && out.counter) {
+			m_JobSystem->WaitForCounterAndFree(&out.counter, 0);
+			Dumper::FreeCtx(ctx);
+		}
 
-				always_assert(LoginResItem == nullptr, "LoginResItem callback was not set!");
-
-				spdlog::info("[{}] Dumping {} package(s)…", GetName(), packages.size());
-
-				size_t cursor = 0;
-				while (cursor < packages.size()) {
-
-					bool locked = false;
-					if (InternalMgr->GetLoadingLock()->IsInitialized()) {
-						locked = InternalMgr->GetLoadingLock()->Lock();
-					}
-
-					if (!wait_slot_available()) {
-						if (locked) InternalMgr->GetLoadingLock()->Unlock();
-						return std::unexpected("timeout waiting for free package slot");
-					}
-
-					const size_t freeNow = static_cast<size_t>(GetNumFreePackageSlots());
-					const size_t batch = std::min<size_t>(freeNow, packages.size() - cursor);
-
-					/* queue login */
-					std::vector<StringId64> PackageRequestIds;
-					for (std::size_t i = 0; i < batch; ++i) {
-						const std::string& packageName = packages[cursor + i];
-						RequestLoadPackage(packageName.c_str(), nullptr, PackageMgr::PackageCategory::LevelPak);
-						PackageRequestIds.push_back(SID(packageName.c_str()));
-						spdlog::info("[{}] Queued package '{}' for loading.", GetName(), packageName);
-					}
-
-					spdlog::info("[{}] Waiting for login queue to process {} package(s)…", GetName(), batch);
-
-					InternalMgr->Get()->m_forceReleaseVirtualMemory = true;
-
-					if (auto Err = wait_queues_idle("login queue"); !Err) {
-
-						for (const auto& packId : PackageRequestIds)
-							RequestLogoutPackage(packId);
-
-						if (locked) InternalMgr->GetLoadingLock()->Unlock();
-						return Err;
-					}
-
-					for (const auto& packId : PackageRequestIds) {
-
-						Package* pPackage = GetPackageById(packId);
-						if (!pPackage) {
-							spdlog::error("[{}] Package with ID '{}' not found after login request.", GetName(), packId);
-							continue;
-						}
-
-						spdlog::info("[{}] Processing package '{}' for resource dumping.", GetName(), pPackage->GetName());
-
-						PackageProcessingInfo* ppi = FetchPackageProcessingInfo(pPackage);
-						auto status = ppi->GetStatus();
-						
-						if (ppi->GetStatus() == PackageProcessingInfo::LoadingStatus::LoadingPackageStatusError) {
-							spdlog::error("[{}] Package '{}' failed to load: {}", 
-								GetName(), ppi->GetPackage()->GetName(), ppi->GetStatusString());
-							continue;
-						}
-
-						auto resItems = ParseResources(ppi);
-						if (!resItems.has_value()) {
-							spdlog::error("[{}] Failed to parse resources for package '{}': {}", GetName(), pPackage->GetName(), resItems.error());
-							continue;
-						}
-
-						for (auto* resItem : *resItems) {
-							if (!LoginResItem(InternalMgr, pPackage, resItem))
-								spdlog::warn("[{}] LoginResItem callback failed for package '{}'.", GetName(), pPackage->GetName());
-						}
-
-						spdlog::info("[{}] Successfully processed package '{}' with {} resources.",
-							GetName(), pPackage->GetName(), resItems->size());
-
-						RequestLogoutPackage(packId);
-						spdlog::info("[{}] Queued package '{}' for logout.", GetName(), pPackage->GetName());
-					}
-
-					/* queue logout */
-					if (auto Err = wait_queues_idle("logout queue"); !Err) {
-						if (locked) InternalMgr->GetLoadingLock()->Unlock();
-						return Err;
-					}
-
-					cursor += batch;
-					InternalMgr->Get()->m_forceReleaseVirtualMemory = false;
-					if (locked) InternalMgr->GetLoadingLock()->Unlock();
-				}
-
-				spdlog::info("[{}] Successfully dumped resources for {} package(s).", GetName(), packages.size());
-
-				return {};
-			});
+		return out;
 	}
 
 	bool PackageManager::ArePackageQueuesIdle() const {
@@ -462,48 +365,69 @@ namespace NdGameSdk::ndlib::io {
 #endif
 	}
 
-	bool PackageManager::TestFunct(DMENU::ItemFunction& pFunction, DMENU::Message pMessage) {
+	bool PackageManager::TestDumpPackages(DMENU::ItemFunction& pFunction, DMENU::Message pMessage) {
 		if (pMessage == DMENU::Message::OnExecute) {
 			auto pm = reinterpret_cast<PackageManager*>(pFunction.Data());
 			if (pm) {
-				spdlog::info("TestFunct called!");
 
-				/*spdlog::info("TestFunct : launching DumpPackageResources…");
+
+				spdlog::info("TestDumpPackages : launching DumpPackageResources (NdJobWorkerThread async)");
+
 				static const std::vector<std::string> kPackages = {
 					"t2r-anim-ratking",
 					"t2r-anim-ellie-workbench",
-					"t2r-anim-nor-sewers",
+					"t2r-anim-nor-sewers"
 				};
 
-				auto cb = [](PackageMgr* mgr,
+				auto cb = [](PackageMgr*,
 					Package* pkg,
 					Package::ResItem* ri) -> bool
 					{
-						std::string_view name = ri->GetResourceName(); 
-						spdlog::info("[Dump]  {:<20}  {}", pkg->GetName(), name);
+						//const auto t = ri->GetResourceType();
+						//if (t != Package::ItemId::ANIM && t != Package::ItemId::ANIM_STREAM) {
+						//	return true;
+						//}
+
+						std::string_view name = ri->GetResourceName();
+						spdlog::info("[Dump]  {:<28} {}", pkg->GetName(), name);
 						return true;
 					};
 
-				std::future<std::expected<void, std::string>> fut =
-					pm->DumpPackageResources(kPackages, cb);
+				auto handle = pm->DumpPackageResourcesAsync(kPackages, cb, 1, false);
 
-				std::thread watcher(
-					[f = std::move(fut)]() mutable
-					{
-						auto res = f.get();
-						if (!res)
-							spdlog::error("dump failed: {}", res.error());
-						else
-							spdlog::info("dump completed");
+				if (!handle.counter) {
+					spdlog::error("Dump dispatch failed (no counter).");
+					return true;
+				}
+
+				std::thread watcher([pm, ctr = handle.counter]() mutable {
+					while (ctr->GetCountJobArrays() != 0) {
+						spdlog::debug("[Dump] coordinator running remaining arrays={}", ctr->GetCountJobArrays());
+						std::this_thread::sleep_for(std::chrono::milliseconds{ 500 });
+					}
+					pm->m_JobSystem->FreeCounter(&ctr);
+					spdlog::info("Dump completed.");
 					});
-				watcher.detach();*/
+				watcher.detach();
 
-				const char* packageName = "world-patrol-jackson-ingame";
+				return true;
+			}
+		}
+		return true;
+	}
+
+	bool PackageManager::TestLoginPackage(DMENU::ItemFunction& pFunction, DMENU::Message pMessage) {
+		if (pMessage == DMENU::Message::OnExecute) {
+			auto pm = reinterpret_cast<PackageManager*>(pFunction.Data());
+			if (pm) {
+
+				const char* packageName = "t2r-anim-ratking";
 
 				if (!pm->GetPackageById(SID(packageName))) {
 					spdlog::info("Package '{}' not found, requesting load...", packageName);
-					if (pm->RequestLoadPackage(packageName, nullptr, PackageMgr::PackageCategory::LevelPak)) {
+					if (pm->RequestLoadPackage(packageName, nullptr, PackageMgr::PackageCategory::GlobalPak)) {
 						spdlog::info("Load request for package '{}' sent successfully.", packageName);
+						pFunction.SetActive(true);
 					}
 					else {
 						spdlog::error("Failed to send load request for package '{}'.", packageName);
@@ -512,22 +436,38 @@ namespace NdGameSdk::ndlib::io {
 				else {
 					spdlog::info("Package '{}' is already loaded.", packageName);
 					pm->RequestLogoutPackage(SID(packageName));
+					pFunction.SetActive(false);
 					spdlog::info("Logout request for package '{}' sent successfully.", packageName);
 				}
 
 				return true;
 			}
 		}
+
+		if (pMessage == DMENU::Message::OnOpen) {
+			auto pm = reinterpret_cast<PackageManager*>(pFunction.Data());
+			if (pm) {
+				const char* packageName = "t2r-anim-ratking";
+				auto pPackage = pm->GetPackageById(SID(packageName));
+				if (pPackage) {
+					pFunction.SetActive(true);
+				}
+				else {
+					pFunction.SetActive(false);
+				}
+			}
+		}
+
 		return true;
 	}
 
-	bool PackageManager::TestFunct2(DMENU::ItemFunction& pFunction, DMENU::Message pMessage) {
+	bool PackageManager::TestParseResources(DMENU::ItemFunction& pFunction, DMENU::Message pMessage) {
 		if (pMessage == DMENU::Message::OnExecute) {
 			auto PackageMgr = reinterpret_cast<PackageManager*>(pFunction.Data());
 			if (PackageMgr) {
-				spdlog::info("TestFunct2 called!");
+				spdlog::info("TestParseResources called!");
 
-				const char* packageName = "world-patrol-jackson-ingame";
+				const char* packageName = "t2r-anim-ratking";
 
 				auto pPackage = PackageMgr->GetPackageById(SID(packageName));
 
@@ -613,6 +553,13 @@ namespace NdGameSdk::ndlib::io {
 	void PackageManager::Init(PackageMgr* pPackageMgr, PackageMgr::Configuration* pConfiguration) {
 		auto pPackageManager = Instance<PackageManager>();
 		pPackageManager->m_PackageMgrInitHook.thiscall<void>(pPackageMgr, pConfiguration);
+
+		NdSystem* pSystem = GetSharedComponents()->GetComponent<NdSystem>();
+		if (pSystem) {
+			platform::MutexDesc pDesc{ "PkgMgr SdkDumperLock" };
+			pDesc.SetType(Mutex::MutexType::MUTEX_RECURSIVE);
+			pSystem->CreateMutex(&pDesc, &Dumper::s_DumperMutex);
+		}
 	}
 
 	void PackageManager::PackageManagerInitialized(SafetyHookContext& ctx) {
@@ -629,8 +576,9 @@ namespace NdGameSdk::ndlib::io {
 			DMENU::Menu* PackageManagerMenu = pdmenu->Create_DMENU_Menu(pPackageManager->GetName().data(), HeapArena_Source);
 			if (PackageManagerMenu) {
 			#if SDK_DEBUG
-                pdmenu->Create_DMENU_ItemFunction("Test funct", PackageManagerMenu, &TestFunct, PackageManagerAddr, false, HeapArena_Source);
-				pdmenu->Create_DMENU_ItemFunction("Test funct2", PackageManagerMenu, &TestFunct2, PackageManagerAddr, false, HeapArena_Source);
+                pdmenu->Create_DMENU_ItemFunction("Test Dump Packages (NdJobWorkerThread)", PackageManagerMenu, &TestDumpPackages, PackageManagerAddr, false, HeapArena_Source);
+				pdmenu->Create_DMENU_ItemFunction("Test Login Package", PackageManagerMenu, &TestLoginPackage, PackageManagerAddr, false, HeapArena_Source);
+				pdmenu->Create_DMENU_ItemFunction("Test Parse Resources", PackageManagerMenu, &TestParseResources, PackageManagerAddr, false, HeapArena_Source);
 
             #endif
 				return pdmenu->Create_DMENU_ItemSubmenu(PackageManagerMenu->Name(),
@@ -638,6 +586,261 @@ namespace NdGameSdk::ndlib::io {
 			}
 		}
 		return nullptr;
+	}
+
+	void __cdecl PackageManager::Dumper::ResEntry(uint64_t arg) {
+		PackageManager* pm = Instance<PackageManager>();
+		auto* w = reinterpret_cast<ResWork*>(arg);
+		if (!w || !w->cb) return;
+		w->cb(pm->GetPackageMgr(), w->pkg, w->res);
+	}
+
+	void __cdecl PackageManager::Dumper::Coordinator(Ctx* ctx) {
+		if (!ctx) return;
+
+		PackageManager* pm = Instance<PackageManager>();
+		NdJob* js = pm->m_JobSystem;
+		Memory* mem = pm->m_Memory;
+		PackageMgr* mgr = pm->GetPackageMgr();
+
+		auto wait_frames = [pm, js](uint64_t baseline, uint32_t frames, uint32_t msTimeout)->bool {
+			const uint64_t t0 = GetTickCount64();
+			for (;;) {
+				FrameParams* fp = pm->m_RenderFrameParams->GetRenderFrameParams();
+				if (fp) {
+					const uint64_t fn = fp->GetFrameNumber();
+					if (fn >= baseline + frames) {
+						// ensure the (fn-1) frame is fully completed
+						if (fn > 0 && pm->m_RenderFrameParams->IsFrameReady(fn - 1))
+							return true;
+					}
+				}
+				if ((GetTickCount64() - t0) > msTimeout) return false;
+				js->JobYield();
+			}
+		};
+
+		auto wait_queues_idle = [pm, js](const char* what, uint32_t msTimeout)->bool {
+			const uint64_t t0 = GetTickCount64();
+			for (;;) {
+				FrameParams* fp = pm->m_RenderFrameParams->GetRenderFrameParams();
+				if (fp) {
+					const uint64_t fn = fp->GetFrameNumber();
+					if (fn > 0 && pm->m_RenderFrameParams->IsFrameReady(fn - 1)) {
+						if (!fp->Get()->m_ArePackageQueuesBusy)
+							return true;
+					}
+				}
+				else {
+					if (pm->ArePackageQueuesIdle())
+						return true;
+				}
+
+				if ((GetTickCount64() - t0) > msTimeout) {
+					spdlog::error("[PkgDump] timeout (queues) while waiting for {}", what);
+					return false;
+				}
+				js->JobYield();
+			}
+		};
+
+		auto wait_slot_available = [pm, js](uint32_t msTimeout)->bool {
+			const uint64_t t0 = GetTickCount64();
+			while (pm->GetNumFreePackageSlots() == 0) {
+				if ((GetTickCount64() - t0) > msTimeout) {
+					return false;
+				}
+				js->JobYield();
+			}
+			return true;
+		};
+
+		constexpr uint32_t kTimeoutMs = 25'000;
+		constexpr size_t kResChunk = 256;
+
+		mem->PushAllocator(mgr->GetMemoryContext(), HeapArena_Source);
+		mgr->Get()->m_forceReleaseVirtualMemory = true;
+
+		try {
+
+			size_t cursor = 0;
+
+			while (cursor < ctx->count) {
+
+				ScopedLock ql(&s_DumperMutex, kTimeoutMs);
+
+				const size_t freeNow = static_cast<size_t>(pm->GetNumFreePackageSlots());
+				auto& reqInfo = mgr->GetPackageRequestInfo();
+				const uint32_t inFlight = reqInfo.GetNumRequests();
+				const uint32_t limit = reqInfo.GetLimitRequests();
+				const size_t reqRemaining = (limit > inFlight) ? (limit - inFlight) : 0;
+
+				const size_t slots = freeNow; 
+				const size_t toReq = reqRemaining > 0 ? size_t(reqRemaining) : 0;
+				const size_t remaining = (cursor >= size_t(ctx->count)) ? 0 : size_t(ctx->count) - cursor;
+				
+				size_t cap = size_t(ctx->maxConcurrent);
+				if (cap == 0) cap = SIZE_MAX;
+
+				const size_t batch = (std::min)({ slots, toReq, cap, remaining });
+				
+				if (batch == 0) {
+
+					// budget exhausted: inFlight >= limit
+					if (toReq == 0) {
+						if (!wait_queues_idle("login budget", kTimeoutMs)) {
+							spdlog::warn("[PkgDump] login budget stuck; breaking");
+							break;
+						}
+						continue;
+					}
+
+					// no free package slots
+					if (slots == 0) {
+						if (!wait_slot_available(kTimeoutMs)) {
+							spdlog::error("[PkgDump] timeout waiting for free slot");
+							break;
+						}
+						continue;
+					}
+
+					js->JobYield();
+					continue;
+				}
+
+				// login
+				for (size_t i = 0; i < batch; ++i) {
+					const char* name = ctx->names[cursor + i];
+					pm->RequestLoadPackage(name, nullptr, PackageMgr::PackageCategory::GlobalPak);
+					ctx->batchIds[i] = ctx->ids[cursor + i];
+					spdlog::info("[PkgDump] login '{}'", name);
+				}
+
+				const uint64_t baseFn = pm->m_RenderFrameParams->GetCurrentFrameNumber();
+				if (!wait_frames(baseFn, 1, kTimeoutMs)) {
+					spdlog::error("[PkgDump] frame fence timeout after queuing loads");
+					break;
+				}
+
+				const bool login_ok = wait_queues_idle("login queue", kTimeoutMs);
+				if (!login_ok) {
+					spdlog::error("[PkgDump] login queue did not fully drain in time (continuing)");
+					break;
+				}
+
+				if (login_ok) {
+					for (size_t i = 0; i < batch; ++i) {
+						const StringId64 pid = ctx->batchIds[i];
+
+						Package* pkg = pm->GetPackageById(pid);
+						if (!pkg) {
+							const char* wantedName = ctx->names[cursor + i];
+							spdlog::error("[PkgDump] missing pkg post-login '{}' (id=0x{:016x})", wantedName, (uint64_t)pid);
+							continue;
+						}
+
+						PackageProcessingInfo* ppi = pm->FetchPackageProcessingInfo(pkg);
+						if (!ppi) {
+							throw std::runtime_error{ std::format("PackageProcessingInfo for package '{}' was null after login.", pkg->GetName()) };
+						}
+
+						if (ppi->GetStatus() == PackageProcessingInfo::LoadingStatus::LoadingPackageStatusError) {
+							spdlog::error("[PkgDump] load error '{}': {}", pkg->GetName(), ppi->GetStatusString());
+							continue;
+						}
+
+						if (pkg->GetNumRequests() > 1) {
+							spdlog::warn("[PkgDump] package '{}' has multiple requests ({})", pkg->GetName(), pkg->GetNumRequests());
+						}
+
+						auto resItems = [&]() -> decltype(pm->ParseResources(ppi)) {
+							ScopedLock lk(mgr->GetLoadingLock());
+							return pm->ParseResources(ppi);
+						}();
+
+						if (!resItems.has_value()) {
+							spdlog::error("[PkgDump] parse failed '{}': {}", pkg->GetName(), resItems.error());
+							continue;
+						}
+
+						const size_t n = resItems->size();
+						size_t rk = 0;
+						while (rk < n) {
+
+							const size_t chunk = std::min<size_t>(kResChunk, n - rk);
+							ResWork* work = mem->Allocate<ResWork>(sizeof(ResWork) * chunk, 0x10, HeapArena_Source);
+							ResWork** items = mem->Allocate<ResWork*>(sizeof(ResWork*) * chunk, 0x10, HeapArena_Source);
+
+							if (!work || !items) {
+								spdlog::error("[PkgDump] work alloc failed '{}'", pkg->GetName());
+								if (work) mem->Free(work, HeapArena_Source);
+								if (items) mem->Free(items, HeapArena_Source);
+								break;
+							}
+
+							for (size_t j = 0; j < chunk; ++j) {
+								work[j] = ResWork{ pkg, (*resItems)[rk + j], ctx->cb };
+								items[j] = &work[j];
+							}
+
+							CounterHandle* ctr = nullptr;
+							js->SubmitJobArray(
+								reinterpret_cast<void*>(ResEntry),
+								reinterpret_cast<void**>(items),
+								chunk,
+								NdJob::Priority::KLow,
+								HeapArena_Source,
+								&ctr);
+
+							spdlog::info("[PkgDump] submitted {} resources for package '{}'", chunk, pkg->GetName());
+							if (ctr) {
+								js->WaitForCounterAndFree(&ctr, 0);
+							}
+
+							mem->Free(work, HeapArena_Source);
+							mem->Free(items, HeapArena_Source);
+							rk += chunk;
+						}
+					}
+				}
+
+				for (size_t i = 0; i < batch; ++i) {
+					const auto pid = ctx->batchIds[i];
+					if (pm->GetPackageById(pid)) {
+						pm->RequestLogoutPackage(pid);
+					}
+				}
+
+				const bool logout_ok = wait_queues_idle("logout queue", kTimeoutMs);
+				if (logout_ok) {
+					mgr->ReleaseLoadedVramPages();
+				}
+
+				cursor += batch;
+			}
+
+		} catch (const std::exception& e) {
+			spdlog::error("[PkgDump] Error during dump: {}", e.what());
+		} 
+
+		if (ctx->selfFree) {
+			FreeCtx(ctx);
+		}
+
+		mgr->Get()->m_forceReleaseVirtualMemory = false;
+		mem->PopAllocator();
+	}
+
+	void PackageManager::Dumper::FreeCtx(Ctx* ctx) {
+		auto* pm = Instance<PackageManager>();
+		always_assert(pm == nullptr, "PackageManager instance missing in FreeCtx");
+
+		Memory* mem = pm->m_Memory;
+		mem->Free(ctx->namesRaw, HeapArena_Source);
+		mem->Free(ctx->names, HeapArena_Source);
+		mem->Free(ctx->ids, HeapArena_Source);
+		mem->Free(ctx->batchIds, HeapArena_Source);
+		mem->Free(ctx, HeapArena_Source);
 	}
 
 	int PackageMgr::GetFreePackageSlots() const {
@@ -648,8 +851,12 @@ namespace NdGameSdk::ndlib::io {
 		return this->Get()->m_allocationRingBufferSize;
 	}
 
+	Memory::Context& PackageMgr::GetRingBufferContext() const {
+		return this->Get()->m_RingBufferContext;
+	}
+
 	Memory::Context& PackageMgr::GetMemoryContext() const {
-		return this->Get()->m_memcontext;
+		return this->Get()->m_memoryContext;
 	}
 
 	Package* PackageMgr::PackageHead() {
@@ -834,9 +1041,12 @@ namespace NdGameSdk::ndlib::io {
 		return this->Get()->m_head;
 	}
 
+	Mutex PackageManager::Dumper::s_DumperMutex{};
+
 	INIT_FUNCTION_PTR(PackageMgr_PackageProcessingInfo_GetStatusString);
 
 #endif
+
 }
 
 

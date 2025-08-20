@@ -128,6 +128,7 @@ namespace NdGameSdk::ndlib::io {
         size_t GetDataSize() const;
 		uint32_t GetNumAllocatedPages() const;
 		uint32_t GetNumPages() const;
+		uint32_t GetNumRequests() const;
 
 		void* GetVirtualMemoryAddressRange() const;
 		Level* GetLevel() const;

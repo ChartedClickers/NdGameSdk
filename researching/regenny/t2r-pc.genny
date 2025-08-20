@@ -1693,7 +1693,7 @@ namespace regenny {
                     char m_packfilepath[0x80] + 0x1 [[utf8*]];
                     StringId64 m_packfilepathid @ 0xad8;
                     PakVramItemTable* m_VramItemTable;
-                    uint32_t m_fieldae8;
+                    uint32_t m_numRequests; // number of requests for this package
                     Status m_status;
                 } // package.cpp
 
@@ -1766,7 +1766,8 @@ namespace regenny {
                     struct Configuration 0x50 { 
                         uint32_t m_freepackageslots;
                         uint32_t m_allocationRingBufferSize;
-                        regenny.shared.corelib.memory.Context m_memcontext @ 0xc;
+                        regenny.shared.corelib.memory.Context m_RingBufferContext;
+                        regenny.shared.corelib.memory.Context m_memoryContext;
                         void* m_GetGameFrameNumber @ 0x20; // function pointer
                         uint64_t* m_PackageLoginResFuncs @ 0x38; // functions pointer
                         LoadingHeapMgr.LevelHeapType m_levelheaptype;
@@ -1827,8 +1828,8 @@ namespace regenny {
 
                     uint32_t m_freepackageslots;
                     uint32_t m_allocationRingBufferSize;
-                    uint32_t m_field8;
-                    regenny.shared.corelib.memory.Context m_memcontext;
+                    regenny.shared.corelib.memory.Context m_RingBufferContext;
+                    regenny.shared.corelib.memory.Context m_memoryContext;
                     void* m_field30 @ 0x30; // function pointer
                     regenny.shared.gamelib.level.DataLoading.PackageDataLoadingVTable* m_PackageLoginResFuncs; // functions pointer
                     LoadingHeapMgr.LevelHeapType m_levelheaptype;

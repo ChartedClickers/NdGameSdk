@@ -22,6 +22,8 @@ namespace NdGameSdk::corelib::system {
 			platform::NdSystem_CreateThread(pThread, pThreadDesc, pEntryPoint, pUserParam);
 		}
 
+		void CreateMutex(platform::MutexDesc* pMutexDesc, platform::Mutex* pMutexData);
+
 		bool ReleaseThreadHandle(platform::Thread* pThread);
 	private:
 		void Initialize() override;

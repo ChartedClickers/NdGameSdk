@@ -578,6 +578,11 @@ namespace regenny {
                             bool m_initialized;
                         } // mutex.h
 
+                        struct MutexDesc 0x24 {
+                            ndsys.Mutex.Type m_type;
+                            char m_name[0x20];
+                        };
+
                         struct ConditionVariable 0x20 {
                             void* m_ConditionVar; // CONDITION_VARIABLE*
                             bool m_initialized;

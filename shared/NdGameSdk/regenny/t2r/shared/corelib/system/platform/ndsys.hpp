@@ -50,6 +50,11 @@ struct ndsys {
         private: char pad_15[0x2b]; public:
     }; // Size: 0x40
 
+    struct MutexDesc {
+        regenny::shared::corelib::system::platform::ndsys::Mutex::Type m_type; // 0x0
+        char m_name[32]; // 0x4
+    }; // Size: 0x24
+
     struct ConditionVariable {
         void* m_ConditionVar; // 0x0
         bool m_initialized; // 0x8

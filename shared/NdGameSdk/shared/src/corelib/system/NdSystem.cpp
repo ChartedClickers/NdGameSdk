@@ -28,6 +28,10 @@ namespace NdGameSdk::corelib::system {
 			platform::NdSystem_Thread_Join = (platform::NdSystem_Thread_Join_ptr)Utility::FindAndPrintPattern(
 				Utility::memory::get_executable(), findpattern.pattern, wstr(Patterns::NdSystem_Thread_Join), findpattern.offset);
 
+			findpattern = Patterns::NdSystem_CreateMutex;
+			platform::NdSystem_CreateMutex = (platform::NdSystem_CreateMutex_ptr)Utility::FindAndPrintPattern(
+				Utility::memory::get_executable(), findpattern.pattern, wstr(Patterns::NdSystem_CreateMutex), findpattern.offset);
+
 			findpattern = Patterns::NdSystem_Mutex_Lock;
 			platform::NdSystem_Mutex_Lock = (platform::NdSystem_Mutex_Lock_ptr)Utility::FindAndPrintPattern(
 				Utility::memory::get_executable(), findpattern.pattern, wstr(Patterns::NdSystem_Mutex_Lock), findpattern.offset);
@@ -43,6 +47,7 @@ namespace NdGameSdk::corelib::system {
 			if (!platform::NdSystem_CreateThread ||
 				!platform::NdSystem_ReleaseThreadHandle ||
 				!platform::NdSystem_Thread_Join ||
+				!platform::NdSystem_CreateMutex ||
 				!platform::NdSystem_Mutex_Lock ||
 				!platform::NdSystem_Mutex_TryLock ||
 				!platform::NdSystem_Mutex_Unlock) {
@@ -50,6 +55,12 @@ namespace NdGameSdk::corelib::system {
 			}
 
 		});
+	}
+
+	void NdSystem::CreateMutex(platform::MutexDesc* pMutexDesc, platform::Mutex* pMutexData) {
+		always_assert(platform::NdSystem_CreateMutex == nullptr, "Function pointer was not set!");
+		platform::NdSystem_CreateMutex(pMutexDesc, pMutexData);
+		spdlog::debug("Created mutex: {}", pMutexDesc->GetName());
 	}
 
 	bool NdSystem::ReleaseThreadHandle(platform::Thread* pThread) {

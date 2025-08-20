@@ -11,8 +11,10 @@
 
 namespace NdGameSdk::corelib::system::platform {
 
+	class MutexDesc;
 	class Mutex;
 
+	TYPEDEF_EXTERN_FUNCTION_PTR(void, NdSystem_CreateMutex, MutexDesc* pMutexDesc, Mutex* pMutexData);
 	TYPEDEF_EXTERN_FUNCTION_PTR(bool, NdSystem_Mutex_Lock, Mutex* pMutexData, int32_t timeoutMs);
 	TYPEDEF_EXTERN_FUNCTION_PTR(bool, NdSystem_Mutex_TryLock, Mutex* pMutexData);
 	TYPEDEF_EXTERN_FUNCTION_PTR(void, NdSystem_Mutex_Unlock, Mutex* pMutexData);

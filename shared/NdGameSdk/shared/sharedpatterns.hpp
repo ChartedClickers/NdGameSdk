@@ -327,6 +327,7 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern NdSystem_CreateThread = { L"40 53 55 56 57 41 56 48 81 ec 60 02 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 50 02 00 00 48 8d 44 24 30 48 8b fa 8b 12 48 8b e9 48 89 44 24 28 45 33 f6 33 c9 c7 44 24 20 04 00 00 00 44 89 74 24 30 e8 ?? ?? ?? ?? 48 8b f0 48 85 c0 75 6d" };
 	static inline const SdkPattern NdSystem_ReleaseThreadHandle = { L"48 89 6c 24 10 48 89 74 24 18 57 48 83 ec 40 48 8b 31 33 ed 48 8b f9 48 85 f6 75 77 48 89 5c 24 50 e8 ?? ?? ?? ?? 48 8b d8 48 85 c0 74 04 b1 01 ff d3 e8 ?? ?? ?? ?? 48 85 c0 74 02 ff d0 e8 ?? ?? ?? ?? 48 85 c0 74 02 ff d0 e8 ?? ?? ?? ?? 48 85 c0 74 2b 48 89 6c 24 28 4c 8d 0d" };
 	static inline const SdkPattern NdSystem_Thread_Join = { L"48 89 5c 24 18 56 48 83 ec 30 f6 41 0c 01 48 8b f1 48 89 7c 24 48 0f 85 ?? ?? ?? ??" };
+	static inline const SdkPattern NdSystem_CreateMutex = { L"48 89 5c 24 10 48 89 6c 24 18 56 48 83 ec 30 33 ed 48 8b da 48 8b f1 40 38 6a 14 74 ?? 48 89 7c 24 40 e8 ?? ?? ?? ?? 48 8b f8 48 85 c0 74 ?? b1 01 ff d7" };
 
 	static inline const SdkPattern Memory_s_MemoryMap = { L"01 00 00 00 02 00 00 00 00 00 ?? 00 00 00 00 00 00 00 10 00" };
 

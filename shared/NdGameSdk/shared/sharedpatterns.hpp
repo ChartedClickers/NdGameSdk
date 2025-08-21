@@ -128,6 +128,7 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern PackageMgr_Package_GetStatusString = { L"57 48 83 ec 30 0f b6 f9 40 80 ff 06 72 7b 48 89 5c 24 40 e8 ?? ?? ?? ff 48 8b d8 48 85 c0 74 04 b1 01 ff d3 e8 ?? ?? ?? ff 48 85 c0 74 02 ff d0 e8 ?? ?? ?? ff 48 85 c0 74 02 ff d0" };
 	static inline const SdkPattern PackageMgr_GetPakHdrPageEntry = { L"48 89 74 24 10 48 89 7c 24 18 41 56 48 83 ec 30 4c 8b f2 41 8b f8 48 8b f1 44 3b 41 10 72 7b 48 89 5c 24 40 e8 ?? ?? ?? ?? 48 8b d8 48 85 c0 74 04 b1 01 ff d3" };
 	static inline const SdkPattern PackageMgr_ResolvePakPagePtr = { L"48 83 ec 18 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 04 24 41 8b c0 8b 44 82 20 0f ba e0 18 73 26 44 2b 82 9c 09 00 00 41 c1 e0 15 49 63 c0 48" };
+	static inline const SdkPattern PackageMgr_g_PackageMgrGlobalData = { PackageMgr_ProcessLoginQueue.pattern, +0x27 };
 
 	static inline const SdkPattern NdDevMenu_GameConfig_DevMode = { L"41 0f b6 8c 24 13 3f 00 00 84 c9 0f 94 c2 84 c9 0f 95 c1", +0xb };
 	static inline const SdkPattern NdDevMenu_NdDevMenuAppend_Particles = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 40 48 8b f1 33 c9 e8 ?? ?? ?? ?? 84 c0 0f 84 9d" };

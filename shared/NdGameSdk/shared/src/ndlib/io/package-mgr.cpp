@@ -34,8 +34,13 @@ namespace NdGameSdk::ndlib::io {
 			auto PackageMgrInitReturn = (void*)Utility::FindAndPrintPattern(module
 				, findpattern.pattern, wstr(Patterns::PackageMgr_InitReturn), findpattern.offset);
 
+			findpattern = Patterns::PackageMgr_g_PackageMgrGlobalData;
+			auto PackageMgrGlobalData = (uint8_t*)Utility::ReadLEA32(module,
+				findpattern.pattern, wstr(Patterns::PackageMgr_g_PackageMgrGlobalData), findpattern.offset, 3, 7);
+
 			if (!PackageMgrInit || 
-				!PackageMgrInitReturn) {
+				!PackageMgrInitReturn ||
+				!PackageMgrGlobalData) {
 				throw SdkComponentEx{ std::format("Failed to find PackageMgr patterns!"),
 					SdkComponentEx::ErrorCode::PatternFailed };
 			}
@@ -149,6 +154,10 @@ namespace NdGameSdk::ndlib::io {
 				!m_PackageMgrInitReturnHook) {
 				throw SdkComponentEx{ "Failed to create hooks!", SdkComponentEx::ErrorCode::PatchFailed };
 			}
+
+			g_ShowPackageStatus = reinterpret_cast<bool*>(PackageMgrGlobalData + 0x00);
+			g_ShowPackageMemoryDetails = reinterpret_cast<bool*>(PackageMgrGlobalData + 0x01);
+			g_LoadDebugPackagePages = reinterpret_cast<bool*>(PackageMgrGlobalData + 0x04);
 
 		});
 	}
@@ -1046,6 +1055,10 @@ namespace NdGameSdk::ndlib::io {
 	uint32_t PackageMgr::ProcessingRingBuffer::Head() const {
 		return this->Get()->m_head;
 	}
+
+	bool* PackageManager::g_ShowPackageStatus = nullptr;
+	bool* PackageManager::g_ShowPackageMemoryDetails = nullptr;
+	bool* PackageManager::g_LoadDebugPackagePages = nullptr;
 
 	Mutex PackageManager::Dumper::s_DumperMutex{};
 

@@ -299,6 +299,11 @@ namespace NdGameSdk::ndlib::io {
 		InlineHook m_PackageMgrInitHook{};
 		MidHook m_PackageMgrInitReturnHook{};
 
+		/*Extern variables*/
+		static bool* g_ShowPackageStatus;
+		static bool* g_ShowPackageMemoryDetails;
+		static bool* g_LoadDebugPackagePages;
+
 		MEMBER_FUNCTION_PTR(Package*, PackageMgr_GetPackageById, PackageMgr* pPackageMgr, StringId64 PackId);
 		MEMBER_FUNCTION_PTR(PackageProcessingInfo*, PackageMgr_GetProcessingInfoFromPackage, PackageMgr* pPackageMgr, Package* pPackage);
 		MEMBER_FUNCTION_PTR(Package::Status, PackageMgr_GetPackageStatusById, PackageMgr* pPackageMgr, StringId64 PackId);

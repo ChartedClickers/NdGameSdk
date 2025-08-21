@@ -266,7 +266,8 @@ namespace NdGameSdk::ndlib::io {
 
 		CounterHandle* ctr = nullptr;
 		m_JobSystem->SubmitJobArray(reinterpret_cast<void*>(Dumper::Coordinator),
-			ctx, 1, NdJob::Priority::KNormal, HeapArena_Source, &ctr, NdJob::JobFlag::ArrayRoot);
+			ctx, 1, NdJob::Priority::KNormal, HeapArena_Source, &ctr, 
+			NdJob::JobFlag::ArrayRoot | NdJob::JobFlag::GameFramePhase);
 
 		out.counter = ctr;
 		out.totalPackages = ctx->count;
@@ -603,6 +604,11 @@ namespace NdGameSdk::ndlib::io {
 		Memory* mem = pm->m_Memory;
 		PackageMgr* mgr = pm->GetPackageMgr();
 
+		if (!js->IsWorkerThread() && !js->IsGameFrameJob()) {
+			spdlog::error("[PkgDump] Dumper::Coordinator called from non-worker thread or non-game frame job.");
+			return;
+		}
+
 		auto wait_frames = [pm, js](uint64_t baseline, uint32_t frames, uint32_t msTimeout)->bool {
 			const uint64_t t0 = GetTickCount64();
 			for (;;) {
@@ -611,8 +617,10 @@ namespace NdGameSdk::ndlib::io {
 					const uint64_t fn = fp->GetFrameNumber();
 					if (fn >= baseline + frames) {
 						// ensure the (fn-1) frame is fully completed
-						if (fn > 0 && pm->m_RenderFrameParams->IsFrameReady(fn - 1))
+						if (fn > 0 && pm->m_RenderFrameParams->IsFrameReady(fn - 1)) {
+							spdlog::debug("[PkgDump] frame fence passed ({} -> {})", baseline, fn);
 							return true;
+						}
 					}
 				}
 				if ((GetTickCount64() - t0) > msTimeout) return false;
@@ -623,12 +631,14 @@ namespace NdGameSdk::ndlib::io {
 		auto wait_queues_idle = [pm, js](const char* what, uint32_t msTimeout)->bool {
 			const uint64_t t0 = GetTickCount64();
 			for (;;) {
-				FrameParams* fp = pm->m_RenderFrameParams->GetRenderFrameParams();
-				if (fp) {
-					const uint64_t fn = fp->GetFrameNumber();
-					if (fn > 0 && pm->m_RenderFrameParams->IsFrameReady(fn - 1)) {
-						if (!fp->Get()->m_ArePackageQueuesBusy)
+				const uint64_t baseFn = pm->m_RenderFrameParams->GetCurrentFrameNumber();
+				if (baseFn >= 0) {
+					FrameParams* fp = pm->m_RenderFrameParams->GetFrameParams(baseFn - 1);
+					if (fp && pm->m_RenderFrameParams->IsFrameReady(baseFn - 1)) {
+						if (!fp->Get()->m_ArePackageQueuesBusy) {
+							spdlog::debug("[PkgDump] queues are idle ({} -> {}), FrameParams*={:p}", baseFn - 1, baseFn, static_cast<void*>(fp));
 							return true;
+						}
 					}
 				}
 				else {
@@ -655,7 +665,7 @@ namespace NdGameSdk::ndlib::io {
 			return true;
 		};
 
-		constexpr uint32_t kTimeoutMs = 25'000;
+		constexpr uint32_t kTimeoutMs = 100'000;
 		constexpr size_t kResChunk = 256;
 
 		mem->PushAllocator(mgr->GetMemoryContext(), HeapArena_Source);
@@ -717,7 +727,7 @@ namespace NdGameSdk::ndlib::io {
 				}
 
 				const uint64_t baseFn = pm->m_RenderFrameParams->GetCurrentFrameNumber();
-				if (!wait_frames(baseFn, 1, kTimeoutMs)) {
+				if (!wait_frames(baseFn, 2, kTimeoutMs)) {
 					spdlog::error("[PkgDump] frame fence timeout after queuing loads");
 					break;
 				}

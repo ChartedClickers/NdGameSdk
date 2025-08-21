@@ -73,7 +73,7 @@ namespace NdGameSdk::corelib::system::platform {
 
 	struct ScopedLock {
 		Mutex* m{}; bool locked{ false };
-		explicit ScopedLock(Mutex* mu, int32_t timeoutMs = Mutex::KInfiniteTimeoutMs) : m(mu) { if (m && m->IsInitialized()) locked = m->Lock(); }
+		explicit ScopedLock(Mutex* mu, int32_t timeoutMs = Mutex::KInfiniteTimeoutMs) : m(mu) { if (m && m->IsInitialized()) locked = m->Lock(timeoutMs); }
 		~ScopedLock() { if (locked && m) m->Unlock(); }
 	};
 

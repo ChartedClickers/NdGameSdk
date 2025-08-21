@@ -251,7 +251,7 @@ namespace NdGameSdk::ndlib::io {
 		std::expected<std::vector<Package::ResItem*>, std::string> ParseResources(PackageProcessingInfo* ppi);
 		DumpHandle DumpPackageResourcesAsync(
 			std::span<const std::string> packages, PackageLoginResItemCallback onResItem,
-			uint32_t maxConcurrentLogins = 10, bool wait = false);
+			uint32_t maxConcurrentLogins = 100, uint32_t maxWaitFrames = 2, uint32_t TimeoutMs = 60'000, bool wait = false);
 
 		struct Dumper {
 			struct Ctx {
@@ -262,6 +262,8 @@ namespace NdGameSdk::ndlib::io {
 				StringId64* ids{};
 				StringId64* batchIds{};
 				uint32_t maxConcurrent{ 8 };
+				uint32_t maxWaitFrames{ 2 };
+				uint32_t TimeoutMs { 60'000 };
 				bool selfFree{ true };
 			};
 
@@ -272,7 +274,7 @@ namespace NdGameSdk::ndlib::io {
 			};
 
 			static void __cdecl Coordinator(Ctx* ctx);
-			static void __cdecl ResEntry(uint64_t arg);
+			static void __cdecl ResEntry(ResWork* arg);
 			static void FreeCtx(Ctx* c);
 
 			static Mutex s_DumperMutex;

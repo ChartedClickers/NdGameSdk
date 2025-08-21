@@ -234,7 +234,7 @@ namespace NdGameSdk::ndlib::io {
 
 	PackageManager::DumpHandle PackageManager::DumpPackageResourcesAsync(
 	std::span<const std::string> packages, PackageLoginResItemCallback onResItem,
-	uint32_t maxConcurrentLogins, bool wait) {
+	uint32_t maxConcurrentLogins, uint32_t maxWaitFrames, uint32_t TimeoutMs, bool wait) {
 		DumpHandle out{};
 		if (packages.empty()) 
 			return out;
@@ -249,6 +249,8 @@ namespace NdGameSdk::ndlib::io {
 		ctx->count = packages.size();
 		ctx->maxConcurrent = std::max<uint32_t>(1, maxConcurrentLogins);
 		ctx->selfFree = !wait;
+		ctx->maxWaitFrames = maxWaitFrames;
+		ctx->TimeoutMs = TimeoutMs;
 
 		const size_t namesBytes = size_t(ctx->count) * Package::kMaxNameLength;
 		ctx->namesRaw = m_Memory->AllocateAtContext<char>(namesBytes, 0x10, InternalMgr->GetMemoryContext());
@@ -371,7 +373,6 @@ namespace NdGameSdk::ndlib::io {
 			auto pm = reinterpret_cast<PackageManager*>(pFunction.Data());
 			if (pm) {
 
-
 				spdlog::info("TestDumpPackages : launching DumpPackageResources (NdJobWorkerThread async)");
 
 				static const std::vector<std::string> kPackages = {
@@ -380,25 +381,17 @@ namespace NdGameSdk::ndlib::io {
 					"t2r-anim-nor-sewers"
 				};
 
-				auto cb = [](PackageMgr*,
-					Package* pkg,
-					Package::ResItem* ri) -> bool
-					{
-						//const auto t = ri->GetResourceType();
-						//if (t != Package::ItemId::ANIM && t != Package::ItemId::ANIM_STREAM) {
-						//	return true;
-						//}
+				auto cb = [](PackageMgr*, Package* pkg, Package::ResItem* ri) -> bool {
+					std::string_view name = ri->GetResourceName();
+					spdlog::info("[Dump]  {:<28} {}", pkg->GetName(), name);
+					return true;
+				};
 
-						std::string_view name = ri->GetResourceName();
-						spdlog::info("[Dump]  {:<28} {}", pkg->GetName(), name);
-						return true;
-					};
-
-				auto handle = pm->DumpPackageResourcesAsync(kPackages, cb, 1, false);
+				auto handle = pm->DumpPackageResourcesAsync(kPackages, cb, 10, 2, 60'000, false);
 
 				if (!handle.counter) {
 					spdlog::error("Dump dispatch failed (no counter).");
-					return true;
+					return false;
 				}
 
 				std::thread watcher([pm, ctr = handle.counter]() mutable {
@@ -408,7 +401,7 @@ namespace NdGameSdk::ndlib::io {
 					}
 					pm->m_JobSystem->FreeCounter(&ctr);
 					spdlog::info("Dump completed.");
-					});
+				});
 				watcher.detach();
 
 				return true;
@@ -589,67 +582,67 @@ namespace NdGameSdk::ndlib::io {
 		return nullptr;
 	}
 
-	void __cdecl PackageManager::Dumper::ResEntry(uint64_t arg) {
+	void __cdecl PackageManager::Dumper::ResEntry(ResWork* pResWork) {
 		PackageManager* pm = Instance<PackageManager>();
-		auto* w = reinterpret_cast<ResWork*>(arg);
-		if (!w || !w->cb) return;
-		w->cb(pm->GetPackageMgr(), w->pkg, w->res);
+		if (!pResWork || !pResWork->cb) return;
+		pResWork->cb(pm->GetPackageMgr(), pResWork->pkg, pResWork->res);
 	}
 
 	void __cdecl PackageManager::Dumper::Coordinator(Ctx* ctx) {
 		if (!ctx) return;
 
 		PackageManager* pm = Instance<PackageManager>();
+		PackageMgr* mgr = pm->GetPackageMgr();
 		NdJob* js = pm->m_JobSystem;
 		Memory* mem = pm->m_Memory;
-		PackageMgr* mgr = pm->GetPackageMgr();
 
 		if (!js->IsWorkerThread() && !js->IsGameFrameJob()) {
 			spdlog::error("[PkgDump] Dumper::Coordinator called from non-worker thread or non-game frame job.");
+			if (ctx->selfFree) FreeCtx(ctx); 
 			return;
 		}
 
-		auto wait_frames = [pm, js](uint64_t baseline, uint32_t frames, uint32_t msTimeout)->bool {
+		auto wait_queues_idle = [pm, js]
+		(const char* what, uint32_t msTimeout, uint64_t baseline = 0, uint32_t frames = 0) -> bool
+		{
 			const uint64_t t0 = GetTickCount64();
-			for (;;) {
-				FrameParams* fp = pm->m_RenderFrameParams->GetRenderFrameParams();
-				if (fp) {
-					const uint64_t fn = fp->GetFrameNumber();
-					if (fn >= baseline + frames) {
-						// ensure the (fn-1) frame is fully completed
-						if (fn > 0 && pm->m_RenderFrameParams->IsFrameReady(fn - 1)) {
-							spdlog::debug("[PkgDump] frame fence passed ({} -> {})", baseline, fn);
-							return true;
-						}
-					}
-				}
-				if ((GetTickCount64() - t0) > msTimeout) return false;
-				js->JobYield();
-			}
-		};
+			bool FrameChecked = (baseline == 0) || (frames == 0);
 
-		auto wait_queues_idle = [pm, js](const char* what, uint32_t msTimeout)->bool {
-			const uint64_t t0 = GetTickCount64();
 			for (;;) {
-				const uint64_t baseFn = pm->m_RenderFrameParams->GetCurrentFrameNumber();
-				if (baseFn >= 0) {
-					FrameParams* fp = pm->m_RenderFrameParams->GetFrameParams(baseFn - 1);
-					if (fp && pm->m_RenderFrameParams->IsFrameReady(baseFn - 1)) {
-						if (!fp->Get()->m_ArePackageQueuesBusy) {
-							spdlog::debug("[PkgDump] queues are idle ({} -> {}), FrameParams*={:p}", baseFn - 1, baseFn, static_cast<void*>(fp));
-							return true;
+				if (!FrameChecked) {
+					const uint64_t fn = pm->m_RenderFrameParams->GetCurrentFrameNumber();
+					if (fn >= baseline + frames) {
+						if (fn == 0 || pm->m_RenderFrameParams->IsFrameReady(fn - 1)) {
+							FrameChecked = true;
+							spdlog::debug("[PkgDump] frame fence passed ({} -> {})", baseline, fn);
 						}
 					}
 				}
-				else {
-					if (pm->ArePackageQueuesIdle())
-						return true;
+
+				if (FrameChecked) {
+					const uint64_t fn = pm->m_RenderFrameParams->GetCurrentFrameNumber();
+					if (fn > 0) {
+						if (pm->m_RenderFrameParams->IsFrameReady(fn - 1)) {
+							if (auto* fp = pm->m_RenderFrameParams->GetFrameParams(fn - 1)) {
+								if (!fp->Get()->m_ArePackageQueuesBusy) {
+									spdlog::debug("[PkgDump] queues are idle ({} -> {}), FrameParams*={:p}",
+										fn - 1, fn, static_cast<void*>(fp));
+									return true;
+								}
+							}
+						}
+					}
+					else {
+						if (pm->ArePackageQueuesIdle()) 
+							return true;
+					}
 				}
 
 				if ((GetTickCount64() - t0) > msTimeout) {
 					spdlog::error("[PkgDump] timeout (queues) while waiting for {}", what);
 					return false;
 				}
+
 				js->JobYield();
 			}
 		};
@@ -665,8 +658,9 @@ namespace NdGameSdk::ndlib::io {
 			return true;
 		};
 
-		constexpr uint32_t kTimeoutMs = 100'000;
 		constexpr size_t kResChunk = 256;
+		const uint32_t kTimeoutMs = ctx->TimeoutMs;
+		const uint32_t KwaitFrames = ctx->maxWaitFrames;
 
 		mem->PushAllocator(mgr->GetMemoryContext(), HeapArena_Source);
 		mgr->Get()->m_forceReleaseVirtualMemory = true;
@@ -726,13 +720,8 @@ namespace NdGameSdk::ndlib::io {
 					spdlog::info("[PkgDump] login '{}'", name);
 				}
 
-				const uint64_t baseFn = pm->m_RenderFrameParams->GetCurrentFrameNumber();
-				if (!wait_frames(baseFn, 2, kTimeoutMs)) {
-					spdlog::error("[PkgDump] frame fence timeout after queuing loads");
-					break;
-				}
-
-				const bool login_ok = wait_queues_idle("login queue", kTimeoutMs);
+				const bool login_ok = wait_queues_idle("login queue", kTimeoutMs, 
+					pm->m_RenderFrameParams->GetCurrentFrameNumber(), KwaitFrames);
 				if (!login_ok) {
 					spdlog::error("[PkgDump] login queue did not fully drain in time (continuing)");
 					break;
@@ -816,12 +805,19 @@ namespace NdGameSdk::ndlib::io {
 
 				for (size_t i = 0; i < batch; ++i) {
 					const auto pid = ctx->batchIds[i];
-					if (pm->GetPackageById(pid)) {
+					if (Package* pkg = pm->GetPackageById(pid)) {
+						
+						if (pkg->GetNumRequests() > 2) {
+							pkg->Get()->m_numRequests = 2;
+						}
+
 						pm->RequestLogoutPackage(pid);
+						spdlog::info("[PkgDump] logout '{}'", ctx->names[cursor + i]);
 					}
 				}
 
-				const bool logout_ok = wait_queues_idle("logout queue", kTimeoutMs);
+				const bool logout_ok = wait_queues_idle("logout queue", kTimeoutMs, 
+					pm->m_RenderFrameParams->GetCurrentFrameNumber(), KwaitFrames);
 				if (logout_ok) {
 					mgr->ReleaseLoadedVramPages();
 				}

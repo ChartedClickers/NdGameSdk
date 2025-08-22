@@ -710,8 +710,8 @@ namespace regenny {
 
                     enum JobFlag : uint32_t {
                         None = 0x00,
-                        // Set on headers submitted via RegisterJobArray (root of a batched submission).
-                        ArrayRoot = 0x01,
+                        // Allows for larger stack sizes.
+                        LargeStack = 0x01,
                         // Marks job as part of the per-frame pipeline (logic/update side).
                         GameFramePhase = 0x04,
                         // Marks job as part of the render-frame pipeline (graphics side).
@@ -933,7 +933,7 @@ namespace regenny {
 
             struct NdGameInfo 0x4660 {
                 void* vftable;
-                uint64_t m_internalname @ 0x118 [[utf8*]];
+                char* m_internalname @ 0x118 [[utf8*]];
                 StringId64 m_gametitlehash @ 0x120;
                 char m_buidtype[0x128] @ 0x128 [[utf8*]]; // IDK
                 char m_SavePath[0x400] @ 0x548 [[utf8*]];

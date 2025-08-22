@@ -15,7 +15,7 @@ struct ndjob {
 
     enum JobFlag : uint32_t {
         None = 0,
-        ArrayRoot = 1,
+        LargeStack = 1,
         GameFramePhase = 4,
         RenderFramePhase = 8,
         PinToCurrentWorker = 32,

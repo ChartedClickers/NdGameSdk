@@ -441,6 +441,6 @@ namespace NdGameSdk::corelib::job {
 		static constexpr uint64_t kFlagsHighMask = 0xF000000000000000ull;
 		static constexpr uint64_t kFlagsLowMask = 0x0FFFFFFFFFFFFFFFull;
 		static constexpr JobFlag GameLoopUpdate_RunFlags =
-			JobFlag::ArrayRoot | JobFlag::GameFramePhase | JobFlag::FrameSpawner;
+			JobFlag::LargeStack | JobFlag::GameFramePhase | JobFlag::FrameSpawner;
 	};
 }

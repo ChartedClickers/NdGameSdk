@@ -7,7 +7,7 @@ struct NdGameInfo {
     void* vftable; // 0x0
     private: char pad_8[0x110]; public:
     // Metadata: utf8*
-    uint64_t m_internalname; // 0x118
+    char* m_internalname; // 0x118
     StringId64 m_gametitlehash; // 0x120
     // Metadata: utf8*
     char m_buidtype[296]; // 0x128

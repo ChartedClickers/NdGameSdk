@@ -278,7 +278,7 @@ namespace NdGameSdk::ndlib::io {
 		CounterHandle* ctr = nullptr;
 		m_JobSystem->SubmitJobArray(reinterpret_cast<void*>(Dumper::Coordinator),
 			ctx, 1, NdJob::Priority::KNormal, HeapArena_Source, &ctr, 
-			NdJob::JobFlag::ArrayRoot | NdJob::JobFlag::GameFramePhase);
+			NdJob::JobFlag::LargeStack | NdJob::JobFlag::GameFramePhase);
 
 		out.counter = ctr;
 		out.totalPackages = ctx->count;

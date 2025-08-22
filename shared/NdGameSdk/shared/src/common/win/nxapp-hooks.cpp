@@ -64,7 +64,7 @@ namespace NdGameSdk::common::win {
 		bool result = pNxAppHooks->m_NxAppInitHook.thiscall<bool>(pAllocator);
 
 		if (result) {
-			
+
 			NxApp::NixxesLogger* pLogger = pNxAppHooks->GetNxApp()->GetLogger();
 			if (pLogger) {
 				auto** vft = reinterpret_cast<void**>(pLogger->Get()->vftable);
@@ -81,9 +81,10 @@ namespace NdGameSdk::common::win {
 			else {
 				spdlog::error("NxApp::NixxesLogger is null! Logs may not work!");
 			}
-			
+		
 		}
 
+		pNxAppHooks->InvokeSdkEvent(pNxAppHooks->e_NxAppInitialized, result ? pNxAppHooks->GetNxApp() : nullptr, result);
 		return result;
 	}
 
@@ -92,7 +93,6 @@ namespace NdGameSdk::common::win {
 			GetComponent<CommonGame>()->GetSubComponent<NxAppHooks>();
 
 		bool result = pNxAppHooks->m_Init1of2Hook.thiscall<bool>();
-		pNxAppHooks->InvokeSdkEvent(pNxAppHooks->e_NxAppInitialized, pNxAppHooks->GetNxApp(), result);
 		return result;
 	}
 

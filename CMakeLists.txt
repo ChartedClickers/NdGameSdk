@@ -221,6 +221,8 @@ set(T1XSDK_SOURCES
 	cmake.toml
 	"shared/NdGameSdk/components/SdkComponent.cpp"
 	"shared/NdGameSdk/components/SdkComponent.hpp"
+	"shared/NdGameSdk/components/SdkComponentFactory.cpp"
+	"shared/NdGameSdk/components/SdkComponentFactory.hpp"
 	"shared/NdGameSdk/components/SdkModule.cpp"
 	"shared/NdGameSdk/components/SdkModule.hpp"
 	"shared/NdGameSdk/components/SdkRegenny.hpp"
@@ -549,6 +551,8 @@ set(T2RSDK_SOURCES
 	cmake.toml
 	"shared/NdGameSdk/components/SdkComponent.cpp"
 	"shared/NdGameSdk/components/SdkComponent.hpp"
+	"shared/NdGameSdk/components/SdkComponentFactory.cpp"
+	"shared/NdGameSdk/components/SdkComponentFactory.hpp"
 	"shared/NdGameSdk/components/SdkModule.cpp"
 	"shared/NdGameSdk/components/SdkModule.hpp"
 	"shared/NdGameSdk/components/SdkRegenny.hpp"
@@ -575,6 +579,7 @@ set(T2RSDK_SOURCES
 	"shared/NdGameSdk/ndgame/t2r/src/game/weapon/process-weapon.hpp"
 	"shared/NdGameSdk/regenny/t2r/ndgame/game/FrameState.hpp"
 	"shared/NdGameSdk/regenny/t2r/ndgame/game/GameInfo.hpp"
+	"shared/NdGameSdk/regenny/t2r/shared/common/win/NxApp.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/corelib/containers/FixedSizeHeap.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/corelib/containers/TaggedHeap.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/corelib/job/JlsBlock.hpp"

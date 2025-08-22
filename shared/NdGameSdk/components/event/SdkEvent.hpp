@@ -14,11 +14,10 @@
 #include "SdkAction.hpp"
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/components/SdkComponent.hpp"
-
+#include "NdGameSdk/components/SdkSubComponent.hpp"
 
 using namespace std;
 using namespace boost::signals2;
-using namespace Utility::memory;
 
 namespace NdGameSdk {
 
@@ -97,6 +96,7 @@ namespace NdGameSdk {
 
     private:
         friend class ISdkComponent;
+		friend class ISdkSubComponent;
         friend class ISdkModule;
 
         connection Connect(const SdkAction& sdkAction, bool oneTimeInvoke = false, connect_position position = at_front) {

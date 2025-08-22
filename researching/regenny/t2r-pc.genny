@@ -48,6 +48,40 @@ namespace regenny {
             }
         }
 
+        // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\common
+        namespace common {
+
+            // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\common\win
+            namespace win {
+                struct NxApp 0x118 {
+
+                    struct NixxesLogger 0x100250 {
+
+                        struct VTable 0x68 {
+                            virtual uint64_t Startup() @ 1;
+                            virtual bool OpenAndRedirectStdIO() @ 2;
+                            virtual void WriteRawLine(char* src) @ 8;
+                            virtual void LogF(char* arg2, char* arg3, uint64_t arg4) @ 9;
+                        };
+
+                        VTable* vftable;
+                        bool m_initialized;
+                        void* m_StdOutputHandle @ 0x10; // FILE*
+                        uint32_t stdout_fd;
+                        uint32_t stderr_fd;
+                        uint64_t m_field20;                    
+                    };
+
+                    void* m_field0;
+                    void* m_field8;
+                    void* m_field10;
+                    void* m_field18;
+                    void* m_field20;
+                    NixxesLogger* m_logger;
+                }; // nxapp-hooks.cpp
+            }
+        }
+
         // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib
         namespace corelib {
             

@@ -7,6 +7,11 @@
 #include <Utility/helper.hpp>
 #include <regex>
 
+#if defined(T2R)
+#include "win/nxapp-hooks.hpp"
+using namespace NdGameSdk::common::win;
+#endif
+
 namespace NdGameSdk::common {
 
 	class CommonMainWin : public ISdkSubComponent {
@@ -14,8 +19,9 @@ namespace NdGameSdk::common {
 		explicit CommonMainWin();
 		void Init() override;
 	private:
-		static int32_t* SystemInit(int32_t* Err, int32_t argc, char* argv[]);
-		InlineHook m_SystemInitHook{};
+
+		/* Extern functions */
+		static int32_t* SystemInit(int32_t* Err, int32_t argc, char* argv[]);;
 
 		/*NdGame Logs*/
 		static std::string vformat(const char* fmt, va_list args);
@@ -27,10 +33,12 @@ namespace NdGameSdk::common {
 
 #if defined(T2R)
 		static void __fastcall MemoryDumpTaggedHeapMemoryStatsPrintF(void* /*file*/, const char* fmt, ...);
+		static void __fastcall NixxesLoggerWriteRawLine(NxApp::NixxesLogger* pNLogger, const char* str);
 #elif defined(T1X)
 		static void __fastcall CommonGameErrorPrintF(const char* fmt, ...);
 #endif
 
+		InlineHook m_SystemInitHook{};
 		InlineHook m_CommonGamePrintFHook{};
 		InlineHook m_SsManagerPrintFHook{};
 		InlineHook m_SsManagerWarnPrintFHook{};
@@ -39,6 +47,7 @@ namespace NdGameSdk::common {
 
 #if defined(T2R)
 		InlineHook m_MemoryDumpTaggedHeapMemoryStatsPrintFHook{};
+		InlineHook m_NixxesLoggerWriteRawLineHook{};
 #elif defined(T1X)
 		InlineHook m_CommonGameErrorPrintFHook{};
 #endif

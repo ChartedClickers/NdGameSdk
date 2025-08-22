@@ -50,13 +50,14 @@ private:
 	IAllocator* m_IAllocator;
 	CommonGameLoop* m_CommonGameLoop;
 	CommonMainWin* m_CommonMainWin;
+#if defined(T2R)
+	NxAppHooks* m_NxAppHooks;
+#endif
 
 	Memory* m_Memory;
 	EngineComponents* m_EngineComponents;
 
-#if defined(T2R)
-	NxAppHooks m_NxAppHooks{};
-#elif defined(T1X)
+#if defined(T1X)
 	MidHook m_PrimServer_CreateHook{};
 #endif
 

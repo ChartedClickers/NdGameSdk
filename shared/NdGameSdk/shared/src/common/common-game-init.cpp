@@ -21,9 +21,14 @@ namespace NdGameSdk::common {
 		m_Memory = GetDependencyComponent<Memory>(SharedComponents);
 		m_EngineComponents = GetDependencyComponent<EngineComponents>(SharedComponents);
 
+		#if defined(T2R)
+		m_NxAppHooks = AddSubComponent<NxAppHooks>();
+		#endif
+
 		m_IAllocator = AddSubComponent<IAllocator>();
 		m_CommonGameLoop = AddSubComponent<CommonGameLoop>(m_EngineComponents);
 		m_CommonMainWin = AddSubComponent<CommonMainWin>();
+
 	}
 
 	void CommonGame::Initialize() {
@@ -93,14 +98,6 @@ namespace NdGameSdk::common {
 				}, wstr(Patterns::CommonGame_GameInit), wstr(GameInitReturnJMP));
 
 	#if defined(T2R)
-			findpattern = Patterns::CommonGame_NIXXES_StdHandle;
-			m_NxAppHooks.m_StdHandleHook = Utility::WritePatchPattern_Hook(module, findpattern.pattern, wstr(Patterns::CommonGame_NIXXES_StdHandle),
-				findpattern.offset, (void*)NxAppHooks_StdHandle_CC);
-
-			if (!m_NxAppHooks.m_StdHandleHook) {
-				spdlog::warn("Failed to patch {:s}! Logs may not work!", TOSTRING(Patterns::CommonGame_NIXXES_StdHandle));
-			}
-
 			if (m_Memory->IsDebugMemoryAvailable()) {
 				auto ProfileCtrl = GetSharedComponents()->GetComponent<ndlib::profiling::ProfileController>();
 

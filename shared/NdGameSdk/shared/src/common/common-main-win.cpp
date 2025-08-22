@@ -41,6 +41,39 @@ namespace NdGameSdk::common {
 			auto MemoryDumpTaggedHeapMemoryStatsPrintF = (void*)Utility::FindAndPrintPattern(module,
 				Patterns::Memory_DumpTaggedHeapMemoryStatsPrintF.pattern, wstr(Patterns::Memory_DumpTaggedHeapMemoryStatsPrintF),
 				Patterns::Memory_DumpTaggedHeapMemoryStatsPrintF.offset);
+
+            NxAppHooks* pNxAppHooks = GetParentComponent<CommonGame>()->GetSubComponent<NxAppHooks>();
+            if (pNxAppHooks) {
+                ISdkSubComponent::SubscribeSdkEvent<CommonGame, NxAppHooks>(
+                    GetSharedComponents(),
+                    &NxAppHooks::e_NxAppInitialized,
+					[](NxApp* pNxApp, bool successful) {
+						if (successful) {
+                            CommonMainWin* pCommonMainWin = GetSharedComponents()->
+                                GetComponent<CommonGame>()->GetSubComponent<CommonMainWin>();
+							spdlog::info("NxApp initialized successfully, redirecting stdio streams...");
+                            NxApp::NixxesLogger* pLogger = pNxApp->GetLogger();
+                            if (pLogger) {
+                                auto** vft = reinterpret_cast<void**>(pLogger->Get()->vftable);
+								pCommonMainWin->m_NixxesLoggerWriteRawLineHook = Utility::MakeSafetyHookInline(
+                                    vft[NxApp::NixxesLogger::kIdx_WriteRawLine],
+                                    CommonMainWin::NixxesLoggerWriteRawLine,
+                                    wstr(Patterns::CommonGame_NxAppHooks_OpenAndRedirectStdIO), 
+                                    wstr(vft[NxApp::NixxesLogger::kIdx_WriteRawLine]));
+
+                                if (!pCommonMainWin->m_NixxesLoggerWriteRawLineHook) {
+									spdlog::error("Failed to create NixxesLoggerWriteRawLine hook!");
+                                }
+
+                            }
+
+						}
+					}
+                );
+
+            }
+
+
 #elif defined(T1X)
 			auto CommonGameErrorPrintF = (void*)Utility::FindAndPrintPattern(module
 				, Patterns::CommonGame_ErrorPrintF.pattern, wstr(Patterns::CommonGame_ErrorPrintF), Patterns::CommonGame_ErrorPrintF.offset);
@@ -300,6 +333,12 @@ namespace NdGameSdk::common {
 		auto logger = SdkLogger::GetNdGameLogger();
 		logger->info("{}", msg);
     }
+
+    void __fastcall CommonMainWin::NixxesLoggerWriteRawLine(NxApp::NixxesLogger* pNLogger, const char* str) {
+        auto logger = SdkLogger::GetNdGameLogger();
+        logger->info("[NxApp] {}", str);
+    }
+
 #elif defined(T1X)
 	void __fastcall CommonMainWin::CommonGameErrorPrintF(const char* fmt, ...) {
 		va_list args;

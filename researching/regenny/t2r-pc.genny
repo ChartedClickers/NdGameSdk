@@ -1969,13 +1969,16 @@ namespace regenny {
                         LoadingPackageStatusFailedOptionalFile = 0x12
                     };
 
+                    struct ReadSlot : FileSystem.ReadOperation 0x8 {
+                        void* m_ChunkCell;
+                    };
+
                     Package* m_package;
                     LoadingStatus m_status;
                     uint64_t m_NumAsyncReadOps @ 0x210;
-                    uint64_t m_handle;
-                    uint64_t* m_ChunkSizePtr @ 0x230; // m_package->m_size
-                    uint64_t m_fielda18 @ 0xa18;
-                    Package.PakHeader m_pakHdr @ 0xa38;
+                    ReadSlot m_aReadOps[0x40];
+                    FileSystem.ReadOnlyFileHandle m_File;
+                    Package.PakHeader m_pakHdr;
                     uint32_t m_field78;
                     uint32_t m_field7c;
                     uint64_t m_field80;
@@ -2060,7 +2063,17 @@ namespace regenny {
                         uint32_t m_numQueued;
                         uint32_t m_capacity;
                         PackageProcessingInfo** m_slots;
-                    }
+                    };
+
+                    struct IOStagingRing 0x20 {
+                        uint32_t m_userFileOffset;
+                        uint32_t m_streamBytesProduced;
+                        uint32_t m_ringUsedBytes;
+                        uint32_t m_streamSubmitOffset;
+                        uint32_t m_ringTail;
+                        uint32_t m_ringHead;
+                        uint8_t* m_RingBuffer;
+                    };
 
                     uint32_t m_freepackageslots;
                     uint32_t m_allocationRingBufferSize;
@@ -2087,11 +2100,7 @@ namespace regenny {
                     regenny.shared.corelib.system.platform.ndsys.Mutex m_LoadingLock @ 0x480;
                     regenny.shared.corelib.system.platform.ndsys.ConditionVariable m_ConditionVariable;
                     regenny.shared.corelib.system.platform.ndsys.Mutex m_LoginLock;
-                    uint32_t m_field528 @ 0x528;
-                    uint32_t m_field52c;
-                    uint32_t m_field530;
-                    uint32_t m_field534;
-                    void* m_RingBuffer;
+                    IOStagingRing m_ioStagingRing;
                     uint32_t m_PendingPackageVramReleaseCount;
                     PackageProcessingInfo** m_PendingPackageVramRelease + 0x4;
                     bool m_filed4761 @ 0x4761;

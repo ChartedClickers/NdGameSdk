@@ -7,6 +7,7 @@
 #include <string_view>
 #include <type_traits>
 #include <optional>
+#include <atomic>
 
 namespace NdGameSdk {
 
@@ -75,6 +76,20 @@ namespace NdGameSdk {
         template <typename... Args>
         void InvokeSdkEvent(SdkEvent<Args...>& event, Args... args) {
             event.Invoke(args...);
+        }
+
+        template<typename CompT, typename SubCompT>
+        static SubCompT* Instance()
+        {
+            static std::atomic<SubCompT*> p{ nullptr };
+            auto* v = p.load(std::memory_order_acquire);
+            if (!v) {
+                if (auto* owner = CompT::template Instance<CompT>()) {
+                    v = owner->template GetSubComponent<SubCompT>();
+                    if (v) p.store(v, std::memory_order_release);
+                }
+            }
+            return v;
         }
 
         NdGameSdk_API static SdkComponentFactory* GetSharedComponents();

@@ -11,6 +11,7 @@
 #include <deque>
 #include <array>
 #include <span>
+#include <atomic>
 #include <numeric>
 #include <spdlog/spdlog.h>
 #include <Utility/helper.hpp>
@@ -160,10 +161,17 @@ namespace NdGameSdk {
         template<typename CompT>
         static CompT* Instance()
         {
-            static CompT* p =
-                ISdkComponent::GetSharedComponents()
-                ->GetComponent<CompT>();
-            return p;
+            static std::atomic<CompT*> p{ nullptr };
+            auto* v = p.load(std::memory_order_acquire);
+            if (!v) {
+                if (auto* s = ISdkComponent::GetSharedComponents()->GetComponent<CompT>()) {
+                    v = s;
+                } else if (auto* n = ISdkComponent::GetNdGameComponents()->GetComponent<CompT>()) {
+                    v = n;
+                }
+                if (v) p.store(v, std::memory_order_release);
+            }
+            return v;
         }
 
     private:

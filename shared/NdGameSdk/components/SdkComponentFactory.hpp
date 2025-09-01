@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <NdGameSdk/sdk.hpp>
 #include <NdGameSdk/sdkderived.hpp>
@@ -31,7 +31,7 @@ namespace NdGameSdk {
             auto rawcomponent = sdkcomponent.get();
 
             if (m_sdkcomponents.contains(id))
-                spdlog::warn("Component {} already exists – replacing.", id.name());
+                spdlog::warn("Component {} already exists ï¿½ replacing.", id.name());
 
             m_sdkcomponents[id] = std::move(sdkcomponent);
 

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <windows.h>
 #include <filesystem>
@@ -31,6 +31,7 @@ namespace NdGameSdk {
 
     class ISdkComponent;
     class ISdkSubComponent;
+    class SdkComponentEx;
     template <typename... Args>
     class SdkEvent;
    
@@ -128,6 +129,7 @@ namespace NdGameSdk {
         NdGameSdk_API static SdkComponentFactory* GetNdGameComponents();
 
         void InitSubComponents();
+        void InitSubComponentById(const std::type_index& id);
 
         template<typename... Deps>
         static std::span<const std::type_index> MakeDependencies() noexcept {
@@ -158,6 +160,21 @@ namespace NdGameSdk {
             return rawPtr;
         }
 
+        template<typename SubT>
+        SubT* InitSubComponent()
+        {
+            auto* ptr = GetSubComponent<SubT>();
+            if (!ptr) return nullptr;
+            InitSubComponentPtr(reinterpret_cast<ISdkSubComponent*>(ptr));
+            return ptr;
+        }
+
+        template<typename... Subs>
+        void InitSubComponentsOnly()
+        {
+            (InitSubComponent<Subs>(), ...);
+        }
+
         template<typename CompT>
         static CompT* Instance()
         {
@@ -185,6 +202,7 @@ namespace NdGameSdk {
         std::unordered_map<std::type_index, std::unique_ptr<ISdkSubComponent>> m_subcomponents;
 
         static const std::vector<ISdkComponent*>& GetSdkComponents();
+        static void InitSubComponentPtr(ISdkSubComponent* sub);
 
         static SdkComponentFactory s_SharedComponents;
         static SdkComponentFactory s_NdGameComponents;

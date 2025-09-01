@@ -18,6 +18,8 @@ namespace NdGameSdk::common {
 		explicit IAllocator();
 		void Init() override;
 	private:
+		Memory* m_Memory;
+
 		MidHook m_IAllocator_InitTaggedHeapsHook{};
 
 		/*Extern variables*/

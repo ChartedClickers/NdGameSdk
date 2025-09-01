@@ -15,7 +15,7 @@ namespace NdGameSdk::common {
 
 	class CommonGameLoop : public ISdkSubComponent {
 	public:
-		explicit CommonGameLoop(EngineComponents* pEngineComponents);
+		explicit CommonGameLoop();
 		void Init() override;
 	private:
 

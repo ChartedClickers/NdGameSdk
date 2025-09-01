@@ -1,4 +1,4 @@
-#include "SdkComponentFactory.hpp"
+﻿#include "SdkComponentFactory.hpp"
 #include "SdkComponent.hpp"
 #include "SdkSubComponent.hpp"
 
@@ -32,7 +32,11 @@ namespace NdGameSdk {
             progress = 0;
             for (auto id : m_orderedSdkComponents) {
 
-                auto& comp = m_sdkcomponents[id];
+                auto it = m_sdkcomponents.find(id);
+                if (it == m_sdkcomponents.end())
+                    continue;
+
+                auto& comp = it->second;
 
                 if (!comp || comp->IsInitialized() || failed.contains(id))
                     continue;
@@ -53,14 +57,17 @@ namespace NdGameSdk {
                     }
                     spdlog::error("Init failed for {}: {}", comp->GetName(), ex.what());
                     failed.insert(id);
+                    m_sdkcomponents.erase(it);
                 }
                 catch (const std::exception& ex) {
                     spdlog::error("Error initialize {}: {}", comp->GetName(), ex.what());
                     failed.insert(id);
+                    m_sdkcomponents.erase(it);
                 }
                 catch (...) {
                     spdlog::error("Error initialize: {}", comp->GetName());
                     failed.insert(id);
+                    m_sdkcomponents.erase(it);
                 }
             }
         } while (progress > 0);

@@ -5,7 +5,10 @@
 
 namespace NdGameSdk::common {
 
-	IAllocator::IAllocator() : ISdkSubComponent(TOSTRING(IAllocator)) {}
+	IAllocator::IAllocator() : ISdkSubComponent(TOSTRING(IAllocator))  {
+		auto SharedComponents = GetSharedComponents();
+		m_Memory = SharedComponents->GetComponent<Memory>();
+	}
 
 	void IAllocator::Init()
 	{
@@ -14,13 +17,12 @@ namespace NdGameSdk::common {
 		std::call_once(Initialized, [this] {
 
 			spdlog::info("Initializing {} patterns...", GetName());
-			CommonGame* pCommonGame{ GetParentComponent<CommonGame>() };
 
 			Patterns::SdkPattern findpattern{};
 			auto module = Utility::memory::get_executable();
 
 	#if defined(T2R)
-			if (pCommonGame->m_Memory->IsDebugMemoryAvailable()) {
+			if (m_Memory->IsDebugMemoryAvailable()) {
 
 				findpattern = Patterns::CommonGame_IAllocator_s_TaggedGpuDevHeap;
 				s_TaggedGpuDevHeap = (TaggedHeap*)Utility::ReadLEA32(module,
@@ -39,8 +41,8 @@ namespace NdGameSdk::common {
 				m_IAllocator_InitTaggedHeapsHook = Utility::MakeMidHook(InitTaggedHeapsJMP,
 					[](SafetyHookContext& ctx) {
 
-						auto pCommonGame = GetSharedComponents()->GetComponent<CommonGame>();
-						pCommonGame->m_Memory->m_AllocatorTaggedHeap.SetTaggedGpuDevHeap(s_TaggedGpuDevHeap);
+						auto pIAllocator = Instance<CommonGame, IAllocator>();
+						pIAllocator->m_Memory->m_AllocatorTaggedHeap.SetTaggedGpuDevHeap(s_TaggedGpuDevHeap);
 						spdlog::info("TaggedGpuDevHeap installed!");
 
 					}, wstr(Patterns::CommonGame_IAllocator_Init), wstr(InitTaggedHeapsJMP));

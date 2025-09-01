@@ -1,4 +1,4 @@
-#include "SdkComponent.hpp"
+﻿#include "SdkComponent.hpp"
 
 namespace NdGameSdk {
 
@@ -55,31 +55,37 @@ namespace NdGameSdk {
 
 	void ISdkComponent::InitSubComponents() {
 
-		for (auto& subcomponent : m_subcomponents)
-		{
-			const auto& sub = subcomponent.second;
-			if (!sub || sub->IsInitialized())
-				continue;
+		for (auto& [_, sub] : m_subcomponents) {
+			InitSubComponentPtr(sub.get());
+		}
+	}
 
-			spdlog::info("Initialize SubComponent: {}", sub->GetName());
+	void ISdkComponent::InitSubComponentById(const std::type_index& id) {
+		auto it = m_subcomponents.find(id);
+		if (it == m_subcomponents.end()) return;
+		InitSubComponentPtr(it->second.get());
+	}
 
-			try
-			{
-				sub->Init();
-				sub->m_Initialized = true;
-			}
-			catch (SdkComponentEx ComponentEx) {
-				spdlog::error("Error initialize {:s}: {:s}", sub->GetName().data(), ComponentEx.what());
-				throw;
-			}
-			catch (const std::exception& ex) {
-				spdlog::error("Error initialize {}: {}", sub->GetName(), ex.what());
-				throw;
-			}
-			catch (...) {
-				spdlog::error("Error initialize: {}", sub->GetName());
-				throw;
-			}
+
+
+	void ISdkComponent::InitSubComponentPtr(ISdkSubComponent* subraw) {
+		if (!subraw || subraw->IsInitialized()) return;
+		spdlog::info("Initialize SubComponent: {}", subraw->GetName());
+		try {
+			subraw->Init();
+			subraw->m_Initialized = true;
+		}
+		catch (SdkComponentEx ComponentEx) {
+			spdlog::error("Error initialize {:s}: {:s}", subraw->GetName().data(), ComponentEx.what());
+			throw;
+		}
+		catch (const std::exception& ex) {
+			spdlog::error("Error initialize {}: {}", subraw->GetName(), ex.what());
+			throw;
+		}
+		catch (...) {
+			spdlog::error("Error initialize: {}", subraw->GetName());
+			throw;
 		}
 	}
 

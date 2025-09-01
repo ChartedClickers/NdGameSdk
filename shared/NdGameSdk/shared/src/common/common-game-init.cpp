@@ -1,4 +1,4 @@
-#include "common-game-init.hpp"
+﻿#include "common-game-init.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
 #include <NdGameSdk/shared/src/ndlib/render/dev/debugdraw-common.hpp>
@@ -18,7 +18,6 @@ namespace NdGameSdk::common {
 
 	void CommonGame::Awake() {
 		auto SharedComponents = ISdkComponent::GetSharedComponents();
-		m_Memory = GetDependencyComponent<Memory>(SharedComponents);
 		m_EngineComponents = GetDependencyComponent<EngineComponents>(SharedComponents);
 
 		#if defined(T2R)
@@ -26,7 +25,7 @@ namespace NdGameSdk::common {
 		#endif
 
 		m_IAllocator = AddSubComponent<IAllocator>();
-		m_CommonGameLoop = AddSubComponent<CommonGameLoop>(m_EngineComponents);
+		m_CommonGameLoop = AddSubComponent<CommonGameLoop>();
 		m_CommonMainWin = AddSubComponent<CommonMainWin>();
 
 	}
@@ -96,6 +95,12 @@ namespace NdGameSdk::common {
 					pCommonGame->InvokeSdkEvent(pCommonGame->e_GameInitialized, successful);
 
 				}, wstr(Patterns::CommonGame_GameInit), wstr(GameInitReturnJMP));
+			
+			m_Memory = GetSharedComponents()->GetComponent<Memory>();
+
+			if (m_Memory) {
+
+				this->InitSubComponent<IAllocator>();
 
 	#if defined(T2R)
 			if (m_Memory->IsDebugMemoryAvailable()) {
@@ -154,6 +159,7 @@ namespace NdGameSdk::common {
 				}
 			}
 	#endif
+			}
 
 			if (!m_GameInitHook ||
 				!m_GameInitReturnHook) {
@@ -161,14 +167,11 @@ namespace NdGameSdk::common {
 					SdkComponentEx::ErrorCode::PatchFailed, true };
 			}
 
-			try {
-				spdlog::info("Initializing {} subcomponents...", GetName());
-				this->InitSubComponents();
-			}
-			catch (const SdkComponentEx& e) {
-				spdlog::error("Failed to initialize SubComponent {}: {}", GetName(), e.what());
-				throw SdkComponentEx{ e.what(), e.ErrCode(), true };
-			}
+         #if defined(T2R)
+            this->InitSubComponent<NxAppHooks>();
+		#endif
+			this->InitSubComponent<CommonGameLoop>();
+            this->InitSubComponent<CommonMainWin>();
 
 			const char* game_ver_text = "BUILD_NUMBER=";
 			uintptr_t version_number = (uintptr_t)Utility::memory::char_Scan(module, game_ver_text);

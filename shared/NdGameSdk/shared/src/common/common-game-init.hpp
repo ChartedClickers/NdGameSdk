@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/sdkconfig.hpp"
@@ -31,7 +31,7 @@ class CommonGame : public ISdkComponent
 public:
 	CommonGame();
 
-	SDK_DEPENDENCIES(Memory, EngineComponents);
+	SDK_DEPENDENCIES(EngineComponents);
 
 	SdkEvent<bool> e_GameInitialized{true};
 
@@ -61,6 +61,5 @@ private:
 	MidHook m_PrimServer_CreateHook{};
 #endif
 
-	friend class IAllocator;
 };
 }

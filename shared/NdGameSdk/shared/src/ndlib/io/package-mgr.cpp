@@ -30,17 +30,11 @@ namespace NdGameSdk::ndlib::io {
 			auto PackageMgrInit = (void*)Utility::FindAndPrintPattern(module
 				, findpattern.pattern, wstr(Patterns::PackageMgr_Init), findpattern.offset);
 
-			findpattern = Patterns::PackageMgr_InitReturn;
-			auto PackageMgrInitReturn = (void*)Utility::FindAndPrintPattern(module
-				, findpattern.pattern, wstr(Patterns::PackageMgr_InitReturn), findpattern.offset);
-
 			findpattern = Patterns::PackageMgr_g_PackageMgrGlobalData;
 			auto PackageMgrGlobalData = (uint8_t*)Utility::ReadLEA32(module,
 				findpattern.pattern, wstr(Patterns::PackageMgr_g_PackageMgrGlobalData), findpattern.offset, 3, 7);
 
-			if (!PackageMgrInit || 
-				!PackageMgrInitReturn ||
-				!PackageMgrGlobalData) {
+			if (!PackageMgrInit || !PackageMgrGlobalData) {
 				throw SdkComponentEx{ std::format("Failed to find PackageMgr patterns!"),
 					SdkComponentEx::ErrorCode::PatternFailed };
 			}
@@ -147,11 +141,7 @@ namespace NdGameSdk::ndlib::io {
 			m_PackageMgrInitHook = Utility::MakeSafetyHookInline(PackageMgrInit, Init,
 				wstr(Patterns::PackageMgr_Init), wstr(PackageManager::Init));
 
-			m_PackageMgrInitReturnHook = Utility::MakeMidHook(PackageMgrInitReturn, PackageManagerInitialized,
-				wstr(Patterns::PackageMgr_InitReturn), wstr(PackageManager::PackageManagerInitialized));
-
-			if (!m_PackageMgrInitHook ||
-				!m_PackageMgrInitReturnHook) {
+			if (!m_PackageMgrInitHook) {
 				throw SdkComponentEx{ "Failed to create hooks!", SdkComponentEx::ErrorCode::PatchFailed };
 			}
 
@@ -563,13 +553,8 @@ namespace NdGameSdk::ndlib::io {
 			pDesc.SetType(Mutex::MutexType::MUTEX_RECURSIVE);
 			pSystem->CreateMutex(&pDesc, &Dumper::s_DumperMutex);
 		}
-	}
 
-	void PackageManager::PackageManagerInitialized(SafetyHookContext& ctx) {
-		auto PackageMgrComponent = Instance<PackageManager>();
-		PackageMgr* PackageMgr = reinterpret_cast<io::PackageMgr*>(ctx.rbx);
-		PackageMgrComponent->InvokeSdkEvent(PackageMgrComponent->e_PackageManagerInitialized, PackageMgrComponent);
-		return;
+		pPackageManager->InvokeSdkEvent(pPackageManager->e_PackageManagerInitialized, pPackageManager);
 	}
 		
 	DMENU::ItemSubmenu* PackageManager::CreatePackageManagerMenu(NdDevMenu* pdmenu, DMENU::Menu* pMenu) {

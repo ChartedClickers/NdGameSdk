@@ -289,7 +289,6 @@ namespace NdGameSdk::ndlib::io {
 
 		/*Extern Functs*/
 		static void Init(PackageMgr* pPackageMgr, PackageMgr::Configuration* pConfiguration);
-		static void PackageManagerInitialized(SafetyHookContext& ctx);
 
 		EngineComponents* m_EngineComponents;
 		RenderFrameParams* m_RenderFrameParams;
@@ -297,7 +296,6 @@ namespace NdGameSdk::ndlib::io {
 		NdJob* m_JobSystem;
 
 		InlineHook m_PackageMgrInitHook{};
-		MidHook m_PackageMgrInitReturnHook{};
 
 		/*Extern variables*/
 		static bool* g_ShowPackageStatus;

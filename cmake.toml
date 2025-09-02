@@ -56,7 +56,7 @@ tag = "55f93686c01528224f448c19128836e7df245f72"
 [vcpkg]
 version = "2025.04.09"
 url = "https://github.com/microsoft/vcpkg/archive/a8954b904ad2a6939ecd8fc213e87702fa1243ea.tar.gz"
-packages = ["boost-thread", "boost-signals2", "boost-container"]
+packages = ["boost-thread", "boost-signals2", "boost-container", "dstorage"]
 
 
 [find-package.Boost]
@@ -64,6 +64,10 @@ version = "1.85.0"
 required = true 
 config = false
 components = ["thread", "signals2"]
+ 
+[find-package.dstorage]
+required = true
+config = true
  
 [template.NdGameSdk]
 type = "shared"

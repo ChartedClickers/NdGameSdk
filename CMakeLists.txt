@@ -86,6 +86,8 @@ find_package(Boost 1.85.0 REQUIRED
 		signals2
 )
 
+find_package(dstorage REQUIRED CONFIG)
+
 include(FetchContent)
 
 message(STATUS "Fetching simpleini (09c21bda1dc1b578fa55f4a005d79b0afd481296)...")

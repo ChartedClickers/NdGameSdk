@@ -642,7 +642,7 @@ namespace regenny {
                     renderFrameParams = 0x2,
                     CurrentAllocator = 0x3,
                     ScriptStackFrame = 0x6,
-                    ScriptCFuncContext = 0x12,
+                    ScriptCFuncContext = 0x8,
                     ContextProcess = 0xc,
                     ContextPlayer = 0xe
                 };

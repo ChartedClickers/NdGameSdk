@@ -34,6 +34,7 @@ namespace NdGameSdk::common {
 #if defined(T2R)
 		static void __fastcall MemoryDumpTaggedHeapMemoryStatsPrintF(void* /*file*/, const char* fmt, ...);
 		static void __fastcall NixxesLoggerWriteRawLine(NxApp::NixxesLogger* pNLogger, const char* str);
+        static void __fastcall DebugPrintF(const char* fmt, void* arg1, ...);
 #elif defined(T1X)
 		static void __fastcall CommonGameErrorPrintF(const char* fmt, ...);
 #endif
@@ -48,6 +49,7 @@ namespace NdGameSdk::common {
 #if defined(T2R)
 		InlineHook m_MemoryDumpTaggedHeapMemoryStatsPrintFHook{};
 		InlineHook m_NixxesLoggerWriteRawLineHook{};
+        InlineHook m_DebugPrintFHook{};
 #elif defined(T1X)
 		InlineHook m_CommonGameErrorPrintFHook{};
 #endif

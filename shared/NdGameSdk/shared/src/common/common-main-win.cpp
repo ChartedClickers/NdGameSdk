@@ -42,6 +42,10 @@ namespace NdGameSdk::common {
 				Patterns::Memory_DumpTaggedHeapMemoryStatsPrintF.pattern, wstr(Patterns::Memory_DumpTaggedHeapMemoryStatsPrintF),
 				Patterns::Memory_DumpTaggedHeapMemoryStatsPrintF.offset);
 
+			auto DebugPrintF = (void*)Utility::FindAndPrintPattern(module,
+				Patterns::DebugPrintF.pattern, wstr(Patterns::DebugPrintF),
+				Patterns::DebugPrintF.offset);
+
             NxAppHooks* pNxAppHooks = GetParentComponent<CommonGame>()->GetSubComponent<NxAppHooks>();
             if (pNxAppHooks) {
                 ISdkSubComponent::SubscribeSdkEvent<CommonGame, NxAppHooks>(
@@ -97,7 +101,8 @@ namespace NdGameSdk::common {
 				SsManagerErrorPrintF && 
 				ScriptManagerErrorPrintF
 				#if defined(T2R)
-				&& MemoryDumpTaggedHeapMemoryStatsPrintF
+				&& MemoryDumpTaggedHeapMemoryStatsPrintF && 
+                DebugPrintF
 				#elif defined(T1X)
 				&& CommonGameErrorPrintF
 				#endif
@@ -122,6 +127,9 @@ namespace NdGameSdk::common {
 				m_MemoryDumpTaggedHeapMemoryStatsPrintFHook = Utility::MakeSafetyHookInline(MemoryDumpTaggedHeapMemoryStatsPrintF,
 					CommonMainWin::MemoryDumpTaggedHeapMemoryStatsPrintF,
 					wstr(Patterns::Memory_DumpTaggedHeapMemoryStatsPrintF), wstr(MemoryDumpTaggedHeapMemoryStatsPrintF));
+
+				m_DebugPrintFHook = Utility::MakeSafetyHookInline(DebugPrintF, CommonMainWin::DebugPrintF, wstr(Patterns::DebugPrintF), wstr(DebugPrintF));
+
             #elif defined(T1X)
 				m_CommonGameErrorPrintFHook = Utility::MakeSafetyHookInline(CommonGameErrorPrintF, CommonMainWin::CommonGameErrorPrintF,
 					wstr(Patterns::CommonGame_ErrorPrintF), wstr(CommonGameErrorPrintF));
@@ -325,6 +333,16 @@ namespace NdGameSdk::common {
 
 
 #if defined(T2R)
+
+    void __fastcall CommonMainWin::DebugPrintF(const char* fmt, void* /*arg1*/, ...) {
+        va_list args;
+        va_start(args, fmt);
+        auto msg = vformat(fmt, args);
+        va_end(args);
+        auto logger = SdkLogger::GetNdGameLogger();
+        logger->debug("{}", msg);
+    }
+
     void __fastcall CommonMainWin::MemoryDumpTaggedHeapMemoryStatsPrintF(void*, const char* fmt, ...) {
 		va_list args;
 		va_start(args, fmt);

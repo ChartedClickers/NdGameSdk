@@ -21,6 +21,7 @@ namespace NdGameSdk::Patterns {
 
 	/*NdGame Logs*/
 	static inline const SdkPattern CommonGame_PrintF = { L"48 89 4c 24 08 48 89 54 24 10 4c 89 44 24 18 4c 89 4c 24 20 53 57 48 83 ec 38 b9 01 00 00 00 48 8d 7c 24 58 e8 ?? ?? ?? ?? 48 8b d8 e8 ?? ?? ?? ?? 4c 8b 44 24 50 45 33 c9 48 8b d3 48 89 7c 24 20 48 8b 08" };
+	static inline const SdkPattern DebugPrintF = { L"48 89 5c 24 18 57 48 81 ec 40 04 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 30 04 00 00 48 8b 05 ?? ?? ?? ?? 48 8b fa 48 8b d9 48 85 c0 74 ?? ff d0" };
 	static inline const SdkPattern Memory_DumpTaggedHeapMemoryStatsPrintF = { L"c7 44 24 40 05 00 00 00 4c 8b c0 89 7c 24 38 49 8b ce c7 44 24 30 05 00 00 00 c5 7b 11 44 24 28 c5 f8 28 de c4 c1 f9 7e f1 c5 fb 11 7c 24 20 ff d6 4d 8d 7f 01 49 83 ec 01 0f 85 ?? ?? ?? ?? c5 78 28 4c 24", +0x9a };
 	static inline const SdkPattern SsManager_PrintF = { L"48 8b cb 48 89 44 24 20 4c 8b cf e8 ?? ?? ?? ?? 48 8b 4c 24 30 48 33 cc e8 ?? ?? ?? ?? 48 8b 5c 24 50 48 83 c4 40 5f c3 cc cc 4c 89 4c", +0x2a };
 	static inline const SdkPattern SsManager_WarnPrintF = { SsManager_PrintF.pattern, SsManager_PrintF.offset + 0x10 };

@@ -5,6 +5,7 @@
 #include "src/corelib/job/job-system.hpp"
 #include "src/ndlib/engine-components.hpp"
 #include "src/ndlib/frame-params.hpp"
+#include "src/ndlib/io/file-system-win-fios2.hpp"
 #include "src/ndlib/io/package-mgr.hpp"
 #include "src/ndlib/script/script-manager.hpp"
 #include "src/ndlib/render/dev/debugdraw-common.hpp"
@@ -30,6 +31,7 @@ namespace NdGameSdk {
 #if defined(T1X)
 		auto ParticleMgr = SharedComponents->AddComponent<gamelib::render::particle::ParticleManager>();
 #elif defined(T2R)
+		SharedComponents->AddComponent<ndlib::io::FileSystem>();
 		SharedComponents->AddComponent<ndlib::io::PackageManager>();
 #if SDK_DEBUG
 		SharedComponents->AddComponent<ndlib::profiling::ProfileController>();

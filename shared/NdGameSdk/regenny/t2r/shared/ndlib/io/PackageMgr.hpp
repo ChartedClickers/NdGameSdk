@@ -94,6 +94,16 @@ struct PackageMgr {
         regenny::shared::ndlib::io::PackageProcessingInfo** m_slots; // 0x10
     }; // Size: 0x18
 
+    struct IOStagingRing {
+        uint32_t m_userFileOffset; // 0x0
+        uint32_t m_streamBytesProduced; // 0x4
+        uint32_t m_ringUsedBytes; // 0x8
+        uint32_t m_streamSubmitOffset; // 0xc
+        uint32_t m_ringTail; // 0x10
+        uint32_t m_ringHead; // 0x14
+        uint8_t* m_RingBuffer; // 0x18
+    }; // Size: 0x20
+
     uint32_t m_freepackageslots; // 0x0
     uint32_t m_allocationRingBufferSize; // 0x4
     regenny::shared::corelib::memory::Context m_RingBufferContext; // 0x8
@@ -125,12 +135,7 @@ struct PackageMgr {
     regenny::shared::corelib::system::platform::ndsys::Mutex m_LoadingLock; // 0x480
     regenny::shared::corelib::system::platform::ndsys::ConditionVariable m_ConditionVariable; // 0x4c0
     regenny::shared::corelib::system::platform::ndsys::Mutex m_LoginLock; // 0x4e0
-    private: char pad_520[0x8]; public:
-    uint32_t m_field528; // 0x528
-    uint32_t m_field52c; // 0x52c
-    uint32_t m_field530; // 0x530
-    uint32_t m_field534; // 0x534
-    void* m_RingBuffer; // 0x538
+    IOStagingRing m_ioStagingRing; // 0x520
     uint32_t m_PendingPackageVramReleaseCount; // 0x540
     private: char pad_544[0x4]; public:
     regenny::shared::ndlib::io::PackageProcessingInfo** m_PendingPackageVramRelease; // 0x548

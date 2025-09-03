@@ -27,12 +27,6 @@ namespace regenny {
         // Forward declared structures.
         namespace ndlib {
             struct FrameParams{};
-            
-            namespace io {
-                struct FileSystemData{
-                    struct StorageCore{};
-                };
-            }
 
             namespace render {
                 struct WindowContext{};
@@ -1581,6 +1575,14 @@ namespace regenny {
                     void* m_payload;
                 };
 
+                struct PathString 0x20 {
+                    wchar_t* m_pathPtr [[utf16*]]; // valid only when m_pathCap >= 8
+                    uint64_t m_headHi; // upper 8 bytes of the 16-byte inline head (SSO tail)
+                    // PathString meta
+                    uint64_t m_pathLen; // length in UTF-16 code units
+                    uint64_t m_pathCap; // capacity in UTF-16 code units; < 8 => SSO/inline
+                };
+
                 // big-endian PSARC header
                 struct PSARCHeaderBE 0x32 {
                     uint32_t m_magic; // 'PSAR'
@@ -1597,6 +1599,57 @@ namespace regenny {
                     // derived by the parser (the code writes these bytes into the same object):
                     uint8_t m_indexWidth;
                     uint8_t m_tocIsCompressed;
+                };
+
+                struct FileRecord 0x270 {
+
+                    enum HandleObjType : uint32_t {
+                        kHandleInvalid = 0x0,
+                        kHandleWin32 = 0x1,
+                        kHandleDSFile = 0x2
+                    };
+
+                    enum FileState : uint32_t {
+                        kStateRaw = 0x0,
+                        kStateArchive = 0x1
+                    };
+                    
+                    struct RBTreeHeader 0x18 {
+                        FileRecord** m_Parent;
+                        FileRecord** m_Left;
+                        FileRecord** m_Right;
+                    };
+
+                    struct HandleObj 0x10 {
+                        void* m_obj;  // IDStorageFile || Win32 Handle
+                        HandleObjType m_type;
+                    };
+
+                    FileRecord* m_left;
+                    FileRecord* m_parent;
+                    FileRecord* m_right;
+                    bool m_isBlack;
+                    bool m_isHeader;
+                    PathString m_pathStr @ 0x20;
+                    FileState m_state @ 0x40;
+                    uint64_t m_fileSize @ 0x48;
+                    HandleObj m_handleObj;
+                    uint32_t m_refCount;
+                    uint32_t m_openIndex;
+                    wchar_t m_path[0x104];
+                };
+
+                struct StorageCore 0x120 {
+                    FileRecord.RBTreeHeader* m_recordTreeHead; // sentinel head node;
+                    uint64_t m_mapCount; 
+                    FileRecord** m_openBegin;
+                    FileRecord** m_openEnd;
+                    FileRecord** m_openCap;
+                    CRITICAL_SECTION m_cs;
+                    void* m_dsFactory @ 0x60; // IDStorageFactory*
+                    void* m_dsQueue; // IDStorageQueue *
+                    bool m_useDirectStorage;
+                    void* m_OnProcessSpawnedFunc @ 0x108;
                 };
 
                 struct ArchiveSystem 0x50 {
@@ -1630,7 +1683,7 @@ namespace regenny {
                     uint32_t m_ptrCount;
                     uint32_t m_ptrCap;
                     Archive** m_ptrs;
-                    FileSystemData.StorageCore* m_storageCore;
+                    StorageCore* m_storageCore;
                     void* m_grpDefault;
                     uint64_t m_nextId;
                     void* m_rwLock @ 0x40;
@@ -1719,41 +1772,6 @@ namespace regenny {
                 struct FileSystemData 0x42450 {
 
                     struct FsPoolBucket 0x848 {};
-
-                    struct FileRecord 0x270 {
-
-                        struct RBTreeHeader 0x18 {
-                            FileRecord** m_Parent;
-                            FileRecord** m_Left;
-                            FileRecord** m_Right;
-                        };
-
-                        FileRecord* m_left;
-                        FileRecord* m_parent;
-                        FileRecord* m_right;
-                        bool m_isBlack;
-                        bool m_isHeader;
-                        wchar_t* m_pathPtr @ 0x20 [[utf16*]];
-                        uint32_t m_state @ 0x40;
-                        uint64_t m_fileSize @ 0x48;
-                        void* m_handleObj; // IDStorageFile || Handle
-                        uint32_t m_refCount @ 0x60;
-                        uint32_t m_openIndex;
-                        wchar_t m_path[0x104];
-                    };
-
-                    struct StorageCore 0x120 {
-                        FileRecord.RBTreeHeader* m_recordTreeHead; // sentinel head node;
-                        uint64_t m_mapCount; 
-                        FileRecord** m_openBegin;
-                        FileRecord** m_openEnd;
-                        FileRecord** m_openCap;
-                        CRITICAL_SECTION m_cs;
-                        void* m_dsFactory @ 0x60; // IDStorageFactory*
-                        void* m_dsQueue; // IDStorageQueue *
-                        bool m_useDirectStorage;
-                        void* m_OnProcessSpawnedFunc @ 0x108;
-                    };
 
                     FsPoolBucket m_pool[0x80] @ 0x10;
                     uint64_t m_initFlag @ 0x42420;

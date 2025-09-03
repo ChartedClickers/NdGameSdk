@@ -17,6 +17,7 @@
 
 #include "nd-game-info.hpp"
 #include "nd-frame-state.hpp"
+#include "io/file-system-win-fios2.hpp"
 #include "io/package-mgr.hpp"
 #include "nd-config.hpp"
 
@@ -32,6 +33,7 @@ namespace NdGameSdk::ndlib {
 		NdGameSdk_API ndlib::NdFrameState& GetNdFrameState();
 
 #if defined(T2R)
+		NdGameSdk_API ndlib::io::FileSystemWin& GetFileSystem();
 		NdGameSdk_API ndlib::io::PackageMgr& GetPackageMgr();
 #endif
 

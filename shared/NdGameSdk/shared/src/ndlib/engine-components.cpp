@@ -44,6 +44,10 @@ namespace NdGameSdk::ndlib {
 	}
 	
 #if defined(T2R)
+	ndlib::io::FileSystemWin& EngineComponents::GetFileSystem() {
+		return *GetEngineComponent<ndlib::io::FileSystemWin>(EngineComponent::FileSystem);
+	}
+
 	ndlib::io::PackageMgr& EngineComponents::GetPackageMgr() {
 		return *GetEngineComponent<ndlib::io::PackageMgr>(EngineComponent::PackageMgr);
 	}

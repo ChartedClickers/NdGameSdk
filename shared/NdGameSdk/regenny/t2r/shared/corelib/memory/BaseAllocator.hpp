@@ -7,6 +7,7 @@ struct BaseAllocator {
     void* vftable; // 0x0
     private: char pad_8[0x30]; public:
     void* m_pTracker; // 0x38
+    // Metadata: utf8*
     char* m_context_name; // 0x40
     StringId64 m_context_hash; // 0x48
     bool m_Initialized; // 0x50

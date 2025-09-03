@@ -9,7 +9,7 @@ enum JlsContext : uint32_t {
     renderFrameParams = 2,
     CurrentAllocator = 3,
     ScriptStackFrame = 6,
-    ScriptCFuncContext = 18,
+    ScriptCFuncContext = 8,
     ContextProcess = 12,
     ContextPlayer = 14,
 };

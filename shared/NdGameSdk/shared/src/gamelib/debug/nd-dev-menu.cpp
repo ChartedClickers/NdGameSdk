@@ -5,6 +5,7 @@
 #include <NdGameSdk/shared/src/ndlib/render/dev/debugdraw-common.hpp>
 #include <NdGameSdk/shared/src/ndlib/script/script-manager.hpp>
 #include <NdGameSdk/shared/src/ndlib/io/package-mgr.hpp>
+#include <NdGameSdk/shared/src/ndlib/io/file-system-win-fios2.hpp>
 #include <NdGameSdk/shared/src/ndlib/profiling/profile-ctrl.hpp>
 
 #include <cstddef> 
@@ -345,6 +346,7 @@ namespace NdGameSdk::gamelib::debug {
 		NdJob::CreateJobSystemMenu(this, NdGameSdkMenu);
 #if defined(T2R)
 		PackageManager::CreatePackageManagerMenu(this, NdGameSdkMenu);
+		FileSystem::CreateFileSystemMenu(this, NdGameSdkMenu);
 #endif
 		return NdGameSdkMenu;
 	}

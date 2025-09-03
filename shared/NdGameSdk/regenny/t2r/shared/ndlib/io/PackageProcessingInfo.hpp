@@ -1,6 +1,7 @@
 #pragma once
 #include <NdGameSdk/components/SdkRegenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
+#include "FileSystem.hpp"
 #include "Package.hpp"
 namespace regenny::shared::ndlib::io {
 #pragma pack(push, 1)
@@ -27,16 +28,16 @@ struct PackageProcessingInfo {
         LoadingPackageStatusFailedOptionalFile = 18,
     };
 
+    struct ReadSlot : public regenny::shared::ndlib::io::FileSystem::ReadOperation {
+        void* m_ChunkCell; // 0x18
+    }; // Size: 0x20
+
     regenny::shared::ndlib::io::Package* m_package; // 0x0
     LoadingStatus m_status; // 0x8
     private: char pad_c[0x204]; public:
     uint64_t m_NumAsyncReadOps; // 0x210
-    uint64_t m_handle; // 0x218
-    private: char pad_220[0x10]; public:
-    uint64_t* m_ChunkSizePtr; // 0x230
-    private: char pad_238[0x7e0]; public:
-    uint64_t m_fielda18; // 0xa18
-    private: char pad_a20[0x18]; public:
+    ReadSlot m_aReadOps[64]; // 0x218
+    regenny::shared::ndlib::io::FileSystem::ReadOnlyFileHandle m_File; // 0xa18
     regenny::shared::ndlib::io::Package::PakHeader m_pakHdr; // 0xa38
     uint32_t m_field78; // 0xa78
     uint32_t m_field7c; // 0xa7c

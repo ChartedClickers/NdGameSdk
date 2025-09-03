@@ -3,6 +3,10 @@
 #include "sdk.hpp"
 
 namespace NdGameSdk {
+
+	template<typename T>
+	inline constexpr bool always_false_v = false;
+
 	class SdkDerived {
 	public:
 		template <typename Derived>

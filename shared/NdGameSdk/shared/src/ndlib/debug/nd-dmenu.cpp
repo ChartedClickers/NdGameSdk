@@ -124,8 +124,8 @@ namespace NdGameSdk::ndlib::debug {
 		this->Get()->m_lazyinitcallback = reinterpret_cast<void*>(handler);
 	}
 
-	DMENU::Menu* DMENU::Menu::DeleteAllItems(bool freeArena) {
-		return DMENU::s_NdDevMenu->Menu_DeleteAllItems(this, freeArena);
+	DMENU::Menu* DMENU::Menu::DeleteAllItems(bool pFreeMenu) {
+		return DMENU::s_NdDevMenu->Menu_DeleteAllItems(this, pFreeMenu);
 	}
 
 	DMENU::Component* DMENU::Menu::PushBackItem(DMENU::Component* pComponent) {

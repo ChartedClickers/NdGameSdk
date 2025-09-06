@@ -68,6 +68,21 @@ struct FileSystem {
         uint32_t m_bucket[20]; // 0x10
     }; // Size: 0x60
 
+    struct BatchReadItem {
+        void* m_dst; // 0x0
+        uint32_t m_fh; // 0x8
+        uint64_t m_offset; // 0xc
+        uint64_t m_length; // 0x14
+        void* m_field20; // 0x1c
+        private: char pad_24[0x4]; public:
+    }; // Size: 0x28
+
+    struct BatchResolveItem {
+        // Metadata: utf8*
+        char* m_path; // 0x0
+        uint32_t* m_outFh; // 0x8
+    }; // Size: 0x10
+
     struct ArchiveMount {
         struct Buffer {
             uint64_t m_archiveId; // 0x0

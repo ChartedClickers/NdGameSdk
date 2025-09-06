@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "NdGameSdk/sdkderived.hpp"
 #include "NdGameSdk/components/SdkRegenny.hpp"
 
@@ -6,15 +6,101 @@
 #include <NdGameSdk/regenny/t2r/shared/ndlib/io/FileSystemData.hpp>
 #include <NdGameSdk/regenny/t2r/shared/ndlib/io/StorageCore.hpp>
 #include <NdGameSdk/regenny/t2r/shared/ndlib/io/FileRecord.hpp>
+#include <NdGameSdk/regenny/t2r/shared/ndlib/io/FsResult.hpp>
+#include <NdGameSdk/regenny/t2r/shared/ndlib/io/FhOpenAccess.hpp>
+#include <NdGameSdk/regenny/t2r/shared/ndlib/io/FhOpenFlags.hpp>
 #endif
 
+#include "file-system-archive.hpp"
+
 #include <string_view>
+#include <Windows.h>
 #include <dstorage.h>
+
+#include <Utility/helper.hpp>
+#include <Utility/function_ptr.hpp>
+
+namespace regenny::shared::ndlib::io {
+#if defined(T2R)
+
+	constexpr std::uint32_t FHO_ACCESS_MASK = 0x3u;
+
+	using __ff_u32 = std::underlying_type_t<FhOpenFlags>;
+
+	constexpr FhOpenFlags operator|(FhOpenFlags a, FhOpenFlags b) noexcept {
+		return static_cast<FhOpenFlags>(static_cast<__ff_u32>(a) | static_cast<__ff_u32>(b));
+	}
+
+	constexpr FhOpenFlags operator&(FhOpenFlags a, FhOpenFlags b) noexcept {
+		return static_cast<FhOpenFlags>(static_cast<__ff_u32>(a) & static_cast<__ff_u32>(b));
+	}
+
+	constexpr FhOpenFlags operator^(FhOpenFlags a, FhOpenFlags b) noexcept {
+		return static_cast<FhOpenFlags>(static_cast<__ff_u32>(a) ^ static_cast<__ff_u32>(b));
+	}
+
+	constexpr FhOpenFlags operator~(FhOpenFlags a) noexcept {
+		return static_cast<FhOpenFlags>(~static_cast<__ff_u32>(a));
+	}
+
+	inline FhOpenFlags& operator|=(FhOpenFlags& a, FhOpenFlags b) noexcept { a = a | b; return a; }
+	inline FhOpenFlags& operator&=(FhOpenFlags& a, FhOpenFlags b) noexcept { a = a & b; return a; }
+	inline FhOpenFlags& operator^=(FhOpenFlags& a, FhOpenFlags b) noexcept { a = a ^ b; return a; }
+
+	using __fa_u32 = std::underlying_type_t<FhOpenAccess>;
+
+	constexpr FhOpenFlags operator|(FhOpenFlags f, FhOpenAccess a) noexcept {
+		return static_cast<FhOpenFlags>((static_cast<__ff_u32>(f) & ~FHO_ACCESS_MASK) |
+			(static_cast<__fa_u32>(a) & FHO_ACCESS_MASK));
+	}
+
+	constexpr FhOpenFlags operator|(FhOpenAccess a, FhOpenFlags f) noexcept { return f | a; }
+
+	constexpr FhOpenFlags make_open(FhOpenAccess a, FhOpenFlags f = static_cast<FhOpenFlags>(0)) noexcept {
+		return static_cast<FhOpenFlags>((static_cast<__ff_u32>(f) & ~FHO_ACCESS_MASK) |
+			(static_cast<__fa_u32>(a) & FHO_ACCESS_MASK));
+	}
+
+	constexpr FhOpenFlags set_access(FhOpenFlags f, FhOpenAccess a) noexcept { return f | a; }
+
+	constexpr FhOpenAccess access_of(FhOpenFlags f) noexcept {
+		return static_cast<FhOpenAccess>(static_cast<__ff_u32>(f) & FHO_ACCESS_MASK);
+	}
+
+	constexpr FhOpenAccess sanitized_access(FhOpenFlags f) noexcept {
+		auto a = access_of(f);
+		// binary coerces 3 → READ
+		return (a == FhOpenAccess::FHO_ACCESS_RESERVED3) ? FhOpenAccess::FHO_ACCESS_READ : a;
+	}
+
+	constexpr FhOpenFlags flags_only(FhOpenFlags f) noexcept {
+		return static_cast<FhOpenFlags>(static_cast<__ff_u32>(f) & ~FHO_ACCESS_MASK);
+	}
+
+	constexpr bool has_any(FhOpenFlags f, FhOpenFlags m) noexcept {
+		return (static_cast<__ff_u32>(f) & static_cast<__ff_u32>(m)) != 0;
+	}
+
+	constexpr bool has_all(FhOpenFlags f, FhOpenFlags m) noexcept {
+		return (flags_only(f) & m) == m;
+	}
+
+	static_assert((static_cast<__ff_u32>(FhOpenFlags::FHOF_ALLOW_CREATE) & FHO_ACCESS_MASK) == 0, "flag/access overlap");
+	static_assert((static_cast<__ff_u32>(FhOpenFlags::FHOF_TRUNCATE) & FHO_ACCESS_MASK) == 0, "flag/access overlap");
+	static_assert((static_cast<__ff_u32>(FhOpenFlags::FHOF_MODE_04) & FHO_ACCESS_MASK) == 0, "flag/access overlap");
+	static_assert((static_cast<__ff_u32>(FhOpenFlags::FHOF_DIRECT_IO) & FHO_ACCESS_MASK) == 0, "flag/access overlap");
+
+
+#endif
+}
 
 namespace NdGameSdk::ndlib::io {
 #if defined(T2R)
 
 	class FileSystem;
+	using FsResult = regenny::shared::ndlib::io::FsResult;
+	using FhOpenAccess = regenny::shared::ndlib::io::FhOpenAccess;
+	using FhOpenFlags = regenny::shared::ndlib::io::FhOpenFlags;
 
 	class NdGameSdk_API FileRecord : public ISdkRegenny<regenny::shared::ndlib::io::FileRecord> {
 	public:
@@ -56,6 +142,7 @@ namespace NdGameSdk::ndlib::io {
 
 		uint64_t GetFileSize() const;
 		uint32_t GetRefCount() const;
+		uint32_t GetOpenIndex() const;
 
 		HandleObjType GetHandleType() const;
 		FileState GetFileState() const;
@@ -97,7 +184,7 @@ namespace NdGameSdk::ndlib::io {
 
 		static FileRecord* Rightmost(FileRecord* header) {
 			if (!header) return nullptr;
-			auto x = header->Right();// header->right = rightmost
+			auto x = header->Right(); // header->right = rightmost
 			return (x && !x->IsHeader()) ? x : header;
 		}
 	private:
@@ -114,6 +201,8 @@ namespace NdGameSdk::ndlib::io {
 
 		IDStorageFactory* GetDirectStorageFactory() const;
 		IDStorageQueue* GetDirectStorageQueue() const;
+
+		FileRecord* LookupByIoHandle(uint32_t ioHandle) const;
 
 		bool IsUsingDirectStorage();
 
@@ -167,7 +256,15 @@ namespace NdGameSdk::ndlib::io {
 	class NdGameSdk_API FileSystemData : public ISdkRegenny<regenny::shared::ndlib::io::FileSystemData> {
 	public:
 		StorageCore* GetStorageCore() const;
+		ArchiveSystem* GetArchiveSystem() const;
 	};
+
+	TYPEDEF_EXTERN_FUNCTION_PTR(const char*, FileSystem_StrError, FsResult* pFsResult);
+
+    static_assert(sizeof(FileRecord) == 0x270, "Invalid FileRecord size");
+    static_assert(sizeof(StorageCore) == 0x120, "Invalid StorageCore size");
+    static_assert(sizeof(FileSystemData) == 0x42450, "Invalid FileSystemData size");
 
 #endif
 }
+

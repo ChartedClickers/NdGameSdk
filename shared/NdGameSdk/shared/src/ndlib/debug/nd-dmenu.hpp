@@ -156,7 +156,7 @@ namespace NdGameSdk::ndlib::debug {
 			void SetPagePointer(int num);
 			bool DeleteItem(DMENU::Component* pItem);
 			void SetLazyInitHandler(LazyInitCallback* handler);
-			DMENU::Menu* DeleteAllItems(bool freeArena);
+			DMENU::Menu* DeleteAllItems(bool pFreeMenu);
 			DMENU::Component* PushBackItem(DMENU::Component* pComponent);
 		private:
 			static regenny::shared::ndlib::debug::DMENU::Menu::VTable* VTable;

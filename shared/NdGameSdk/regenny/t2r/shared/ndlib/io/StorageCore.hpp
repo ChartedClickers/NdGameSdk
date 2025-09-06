@@ -11,7 +11,7 @@ struct StorageCore {
     regenny::shared::ndlib::io::FileRecord** m_openEnd; // 0x18
     regenny::shared::ndlib::io::FileRecord** m_openCap; // 0x20
     CRITICAL_SECTION m_cs; // 0x28
-    private: char pad_44[0x1c]; public:
+    private: char pad_50[0x10]; public:
     void* m_dsFactory; // 0x60
     void* m_dsQueue; // 0x68
     bool m_useDirectStorage; // 0x70

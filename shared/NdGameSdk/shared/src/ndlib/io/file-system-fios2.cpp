@@ -11,8 +11,109 @@ namespace NdGameSdk::ndlib::io {
 		return *reinterpret_cast<FileSystemData* volatile*>(g_FileSystemDataSlot);
 	}
 
+	bool FileSystem::OpenSync(FsResult& outResult, const char* path, 
+		FileSystemInternal::ReadOnlyFileHandle* pFileHandle, FileSystemInternal::Priority prio) {
+		always_assert(FileSystem_OpenSync == nullptr, "FileSystem_OpenSync was not set!");
+
+		int32_t* ret = FileSystem_OpenSync(
+			this->GetFileSystem(),
+			&outResult,
+			path,
+			pFileHandle,
+			prio
+		);
+
+		const int32_t code = ret ? *ret : 0;
+		return code <= 0;
+	}
+
+	bool FileSystem::CloseSync(FsResult& outResult, FileSystemInternal::ReadOnlyFileHandle& pFileHandle) {
+		always_assert(FileSystem_CloseSync == nullptr, "FileSystem_CloseSync was not set!");
+		int32_t* ret = FileSystem_CloseSync(
+			this->GetFileSystem(),
+			&outResult,
+			&pFileHandle
+		);
+
+		const int32_t code = ret ? *ret : 0;
+		return code <= 0;
+	}
+
+	bool FileSystem::GetSizeSync(FsResult& outResult, FileSystemInternal::ReadOnlyFileHandle& pFileHandle, int64_t* outSize) {
+		always_assert(FileSystem_GetSizeSync == nullptr, "FileSystem_GetSizeSync was not set!");
+
+		int32_t* ret = FileSystem_GetSizeSync(
+			this->GetFileSystem(),
+			&outResult,
+			&pFileHandle,
+			outSize
+		);
+
+		const int32_t code = ret ? *ret : 0;
+		return code <= 0;
+	}
+
+	bool FileSystem::PreadSync(FsResult& outResult, FileSystemInternal::ReadOnlyFileHandle* pFileHandle, void* dst, 
+		uint64_t fileRelativeOffset, uint64_t requestedBytes, uint64_t* ioBytesDoneCell, FileSystemInternal::Priority prio) {
+		always_assert(FileSystem_PreadSync == nullptr, "FileSystem_PreadSync was not set!");
+		int32_t* ret = FileSystem_PreadSync(
+			this->GetFileSystem(),
+			&outResult,
+			pFileHandle,
+			dst,
+			fileRelativeOffset,
+			requestedBytes,
+			ioBytesDoneCell,
+			prio
+		);
+
+		const int32_t code = ret ? *ret : 0;
+		return code <= 0;
+	}
+
+	bool FileSystem::MountArchiveSync(FsResult& outResult, const char* archivePath, const char* mountPath,
+		FileSystemInternal::ArchiveMount* pArchiveMount, bool appendToEnd) {
+		always_assert(FileSystem_MountArchiveSync == nullptr, "FileSystem_MountArchiveSync was not set!");
+		
+		spdlog::info("Mounting archive '{}' at mount point '{}'...", archivePath, mountPath);
+		int32_t* ret = FileSystem_MountArchiveSync(
+			this->GetFileSystem(),
+			&outResult,
+			archivePath,
+			mountPath,
+			pArchiveMount,
+			appendToEnd
+		);
+
+		const int32_t code = ret ? *ret : 0;
+		return code <= 0;
+	}
+
+	bool FileSystem::UnmountArchiveSync(FsResult& outResult, FileSystemInternal::ArchiveMount* pArchiveMount) {
+		always_assert(FileSystem_UnmountArchiveSync == nullptr, "FileSystem_UnmountArchiveSync was not set!");
+
+		spdlog::info("Unmounting archive at mount point '{}'...", pArchiveMount ? pArchiveMount->GetMountPath() : "(null)");
+		int32_t* ret = FileSystem_UnmountArchiveSync(
+			this->GetFileSystem(),
+			&outResult,
+			pArchiveMount
+		);
+
+		const int32_t code = ret ? *ret : 0;
+		return code <= 0;
+	}
+
+	const char* FileSystem::FsStrError(FsResult& pFsResult) {
+		always_assert(FileSystem_StrError == nullptr, "FileSystem_FsStrError was not set!");
+		return FileSystem_StrError(&pFsResult);
+	}
+
 	StorageCore* FileSystemData::GetStorageCore() const {
 		return reinterpret_cast<StorageCore*>(this->Get()->m_storageCore);
+	}
+
+	ArchiveSystem* FileSystemData::GetArchiveSystem() const {
+		return reinterpret_cast<ArchiveSystem*>(this->Get()->m_archive);
 	}
 
 	inline const wchar_t* FileRecord::GetPath() const {
@@ -96,6 +197,10 @@ namespace NdGameSdk::ndlib::io {
 		return this->Get()->m_refCount;
 	}
 
+	uint32_t FileRecord::GetOpenIndex() const {
+		return this->Get()->m_openIndex;
+	}
+
 	FileRecord::HandleObjType FileRecord::GetHandleType() const {
 		return this->Get()->m_handleObj.m_type;
 	}
@@ -148,11 +253,32 @@ namespace NdGameSdk::ndlib::io {
 		return reinterpret_cast<IDStorageQueue*>(this->Get()->m_dsQueue);
 	}
 
+	FileRecord* StorageCore::LookupByIoHandle(uint32_t ioHandle) const {
+		if (ioHandle == 0) return nullptr;
+
+		const auto* self = this->Get();
+
+		auto** begin = reinterpret_cast<FileRecord**>(self->m_openBegin);
+		auto** end = reinterpret_cast<FileRecord**>(self->m_openEnd);
+		const size_t count = static_cast<size_t>(end - begin);
+
+		const size_t idx = static_cast<size_t>(ioHandle - 1); // 1-based -> 0-based
+		if (idx >= count) return nullptr;
+
+		FileRecord* fr = begin[idx];
+		if (!fr || fr->Get()->m_openIndex != idx) 
+			return nullptr;
+
+		return fr;
+	}
+
 	bool StorageCore::IsUsingDirectStorage() {
 		return this->Get()->m_useDirectStorage;
 	}
 
 	FileSystemData* FileSystem::g_FileSystemDataSlot = nullptr;
+
+	INIT_FUNCTION_PTR(FileSystem_StrError);
 
 #endif
 }

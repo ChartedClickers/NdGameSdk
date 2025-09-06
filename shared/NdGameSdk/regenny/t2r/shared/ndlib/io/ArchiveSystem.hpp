@@ -15,8 +15,8 @@ struct ArchiveSystem {
 
     struct Archive {
         uint64_t m_id; // 0x0
-        uint32_t m_field8; // 0x8
-        uint32_t m_fieldc; // 0xc
+        regenny::shared::ndlib::io::ArchiveSystem::PriorityGroup m_priority; // 0x8
+        uint32_t m_ioHandle; // 0xc
         // Metadata: utf8*
         char m_mountPrefix[1024]; // 0x10
         uint32_t m_mountPrefixLen; // 0x410

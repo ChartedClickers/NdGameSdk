@@ -52,7 +52,11 @@ add_compile_options(
 )
 
 set(SAFETYHOOK_FETCH_ZYDIS ON)
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+
+# Configure vcpkg
+set(VCPKG_OVERLAY_TRIPLETS "${CMAKE_SOURCE_DIR}/vcpkg-overlays/triplets" CACHE STRING "" FORCE)
+set(VCPKG_TARGET_TRIPLET   "x64-windows-ndgamesdk" CACHE STRING "" FORCE)
 
 if(CMKR_ROOT_PROJECT AND NOT CMKR_DISABLE_VCPKG)
 	include(FetchContent)

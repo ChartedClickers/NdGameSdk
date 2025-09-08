@@ -10,7 +10,9 @@
       "architecture": "x64",
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/"
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/",
+        "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/vcpkg-overlays/triplets",
+        "VCPKG_TARGET_TRIPLET": "x64-windows-ndgamesdk.cmake"
       }
     }
   ],

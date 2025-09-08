@@ -6,7 +6,9 @@
     "boost-thread",
     "boost-signals2",
     "boost-container",
-    "dstorage"
+    "dstorage",
+    "lz4",
+    "zlib"
   ],
   "description": "",
   "name": "nd-modclient",

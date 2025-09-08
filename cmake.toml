@@ -17,7 +17,11 @@ add_compile_options(
 )
 
 set(SAFETYHOOK_FETCH_ZYDIS ON)
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+
+# Configure vcpkg
+set(VCPKG_OVERLAY_TRIPLETS "${CMAKE_SOURCE_DIR}/vcpkg-overlays/triplets" CACHE STRING "" FORCE)
+set(VCPKG_TARGET_TRIPLET   "x64-windows-ndgamesdk" CACHE STRING "" FORCE)
 """
  
 [variables]
@@ -56,7 +60,7 @@ tag = "55f93686c01528224f448c19128836e7df245f72"
 [vcpkg]
 version = "2025.04.09"
 url = "https://github.com/microsoft/vcpkg/archive/a8954b904ad2a6939ecd8fc213e87702fa1243ea.tar.gz"
-packages = ["boost-thread", "boost-signals2", "boost-container", "dstorage"]
+packages = ["boost-thread", "boost-signals2", "boost-container", "dstorage", "lz4", "zlib"]
 
 
 [find-package.Boost]

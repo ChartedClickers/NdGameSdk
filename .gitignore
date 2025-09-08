@@ -3,6 +3,7 @@
 .vscode/
 # cmkr
 build*/
+out*/
 cmake-build*/
 CMakerLists.txt
 CMakeLists.txt.user

@@ -5,8 +5,8 @@ namespace regenny::shared::ndlib::io {
 #pragma pack(push, 1)
 struct FsResult {
     uint32_t m_code; // 0x0
-    void* m_payload; // 0x4
-    private: char pad_c[0x4]; public:
+    private: char pad_4[0x4]; public:
+    void* m_payload; // 0x8
 }; // Size: 0x10
 #pragma pack(pop)
 }

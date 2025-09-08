@@ -72,6 +72,13 @@ components = ["thread", "signals2"]
 [find-package.dstorage]
 required = true
 config = true
+
+[find-package.lz4]
+required = true
+config = true
+
+[find-package.zlib]
+required = true
  
 [template.NdGameSdk]
 type = "shared"
@@ -102,7 +109,9 @@ link-libraries = [
     "Utility",
     "Boost::thread",
 	"Boost::signals2",
-    "Boost::container"
+    "Boost::container",
+    "lz4::lz4",
+    "ZLIB::ZLIB"
 ]
 cmake-before="""
 """

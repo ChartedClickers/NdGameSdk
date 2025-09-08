@@ -92,6 +92,10 @@ find_package(Boost 1.85.0 REQUIRED
 
 find_package(dstorage REQUIRED CONFIG)
 
+find_package(lz4 REQUIRED CONFIG)
+
+find_package(zlib REQUIRED)
+
 include(FetchContent)
 
 message(STATUS "Fetching simpleini (09c21bda1dc1b578fa55f4a005d79b0afd481296)...")
@@ -468,6 +472,8 @@ target_link_libraries(T1XSDK PUBLIC
 	Boost::thread
 	Boost::signals2
 	Boost::container
+	lz4::lz4
+	ZLIB::ZLIB
 )
 
 target_compile_definitions(T1XSDK PUBLIC
@@ -813,6 +819,8 @@ target_link_libraries(T2RSDK PUBLIC
 	Boost::thread
 	Boost::signals2
 	Boost::container
+	lz4::lz4
+	ZLIB::ZLIB
 )
 
 target_compile_definitions(T2RSDK PUBLIC

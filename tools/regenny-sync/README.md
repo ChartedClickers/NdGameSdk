@@ -9,12 +9,12 @@ What it does
 - Offers `--dry-run` to preview and `--yes` to skip confirmation.
 
 Usage
-- From the repo root (folder containing `researching/`), run:
-  - `python researching/tools/regenny-sync/update_regenny.py --yes`
-  - Preview only: `python researching/tools/regenny-sync/update_regenny.py --dry-run`
-  - Specific game(s): `python researching/tools/regenny-sync/update_regenny.py -g t2r -g t1x --yes`
-  - List discovered games: `python researching/tools/regenny-sync/update_regenny.py --list`
-  - Merge without cleaning: `python researching/tools/regenny-sync/update_regenny.py --no-clean --yes`
+- From the repo root, run:
+  - `python tools/regenny-sync/update_regenny.py --yes`
+  - Preview only: `python tools/regenny-sync/update_regenny.py --dry-run`
+  - Specific game(s): `python tools/regenny-sync/update_regenny.py -g t2r -g t1x --yes`
+  - List discovered games: `python tools/regenny-sync/update_regenny.py --list`
+  - Merge without cleaning: `python tools/regenny-sync/update_regenny.py --no-clean --yes`
   - Override paths:
     - `--src <path>` default: `researching/regenny-sdk`
     - `--dst <path>` default: `shared/NdGameSdk/regenny`

@@ -9,24 +9,14 @@ import sys
 
 def researching_root() -> Path:
     """
-    Resolve the path to the 'researching' folder in a robust way.
-    Expected layout:
-      <repo>/researching/tools/regenny-sync/update_regenny.py
+    Resolve the path to the 'researching' folder based on the current layout:
+      <repo>/tools/regenny-sync/update_regenny.py
+
+    Returns: <repo>/researching
     """
     here = Path(__file__).resolve()
-
-    for p in here.parents:
-        if p.name == "researching":
-            return p
-
-    for p in here.parents:
-        candidate = p / "researching"
-        if candidate.is_dir():
-            return candidate
-    try:
-        return here.parents[2]
-    except IndexError:
-        return here
+    repo_root = here.parents[2]  # .../NdGameSdk
+    return repo_root / "researching"
 
 
 def discover_games(src_base: Path) -> list[str]:

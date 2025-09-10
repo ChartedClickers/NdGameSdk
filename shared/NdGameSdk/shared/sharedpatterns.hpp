@@ -145,7 +145,6 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern FileSystem_ArchiveSystem_Add = { L"40 55 53 56 57 41 54 41 55 41 56 41 57 48 8d ac 24 f8 fb ff ff 48 81 ec 08 05 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 85 f0 03 00 00 45 8b e1 49 8b f8 4c 8b f2 48 8b f1 48 85 d2 0f 84 c4 03 00 00 4d 85 c0 0f 84 bb 03 00 00 48 c7" };
 	static inline const SdkPattern FileSystem_ArchiveSystem_Remove = { L"48 89 5c 24 10 48 89 6c 24 18 56 57 41 56 48 81 ec b0 04 00 00 48 8b f9 45 33 c0 44 8b 09 45 85 c9 74 25 48 8b 49 08 66 0f 1f 84 00 00 00 00 00 41 8b d8 48 69 c3 68 04" };
 	static inline const SdkPattern FileSystem_ArchiveSystem_Resolve = { L"48 89 5c 24 20 55 56 57 41 54 41 55 41 56 41 57 48 81 ec 70 04 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 60 04 00 00 48 8b f2 48 8b f9 4d 85 c0 0f 84" };
-
 	static inline const SdkPattern FileSystem_g_FileSystemData = { L"4c 89 3d ?? ?? ?? ?? 89 5d c7 48 8d 15 ?? ?? ?? ?? 48 8d 4d c7 e8 ?? ?? ?? ?? 49 8d 55 60 48 8d 4d c7 e8 ?? ?? ?? ?? 89 5d ef 48 8d 15 ?? ?? ?? ?? 48 8d 4d ef e8 ?? ?? ?? ?? 49 8d 95 a0 00 00 00" };
 
 	static inline const SdkPattern PackageMgr_Init = { L"48 89 5c 24 10 48 89 74 24 18 48 89 7c 24 20 55 41 54 41 55 41 56 41 57 48 8d ac 24 ?? ?? ?? ?? 48 81 ec 70 02 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 85 60 01 00 00 48 8b fa 48 8b d9 48 81 c1 68 47 00 00 33 d2 41 b8 00 08 00" };

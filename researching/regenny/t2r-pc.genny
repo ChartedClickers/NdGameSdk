@@ -1564,6 +1564,34 @@ namespace regenny {
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\io
             namespace io {
 
+                namespace PSARC {
+                    // big-endian PSARC header
+                    struct HeaderBE 0x32 {
+                        uint32_t m_magic; // 'PSAR'
+                        uint32_t m_version;
+                        uint32_t m_compression; // 'zlib'/'lz4f'/... 
+                        uint32_t m_tocLength;
+                        uint32_t m_tocEntrySize;
+                        uint32_t m_fileCount; 
+                        uint32_t m_blockSize; 
+                        uint32_t m_flags; 
+                        uint64_t m_tocOffset; 
+                        uint64_t m_tocUncompressedLen;
+
+                        // derived by the parser (the code writes these bytes into the same object):
+                        uint8_t m_indexWidth;
+                        uint8_t m_tocIsCompressed;
+                    };
+
+                    // PSARC TOC entry (big-endian)
+                    struct EntryBE 0x1e {
+                        uint8_t m_hashNames[0x10];
+                        uint32_t m_zsizeIndexBE;
+                        uint8_t m_uncompressedSizeBE[0x5];
+                        uint8_t m_offsetBE[0x5];
+                    };
+                };
+
                 enum FhOpenAccess : uint32_t {
                     FHO_ACCESS_READ = 0, // GENERIC_READ
                     FHO_ACCESS_WRITE = 1, // GENERIC_WRITE
@@ -1604,24 +1632,6 @@ namespace regenny {
                     // PathString meta
                     uint64_t m_pathLen; // length in UTF-16 code units
                     uint64_t m_pathCap; // capacity in UTF-16 code units; < 8 => SSO/inline
-                };
-
-                // big-endian PSARC header
-                struct PSARCHeaderBE 0x32 {
-                    uint32_t m_magic; // 'PSAR'
-                    uint32_t m_version;
-                    uint32_t m_compression; // 'zlib'/'lz4f'/... 
-                    uint32_t m_tocLength;
-                    uint32_t m_tocEntrySize;
-                    uint32_t m_fileCount; 
-                    uint32_t m_blockSize; 
-                    uint32_t m_flags; 
-                    uint64_t m_tocOffset; 
-                    uint64_t m_tocUncompressedLen;
-
-                    // derived by the parser (the code writes these bytes into the same object):
-                    uint8_t m_indexWidth;
-                    uint8_t m_tocIsCompressed;
                 };
 
                 struct FileRecord 0x270 {
@@ -1688,7 +1698,7 @@ namespace regenny {
                         uint32_t m_ioHandle;
                         char m_mountPrefix[0x400] [[utf8*]];
                         uint32_t m_mountPrefixLen; // char m_mountPrefix length
-                        PSARCHeaderBE m_psarcHeader @ 0x418;
+                        PSARC.HeaderBE m_psarcHeader @ 0x418;
                         void* m_heapBlock @ 0x450; // (allocation base)
                         void* m_auxPtr; // (uint8_t*)m_heapBlock; points to TOC bytes
                         void* m_lookupRoot; // (Offset40BE*)((uint8_t*)m_heapBlock + m_psarcHeader.m_tocLength)

@@ -68,7 +68,7 @@ namespace NdGameSdk::corelib::system::platform {
 			NdSystem_Mutex_Unlock(this);
 		}
 
-		inline static constexpr int32_t KInfiniteTimeoutMs = 0xffffffff;
+		inline static constexpr int32_t KInfiniteTimeoutMs = INFINITE;
 	};
 
 	struct ScopedLock {

@@ -1,9 +1,9 @@
 #pragma once
 #include <NdGameSdk/components/SdkRegenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
-namespace regenny::shared::ndlib::io {
+namespace regenny::shared::ndlib::io::PSARC {
 #pragma pack(push, 1)
-struct PSARCHeaderBE {
+struct HeaderBE {
     uint32_t m_magic; // 0x0
     uint32_t m_version; // 0x4
     uint32_t m_compression; // 0x8

@@ -62,7 +62,6 @@ version = "2025.04.09"
 url = "https://github.com/microsoft/vcpkg/archive/a8954b904ad2a6939ecd8fc213e87702fa1243ea.tar.gz"
 packages = ["boost-thread", "boost-signals2", "boost-container", "dstorage", "lz4", "zlib"]
 
-
 [find-package.Boost]
 version = "1.85.0"
 required = true 

@@ -1,7 +1,7 @@
 #pragma once
 #include <NdGameSdk/components/SdkRegenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
-#include "PSARCHeaderBE.hpp"
+#include "PSARC\HeaderBE.hpp"
 namespace regenny::shared::ndlib::io {
 struct StorageCore;
 }
@@ -21,7 +21,7 @@ struct ArchiveSystem {
         char m_mountPrefix[1024]; // 0x10
         uint32_t m_mountPrefixLen; // 0x410
         private: char pad_414[0x4]; public:
-        regenny::shared::ndlib::io::PSARCHeaderBE m_psarcHeader; // 0x418
+        regenny::shared::ndlib::io::PSARC::HeaderBE m_psarcHeader; // 0x418
         private: char pad_44a[0x6]; public:
         void* m_heapBlock; // 0x450
         void* m_auxPtr; // 0x458

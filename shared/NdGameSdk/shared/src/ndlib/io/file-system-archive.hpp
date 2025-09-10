@@ -7,15 +7,17 @@
 #endif
 
 #include <string_view>
+#include <string>
+#include <vector>
 #include <Utility/function_ptr.hpp>
+
+#include "psarc/psarc.hpp"
 
 namespace NdGameSdk::ndlib::io {
 #if defined(T2R)
 
     class FileSystem;
 	class StorageCore;
-
-    using PSARCHeaderBE = regenny::shared::ndlib::io::PSARCHeaderBE;
 
     class NdGameSdk_API ArchiveSystem : public ISdkRegenny<regenny::shared::ndlib::io::ArchiveSystem> {
     public:
@@ -28,6 +30,7 @@ namespace NdGameSdk::ndlib::io {
 
             uint64_t GetId() const;
             uint32_t GetMountPrefixLen() const;
+            uint32_t GetIoHandle() const;
 
             uint32_t GetSize() const;
 			uint64_t GetSizeUncompressed() const;
@@ -36,7 +39,11 @@ namespace NdGameSdk::ndlib::io {
 
             PriorityGroup GetPriority() const;
 
-            const PSARCHeaderBE& GetPSARCHeader() const;
+            const PSARC::PSARCHeaderBE& GetPSARCHeader() const;
+
+            // PSARC filenames listing helper: parse PSARC directly using the mounted archive object.
+            std::vector<std::string> ListPsarcFiles();
+
         };
 
         class File : public ISdkRegenny<regenny::shared::ndlib::io::ArchiveSystem::File> {
@@ -60,6 +67,11 @@ namespace NdGameSdk::ndlib::io {
         uint64_t Add(const char* indexPath, const char* mountPrefix, PriorityGroup prio = PriorityGroup::Low);
 		bool Remove(uint64_t archiveId);
 		File* Resolve(File* pFile, char* Path);
+
+        // Lookup: find mounted archive by id
+        ArchiveSystem::Archive* FindMountedArchive(uint64_t archiveId);
+        // Convenience overload: list by archive id (searches mounted archives)
+        std::vector<std::string> ListPsarcFiles(uint64_t archiveId);
 
         struct PtrIterator {
             Archive** it{};
@@ -106,10 +118,12 @@ namespace NdGameSdk::ndlib::io {
         }
 
     private:
+        static FileSystem* s_FileSystem;
         TYPEDEF_FUNCTION_PTR(uint64_t, FileSystem_ArchiveSystem_Add, ArchiveSystem* pArchiveSystem, const char* indexPath, const char* mountPrefix, PriorityGroup prio);
         TYPEDEF_FUNCTION_PTR(bool, FileSystem_ArchiveSystem_Remove, ArchiveSystem* pArchiveSystem, uint64_t archiveId);
         TYPEDEF_FUNCTION_PTR(File*, FileSystem_ArchiveSystem_Resolve, ArchiveSystem* pArchiveSystem, File* pFile, char* Path);
         friend class FileSystem;
+        friend class Archive;
     };
 
     static_assert(sizeof(ArchiveSystem) == 0x50, "Invalid ArchiveSystem size");

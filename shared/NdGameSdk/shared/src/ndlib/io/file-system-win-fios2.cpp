@@ -1,4 +1,5 @@
 #include "file-system-win-fios2.hpp"
+#include "file-system-archive.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
 #include <NdGameSdk/shared/src/ndlib/engine-components.hpp>
@@ -8,7 +9,9 @@ namespace NdGameSdk::ndlib::io {
 
 #if defined(T2R)
 
-	FileSystem::FileSystem() : ISdkComponent(TOSTRING(FileSystem)) {}
+	FileSystem::FileSystem() : ISdkComponent(TOSTRING(FileSystem)) {
+		ArchiveSystem::s_FileSystem = this;
+	}
 
 	void FileSystem::Awake() {
 		auto SharedComponents = ISdkComponent::GetSharedComponents();
@@ -404,6 +407,55 @@ namespace NdGameSdk::ndlib::io {
 
 							fs->m_Memory->Free(buffer, HeapArena_Source);
 							fs->CloseSync(fsRes, fh);
+						}
+						return true;
+					},
+					FileSystemAddr, false, HeapArena_Source);
+
+				pdmenu->Create_DMENU_ItemFunction("List archive files", pFileSystemMenu,
+					+[](DMENU::ItemFunction& pFunction, DMENU::Message pMessage)->bool {
+						if (pMessage == DMENU::Message::OnExecute) {
+							auto* fs = reinterpret_cast<FileSystem*>(pFunction.Data());
+							NdGameInfo& NdGameInfo = fs->m_EngineComponents->GetNdGameInfo();
+							ArchiveSystem* fsa = fs->GetFileSystemData()->GetArchiveSystem();
+
+							if (auto ArchiveId = pTestMount.GetId()) {
+								auto list = fsa->ListPsarcFiles(ArchiveId);
+								spdlog::info("Entries in {} ({}):", pTestMount.GetMountPath(), list.size());
+								for (auto& s : list) {
+									spdlog::info("  {}", s);
+								}
+							}
+							else {
+								spdlog::warn("No test archive mounted at '{}'", NdGameInfo.Get()->m_GamePath);
+							}
+
+							/*
+							auto archive0 = fsa->GetMountedArchives().begin().cur[0];
+
+							auto list = archive0.ListPsarcFiles();
+							if (!list.empty()) {
+
+								auto archive0File = fsa->GetStorageCore()->LookupByIoHandle(archive0.GetIoHandle());
+
+								if (archive0File != nullptr) {
+								    const auto wname = archive0File->GetFileName();
+								    const std::string name(wname.begin(), wname.end());
+								    spdlog::info("Entries in {} ({}):", name, list.size());
+								} else {
+								    spdlog::info("Entries in IOHandle={} ({}):", archive0.GetIoHandle(), list.size());
+								}
+
+								for (auto& s : list) {
+									spdlog::info("  {}", s);
+								}
+
+							} else {
+								spdlog::warn("Failed to list files in archive ID={}", archive0.GetId());
+							}
+							*/
+
+							return true;
 						}
 						return true;
 					},

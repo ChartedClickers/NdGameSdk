@@ -1,4 +1,16 @@
 #include "file-system-archive.hpp"
+#include "file-system-fios2.hpp"
+#include "psarc/psarc_reader.hpp"
+#include "psarc/psarc_dsar.hpp"
+#include "psarc/psarc_parser.hpp"
+
+#include <Windows.h>
+#include <format>
+#include <cstring>
+#include <memory>
+#include <spdlog/spdlog.h>
+
+#include <NdGameSdk/shared/src/ndlib/engine-components.hpp>
 
 namespace NdGameSdk::ndlib::io {
 #if defined(T2R)
@@ -15,12 +27,16 @@ namespace NdGameSdk::ndlib::io {
         return this->Get()->m_mountPrefixLen;
     }
 
+    uint32_t ArchiveSystem::Archive::GetIoHandle() const {
+        return this->Get()->m_ioHandle;
+    }
+
     uint32_t ArchiveSystem::Archive::GetSize() const {
-		return this->GetPSARCHeader().m_tocLength;
+        return this->GetPSARCHeader().m_tocLength;
     }
 
     uint64_t ArchiveSystem::Archive::GetSizeUncompressed() const {
-		return this->GetPSARCHeader().m_tocUncompressedLen;
+        return this->GetPSARCHeader().m_tocUncompressedLen;
     }
 
     std::string_view ArchiveSystem::Archive::GetMountPrefixView() const {
@@ -29,11 +45,56 @@ namespace NdGameSdk::ndlib::io {
     }
 
     ArchiveSystem::PriorityGroup ArchiveSystem::Archive::GetPriority() const {
-		return this->Get()->m_priority;
+        return this->Get()->m_priority;
     }
 
-    const PSARCHeaderBE& ArchiveSystem::Archive::GetPSARCHeader() const {
+    const  PSARC::PSARCHeaderBE& ArchiveSystem::Archive::GetPSARCHeader() const {
         return this->Get()->m_psarcHeader;
+    }
+
+    std::vector<std::string> ArchiveSystem::Archive::ListPsarcFiles() {
+        std::vector<std::string> result;
+        
+        FileSystemData* fsd = ArchiveSystem::s_FileSystem->GetFileSystemData();
+        StorageCore* sc = fsd->GetStorageCore();
+		always_assert(sc == nullptr, "StorageCore is null");
+
+        const uint32_t ioHandle = this->GetIoHandle();
+        auto* fr = sc->LookupByIoHandle(ioHandle);
+        if (!fr) {
+            spdlog::warn("{}: LookupByIoHandle({}) returned null", __func__, ioHandle);
+            return result;
+        }
+
+        std::unique_ptr<PSARC::iReader> baseReader;
+        switch (fr->GetHandleType()) {
+        case FileRecord::HandleObjType::kHandleWin32:
+            baseReader = std::make_unique<PSARC::Win32Reader>(fr->GetHandleObject<HANDLE>());
+			break;
+		case FileRecord::HandleObjType::kHandleDSFile:
+			baseReader = std::make_unique<PSARC::DSReader>(sc, fr->GetHandleObject<IDStorageFile*>());
+            break;
+        default:
+			spdlog::warn("{}: Unsupported file handle type {}", __func__, static_cast<uint32_t>(fr->GetHandleType()));
+            return result;
+        }
+
+        auto readerWrapped = PSARC::AsPsarcReader(std::move(baseReader));
+        if (!readerWrapped) {
+            spdlog::warn("{}: Unsupported or unreadable archive header", __func__);
+            return result;
+        }
+
+        std::vector<std::string> names;
+        const auto& beHeader = this->GetPSARCHeader();
+        const auto normHeader = PSARC::ToHeaderNormalized(beHeader);
+
+        bool ok = PSARC::ListFilenames(*readerWrapped, normHeader, names);
+        if (!ok) {
+            spdlog::warn("{}: Failed to parse PSARC filenames", __func__);
+            return result;
+        }
+        return names;
     }
 
     uint32_t ArchiveSystem::File::GetIoHandle() const {
@@ -95,9 +156,25 @@ namespace NdGameSdk::ndlib::io {
         return FileSystem_ArchiveSystem_Resolve(this, pFile, Path);
     }
 
+    ArchiveSystem::Archive* ArchiveSystem::FindMountedArchive(uint64_t archiveId) {
+        if (archiveId == 0) return nullptr;
+        for (auto* a : this->GetMountedArchives()) {
+            if (a && a->GetId() == archiveId) return a;
+        }
+        return nullptr;
+    }
+
+    std::vector<std::string> ArchiveSystem::ListPsarcFiles(uint64_t archiveId) {
+        if (archiveId == 0) return {};
+        auto* archive = FindMountedArchive(archiveId);
+        return archive->ListPsarcFiles();
+    }
+
     INIT_FUNCTION_PTR(ArchiveSystem::FileSystem_ArchiveSystem_Add);
-	INIT_FUNCTION_PTR(ArchiveSystem::FileSystem_ArchiveSystem_Remove);
-	INIT_FUNCTION_PTR(ArchiveSystem::FileSystem_ArchiveSystem_Resolve);
+    INIT_FUNCTION_PTR(ArchiveSystem::FileSystem_ArchiveSystem_Remove);
+    INIT_FUNCTION_PTR(ArchiveSystem::FileSystem_ArchiveSystem_Resolve);
+
+	FileSystem* ArchiveSystem::s_FileSystem = nullptr;
 
 #endif
 }

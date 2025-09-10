@@ -32,7 +32,7 @@ struct FileSystem {
     }; // Size: 0x20
 
     struct ReadOperation {
-        void* m_hEvent; // 0x0
+        HANDLE m_hEvent; // 0x0
         regenny::shared::ndlib::io::FsResult m_FsResult; // 0x8
     }; // Size: 0x18
 

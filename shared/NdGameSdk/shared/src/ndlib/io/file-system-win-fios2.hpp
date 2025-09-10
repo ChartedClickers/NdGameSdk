@@ -90,9 +90,17 @@ namespace NdGameSdk::ndlib::io {
 
 		bool WriteSync(FsResult& outResult, uint32_t fh, const void* src, int64_t length, int64_t* outBytesWritten, uint8_t opFlags);
 
+		bool PreadAsync(FsResult& outResult, FileSystemInternal::ReadOnlyFileHandle& pFileHandle,
+			FileSystemInternal::ReadOperation* pReadOperation, void* dst, int64_t fileRelativeOffset,
+			int64_t requestedBytes, uint64_t* ioBytesDoneCell, FileSystemInternal::Priority prio = FileSystemInternal::Priority::None,
+			bool allowShortRead = false);
+		DWORD PollReadOp(FileSystemInternal::ReadOperation* pReadOperation, FsResult* pFsResult);
+		bool Wait(FsResult& outResult, FileSystemInternal::ReadOperation* pReadOperation);
+		bool Wait(FsResult& outResult, int32_t opId);
+
 		bool DeleteSync(FsResult& outResult, const char* path);
 		bool RenameSync(FsResult& outResult, const char* oldPath, const char* newPath);
-		void ResolvePath(const char* originalPath, char* resolvedPath, uint64_t resolvedPathSize, bool skipAssetView);
+		int64_t ResolvePath(const char* originalPath, char* resolvedPath, uint64_t resolvedPathSize, bool skipAssetView);
 
 		bool IsFileExists(const char* Path);
 		bool IsDirectoryExsist(const char* Path);
@@ -135,7 +143,7 @@ namespace NdGameSdk::ndlib::io {
 			int64_t length, int64_t* numWritten, uint8_t opFlags);
 		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_WriteAsync, FileSystemInternal* pFileSys, FsResult* pFsResult, int32_t fh, const void* src,
 			int64_t length, int64_t* FiosOpId, bool flush);
-		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_WaitOSHandle, FileSystemInternal* pFileSys, FsResult* pOut, HANDLE* pReadOps);
+		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_WaitReadOperation, FileSystemInternal* pFileSys, FsResult* pOut, FileSystemInternal::ReadOperation* pReadOperation);
 		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_WaitFIOSOpId, FileSystemInternal* pFileSys, FsResult* pOut, int32_t opId);
 		MEMBER_FUNCTION_PTR(DWORD, FileSystem_PollReadOp, FileSystemInternal* pFileSys, FileSystemInternal::ReadOperation* pReadOperation, FsResult* pFsResult);
 		MEMBER_FUNCTION_PTR(void, FileSystem_ReleaseOp, FileSystemInternal* pFileSys, int32_t opId);

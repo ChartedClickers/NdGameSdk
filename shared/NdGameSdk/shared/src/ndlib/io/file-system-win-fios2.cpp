@@ -73,9 +73,9 @@ namespace NdGameSdk::ndlib::io {
 			FileSystem_WriteAsync = (FileSystem_WriteAsync_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::FileSystem_WriteAsync), findpattern.offset);
 
-			findpattern = Patterns::FileSystem_WaitOSHandle;
-			FileSystem_WaitOSHandle = (FileSystem_WaitOSHandle_ptr)Utility::FindAndPrintPattern(module,
-				findpattern.pattern, wstr(Patterns::FileSystem_WaitOSHandle), findpattern.offset);
+			findpattern = Patterns::FileSystem_WaitReadOperation;
+			FileSystem_WaitReadOperation = (FileSystem_WaitReadOperation_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::FileSystem_WaitReadOperation), findpattern.offset);
 
 			findpattern = Patterns::FileSystem_WaitFIOSOpId;
 			FileSystem_WaitFIOSOpId = (FileSystem_WaitFIOSOpId_ptr)Utility::FindAndPrintPattern(module,
@@ -194,7 +194,7 @@ namespace NdGameSdk::ndlib::io {
 				!FileSystem_CloseSyncImp ||
 				!FileSystem_WriteSync ||
 				!FileSystem_WriteAsync ||
-				!FileSystem_WaitOSHandle ||
+				!FileSystem_WaitReadOperation ||
 				!FileSystem_WaitFIOSOpId ||
 				!FileSystem_PollReadOp ||
 				!FileSystem_ReleaseOp ||
@@ -379,6 +379,46 @@ namespace NdGameSdk::ndlib::io {
 					},
 					FileSystemAddr, false, HeapArena_Source);
 
+				pdmenu->Create_DMENU_ItemFunction("Create big_test.txt (8 MiB)", pFileSystemMenu,
+					+[](DMENU::ItemFunction& pFunction, DMENU::Message pMessage)->bool {
+						if (pMessage == DMENU::Message::OnExecute) {
+							auto* fs = reinterpret_cast<FileSystem*>(pFunction.Data());
+							NdGameInfo& NdGameInfo = fs->m_EngineComponents->GetNdGameInfo();
+
+							const std::string filePath = std::format("{}/big_test.txt", NdGameInfo.Get()->m_GamePath);
+
+							constexpr size_t MiB = 1024ull * 1024ull;
+							constexpr size_t targetSize = 8ull * MiB;
+							const std::string line = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz :: NdGameSdk Async Read Test\n";
+
+							std::string content;
+							content.reserve(targetSize);
+							while (content.size() + line.size() <= targetSize) content += line;
+							if (content.size() < targetSize) content.append(targetSize - content.size(), 'X');
+
+							FsResult fsRes{};
+							uint32_t fh = 0;
+							FhOpenFlags oflags = FhOpenAccess::FHO_ACCESS_READWRITE | (FhOpenFlags::FHOF_ALLOW_CREATE | FhOpenFlags::FHOF_TRUNCATE);
+							if (!fs->OpenSyncImp(fsRes, filePath.c_str(), &fh, oflags, /*resolveMode*/true)) {
+								spdlog::error("OpenSyncImp failed for '{}': {}", filePath, FileSystem::FsStrError(fsRes));
+								return false;
+							}
+
+							int64_t bytesWritten = 0;
+							const bool ok = fs->WriteSync(fsRes, fh, content.data(), static_cast<int64_t>(content.size()), &bytesWritten, /*opFlags*/0);
+							fs->CloseSyncImp(fsRes, fh, /*flush*/true);
+
+							if (!ok) {
+								spdlog::error("WriteSync failed for '{}': {}", filePath, FileSystem::FsStrError(fsRes));
+								return false;
+							}
+
+							spdlog::info("Created '{}' ({} bytes)", filePath, bytesWritten);
+						}
+						return true;
+					},
+					FileSystemAddr, false, HeapArena_Source);
+
 				pdmenu->Create_DMENU_ItemFunction("Rename testfile.txt -> testfile_renamed.txt", pFileSystemMenu,
 					+[](DMENU::ItemFunction& pFunction, DMENU::Message pMessage)->bool {
 						if (pMessage == DMENU::Message::OnExecute) {
@@ -544,9 +584,142 @@ namespace NdGameSdk::ndlib::io {
 					},
 					FileSystemAddr, false, HeapArena_Source);
 
+				struct AsyncReadState {
+					bool active{};
+					std::string path{};
+					FileSystem* fs{};
+					FileSystemWin::ReadOnlyFileHandle fh{};
+					FileSystemWin::ReadOperation op{};
+					FsResult fsRes{};
+					char* buffer{};
+					Memory* mem{};
+					int64_t size{};
+					uint64_t totalDone{};
+					uint64_t bytesDoneCell{};
+					int64_t chunkSize{ 1 * 1024 * 1024 }; // 1 MiB
+				};
+
+				static AsyncReadState fs_async_read{};
+				pdmenu->Create_DMENU_ItemFunction("Start async read big_test.txt (chunked)", pFileSystemMenu,
+					+[](DMENU::ItemFunction& pFunction, DMENU::Message pMessage)->bool {
+						if (pMessage == DMENU::Message::OnExecute) {
+							auto* fs = reinterpret_cast<FileSystem*>(pFunction.Data());
+							AsyncReadState& S = fs_async_read;
+							if (S.active) {
+								spdlog::warn("Async read already in progress for '{}' ({} / {} bytes)", S.path, S.totalDone, S.size);
+								return true;
+							}
+
+							auto& NdGameInfo = fs->m_EngineComponents->GetNdGameInfo();
+							S.path = std::format("{}/big_test.txt", NdGameInfo.Get()->m_GamePath);
+							S.fs = fs;
+	                        S.mem = fs->m_Memory;
+
+							if (!S.fs->IsFileExists(S.path.c_str())) {
+								spdlog::error("File not found: '{}' — run 'Create big_test.txt' first", S.path);
+								return true;
+							}
+
+							if (!S.fs->OpenSync(S.fsRes, S.path.c_str(), &S.fh)) {
+								spdlog::error("OpenSync failed for '{}': {}", S.path, FileSystem::FsStrError(S.fsRes));
+								return false;
+							}
+
+							if (!S.fs->GetSizeSync(S.fsRes, S.fh, &S.size) || S.size <= 0) {
+								spdlog::error("GetSizeSync failed or file empty for '{}': {} (size={})", S.path, FileSystem::FsStrError(S.fsRes), S.size);
+								S.fs->CloseSync(S.fsRes, S.fh);
+								return false;
+							}
+
+							S.buffer = S.fs->m_Memory->AllocateAtContext<char>(static_cast<size_t>(S.size) + 1ull, 0x10, Memory::Context::kAllocAppCpu);
+							if (!S.buffer) {
+								spdlog::error("AllocateAtContext failed for {} bytes", static_cast<uint64_t>(S.size) + 1ull);
+								S.fs->CloseSync(S.fsRes, S.fh);
+								return false;
+							}
+
+							S.totalDone = 0;
+							S.bytesDoneCell = 0;
+							const int64_t toRead = std::min<int64_t>(S.chunkSize, S.size);
+							const bool queued = S.fs->PreadAsync(S.fsRes, S.fh, &S.op, S.buffer, /*offset*/0, /*bytes*/toRead, &S.bytesDoneCell);
+							if (!queued) {
+								spdlog::error("PreadAsync failed for '{}': {}", S.path, FileSystem::FsStrError(S.fsRes));
+								S.fs->m_Memory->Free(S.buffer, HeapArena_Source);
+								S.fs->CloseSync(S.fsRes, S.fh);
+								return false;
+							}
+
+							S.active = true;
+							spdlog::info("Started async chunked read: '{}' size={} chunk={} bytes", S.path, S.size, S.chunkSize);
+						}
+						return true;
+					},
+					FileSystemAddr, false, HeapArena_Source);
+
 			#endif
 				return pdmenu->Create_DMENU_ItemSubmenu(pFileSystemMenu->Name(),
-					pMenu, pFileSystemMenu, NULL, NULL, nullptr, HeapArena_Source);
+					pMenu, pFileSystemMenu, +[](DMENU::ItemSubmenu& submenu, DMENU::Message msg)->bool {
+				#if SDK_DEBUG
+						auto* fs = reinterpret_cast<FileSystem*>(submenu.Data());
+						AsyncReadState& S = fs_async_read;
+						switch (msg) {
+						case DMENU::Message::OnUpdate: {
+							if (!S.active) return true;
+
+							DWORD done = fs->PollReadOp(&S.op, &S.fsRes);
+							if (done) {
+								S.totalDone += S.bytesDoneCell;
+								S.bytesDoneCell = 0;
+
+								if (S.totalDone < static_cast<uint64_t>(S.size)) {
+									const int64_t remain = S.size - static_cast<int64_t>(S.totalDone);
+									const int64_t toRead = std::min<int64_t>(S.chunkSize, remain);
+									char* dst = S.buffer + S.totalDone;
+
+									const bool queued = fs->PreadAsync(S.fsRes, S.fh, &S.op, dst,
+										/*offset*/static_cast<int64_t>(S.totalDone), /*bytes*/toRead, &S.bytesDoneCell);
+
+									if (!queued) {
+										spdlog::error("PreadAsync failed mid-stream for '{}': {}", S.path, FileSystem::FsStrError(S.fsRes));
+										if (S.buffer && S.mem) S.mem->Free(S.buffer, HeapArena_Source);
+										fs->CloseSync(S.fsRes, S.fh);
+										S = AsyncReadState{};
+										return true;
+									}
+									spdlog::info("Queued next chunk: {} / {} bytes", S.totalDone, S.size);
+								}
+								else {
+									const uint64_t termIndex = S.totalDone;
+									S.buffer[termIndex] = '\0';
+									spdlog::info("Async chunked read complete: '{}' total={} bytes", S.path, termIndex);
+									
+									const size_t previewLen = std::min<size_t>(static_cast<size_t>(termIndex), 256);
+									std::string_view preview(S.buffer, previewLen);
+
+									spdlog::info("Preview ({} bytes):\n{}", previewLen, preview);
+									
+									if (S.mem) S.mem->Free(S.buffer, HeapArena_Source);
+									fs->CloseSync(S.fsRes, S.fh);
+									S = AsyncReadState{};
+								}
+							}
+							return true;
+						}
+						case DMENU::Message::OnClose: {
+							if (S.active) {
+								spdlog::warn("Aborting async read for '{}' at {} / {} bytes", S.path, S.totalDone, S.size);
+								if (S.buffer && S.mem) S.mem->Free(S.buffer, HeapArena_Source);
+								fs->CloseSync(S.fsRes, S.fh);
+								S = AsyncReadState{};
+							}
+							return true;
+						}
+						default:
+							return true;
+						}
+					#endif
+						return true;
+					}, FileSystemAddr, nullptr, HeapArena_Source);
 			}
 		}
 		return nullptr;

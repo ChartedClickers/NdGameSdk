@@ -17,6 +17,7 @@ type wchar_t 2
 type float 4 [[f32]]
 type double 8
 type StringId64 8 [[u64]]
+type HANDLE 8 [[u64]]
 type CRITICAL_SECTION 40
 
 namespace regenny {
@@ -1745,7 +1746,7 @@ namespace regenny {
                     };
 
                     struct ReadOperation 0x18 {
-                        void* m_hEvent;
+                        HANDLE m_hEvent;
                         FsResult m_FsResult;
                     };
 

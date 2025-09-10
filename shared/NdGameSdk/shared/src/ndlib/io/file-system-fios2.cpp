@@ -178,11 +178,10 @@ namespace NdGameSdk::ndlib::io {
 		return code <= 0;
 	}
 
-	void FileSystem::ResolvePath(const char* originalPath, char* resolvedPath, uint64_t resolvedPathSize, bool skipAssetView) {
+	int64_t FileSystem::ResolvePath(const char* originalPath, char* resolvedPath, uint64_t resolvedPathSize, bool skipAssetView) {
 		always_assert(FileSystem_ResolvePath == 0, "FileSystem_ResolvePath was not set!");
-		FileSystem_ResolvePath(const_cast<char*>(originalPath), resolvedPath, resolvedPathSize, skipAssetView);
+		return FileSystem_ResolvePath(const_cast<char*>(originalPath), resolvedPath, resolvedPathSize, skipAssetView);
 	}
-
 
 	bool FileSystem::CloseSyncImp(FsResult& outResult, uint32_t fh, bool flush) {
 		always_assert(FileSystem_CloseSyncImp == nullptr, "FileSystem_CloseSyncImp was not set!");
@@ -194,6 +193,47 @@ namespace NdGameSdk::ndlib::io {
 			flush
 		);
 
+		const int32_t code = ret ? *ret : 0;
+		return code <= 0;
+	}
+
+	bool FileSystem::PreadAsync(FsResult& outResult, FileSystemInternal::ReadOnlyFileHandle& pFileHandle,
+		FileSystemInternal::ReadOperation* pReadOperation, void* dst, int64_t fileRelativeOffset,
+		int64_t requestedBytes, uint64_t* ioBytesDoneCell, FileSystemInternal::Priority prio, bool allowShortRead) {
+		always_assert(FileSystem_PreadAsync == nullptr, "FileSystem_PreadAsync was not set!");
+
+		int32_t* ret = FileSystem_PreadAsync(
+			this->GetFileSystem(),
+			&outResult,
+			pFileHandle,
+			pReadOperation,
+			dst,
+			fileRelativeOffset,
+			requestedBytes,
+			ioBytesDoneCell,
+			prio,
+			allowShortRead
+		);
+
+		const int32_t code = ret ? *ret : 0;
+		return code <= 0;
+	}
+
+	DWORD FileSystem::PollReadOp(FileSystemInternal::ReadOperation* pReadOperation, FsResult* pFsResult) {
+		always_assert(FileSystem_PollReadOp == nullptr, "FileSystem_PollReadOp was not set!");
+		return FileSystem_PollReadOp(this->GetFileSystem(), pReadOperation, pFsResult);
+	}
+
+	bool FileSystem::Wait(FsResult& outResult, FileSystemInternal::ReadOperation* pReadOperation) {
+		always_assert(FileSystem_WaitReadOperation == nullptr, "FileSystem_WaitReadOperation was not set!");
+		int32_t* ret = FileSystem_WaitReadOperation(this->GetFileSystem(), &outResult, pReadOperation);
+		const int32_t code = ret ? *ret : 0;
+		return code <= 0;
+	}
+
+	bool FileSystem::Wait(FsResult& outResult, int32_t opId) {
+		always_assert(FileSystem_WaitFIOSOpId == nullptr, "FileSystem_WaitFIOSOpId was not set!");
+		int32_t* ret = FileSystem_WaitFIOSOpId(this->GetFileSystem(), &outResult, opId);
 		const int32_t code = ret ? *ret : 0;
 		return code <= 0;
 	}

@@ -85,6 +85,18 @@ namespace NdGameSdk::ndlib::io {
 		bool PreadSync(FsResult& outResult, FileSystemInternal::ReadOnlyFileHandle* pFileHandle, void* dst, uint64_t fileRelativeOffset,
 			uint64_t requestedBytes, uint64_t* ioBytesDoneCell, FileSystemInternal::Priority prio = FileSystemInternal::Priority::None);
 
+		bool OpenSyncImp(FsResult& outResult, const char* path, uint32_t* outFh, FhOpenFlags openFlags, bool resolveMode);
+		bool CloseSyncImp(FsResult& outResult, uint32_t fh, bool flush);
+
+		bool WriteSync(FsResult& outResult, uint32_t fh, const void* src, int64_t length, int64_t* outBytesWritten, uint8_t opFlags);
+
+		bool DeleteSync(FsResult& outResult, const char* path);
+		bool RenameSync(FsResult& outResult, const char* oldPath, const char* newPath);
+		void ResolvePath(const char* originalPath, char* resolvedPath, uint64_t resolvedPathSize, bool skipAssetView);
+
+		bool IsFileExists(const char* Path);
+		bool IsDirectoryExsist(const char* Path);
+
 		bool MountArchiveSync(FsResult& outResult, const char* archivePath, const char* mountPath, FileSystemInternal::ArchiveMount* pArchiveMount, bool appendToEnd = false);
 		bool UnmountArchiveSync(FsResult& outResult, FileSystemInternal::ArchiveMount* pArchiveMount);
 
@@ -113,16 +125,14 @@ namespace NdGameSdk::ndlib::io {
 		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_PreadAsync, FileSystemInternal* pFileSys, FsResult* pOutResult, FileSystemInternal::ReadOnlyFileHandle& pFileHandle,
 			FileSystemInternal::ReadOperation* pReadOperation, void* dst, int64_t pfileRelativeOffset, int64_t pRequestedBytes,
 			uint64_t* pIoBytesDoneCell, FileSystemInternal::Priority prio, bool allowShortRead);
-		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_PwriteSync, FileSystemInternal* pFileSys, FsResult* pOutResult, uint32_t fh, const void* src,
-			uint64_t length, uint64_t offset, uint64_t* outBytesWritten, uint8_t flags);
 		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_OpenSync, FileSystemInternal* pFileSys, FsResult* pOutResult, const char* path,
 			FileSystemInternal::ReadOnlyFileHandle* pFileHandle, FileSystemInternal::Priority prio);
 		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_CloseSync, FileSystemInternal* pFileSys, FsResult* pOutResult, FileSystemInternal::ReadOnlyFileHandle* pFileHandle);
-		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_OpenSyncImp, FileSystemInternal* pFileSys, FsResult* pOutResult, const char* path, 
-			uint32_t fh, FhOpenFlags openFlags, bool resolveMode);
-		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_CloseSyncImp, FileSystemInternal* pFileSys, FsResult* pOutResult, uint32_t fh, bool flush);
+        MEMBER_FUNCTION_PTR(int32_t*, FileSystem_OpenSyncImp, FileSystemInternal* pFileSys, FsResult* pOutResult, const char* path, 
+            uint32_t* pFh, FhOpenFlags openFlags, bool resolveMode);
+        MEMBER_FUNCTION_PTR(int32_t*, FileSystem_CloseSyncImp, FileSystemInternal* pFileSys, FsResult* pOutResult, uint32_t fh, bool flush);
         MEMBER_FUNCTION_PTR(int32_t*, FileSystem_WriteSync, FileSystemInternal* pFileSys, FsResult* pFsResult, int32_t fh, const void* src,
-			int64_t length, int64_t offset, int64_t* numWritten, bool flush);
+			int64_t length, int64_t* numWritten, uint8_t opFlags);
 		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_WriteAsync, FileSystemInternal* pFileSys, FsResult* pFsResult, int32_t fh, const void* src,
 			int64_t length, int64_t* FiosOpId, bool flush);
 		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_WaitOSHandle, FileSystemInternal* pFileSys, FsResult* pOut, HANDLE* pReadOps);
@@ -131,8 +141,8 @@ namespace NdGameSdk::ndlib::io {
 		MEMBER_FUNCTION_PTR(void, FileSystem_ReleaseOp, FileSystemInternal* pFileSys, int32_t opId);
 		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_ReadSync, FileSystemInternal* pFileSys, FsResult* pOutResult, int32_t fh, void* dst, int64_t length, 
 			uint64_t* outBytesRead, uint8_t flags);
-		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_ReadAsync, FileSystemInternal* pFileSys, FsResult* outErr, int32_t fh, const void* buffer, uint64_t length, 
-			uint64_t* bytesThisSubmit, int32_t* outOpId, uint8_t submitFlag);
+        MEMBER_FUNCTION_PTR(int32_t*, FileSystem_ReadAsync, FileSystemInternal* pFileSys, FsResult* outErr, int32_t fh, const void* buffer, uint64_t length, 
+            uint64_t* bytesThisSubmit, int32_t* outOpId, uint8_t submitFlag);
 
 		MEMBER_FUNCTION_PTR(bool, FileSystem_IsFileExists, FileSystemInternal* pFileSys, char* Path);
 		MEMBER_FUNCTION_PTR(int64_t, FileSystem_IsDirectoryExsist, FileSystemInternal* pFileSys, char* path);
@@ -161,10 +171,10 @@ namespace NdGameSdk::ndlib::io {
 
 		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_MountArchiveSync, FileSystemInternal* pFileSys, FsResult* pOutResult, const char* indexPath, const char* mountPrefix, 
 			FileSystemInternal::ArchiveMount* ArchiveMount, bool preferForeground);
-		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_UnmountArchiveSync, FileSystemInternal* FileSys, FsResult* outRes, FileSystemInternal::ArchiveMount* pArchiveMount);
+        MEMBER_FUNCTION_PTR(int32_t*, FileSystem_UnmountArchiveSync, FileSystemInternal* FileSys, FsResult* outRes, FileSystemInternal::ArchiveMount* pArchiveMount);
 
-		friend class NdDevMenu;
-	};
+        friend class NdDevMenu;
+    };
 
 	static_assert(sizeof(FileSystemWin) == 0x220, "Invalid FileSystemWin size");
 	static_assert(sizeof(FileSystemWin::Overlay) == 0x60, "Invalid Overlay size");

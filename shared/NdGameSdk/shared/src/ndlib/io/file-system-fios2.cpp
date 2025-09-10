@@ -71,6 +71,16 @@ namespace NdGameSdk::ndlib::io {
 		return code <= 0;
 	}
 
+	bool FileSystem::IsFileExists(const char* Path) {
+		always_assert(FileSystem_IsFileExists == nullptr, "FileSystem_IsFileExists was not set!");
+		return FileSystem_IsFileExists(this->GetFileSystem(), const_cast<char*>(Path));
+	}
+
+	bool FileSystem::IsDirectoryExsist(const char* Path) {
+		always_assert(FileSystem_IsDirectoryExsist == nullptr, "FileSystem_IsDirectoryExsist was not set!");
+		return FileSystem_IsDirectoryExsist(this->GetFileSystem(), const_cast<char*>(Path)) != 0;
+	}
+
 	bool FileSystem::MountArchiveSync(FsResult& outResult, const char* archivePath, const char* mountPath,
 		FileSystemInternal::ArchiveMount* pArchiveMount, bool appendToEnd) {
 		always_assert(FileSystem_MountArchiveSync == nullptr, "FileSystem_MountArchiveSync was not set!");
@@ -106,6 +116,86 @@ namespace NdGameSdk::ndlib::io {
 	const char* FileSystem::FsStrError(FsResult& pFsResult) {
 		always_assert(FileSystem_StrError == nullptr, "FileSystem_FsStrError was not set!");
 		return FileSystem_StrError(&pFsResult);
+	}
+
+	bool FileSystem::OpenSyncImp(FsResult& outResult, const char* path, uint32_t* outFh, FhOpenFlags openFlags, bool resolveMode) {
+		always_assert(FileSystem_OpenSyncImp == nullptr, "FileSystem_OpenSyncImp was not set!");
+
+		int32_t* ret = FileSystem_OpenSyncImp(
+			this->GetFileSystem(),
+			&outResult,
+			path,
+			outFh,
+			openFlags,
+			resolveMode
+		);
+
+		const int32_t code = ret ? *ret : 0;
+		return code <= 0;
+	}
+
+	bool FileSystem::WriteSync(FsResult& outResult, uint32_t fh, const void* src, int64_t length, int64_t* outBytesWritten, uint8_t opFlags) {
+		always_assert(FileSystem_WriteSync == nullptr, "FileSystem_WriteSync was not set!");
+
+		int32_t* ret = FileSystem_WriteSync(
+			this->GetFileSystem(),
+			&outResult,
+			static_cast<int32_t>(fh),
+			src,
+			length,
+			outBytesWritten,
+			opFlags
+		);
+
+		const int32_t code = ret ? *ret : 0;
+		return code <= 0;
+	}
+
+	bool FileSystem::DeleteSync(FsResult& outResult, const char* path) {
+		always_assert(FileSystem_DeleteSync == nullptr, "FileSystem_DeleteSync was not set!");
+
+		int32_t* ret = FileSystem_DeleteSync(
+			this->GetFileSystem(),
+			&outResult,
+			path
+		);
+
+		const int32_t code = ret ? *ret : 0;
+		return code <= 0;
+	}
+
+	bool FileSystem::RenameSync(FsResult& outResult, const char* oldPath, const char* newPath) {
+		always_assert(FileSystem_RenameSync == nullptr, "FileSystem_RenameSync was not set!");
+
+		int32_t* ret = FileSystem_RenameSync(
+			this->GetFileSystem(),
+			&outResult,
+			oldPath,
+			newPath
+		);
+
+		const int32_t code = ret ? *ret : 0;
+		return code <= 0;
+	}
+
+	void FileSystem::ResolvePath(const char* originalPath, char* resolvedPath, uint64_t resolvedPathSize, bool skipAssetView) {
+		always_assert(FileSystem_ResolvePath == 0, "FileSystem_ResolvePath was not set!");
+		FileSystem_ResolvePath(const_cast<char*>(originalPath), resolvedPath, resolvedPathSize, skipAssetView);
+	}
+
+
+	bool FileSystem::CloseSyncImp(FsResult& outResult, uint32_t fh, bool flush) {
+		always_assert(FileSystem_CloseSyncImp == nullptr, "FileSystem_CloseSyncImp was not set!");
+
+		int32_t* ret = FileSystem_CloseSyncImp(
+			this->GetFileSystem(),
+			&outResult,
+			static_cast<uint32_t>(fh),
+			flush
+		);
+
+		const int32_t code = ret ? *ret : 0;
+		return code <= 0;
 	}
 
 	StorageCore* FileSystemData::GetStorageCore() const {

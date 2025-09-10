@@ -104,7 +104,10 @@ namespace NdGameSdk::ndlib::io {
                 const uint64_t outBytes = std::min<uint64_t>(remaining, ph.BlockSize);
 
                 std::vector<unsigned char> block(compSize);
-                if (!rdr.Read(curOfs, block.data(), block.size())) { spdlog::warn("PsarcParser: block read failed"); return false; }
+                if (!rdr.Read(curOfs, block.data(), block.size())) { 
+                    spdlog::warn("PsarcParser: block read failed"); 
+                    return false; 
+                }
 
                 if (z == 0 || compSize == outBytes) {
                     buf.insert(buf.end(), block.data(), block.data() + outBytes);

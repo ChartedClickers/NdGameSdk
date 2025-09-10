@@ -49,10 +49,6 @@ namespace NdGameSdk::ndlib::io {
 			FileSystem_PreadAsync = (FileSystem_PreadAsync_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::FileSystem_PreadAsync), findpattern.offset);
 
-			findpattern = Patterns::FileSystem_PwriteSync;
-			FileSystem_PwriteSync = (FileSystem_PwriteSync_ptr)Utility::FindAndPrintPattern(module,
-				findpattern.pattern, wstr(Patterns::FileSystem_PwriteSync), findpattern.offset);
-
 			findpattern = Patterns::FileSystem_OpenSync;
 			FileSystem_OpenSync = (FileSystem_OpenSync_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::FileSystem_OpenSync), findpattern.offset);
@@ -192,7 +188,6 @@ namespace NdGameSdk::ndlib::io {
 
 			if (!FileSystem_PreadSync ||
 				!FileSystem_PreadAsync ||
-				!FileSystem_PwriteSync ||
 				!FileSystem_OpenSync ||
 				!FileSystem_CloseSync ||
 				!FileSystem_OpenSyncImp ||
@@ -342,6 +337,94 @@ namespace NdGameSdk::ndlib::io {
 								pFunction.SetActive(false);
 							}
 
+						}
+						return true;
+					},
+					FileSystemAddr, false, HeapArena_Source);
+
+				pdmenu->Create_DMENU_ItemFunction("Write testfile.txt", pFileSystemMenu,
+					+[](DMENU::ItemFunction& pFunction, DMENU::Message pMessage)->bool {
+						if (pMessage == DMENU::Message::OnExecute) {
+							auto* fs = reinterpret_cast<FileSystem*>(pFunction.Data());
+							NdGameInfo& NdGameInfo = fs->m_EngineComponents->GetNdGameInfo();
+							const std::string filePath = std::format("{}/testfile.txt", NdGameInfo.Get()->m_GamePath);
+
+							FsResult fsRes{};
+							uint32_t fh = 0;
+
+							FhOpenFlags oflags = FhOpenAccess::FHO_ACCESS_READWRITE | (FhOpenFlags::FHOF_ALLOW_CREATE | FhOpenFlags::FHOF_TRUNCATE);
+							if (!fs->OpenSyncImp(fsRes, filePath.c_str(), &fh, oflags, /*resolveMode*/true)) {
+								spdlog::error("OpenSyncImp failed for '{}': {}", filePath, FileSystem::FsStrError(fsRes));
+								return false;
+							}
+
+							const std::string content = std::format(
+								"NdGameSdk WriteSync test\nGamePath: {}\nMessage: {}\n",
+								NdGameInfo.Get()->m_GamePath,
+								"Hello from FileSystem::WriteSync()"
+							);
+
+							int64_t bytesWritten = 0;
+							const bool ok = fs->WriteSync(fsRes, fh, content.data(), static_cast<int64_t>(content.size()), &bytesWritten, /*opFlags*/0);
+							if (!ok) {
+								spdlog::error("WriteSync failed for '{}': {}", filePath, FileSystem::FsStrError(fsRes));
+								fs->CloseSyncImp(fsRes, fh, /*flush*/false);
+								return false;
+							}
+
+							spdlog::info("Wrote {} bytes to '{}'", bytesWritten, filePath);
+						fs->CloseSyncImp(fsRes, fh, /*flush*/true);
+						}
+						return true;
+					},
+					FileSystemAddr, false, HeapArena_Source);
+
+				pdmenu->Create_DMENU_ItemFunction("Rename testfile.txt -> testfile_renamed.txt", pFileSystemMenu,
+					+[](DMENU::ItemFunction& pFunction, DMENU::Message pMessage)->bool {
+						if (pMessage == DMENU::Message::OnExecute) {
+							auto* fs = reinterpret_cast<FileSystem*>(pFunction.Data());
+							NdGameInfo& NdGameInfo = fs->m_EngineComponents->GetNdGameInfo();
+
+							const std::string srcPath = std::format("{}/testfile.txt", NdGameInfo.Get()->m_GamePath);
+							const std::string dstPath = std::format("{}/testfile_renamed.txt", NdGameInfo.Get()->m_GamePath);
+
+							if (!fs->IsFileExists(srcPath.c_str())) {
+								spdlog::warn("Source file does not exist: '{}'", srcPath);
+								return true;
+							}
+
+							FsResult fsRes{};
+							if (!fs->RenameSync(fsRes, srcPath.c_str(), dstPath.c_str())) {
+								spdlog::error("RenameSync failed: '{}' -> '{}': {}", srcPath, dstPath, FileSystem::FsStrError(fsRes));
+								return false;
+							}
+
+							spdlog::info("Renamed '{}' -> '{}'", srcPath, dstPath);
+						}
+						return true;
+					},
+					FileSystemAddr, false, HeapArena_Source);
+
+				pdmenu->Create_DMENU_ItemFunction("Delete testfile_renamed.txt", pFileSystemMenu,
+					+[](DMENU::ItemFunction& pFunction, DMENU::Message pMessage)->bool {
+						if (pMessage == DMENU::Message::OnExecute) {
+							auto* fs = reinterpret_cast<FileSystem*>(pFunction.Data());
+							NdGameInfo& NdGameInfo = fs->m_EngineComponents->GetNdGameInfo();
+
+							const std::string path = std::format("{}/testfile_renamed.txt", NdGameInfo.Get()->m_GamePath);
+
+							if (!fs->IsFileExists(path.c_str())) {
+								spdlog::warn("File not found: '{}'", path);
+								return true;
+							}
+
+							FsResult fsRes{};
+							if (!fs->DeleteSync(fsRes, path.c_str())) {
+								spdlog::error("DeleteSync failed for '{}': {}", path, FileSystem::FsStrError(fsRes));
+								return false;
+							}
+
+							spdlog::info("Deleted '{}'", path);
 						}
 						return true;
 					},

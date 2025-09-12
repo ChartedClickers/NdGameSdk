@@ -8,6 +8,8 @@
 
 #if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/ndlib/io/FileSystem.hpp>
+#elif defined(T1X)
+#include <NdGameSdk/regenny/t1x/shared/ndlib/io/FileSystem.hpp>
 #endif
 
 #include "file-system-fios2.hpp"
@@ -21,11 +23,10 @@ using namespace NdGameSdk::ndlib::debug;
 
 namespace NdGameSdk::ndlib::io {
 
-#if defined(T2R)
-
 	/* Extern classes */
 	class NdGameSdk_API FileSystemWin : public ISdkRegenny<regenny::shared::ndlib::io::FileSystem> {
 	public:
+	#if defined(T2R)
 		using Priority = regenny::shared::ndlib::io::FileSystem::Priority;
 
 		class Overlay : public ISdkRegenny<regenny::shared::ndlib::io::FileSystem::FileSystemOverlay> {
@@ -68,7 +69,10 @@ namespace NdGameSdk::ndlib::io {
 		Overlay& GetOverlay();
 		bool IsInitialized() const;
 		Memory::Allocator& GetAllocator();
+	#endif
 	};
+
+#if defined(T2R)
 
 	#define FileSystemInternal FileSystemWin
 

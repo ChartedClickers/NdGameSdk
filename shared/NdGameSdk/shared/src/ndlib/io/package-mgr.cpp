@@ -947,6 +947,10 @@ namespace NdGameSdk::ndlib::io {
 		return reinterpret_cast<Package::PakHeader&>(this->Get()->m_pakHdr);
 	}
 
+	FileSystemInternal::ReadOnlyFileHandle* PackageProcessingInfo::GetFileHandle() const {
+		return reinterpret_cast<FileSystemInternal::ReadOnlyFileHandle*>(&this->Get()->m_File);
+	}
+
 	std::string PackageProcessingInfo::GetStatusString(LoadingStatus status) {
 	#if defined(T2R) || defined(T1X)
 		always_assert(PackageMgr_PackageProcessingInfo_GetStatusString == nullptr, "Function pointer was not set!");

@@ -36,7 +36,7 @@ project(ND.ModClient
 		C
 		CXX
 	VERSION
-		1.4.2
+		1.6.0
 )
 
 add_compile_options(
@@ -292,6 +292,9 @@ set(T1XSDK_SOURCES
 	"shared/NdGameSdk/regenny/t1x/shared/ndlib/NdFrameState.hpp"
 	"shared/NdGameSdk/regenny/t1x/shared/ndlib/NdGameInfo.hpp"
 	"shared/NdGameSdk/regenny/t1x/shared/ndlib/debug/DMENU.hpp"
+	"shared/NdGameSdk/regenny/t1x/shared/ndlib/io/FileSystem.hpp"
+	"shared/NdGameSdk/regenny/t1x/shared/ndlib/io/PackageMgr.hpp"
+	"shared/NdGameSdk/regenny/t1x/shared/ndlib/io/PrefetchMgr.hpp"
 	"shared/NdGameSdk/regenny/t1x/shared/ndlib/process/process.hpp"
 	"shared/NdGameSdk/regenny/t1x/shared/ndlib/profiling/ProfileCtrl.hpp"
 	"shared/NdGameSdk/regenny/t1x/shared/ndlib/profiling/ProfileMgr.hpp"
@@ -408,6 +411,8 @@ set(T1XSDK_SOURCES
 	"shared/NdGameSdk/shared/src/ndlib/io/package-util.hpp"
 	"shared/NdGameSdk/shared/src/ndlib/io/package.cpp"
 	"shared/NdGameSdk/shared/src/ndlib/io/package.hpp"
+	"shared/NdGameSdk/shared/src/ndlib/io/prefetch.cpp"
+	"shared/NdGameSdk/shared/src/ndlib/io/prefetch.hpp"
 	"shared/NdGameSdk/shared/src/ndlib/io/psarc/psarc.hpp"
 	"shared/NdGameSdk/shared/src/ndlib/io/psarc/psarc_dsar.cpp"
 	"shared/NdGameSdk/shared/src/ndlib/io/psarc/psarc_dsar.hpp"
@@ -653,6 +658,7 @@ set(T2RSDK_SOURCES
 	"shared/NdGameSdk/regenny/t2r/shared/ndlib/io/PackageProcessingInfo.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/ndlib/io/PakLoginTableEntry.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/ndlib/io/PathString.hpp"
+	"shared/NdGameSdk/regenny/t2r/shared/ndlib/io/PrefetchMgr.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/ndlib/io/StorageCore.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/ndlib/profiling/ProfileCtrl.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/ndlib/profiling/ProfileMgr.hpp"
@@ -763,6 +769,8 @@ set(T2RSDK_SOURCES
 	"shared/NdGameSdk/shared/src/ndlib/io/package-util.hpp"
 	"shared/NdGameSdk/shared/src/ndlib/io/package.cpp"
 	"shared/NdGameSdk/shared/src/ndlib/io/package.hpp"
+	"shared/NdGameSdk/shared/src/ndlib/io/prefetch.cpp"
+	"shared/NdGameSdk/shared/src/ndlib/io/prefetch.hpp"
 	"shared/NdGameSdk/shared/src/ndlib/io/psarc/psarc.hpp"
 	"shared/NdGameSdk/shared/src/ndlib/io/psarc/psarc_dsar.cpp"
 	"shared/NdGameSdk/shared/src/ndlib/io/psarc/psarc_dsar.hpp"

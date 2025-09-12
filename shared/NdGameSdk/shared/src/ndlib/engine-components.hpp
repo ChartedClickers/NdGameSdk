@@ -19,6 +19,7 @@
 #include "nd-frame-state.hpp"
 #include "io/file-system-win-fios2.hpp"
 #include "io/package-mgr.hpp"
+#include "io/prefetch.hpp"
 #include "nd-config.hpp"
 
 using EngineComponent = ::regenny::shared::ndlib::EngineComponents::Component;
@@ -31,11 +32,9 @@ namespace NdGameSdk::ndlib {
 
 		NdGameSdk_API ndlib::NdGameInfo& GetNdGameInfo();
 		NdGameSdk_API ndlib::NdFrameState& GetNdFrameState();
-
-#if defined(T2R)
 		NdGameSdk_API ndlib::io::FileSystemWin& GetFileSystem();
 		NdGameSdk_API ndlib::io::PackageMgr& GetPackageMgr();
-#endif
+		NdGameSdk_API ndlib::io::PrefetchMgr& GetPrefetchMgr();
 
 		template <typename TComponent>
 		NdGameSdk_API TComponent* GetEngineComponent(EngineComponent index) {

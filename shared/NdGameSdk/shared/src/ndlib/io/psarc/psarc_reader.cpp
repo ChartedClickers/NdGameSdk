@@ -42,10 +42,19 @@ namespace NdGameSdk::ndlib::io {
         }
 
         bool DSReader::Read(uint64_t ofs, void* dst, size_t sz) {
-            if (!m_StorageCore || !m_file || sz == 0) return false;
+            if (!m_StorageCore || !m_file || sz == 0) 
+                return false;
+
+            if (!m_StorageCore->IsUsingDirectStorage()) {
+				spdlog::error("DSReader::Read called without DirectStorage enabled");
+                return false;
+            }
 
             IDStorageQueue* Queue = m_StorageCore->GetDirectStorageQueue();
-            if (!Queue) return false;
+            if (!Queue) {
+				spdlog::error("DSReader::Read called without a valid DirectStorage queue");
+                return false;
+            }
 
             DSTORAGE_REQUEST req{};
             req.Options.CompressionFormat = DSTORAGE_COMPRESSION_FORMAT_NONE;

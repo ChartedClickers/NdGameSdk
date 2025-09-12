@@ -12,6 +12,8 @@
 #if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/ndlib/io/PackageMgr.hpp>
 #include <NdGameSdk/regenny/t2r/shared/ndlib/io/PackageProcessingInfo.hpp>
+#elif defined(T1X)
+#include <NdGameSdk/regenny/t1x/shared/ndlib/io/PackageMgr.hpp>
 #endif
 
 #include <future>
@@ -19,6 +21,7 @@
 
 #include "package.hpp"
 #include "package-util.hpp"
+#include "file-system-win-fios2.hpp"
 
 namespace NdGameSdk::ndlib { class EngineComponents; }
 
@@ -43,12 +46,15 @@ namespace NdGameSdk::ndlib::io {
 		LoadingStatus GetStatus() const;
 		std::string GetStatusString() const;
 		Package::PakHeader& GetPakHeader();
+		FileSystemInternal::ReadOnlyFileHandle* GetFileHandle() const;
 
 		static std::string GetStatusString(LoadingStatus status);
 	};
+#endif
 
 	class NdGameSdk_API PackageMgr : public ISdkRegenny<regenny::shared::ndlib::io::PackageMgr> {
 	public:
+	#if defined(T2R)
 		using PackageCategory = regenny::shared::ndlib::io::PackageMgr::PackageCategory;
 
 		class Configuration : public ISdkRegenny<regenny::shared::ndlib::io::PackageMgr::Configuration>  {
@@ -212,7 +218,10 @@ namespace NdGameSdk::ndlib::io {
 		}
 
 		inline static constexpr uint32_t kMaxNumPackagesAwaitingUnload = 0x800;
+	#endif
 	};
+
+#if defined(T2R)
 
 	class NdGameSdk_API PackageManager : public ISdkComponent {
 	public:

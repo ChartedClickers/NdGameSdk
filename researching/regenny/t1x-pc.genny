@@ -1964,7 +1964,45 @@ namespace regenny {
     
         // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\io
         namespace io {
-        
+
+            struct FileSystem {}; // not verified for t1x
+            struct PackageMgr {}; // not verified for t1x
+
+            struct PrefetchMgr 0x9e0 {
+
+                struct PrefetchEntry {
+                    uint8_t m_Flags;
+                    uint8_t m_DirSlot;
+                    uint16_t m_field02;
+                    uint32_t m_field04; 
+                    char* m_FileName [[utf8*]];
+                };
+
+                void* m_EntryTable;
+                void* m_EntryAux;
+                uint64_t m_PendingBits[0x5e];
+                uint32_t m_field300;
+                uint32_t m_MaxEntries;
+                FileSystem* m_FileSystem;
+                PackageMgr* m_PackageMgr;
+                char m_GameDataPath[0x400] @ 0x31c [[utf8*]];
+                uint32_t m_GameDataPathLen;
+                bool m_UseGameDataPrefix;
+                bool m_Paused;
+                uint32_t m_QueueHead @ 0x750;
+                uint32_t m_field754;
+                uint32_t m_FileNamePoolHead;
+                uint32_t m_DirSlotCount;
+                void* m_DirTable;
+                void* m_FileNamePool;
+                uint32_t m_FileNamePoolCapacity;
+                uint32_t m_FileNameHighWater;
+                uint32_t m_FileNameUsed;
+                corelib.system.platform.ndsys.Thread m_Threads[0x1f] @ 0x780;
+                corelib.system.platform.ndsys.Mutex m_PrefetchAccessLock;
+                corelib.system.platform.ndsys.ConditionVariable m_PrefetchCondVar;
+                bool m_ShutdownRequested;
+            }; // prefetch.cpp
         }
     
         }

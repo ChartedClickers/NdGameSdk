@@ -11,3 +11,6 @@ CMakeLists.txt.user
 # Researching
 researching/regenny-sdk/
 researching/regenny/*.json
+
+# Misc
+AGENTS.md

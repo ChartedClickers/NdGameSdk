@@ -1965,7 +1965,26 @@ namespace regenny {
         // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\io
         namespace io {
 
-            struct FileSystem {}; // not verified for t1x
+            // not verified for t1x
+            struct FileSystem {
+
+                // usage SCE FIOS legacy...
+                struct ArchiveMount 0x18 {
+
+                    enum ArchiveMountFlags : uint32_t {
+                        Patch = 0x1,
+                        Dynamic = 0x2,
+                        Opaque = 0x4
+                    };
+
+                    uint32_t m_fh;
+                    ArchiveMountFlags m_flags;
+                    void* m_pMountBuffer; // FIOS DATA (Not Resolved)
+                    uint64_t m_sizeBytes;
+                };
+
+            };
+
             struct PackageMgr {}; // not verified for t1x
 
             struct PrefetchMgr 0x9e0 {
@@ -2009,6 +2028,77 @@ namespace regenny {
 
         // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\gamelib
         namespace gamelib {
+
+            // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\gamelib\level
+            namespace level {
+
+                struct GameLoading {
+
+                    enum TransitionStatus : uint32_t {
+                        // Idle / finished:
+                        kSteady = 0x00, // WaitForSteadyState() waits for this
+
+                        // Early pipeline stages scheduled by UpdateInternal():
+                        kMountWorld = 0x01, // schedules GameLoadingMountWorld
+                        kMountLanguage = 0x02, // schedules GameLoadingMountLanguage
+                        kMountSPMP = 0x03, // schedules GameLoadingMountSPMP
+                        kCopyToHDD = 0x04, // schedules GameLoadingCopyToHDD
+                        kPlayGoWait = 0x05, // schedules GameLoadingPlayGoWait
+                        kPlayGoWait_Alias = 0x06, // alias into PlayGo wait path (same dispatch)
+
+                        // Set once the initial-archives job finishes its countdown:
+                        kMountedInitial = 0x07,
+                        // Initial-archives countdown sequence stages:
+                        kMountingOthers = 0x08, // WaitForFirstWorldAvailability()
+                        kMountingFirstWorld = 0x09, // ...
+                        kMountingSPCommon = 0x0A, // ...
+                        kMountingMPCommon = 0x0B, // ...
+                        kMountingCommon = 0x0C, // WaitForCommonAvailability()
+                        kMountingCore = 0x0D, // WaitForCoreAvailability()
+                        kMountingBin = 0x0E, // ...
+                    };
+
+                    enum SpMpMode : uint32_t {
+                        kModeNone = 0x0, 
+                        kModeSP = 0x1, // Single-player
+                        kModeMP = 0x2  // Multi-player
+                    };
+
+                    // Intrusive nodes allocated by LoadChunksTxt()
+                    // name -> bitset of chunk IDs
+                    struct ChunkSetNode 0x30 {
+                        ChunkSetNode* m_next;
+                        ChunkSetNode* m_prev;
+                        char* m_name [[utf8*]]; 
+                        uint64_t m_chunkMaskLo;
+                        uint64_t m_chunkMaskHi;
+                    };
+
+                    // id -> name
+                    struct ChunkIdNode 0x20 {
+                        ChunkIdNode* m_next;
+                        ChunkIdNode* m_prev;
+                        uint32_t m_id;
+                        char* m_name @ 0x18 [[utf8*]];
+                    };
+
+                    // Global/Statics:
+                    // - Initial archive pipeline: bin, shaders, common, mp-common, sp-common, first world, dicts.
+                    // - World switch is driven by Current/Target name pairs; UpdateInternal schedules MountWorld when they differ.
+                    // - Chunk DB uses FixedSizeHeap + hash buckets with the two intrusive node types above.
+                    //   Buckets: ChunkIdNode** and ChunkSetNode** (array of heads); list heads: ChunkIdNode*/ChunkSetNode*.
+                    // - KMaxCoreArchives = 0x64.
+                    // - Job counters: g_pGameLoadingState, g_pStepCounter
+                    // - Mutexes: g_PlayGoSpeedMutex, g_PlayGoChunkAvailMutex
+                    // - Core archives: g_NumCoreArchives (KMaxCoreArchives = 0x64), g_CoreArchives[]
+                    // - World selection: g_WorldNameCurrent/Target, g_WorldCompanionNameCurrent/Target, g_WorldNamePrevious
+                    // - SP/MP mode: g_SpMpModeDesired, g_SpMpModeCurrent (GameLoading::SpMpMode)
+                    // - Copy/PlayGo flags: g_CopyPhaseFlags/Target; PlayGoFlag{1,2,3}_{Curr,Target}
+                    // - Chunk availability: bitset for IDs; event ring (read/write/count/capacity/data)
+                    // - Lang & SP/MP slots: Language A/B, TTS menu/gameplay, SPMP A/B/C
+
+                }; // game-loading.cpp
+            }
 
             // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\gamelib\state-script
             namespace state_script {

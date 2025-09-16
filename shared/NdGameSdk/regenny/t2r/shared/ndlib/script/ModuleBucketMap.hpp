@@ -6,10 +6,10 @@ namespace regenny::shared::ndlib::script {
 struct ModuleInfo;
 }
 namespace regenny::shared::ndlib::script {
-struct ModuleBucket;
+struct ScriptModule;
 }
 namespace regenny::shared::ndlib::script {
-struct ScriptModule;
+struct ModuleBucket;
 }
 namespace regenny::shared::ndlib::script {
 #pragma pack(push, 1)

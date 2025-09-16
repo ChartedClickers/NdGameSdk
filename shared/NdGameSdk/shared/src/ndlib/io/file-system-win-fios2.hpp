@@ -51,21 +51,29 @@ namespace NdGameSdk::ndlib::io {
 
 		class BatchResolveItem : public ISdkRegenny<regenny::shared::ndlib::io::FileSystem::BatchResolveItem> {};
 		class BatchReadItem : public ISdkRegenny<regenny::shared::ndlib::io::FileSystem::BatchReadItem> {};
-
+	#endif
 		class ArchiveMount : public ISdkRegenny<regenny::shared::ndlib::io::FileSystem::ArchiveMount> {
 		public:
+		#if defined(T1X)
+			using ArchiveMountFlags = regenny::shared::ndlib::io::FileSystem::ArchiveMount::ArchiveMountFlags;
+		#endif
+
 			ArchiveMount() = default;
 
 			uint64_t GetId() const;
 			uint64_t GetSize() const;
-
+	#if defined(T1X)
+			ArchiveMountFlags GetFlags() const;
+	#elif defined(T2R)
 			const char* GetMountPath() const;
 			const char* GetArchivePath() const;
 
 		private:
 			regenny::shared::ndlib::io::FileSystem::ArchiveMount::Buffer* GetBuffer() const;
+	#endif
 		};
 
+	#if defined(T2R)
 		Overlay& GetOverlay();
 		bool IsInitialized() const;
 		Memory::Allocator& GetAllocator();
@@ -188,12 +196,16 @@ namespace NdGameSdk::ndlib::io {
         friend class NdDevMenu;
     };
 
-	static_assert(sizeof(FileSystemWin) == 0x220, "Invalid FileSystemWin size");
-	static_assert(sizeof(FileSystemWin::Overlay) == 0x60, "Invalid Overlay size");
-	static_assert(sizeof(FileSystemWin::ReadOnlyFileHandle) == 0x20, "Invalid ReadOnlyFileHandle size");
-	static_assert(sizeof(FileSystemWin::ReadOperation) == 0x18, "Invalid ReadOperation size");
-	static_assert(sizeof(FileSystemWin::ArchiveMount) == 0x10, "Invalid ArchiveMount size");
-
 #endif
+
+	#if defined(T2R)
+		static_assert(sizeof(FileSystemWin) == 0x220, "Invalid FileSystemWin size");
+		static_assert(sizeof(FileSystemWin::Overlay) == 0x60, "Invalid Overlay size");
+		static_assert(sizeof(FileSystemWin::ReadOnlyFileHandle) == 0x20, "Invalid ReadOnlyFileHandle size");
+		static_assert(sizeof(FileSystemWin::ReadOperation) == 0x18, "Invalid ReadOperation size");
+		static_assert(sizeof(FileSystemWin::ArchiveMount) == 0x10, "Invalid ArchiveMount size");
+	#elif defined(T1X)
+	static_assert(sizeof(FileSystemWin::ArchiveMount) == 0x18, "Invalid ArchiveMount size");
+	#endif
 
 }

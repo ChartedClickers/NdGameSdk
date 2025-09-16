@@ -170,6 +170,30 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern PackageMgr_ResolvePakPagePtr = { L"48 83 ec 18 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 04 24 41 8b c0 8b 44 82 20 0f ba e0 18 73 26 44 2b 82 9c 09 00 00 41 c1 e0 15 49 63 c0 48" };
 	static inline const SdkPattern PackageMgr_g_PackageMgrGlobalData = { PackageMgr_ProcessLoginQueue.pattern, +0x27 };
 
+	static inline const SdkPattern GameLoading_Initialize = { L"48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 57 41 54 41 55 41 56 41 57 48 81 ec b0 00 00 00 48 8b 05" };
+	static inline const SdkPattern GameLoading_SwitchToSPLevel = { L"48 89 5c 24 10 48 89 6c 24 18 48 89 74 24 20 57 48 83 ec 30 41 0f b6 e8 48 8b f2 48 8b f9 48 85 c9 75" };
+	static inline const SdkPattern GameLoading_GameLoadingMountWorld = { L"48 83 ec 38 33 d2 33 c9 e8 ?? ?? ?? ?? 48 8b 05 ?? ?? ?? ?? 48 8d 15 ?? ?? ?? ?? 48 85 c0 48 8b ca 4c 8b ca 4c 8b c2 48 0f 45 c8" };
+	static inline const SdkPattern GameLoading_UnmountArchive = { L"40 53 48 83 ec 50 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 40 4c 8b 09 48 8d 05 ?? ?? ?? ?? 4d 85 c9 4c 8d 05 ?? ?? ?? ?? 48 8b d9 48 8b d1 4c 0f 45 c0 48 8d 0d ?? ?? ?? ?? e8 ?? ?? ?? ??" };
+	static inline const SdkPattern GameLoading_MountArchiveIfNotMounted = { L"48 89 5c 24 18 55 56 57 41 56 41 57 48 81 ec 70 02 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 60 02 00 00 48 8b ea 48 8b d9 33 d2 48 8d 4c 24 60 41 b8 00 01 00 00 e8 ?? ?? ?? ??" };
+	static inline const SdkPattern GameLoading_StageStepDown = { L"48 89 5c 24 10 48 89 74 24 18 57 48 83 ec 20 48 8b d9 e8 ?? ?? ?? ?? e8 ?? ?? ?? ?? 84 c0 48 8d 4b 20 0f 94 c2 e8 ?? ?? ?? ?? 48 8b 73 30" };
+	static inline const SdkPattern GameLoading_SetModeAndScheduleSwitch = { L"48 89 5c 24 08 57 48 83 ec 20 33 db 66 c7 05 ?? ?? ?? ?? 01 01 48 89 1d ?? ?? ?? ?? 83 f9 02 75 ?? 89 0d ?? ?? ?? ?? 8b d1 48 8d 0d ?? ?? ?? ?? c7 05 ?? ?? ?? ?? 01 01 01 01 e8 ?? ?? ?? ??" };
+	static inline const SdkPattern GameLoading_RequestLoadPackageWithDictionary = { L"48 89 5c 24 10 48 89 74 24 18 57 48 81 ec 40 04 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 30 04 00 00 48 8b f9 4c 8d 05 ?? ?? ?? ?? 4c 8b c9 ba ff 03 00 00 48 8d 4c 24 30 e8 ?? ?? ?? ?? 33 d2 8d 4a 04 e8 ?? ?? ?? ??" };
+	static inline const SdkPattern GameLoading_UpdateInternal = { L"48 89 5c 24 08 55 48 81 ec 60 01 00 00 48 8d ac 24 90 00 00 00 48 83 e5 c0 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 85 c0 00 00 00" };
+	static inline const SdkPattern GameLoading_UpdateTransitionState = { L"40 53 48 83 ec 20 e8 ?? ?? ?? ?? 48 8b 0d ?? ?? ?? ?? 48 63 d8 48 8b d3 e8 ?? ?? ?? ?? 8b c3 48 83 c4 20 5b c3" };
+	static inline const SdkPattern GameLoading_MountCoreArchiveSync = { L"40 53 48 81 ec 50 02 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 40 02 00 00 48 83 3d ?? ?? ?? ?? 00 74 71 e8 ?? ?? ?? ?? 48 8b d8 48 85 c0" };
+	static inline const SdkPattern GameLoading_g_GameLoadingData = { L"48 39 3d ?? ?? ?? ?? 76 ?? 41 8b de 4c 8d 3d ?? ?? ?? ?? 0f 1f 80 00 00 00 00 33 d2 4c 89 74 24 30 c5 f9 ef c0 c5 f8 11 44 24 38 8d 4a 03" };
+	//static inline const SdkPattern GameLoading_g_pGameLoadingState = { GameLoading_Initialize.pattern, +0xbb };
+	//static inline const SdkPattern GameLoading_g_pStepCounter = { GameLoading_UpdateInternal.pattern, +0x2f };
+	//static inline const SdkPattern GameLoading_g_WorldNameTarget = { GameLoading_GameLoadingMountWorld.pattern, +0x45 };
+	//static inline const SdkPattern GameLoading_g_WorldCompanionNameTarget = { GameLoading_GameLoadingMountWorld.pattern, +0x2b };
+	//static inline const SdkPattern GameLoading_g_WorldNamePrevious = { GameLoading_GameLoadingMountWorld.pattern, +0xd };
+	//static inline const SdkPattern GameLoading_g_WorldNameCurrent = { GameLoading_GameLoadingMountWorld.pattern, +0x53 };
+	//static inline const SdkPattern GameLoading_g_NumCoreArchives = { GameLoading_MountCoreArchiveSync.pattern, +0x1b };
+	//static inline const SdkPattern GameLoading_g_SpMpModeCurrent = { L"8b 1d ?? ?? ?? ?? 48 8d 05 ?? ?? ?? ?? 8b 3d ?? ?? ?? ?? 48 8d 15 ?? ?? ?? ?? 85 db 75 ?? 4c 8b c2 eb ?? 83 fb 01 4c 8d 05" };
+	//static inline const SdkPattern GameLoading_g_SpMpModeDesired = { GameLoading_g_SpMpModeCurrent.pattern, +0xd };
+	//static inline const SdkPattern GameLoading_g_CoreArchives = { L"4c 8d 05 ?? ?? ?? ?? 48 8b d1 c7 44 24 28 00 00 00 00 48 c1 e2 04 4c 8d 4c 24 40 49 03 d0 48 ff c1 48 89 54 24 20" };
+
+
 	static inline const SdkPattern NdDevMenu_GameConfig_DevMode = { L"41 0f b6 8c 24 13 3f 00 00 84 c9 0f 94 c2 84 c9 0f 95 c1", +0xb };
 	static inline const SdkPattern NdDevMenu_NdDevMenuAppend_Particles = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 40 48 8b f1 33 c9 e8 ?? ?? ?? ?? 84 c0 0f 84 9d" };
 	static inline const SdkPattern NdDevMenu_DMENU_Component = { L"40 53 57 41 57 48 83 ec 30 45 33 ff c7 41 68 c8 c8 c8 ff 4c 89 b9 80 00 00 00 48 8d 05 ?? ?? ?? ?? 48 89 01 48 8b da 4c 89 79 30 48 8b f9 44 89 79 4e 4c 89 79 38 4c 89 79 40 44 89 79 48 66 44 89 79 4c 4c 89 79 58 4c 89 79 60 4c 89 b9 90 00 00 00 c7 41 6c ff ff 00 ff c7 41 70 b0 ff b0 ff 66 44 89 79 74 66 44 89 b9 98 00 00 00 4c 89 79 78 4c 89 b9 88 00 00 00 4c 89 79 08 48 85 d2" };
@@ -235,7 +259,7 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern SsManager_ErrorPrintF = { L"48 89 54 24 10 4c 89 44 24 18 4c 89 4c 24 20 c3 48 89 54 24 10 4c 89 44 24 18 4c 89 4c 24 20 c3 48 89 5c 24 18 48 89 74 24 20 55 57 41 55 41 56 41 57 48 8d ac 24 60 fc ff ff" };
 	static inline const SdkPattern ScriptManager_ErrorPrintF = { L"48 8b c4 48 89 48 08 48 89 50 10 4c 89 40 18 4c 89 48 20 53 48 83 ec 20 8b ?? ?? ?? ?? ?? ?? 8d 58 10 e8 ?? ?? ?? ??" };
 
-	static inline const SdkPattern NdSystem_Mutex_Lock = { L"48 83 ec 40 44 8b f2 48 8b f9 85 d2 0f 85 ?? ?? ?? ?? e8 ?? ?? ?? ?? 48 8b d8 48 85 c0 74 04 b1 01 ff d3 e8 ?? ?? ?? ?? 48 85 c0 74 02 ff d0" -0x14 };
+	static inline const SdkPattern NdSystem_Mutex_Lock = { L"48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 57 41 56 41 57 48 83 ec 40 44 8b f2 48 8b f9 85 d2 0f 85" };
 	static inline const SdkPattern NdSystem_Mutex_TryLock = { L"40 57 48 83 ec 20 48 8b f9 4c 8b ca 48 83 c1 04 48 85 d2 74 ?? 48 89 5c 24 30 48 c7 c0 ff ff ff ff 48 ff c0 80 3c 02 00 75 ?? 83 f8 20 ba 1f 00 00 00 0f 4c d0 48 63 da 49 8b d1 4c 8b c3 e8 ?? ?? ?? ?? c6 44 3b 04 00 48 8b 5c 24 30 c5 f8 77 48 83 c4 20 5f c3", +0x70 };
 	static inline const SdkPattern NdSystem_Mutex_Unlock = { L"40 53 48 83 ec 30 80 79 14 00 48 8b d9 48 89 7c 24 40 75 ?? e8 ?? ?? ?? ?? 48 8b f8 48 85 c0 74 ?? b1 01 ff d7 e8 ?? ?? ?? ?? 48 85 c0 74 ?? ff d0 e8 ?? ?? ?? ?? 48 85 c0 74 ?? ff d0" };
 
@@ -302,6 +326,28 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern ScriptManager_ModuleInfo_LookupDcEntry = { L"48 89 5c 24 08 57 48 83 ec 20 48 83 21 00 83 cf ff 48 83 61 08 00 48 8b d9 89 79 20 48 89 51 10 4c 89 41 18 c6 41 24 00 48 8b" };
 	static inline const SdkPattern ScriptManager_ModuleInfo_FetchModule = { L"48 89 5c 24 08 57 48 83 ec 30 33 ff 48 8b d9 40 38 3d ?? ?? ?? ?? 75 04 b0 01 eb 28 48 8d 4c 24 20 e8 ?? ?? ?? ?? 48 8b cb e8 ?? ?? ?? ?? 48 85 c0 74 04 40 8a 78 5c 48" };
 	static inline const SdkPattern ScriptManager_ScriptModule_FetchScriptModuleEntry = { L"44 8b 49 38 45 33 d2 41 83 e9 01 4c 8b 59 40 4c 8b c2 78 2a b9 02 00 00 00 43 8d 04 11 99 f7 f9 48 63 c8 48 8d 14 49 4d 39 04 d3 73" };
+
+	static inline const SdkPattern GameLoading_Initialize = { L"40 53 48 81 ec 90 00 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 88 00 00 00 bb 02 00 00 00 48 8d 15 ?? ?? ?? ?? 48 8d 4c 24 38 89 5c 24 38 e8 ?? ?? ?? ?? 48 8d 15 ?? ?? ?? ?? 48 8d 4c 24 38 e8 ?? ?? ?? ??" };
+	static inline const SdkPattern GameLoading_SwitchToSPLevel = { L"48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 57 48 83 ec 30 41 8a e8 48 8b f2 48 8b f9 48 85 c9 75 73 48 8b 1d ?? ?? ?? ?? 48 85 db 74 04 b1 01 ff d3 48 8b 05 ?? ?? ?? ?? 48 85 c0 74 02 ff d0 48 8b 05" };
+	static inline const SdkPattern GameLoading_GameLoadingMountWorld = { L"48 83 ec 38 48 8b 05 ?? ?? ?? ?? 48 8d 15 ?? ?? ?? ?? 48 85 c0 48 8b ca 4c 8b ca 4c 8b c2 48 0f 45 c8 48 8b 05 ?? ?? ?? ?? 48 85 c0 48 89 4c 24 20 48 8d 0d ?? ?? ?? ?? 4c 0f 45 c8 48 8b 05 ?? ?? ?? ?? 48 85 c0 4c 0f 45 c0 48 8b 05" };
+	static inline const SdkPattern GameLoading_UnmountArchive = { L"48 89 5c 24 10 57 48 83 ec 50 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 40 4c 8b 49 08 48 8b f9 44 8b 01 48 8b d1 48 8d 0d ?? ?? ?? ?? e8 ?? ?? ?? ?? 83 3f 00 0f 84 ?? ?? ?? ?? c5 f9 ef c0 4c 8b c7 48 8d 54 24 30 c5 f8 11 44 24 30" };
+	static inline const SdkPattern GameLoading_MountArchiveIfNotMounted = { L"48 89 5c 24 18 48 89 74 24 20 57 48 81 ec 50 02 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 40 02 00 00 48 8b f2 48 8b d9 bf 00 01 00 00 48 8d 4c 24 40 44 8b c7 33 d2" };
+	static inline const SdkPattern GameLoading_StageStepDown = { L"48 89 5c 24 10 48 89 6c 24 18 56 57 41 56 48 83 ec 20 48 8b da 48 8b f1 e8 ?? ?? ?? ?? 33 ff 48 8d 4e 20 84 c0 0f 94 c2 e8 ?? ?? ?? ?? 39 7e 38 44 8b c7 4c 8b 76" };
+	static inline const SdkPattern GameLoading_SetModeSP = { L"48 83 ec 28 48 8b 0d ?? ?? ?? ?? 83 25 ?? ?? ?? ?? 00 c7 05 ?? ?? ?? ?? 01 01 00 01 66 c7 05 ?? ?? ?? ?? 01 01 48 8b 01 c7 05 ?? ?? ?? ?? 1b 00 00 00 ff 50 40 84 c0 74 1b ba 02 00 00 00 48 8d" };
+	static inline const SdkPattern GameLoading_SetModeMP = { L"48 83 ec 28 ba 02 00 00 00 c7 05 ?? ?? ?? ?? 01 01 01 01 48 8d 0d ?? ?? ?? ?? 89 15 ?? ?? ?? ?? 66 c7 05 ?? ?? ?? ?? 01 01 e8 ?? ?? ?? ?? ba 01 00 00 00 48 8d 0d ?? ?? ?? ?? 44 8b 00 44 89 05" };
+	static inline const SdkPattern GameLoading_RequestLoadPackageWithDictionary = { L"48 89 5c 24 10 48 89 74 24 18 57 48 81 ec 50 04 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 40 04 00 00 48 8b f1 4c 8d 05 ?? ?? ?? ?? 4c 8b c9 ba ff 03 00 00 48 8d 4c 24 40" };
+	static inline const SdkPattern GameLoading_UpdateInternal = { L"48 8b c4 48 89 58 08 48 89 78 10 4c 89 70 18 4c 89 78 20 55 48 81 ec 20 01 00 00 48 8d a8 68 ff ff ff 48 83 e5 c0 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 85 80 00 00 00" };
+	static inline const SdkPattern GameLoading_UpdateTransitionState = { L"40 53 48 83 ec 20 e8 ?? ?? ?? ?? 48 8b 0d ?? ?? ?? ?? 48 63 d8 48 8b d3 e8 ?? ?? ?? ?? 8b c3 48 83 c4 20 5b c3" };
+	static inline const SdkPattern GameLoading_MountCoreArchiveSync = { L"48 89 5c 24 08 57 48 81 ec 50 02 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 40 02 00 00 48 83 3d ?? ?? ?? ?? 00 0f 85 ?? ?? ?? ?? 48 8b 1d ?? ?? ?? ?? 80 bb f3 3e" };
+	static inline const SdkPattern GameLoading_g_WorldNameCurrent = { GameLoading_GameLoadingMountWorld.pattern, +0x4a };
+	static inline const SdkPattern GameLoading_g_WorldNameTarget = { GameLoading_GameLoadingMountWorld.pattern, +0x3c };
+	static inline const SdkPattern GameLoading_g_WorldCompanionNameTarget = { GameLoading_GameLoadingMountWorld.pattern, +0x22 };
+	static inline const SdkPattern GameLoading_g_WorldNamePrevious = { GameLoading_GameLoadingMountWorld.pattern, +0x4 };
+	static inline const SdkPattern GameLoading_g_NumCoreArchives = { GameLoading_GameLoadingMountWorld.pattern, +0x6d };
+	static inline const SdkPattern GameLoading_g_SpMpModeDesired = { GameLoading_Initialize.pattern, +0xb5 };
+	static inline const SdkPattern GameLoading_g_SpMpModeCurrent = { GameLoading_Initialize.pattern, +0x124 };
+	static inline const SdkPattern GameLoading_g_pGameLoadingState = { GameLoading_Initialize.pattern, +0x9c };
+	static inline const SdkPattern GameLoading_g_pStepCounter = { GameLoading_UpdateInternal.pattern, +0x3c };
 
 	static inline const SdkPattern NdDevMenu_GameConfig_DevMode = { L"8a 8f ?? ?? ?? ?? 84 c9 0f 94 c2 84 c9 0f 95 c1" };
 	static inline const SdkPattern NdDevMenu_NdDevMenuAppend_Particles = { L"40 56 48 83 ec 30 48 8b f1 33 c9 e8 ?? ?? ?? ?? 84 c0 0f 84 ?? ?? ?? ?? 48 89 5c 24 40 4c 8d 0d ?? ?? ?? ??" };
@@ -382,3 +428,4 @@ namespace NdGameSdk::Patterns {
 #endif
 
 }
+

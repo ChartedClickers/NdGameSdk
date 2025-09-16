@@ -1,12 +1,14 @@
 #include "nd-dev-menu.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
+// TODO: Refactor, creating a menu of various components into CommonGame or on the event system.
 #include <NdGameSdk/shared/src/corelib/job/job-system.hpp>
 #include <NdGameSdk/shared/src/ndlib/render/dev/debugdraw-common.hpp>
 #include <NdGameSdk/shared/src/ndlib/script/script-manager.hpp>
 #include <NdGameSdk/shared/src/ndlib/io/package-mgr.hpp>
 #include <NdGameSdk/shared/src/ndlib/io/file-system-win-fios2.hpp>
 #include <NdGameSdk/shared/src/ndlib/profiling/profile-ctrl.hpp>
+#include <NdGameSdk/shared/src/gamelib/level/game-loading.hpp>
 
 #include <cstddef> 
 
@@ -15,6 +17,7 @@ using namespace NdGameSdk::corelib::job;
 using namespace NdGameSdk::ndlib::script;
 using namespace NdGameSdk::ndlib::io;
 using namespace NdGameSdk::ndlib::render::dev;
+using namespace NdGameSdk::gamelib::level;
 
 namespace NdGameSdk::gamelib::debug {
 
@@ -341,6 +344,9 @@ namespace NdGameSdk::gamelib::debug {
 
 		itemdecimal->SetColor(Color(0xFF00FF00));
 
+		// TODO: Refactor the creation of Sdk menus.
+		// Currently for testing purposes they are all created here.
+
 		DebugDrawCommon::CreateDebugDrawMenu(this, NdGameSdkMenu);
 		ScriptManager::CreateScriptManagerMenu(this, NdGameSdkMenu);
 		NdJob::CreateJobSystemMenu(this, NdGameSdkMenu);
@@ -348,6 +354,7 @@ namespace NdGameSdk::gamelib::debug {
 		PackageManager::CreatePackageManagerMenu(this, NdGameSdkMenu);
 		FileSystem::CreateFileSystemMenu(this, NdGameSdkMenu);
 #endif
+		GameLoading::CreateGameLoadingMenu(this, NdGameSdkMenu);
 		return NdGameSdkMenu;
 	}
 

@@ -775,16 +775,28 @@ namespace NdGameSdk::ndlib::io {
 		return this->Get()->m_FsResult;
 	}
 
+#endif
+
 	uint64_t FileSystemWin::ArchiveMount::GetId() const {
+	#if defined(T2R)
 		if (auto* buffer = this->GetBuffer())
 			return buffer->m_archiveId;
 		else 
 			return 0;
+	#elif defined(T1X)
+		return this->Get()->m_fh;
+	#endif
 	}
 
 	uint64_t FileSystemWin::ArchiveMount::GetSize() const {
 		return this->Get()->m_sizeBytes;
 	}
+
+#if defined(T1X)
+	FileSystemWin::ArchiveMount::ArchiveMountFlags FileSystemWin::ArchiveMount::GetFlags() const {
+		return this->Get()->m_flags;
+	}
+#elif defined(T2R)
 
 	const char* FileSystemWin::ArchiveMount::GetMountPath() const {
 		if (auto* buffer = this->GetBuffer())

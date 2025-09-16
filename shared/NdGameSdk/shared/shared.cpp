@@ -13,6 +13,7 @@
 #include "src/common/common-game-init.hpp"
 #include "src/gamelib/debug/nd-dev-menu.hpp"
 #include "src/gamelib/render/particle/particle.hpp"
+#include "src/gamelib/level/game-loading.hpp"
 
 namespace NdGameSdk {
 
@@ -33,12 +34,13 @@ namespace NdGameSdk {
 #elif defined(T2R)
 		SharedComponents->AddComponent<ndlib::io::FileSystem>();
 		SharedComponents->AddComponent<ndlib::io::PackageManager>();
-#if SDK_DEBUG
+	#if SDK_DEBUG
 		SharedComponents->AddComponent<ndlib::profiling::ProfileController>();
-#endif
+	#endif
 #endif
 
 		SharedComponents->AddComponent<common::CommonGame>();
+		SharedComponents->AddComponent<gamelib::level::GameLoading>();
 		auto DmenuComponent = SharedComponents->AddComponent<gamelib::debug::NdDevMenu>();
 
 		SharedComponents->InitializeSdkComponents();

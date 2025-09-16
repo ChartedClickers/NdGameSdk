@@ -31,10 +31,36 @@ namespace NdGameSdk {
 
     class ISdkComponent;
     class ISdkSubComponent;
-    class SdkComponentEx;
     template <typename... Args>
     class SdkEvent;
-   
+
+    class SdkComponentEx : public NdGameSdkException {
+    public:
+        enum ErrorCode {
+            DependenciesFailed,
+            PatternFailed,
+            PatchFailed,
+            SdkNotInitialized,
+            InvalidInstance,
+            NotAllowed,
+        };
+
+        SdkComponentEx(const std::string& msg, ErrorCode errcode, bool critical = false)
+            : m_errcode{ errcode }, m_critical{ critical }, NdGameSdkException(msg) {
+        }
+
+        const ErrorCode ErrCode() const noexcept {
+            return m_errcode;
+        }
+
+        const bool IsCritical() const noexcept {
+            return m_critical;
+        }
+
+    private:
+        ErrorCode m_errcode;
+        bool m_critical;
+    };
 
     class ISdkComponent {
     public:
@@ -176,7 +202,7 @@ namespace NdGameSdk {
         }
 
         template<typename CompT>
-        static CompT* Instance()
+        static CompT* Instance() noexcept
         {
             static std::atomic<CompT*> p{ nullptr };
             auto* v = p.load(std::memory_order_acquire);
@@ -189,6 +215,24 @@ namespace NdGameSdk {
                 if (v) p.store(v, std::memory_order_release);
             }
             return v;
+        }
+
+        template<typename T>
+        static T& RequireInstance(bool requireInitialized = true) {
+            auto* p = Instance<T>();
+            if (!p) {
+                throw SdkComponentEx{
+                    std::string(typeid(T).name()) + " instance is null!",
+                    SdkComponentEx::InvalidInstance
+                };
+            }
+            if (requireInitialized && !p->IsInitialized()) {
+                throw SdkComponentEx{
+                    std::string(typeid(T).name()) + " is not initialized",
+                    SdkComponentEx::NotAllowed
+                };
+            }
+            return *p;
         }
 
     private:
@@ -217,33 +261,6 @@ namespace NdGameSdk {
         friend void UnregisterSdkModule(ISdkModule* SdkModule);
         friend void InitSharedComponents();
         friend void InitNdGameComponents();
-    };
-
-    class SdkComponentEx : public NdGameSdkException {
-    public:
-        enum ErrorCode {
-            DependenciesFailed,
-            PatternFailed,
-            PatchFailed,
-            SdkNotInitialized,
-            NotAllowed
-        };
-
-        SdkComponentEx(const std::string& msg, ErrorCode errcode, bool critical = false)
-            : m_errcode{ errcode }, m_critical{ critical }, NdGameSdkException(msg) {
-        }
-
-        const ErrorCode ErrCode() const noexcept {
-            return m_errcode;
-        }
-
-        const bool IsCritical() const noexcept {
-            return m_critical;
-        }
-
-    private:
-        ErrorCode m_errcode;
-        bool m_critical;
     };
 
 #define SDK_DEPENDENCIES(...)                                                 \

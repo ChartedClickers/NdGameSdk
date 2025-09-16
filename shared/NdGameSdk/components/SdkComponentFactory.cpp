@@ -44,6 +44,12 @@ namespace NdGameSdk {
                 if (!isReady(comp.get()))
                     continue;
 
+                auto handleInitFailure = [&](const std::string& message) {
+                    spdlog::error("Initialization failed for {}: {}", comp->GetName(), message);
+                    failed.insert(id);
+                    m_sdkcomponents.erase(it);
+                };
+
                 try {
                     spdlog::info("Initialize {}", comp->GetName());
                     comp->Initialize();
@@ -55,19 +61,13 @@ namespace NdGameSdk {
                         spdlog::critical("Critical initialization error in {}: {}", comp->GetName(), ex.what());
                         throw;
                     }
-                    spdlog::error("Init failed for {}: {}", comp->GetName(), ex.what());
-                    failed.insert(id);
-                    m_sdkcomponents.erase(it);
+                    handleInitFailure(ex.what());
                 }
                 catch (const std::exception& ex) {
-                    spdlog::error("Error initialize {}: {}", comp->GetName(), ex.what());
-                    failed.insert(id);
-                    m_sdkcomponents.erase(it);
+                    handleInitFailure(ex.what());
                 }
                 catch (...) {
-                    spdlog::error("Error initialize: {}", comp->GetName());
-                    failed.insert(id);
-                    m_sdkcomponents.erase(it);
+                    handleInitFailure("Unknown error");
                 }
             }
         } while (progress > 0);

@@ -177,6 +177,7 @@ set(Utility_SOURCES
 	"shared/Utility/cmacros/for_each.hpp"
 	"shared/Utility/color.hpp"
 	"shared/Utility/function_ptr.hpp"
+	"shared/Utility/global_resolver.hpp"
 	"shared/Utility/helper.cpp"
 	"shared/Utility/helper.hpp"
 	"shared/Utility/memory/Address.hpp"

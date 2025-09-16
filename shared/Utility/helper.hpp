@@ -23,6 +23,7 @@
 
 #define LOG_ERROR(...) SPDLOG_LOGGER_PRINTF(spdlog::default_logger(), spdlog::level::err, __VA_ARGS__)
 #define LOG_INFO(...) SPDLOG_LOGGER_PRINTF(spdlog::default_logger(), spdlog::level::info, __VA_ARGS__)
+#define LOG_DEBUG(...) SPDLOG_LOGGER_PRINTF(spdlog::default_logger(), spdlog::level::debug, __VA_ARGS__)
 
 using namespace std;
 

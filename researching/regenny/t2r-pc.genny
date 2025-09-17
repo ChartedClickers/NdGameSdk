@@ -1035,6 +1035,91 @@ namespace regenny {
                 bool m_ArePackageQueuesBusy @ 0x17848;
             } // frame-params.cpp
 
+            // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\settings
+            namespace settings {
+                
+                struct SettingsControl 0x9a70 {
+                    // TODO: fill process structs when it is will be reversed
+                    // - kBuckets = 0x4B (75)
+                    // - kSettingSize = 0xA0; 
+                    // - kHashNodeSize = 0x20; 
+                    // - kInlineDataMax = 0x44;
+                    // - kUltimateMaxSettingPriority = 0x791d;
+                    // ContextProcess (void*): +0x80 m_ProcessCtxPtr; +0x94 ownerId; m_ProcessCtxPtr+0x08 → entry; [entry+0x94] == ownerId
+
+                    enum SettingFlags : uint8_t {
+                        Active = 0x1,
+                        Process = 0x2,
+                        Timed = 0x4,
+                        HasData = 0x8,
+                        ExternalData = 0x10
+                    };
+
+                    struct Setting 0xa0 {
+                        void* m_ProcessPtr; // Process* (can be null)
+                        uint32_t m_ownerId; // Process ownerid 
+                        uint64_t m_expireFrame; // Data from NdFrameState + 0xe8
+                        uint32_t m_type; // by TypeFactory? 
+                        void* m_Callback;
+                        void* m_valuePtr;
+                        uint32_t m_bucketId;
+                        uint32_t m_sequence;
+                        uint8_t m_data[0x44] @ 0x40; // inline data storage
+                        void* m_pData;
+                        uint8_t m_cbByte;
+                        SettingFlags m_flags;
+                        StringId64 m_key @ 0x98;
+                    };
+
+                    struct HashNode 0x20 {
+                        HashNode* m_pNext;
+                        HashNode* m_pPrev;
+                        Setting* m_pFirst;
+                        Setting* m_pLast;
+                    };
+
+                    struct HashIt 0x10 {
+                        HashNode** m_ppSlot;
+                        HashNode* m_pNode;
+                    };
+
+                    struct SettingsHash 0x98 {
+                        HashNode** m_table;
+                        corelib.containers.FixedSizeHeap m_pool;
+                        HashNode* m_head;
+                        uint64_t m_elemSize;
+                        uint64_t m_capacity;
+                        HashNode** m_begin;
+                        HashNode** m_end;
+                        uint64_t m_count;
+                        uint32_t m_roundedCap;
+                        uint32_t m_flags;
+                    };
+
+                    uint64_t m_usedMask[0x4b][0x40];
+                    void* m_poolBase;
+                    void* m_bucketPtr[0x4b];
+                    uint32_t m_bucketTag[0x4b];
+                    uint32_t m_numUsedBuckets;
+                    uint32_t m_maxNumSettings;
+                    HashNode** m_settingHashTable @ 0x99a0;
+                    corelib.containers.FixedSizeHeap m_hashNodePool;
+                    HashNode* m_hashListHead;
+                    uint64_t m_hashElemSize;
+                    uint64_t m_hashCapacity;
+                    HashNode** m_hashBegin;
+                    HashNode** m_hashEnd;
+                    uint64_t m_hashCount;
+                    uint32_t m_hashRoundedCap;
+                    uint32_t m_hashMaxAndFlags;
+                    uint8_t m_rtFlag;
+                    uint32_t m_rtCounter;
+                    uint32_t m_nextSequence;
+                    uint8_t m_waitListLock[0x20] @ 0x9a50;
+                };
+
+            }
+
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\debug
             namespace debug {
 

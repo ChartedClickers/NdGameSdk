@@ -182,17 +182,6 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern GameLoading_UpdateTransitionState = { L"40 53 48 83 ec 20 e8 ?? ?? ?? ?? 48 8b 0d ?? ?? ?? ?? 48 63 d8 48 8b d3 e8 ?? ?? ?? ?? 8b c3 48 83 c4 20 5b c3" };
 	static inline const SdkPattern GameLoading_MountCoreArchiveSync = { L"40 53 48 81 ec 50 02 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 40 02 00 00 48 83 3d ?? ?? ?? ?? 00 74 71 e8 ?? ?? ?? ?? 48 8b d8 48 85 c0" };
 	static inline const SdkPattern GameLoading_g_GameLoadingData = { L"48 39 3d ?? ?? ?? ?? 76 ?? 41 8b de 4c 8d 3d ?? ?? ?? ?? 0f 1f 80 00 00 00 00 33 d2 4c 89 74 24 30 c5 f9 ef c0 c5 f8 11 44 24 38 8d 4a 03" };
-	//static inline const SdkPattern GameLoading_g_pGameLoadingState = { GameLoading_Initialize.pattern, +0xbb };
-	//static inline const SdkPattern GameLoading_g_pStepCounter = { GameLoading_UpdateInternal.pattern, +0x2f };
-	//static inline const SdkPattern GameLoading_g_WorldNameTarget = { GameLoading_GameLoadingMountWorld.pattern, +0x45 };
-	//static inline const SdkPattern GameLoading_g_WorldCompanionNameTarget = { GameLoading_GameLoadingMountWorld.pattern, +0x2b };
-	//static inline const SdkPattern GameLoading_g_WorldNamePrevious = { GameLoading_GameLoadingMountWorld.pattern, +0xd };
-	//static inline const SdkPattern GameLoading_g_WorldNameCurrent = { GameLoading_GameLoadingMountWorld.pattern, +0x53 };
-	//static inline const SdkPattern GameLoading_g_NumCoreArchives = { GameLoading_MountCoreArchiveSync.pattern, +0x1b };
-	//static inline const SdkPattern GameLoading_g_SpMpModeCurrent = { L"8b 1d ?? ?? ?? ?? 48 8d 05 ?? ?? ?? ?? 8b 3d ?? ?? ?? ?? 48 8d 15 ?? ?? ?? ?? 85 db 75 ?? 4c 8b c2 eb ?? 83 fb 01 4c 8d 05" };
-	//static inline const SdkPattern GameLoading_g_SpMpModeDesired = { GameLoading_g_SpMpModeCurrent.pattern, +0xd };
-	//static inline const SdkPattern GameLoading_g_CoreArchives = { L"4c 8d 05 ?? ?? ?? ?? 48 8b d1 c7 44 24 28 00 00 00 00 48 c1 e2 04 4c 8d 4c 24 40 49 03 d0 48 ff c1 48 89 54 24 20" };
-
 
 	static inline const SdkPattern NdDevMenu_GameConfig_DevMode = { L"41 0f b6 8c 24 13 3f 00 00 84 c9 0f 94 c2 84 c9 0f 95 c1", +0xb };
 	static inline const SdkPattern NdDevMenu_NdDevMenuAppend_Particles = { L"48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 40 48 8b f1 33 c9 e8 ?? ?? ?? ?? 84 c0 0f 84 9d" };

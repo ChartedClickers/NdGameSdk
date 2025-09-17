@@ -548,7 +548,9 @@ namespace NdGameSdk::ndlib::io {
 		pPackageManager->m_PackageMgrInitHook.thiscall<void>(pPackageMgr, pConfiguration);
 
 		NdSystem* pSystem = GetSharedComponents()->GetComponent<NdSystem>();
-		if (pSystem) {
+
+		// Check IsInitialized to avoid in case of multiple initializations. (-enable-pso-preload PSO CASE)
+		if (pSystem && !Dumper::s_DumperMutex.IsInitialized()) {
 			platform::MutexDesc pDesc{ "PkgMgr SdkDumperLock" };
 			pDesc.SetType(Mutex::MutexType::MUTEX_RECURSIVE);
 			pSystem->CreateMutex(&pDesc, &Dumper::s_DumperMutex);

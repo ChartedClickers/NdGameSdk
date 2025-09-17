@@ -6,6 +6,8 @@
 #include "platform/thread.hpp"
 #include "platform/mutex.hpp"
 
+#undef CreateMutex;
+
 namespace NdGameSdk::corelib::system {
 
 	class NdSystem : public ISdkComponent {

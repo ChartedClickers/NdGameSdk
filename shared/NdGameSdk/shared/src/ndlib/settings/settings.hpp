@@ -132,5 +132,8 @@ namespace NdGameSdk::ndlib::settings {
         static constexpr int kScriptPriorityBias = 0x791A;
     };
 
+	static_assert(sizeof(GameSettingsControl) == 0x9a70, "Size of GameSettingsControl is not correct.");
+	static_assert(sizeof(GameSettingsControl::Setting) == 0xA0, "Size of GameSettingsControl::Setting is not correct.");
+
 }
 

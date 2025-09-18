@@ -324,6 +324,7 @@ set(T1XSDK_SOURCES
 	"shared/NdGameSdk/regenny/t1x/shared/ndlib/script/ScriptModule.hpp"
 	"shared/NdGameSdk/regenny/t1x/shared/ndlib/script/ScriptValue.hpp"
 	"shared/NdGameSdk/regenny/t1x/shared/ndlib/script/relocatableModule.hpp"
+	"shared/NdGameSdk/regenny/t1x/shared/ndlib/settings/SettingsControl.hpp"
 	"shared/NdGameSdk/regenny/t1x/shared/ndlib/util/BitReader.hpp"
 	"shared/NdGameSdk/sdk.cpp"
 	"shared/NdGameSdk/sdk.hpp"
@@ -463,6 +464,8 @@ set(T1XSDK_SOURCES
 	"shared/NdGameSdk/shared/src/ndlib/script/script-manager.hpp"
 	"shared/NdGameSdk/shared/src/ndlib/script/script-module.cpp"
 	"shared/NdGameSdk/shared/src/ndlib/script/script-module.hpp"
+	"shared/NdGameSdk/shared/src/ndlib/settings/settings.cpp"
+	"shared/NdGameSdk/shared/src/ndlib/settings/settings.hpp"
 	"shared/NdGameSdk/sidbase/sidbase.cpp"
 	"shared/NdGameSdk/sidbase/sidbase.hpp"
 )
@@ -685,6 +688,7 @@ set(T2RSDK_SOURCES
 	"shared/NdGameSdk/regenny/t2r/shared/ndlib/script/ScriptModule.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/ndlib/script/ScriptValue.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/ndlib/script/relocatableModule.hpp"
+	"shared/NdGameSdk/regenny/t2r/shared/ndlib/settings/SettingsControl.hpp"
 	"shared/NdGameSdk/regenny/t2r/shared/ndlib/util/BitReader.hpp"
 	"shared/NdGameSdk/sdk.cpp"
 	"shared/NdGameSdk/sdk.hpp"
@@ -824,6 +828,8 @@ set(T2RSDK_SOURCES
 	"shared/NdGameSdk/shared/src/ndlib/script/script-manager.hpp"
 	"shared/NdGameSdk/shared/src/ndlib/script/script-module.cpp"
 	"shared/NdGameSdk/shared/src/ndlib/script/script-module.hpp"
+	"shared/NdGameSdk/shared/src/ndlib/settings/settings.cpp"
+	"shared/NdGameSdk/shared/src/ndlib/settings/settings.hpp"
 	"shared/NdGameSdk/sidbase/sidbase.cpp"
 	"shared/NdGameSdk/sidbase/sidbase.hpp"
 )

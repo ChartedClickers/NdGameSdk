@@ -1060,12 +1060,12 @@ namespace regenny {
                         uint32_t m_ownerId; // Process ownerid 
                         uint64_t m_expireFrame; // Data from NdFrameState + 0xe8
                         uint32_t m_type; // by TypeFactory? 
-                        void* m_Callback;
+                        void* m_Callback @ 0x20;
                         void* m_valuePtr;
                         uint32_t m_bucketId;
                         uint32_t m_sequence;
                         uint8_t m_data[0x44] @ 0x40; // inline data storage
-                        void* m_pData;
+                        void* m_pData @ 0x88;
                         uint8_t m_cbByte;
                         SettingFlags m_flags;
                         StringId64 m_key @ 0x98;
@@ -1113,10 +1113,10 @@ namespace regenny {
                     uint32_t m_hashRoundedCap;
                     uint32_t m_hashMaxAndFlags;
                     uint8_t m_rtFlag;
-                    uint32_t m_rtCounter;
+                    uint32_t m_rtCounter @ 0x9a3c;
                     uint32_t m_nextSequence;
                     uint8_t m_waitListLock[0x20] @ 0x9a50;
-                };
+                }; // settings.cpp
 
             }
 

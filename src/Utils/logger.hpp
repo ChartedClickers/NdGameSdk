@@ -1,5 +1,4 @@
 #include <filesystem>
-#include <windows.h>
 
 #include <spdlog/spdlog.h>
 #include <spdlog/common.h>
@@ -7,6 +6,8 @@
 #include <spdlog/sinks/ansicolor_sink.h>
 #include <spdlog/sinks/daily_file_sink.h>
 #include <spdlog/sinks/basic_file_sink.h>
+
+#include <Utility/system/console.hpp>
 
 namespace Utils {
 

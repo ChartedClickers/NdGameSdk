@@ -36,7 +36,7 @@ project(ND.ModClient
 		C
 		CXX
 	VERSION
-		1.6.0
+		1.6.1
 )
 
 add_compile_options(
@@ -195,6 +195,8 @@ set(Utility_SOURCES
 	"shared/Utility/memory/proc-memory.hpp"
 	"shared/Utility/system/clipboard.cpp"
 	"shared/Utility/system/clipboard.hpp"
+	"shared/Utility/system/console.cpp"
+	"shared/Utility/system/console.hpp"
 )
 
 add_library(Utility STATIC)

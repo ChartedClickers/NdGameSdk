@@ -5,6 +5,7 @@
 #include "NdGameSdk/components/SdkComponent.hpp"
 
 #include <Utility/helper.hpp>
+#include <Utility/system/console.hpp>
 #include <regex>
 
 #if defined(T2R)

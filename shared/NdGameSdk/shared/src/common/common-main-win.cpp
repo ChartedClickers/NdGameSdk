@@ -150,7 +150,7 @@ namespace NdGameSdk::common {
 		DebugDrawCommon* pDebugDraw = GetSharedComponents()->GetComponent<DebugDrawCommon>();
 		if (pDebugDraw) {
 			auto MsgCon = pDebugDraw->GetMsgCon();
-			MsgCon->SetPrintTTY(true);
+			MsgCon->SetPrintTTY(Utility::sys::HasAttachedConsole());
 		}
 
 		return pCommonMainWin->m_SystemInitHook.thiscall<int32_t*>(Err, argc, argv);

@@ -26,7 +26,7 @@ namespace NdGameSdk::gamelib::level {
 		SDK_DEPENDENCIES(NdJob);
 
 		/*Extern Functs*/
-		static void SwitchToSPLevel(const char* worldName, const char* companionName, bool requireSecondaryCopyPhaseGate);
+		static void SwitchToSPLevel(const char* pWorldLevel, const char* companionName, bool requireSecondaryCopyPhaseGate);
 		static void MountArchiveIfNotMounted(const char* pArchiveName, FileSystemWin::ArchiveMount* pArchiveMountSlot);
 		static void UnmountArchive(FileSystemWin::ArchiveMount* pArchiveMountSlot);
 		static uint64_t StageStepDown(CounterHandle* pGameLoadingState);

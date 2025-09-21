@@ -186,9 +186,9 @@ namespace NdGameSdk::gamelib::level {
 		pGameLoading->m_GameLoadingInitializeHook.thiscall<void>();
 	}
 
-	void GameLoading::SwitchToSPLevel(const char* worldName, const char* companionName, bool requireSecondaryCopyPhaseGate) {
+	void GameLoading::SwitchToSPLevel(const char* pWorldLevel, const char* companionName, bool requireSecondaryCopyPhaseGate) {
 		always_assert(GameLoading_SwitchToSPLevel == nullptr, "GameLoading::SwitchToSPLevel is null!");
-		GameLoading_SwitchToSPLevel(worldName, companionName, requireSecondaryCopyPhaseGate);
+		GameLoading_SwitchToSPLevel(pWorldLevel, companionName, requireSecondaryCopyPhaseGate);
 	}
 
 	void GameLoading::MountArchiveIfNotMounted(const char* pArchiveName, FileSystemWin::ArchiveMount* pArchiveMountSlot) {

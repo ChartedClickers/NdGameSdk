@@ -9,8 +9,8 @@
 
 using namespace NdGameSdk::corelib::containers;
 
-namespace NdGameSdk::corelib::memory
-{
+namespace NdGameSdk::corelib::memory {
+
 	class AllocatorTaggedHeap {
 	public:
 		TaggedHeap* SetTaggedGpuDevHeap(TaggedHeap* pTaggedHeap);

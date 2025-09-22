@@ -7,6 +7,7 @@
 #include "NdGameSdk/components/SdkComponent.hpp"
 
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
+#include <NdGameSdk/shared/src/corelib/containers/fixedsizeheap.hpp>
 #include <NdGameSdk/shared/src/common/common-game-init.hpp>
 #include <NdGameSdk/shared/src/ndlib/debug/nd-dmenu.hpp>
 

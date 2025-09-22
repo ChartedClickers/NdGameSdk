@@ -7,36 +7,31 @@
 #include <NdGameSdk/regenny/t1x/shared/corelib/containers/FixedSizeHeap.hpp>  
 #endif 
 
+#include "../memory/memory.hpp"
+
 #include <Utility/assertion/assert.hpp>
 #include <Utility/function_ptr.hpp>
 
-namespace NdGameSdk::corelib::containers
-{
-    class FixedSizeHeap;
-    TYPEDEF_EXTERN_FUNCTION_PTR(uint64_t, FixedSizeHeap_FreeIndex, FixedSizeHeap* Heap, void* dataIn);
-    TYPEDEF_EXTERN_FUNCTION_PTR(uint64_t, FixedSizeHeap_Copy, FixedSizeHeap* Heap, FixedSizeHeap* srcHeap);
-    TYPEDEF_EXTERN_FUNCTION_PTR(void*, FixedSizeHeap_AddIndex, FixedSizeHeap* Heap);
+namespace NdGameSdk::corelib::containers {
 
-    class NdGameSdk_API FixedSizeHeap : public ISdkRegenny<regenny::shared::corelib::containers::FixedSizeHeap>
-    {
+    class NdGameSdk_API FixedSizeHeap : public ISdkRegenny<regenny::shared::corelib::containers::FixedSizeHeap> {
     public:
         FixedSizeHeap() = default;
 
         uint64_t Count() const;
         uint64_t GetLastIndex() const;
 
-
         template<typename T>
         T* AddIndex() {
-            always_assert(FixedSizeHeap_AddIndex == nullptr, "Function pointer was not set!");
-            T data = reinterpret_cast<T*>(FixedSizeHeap_AddIndex(this));
+            always_assert(Memory_FixedSizeHeap_AddIndex == nullptr, "Function pointer was not set!");
+            T data = reinterpret_cast<T*>(Memory_FixedSizeHeap_AddIndex(this));
             return data;
         };
 
         template<typename T>
         int64_t FreeIndex(T* dataIn) {
-			always_assert(FixedSizeHeap_FreeIndex == nullptr, "Function pointer was not set!");
-			return FixedSizeHeap_FreeIndex(this, dataIn);
+			always_assert(Memory_FixedSizeHeap_FreeIndex == nullptr, "Function pointer was not set!");
+			return Memory_FixedSizeHeap_FreeIndex(this, dataIn);
         };
 
         uint64_t Copy(FixedSizeHeap* srcHeap);
@@ -91,6 +86,10 @@ namespace NdGameSdk::corelib::containers
             return reinterpret_cast<U*>(base + idx * raw->m_elementSize);
         }
 
+        TYPEDEF_FUNCTION_PTR(uint64_t, Memory_FixedSizeHeap_FreeIndex, FixedSizeHeap* Heap, void* dataIn);
+        TYPEDEF_FUNCTION_PTR(uint64_t, Memory_FixedSizeHeap_Copy, FixedSizeHeap* Heap, FixedSizeHeap* srcHeap);
+        TYPEDEF_FUNCTION_PTR(void*, Memory_FixedSizeHeap_AddIndex, FixedSizeHeap* Heap);
+		friend class NdGameSdk::corelib::memory::Memory;
     };
 
     static_assert(sizeof(FixedSizeHeap) == 0x58, "Size of FixedSizeHeap is not correct.");

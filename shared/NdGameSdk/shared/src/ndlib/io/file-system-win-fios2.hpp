@@ -4,6 +4,7 @@
 #include "NdGameSdk/components/SdkComponent.hpp"
 
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
+#include <NdGameSdk/shared/src/corelib/memory/allocator-heap.hpp>
 #include <NdGameSdk/shared/src/ndlib/debug/nd-dmenu.hpp>
 
 #if defined(T2R)
@@ -76,7 +77,7 @@ namespace NdGameSdk::ndlib::io {
 	#if defined(T2R)
 		Overlay& GetOverlay();
 		bool IsInitialized() const;
-		Memory::Allocator& GetAllocator();
+		HeapAllocatorWithOverflow& GetAllocator();
 	#endif
 	};
 

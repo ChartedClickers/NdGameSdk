@@ -1,6 +1,3 @@
 #include "tagged-heap.hpp"
 
-namespace NdGameSdk::corelib::containers
-{
-
-}
+namespace NdGameSdk::corelib::containers{}

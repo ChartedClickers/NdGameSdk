@@ -415,30 +415,85 @@ namespace regenny {
                     char* m_name [[utf8*]]
                 }
 
-                struct BaseAllocator 0x58 {
-                    void* vftable;
-                    void* m_pTracker @ 0x38;
-                    char* m_context_name;
-                    StringId64 m_context_hash;
-                    bool m_Initialized;
-                };
-
-                struct Allocator : BaseAllocator 0xa8 {
+                struct Allocator 0x60 {
 
                     struct VTable {
                         virtual uint64_t PostAllocate(uint64_t pSize, uint64_t pAlignment, char* pFunction, uint32_t pLine, char* pFilePath) @ 7;
                     };
-                    
-                    VTable* vftable @ 0x0;
+
+                    VTable* vftable;
+                    uint16_t m_flags @ 0x30;
+                    uint8_t m_state;
+                    void* m_pTracker @ 0x38;
+                    char* m_contextName;
+                    StringId64 m_contextHash;
+                    bool m_initialized;
+                };
+
+                struct HeapArena 0x50 {
+                    uint8_t* m_pMemory;
+                    uint8_t* m_current;
+                    uint64_t m_sizeFlags;
+                    uint64_t m_peakUsage;
+                    uint64_t m_lock;
+                    uint64_t m_waiterCount;
+                    void* m_waitListHead;
+                    void* m_waitListTail;
+                    bool m_lockEnabled;
+                    uint64_t m_userTag @ 0x48;
+                };
+
+                struct HeapAllocatorWithOverflow : Allocator 0x100 {
+                    HeapArena m_HeapArena;
                     void* m_Data @ 0xb0;
                     uint64_t m_size @ 0xc8;
                 };
 
-                struct HeapAllocator : Allocator 0x20 {
+                struct HeapAllocator : HeapAllocatorWithOverflow 0x120 {
+                    uint64_t m_fieldd0;
+                    uint64_t m_fielde8 @ 0xe8;
                     char* m_file @ 0x100 [[utf8*]];
                     char* m_function [[utf8*]];
                     uint32_t m_line;
                     bool m_field114;
+                };
+
+                struct PoolAllocator : Allocator 0x210 {
+
+                    struct PoolStack 0x68 {
+                        uint32_t m_guard0;
+                        uint32_t m_guard1;
+                        uint32_t m_ticket;
+                        void* m_chunkHead @ 0x10;
+                        void* m_chunkFree;
+                        void* m_blockStart;
+                        uint32_t m_blockSize;
+                        uint32_t m_lastOffset;
+                        uint32_t m_activeCount;
+                        uint32_t m_alignment;
+                        uint32_t m_freeCount;
+                        uint32_t m_hasBlock;
+                        uint32_t m_hasTail;
+                        uint32_t m_lastTicketIdx;
+                        uint64_t m_waitListLock;
+                        uint8_t m_waitListEnabled;
+                    };
+
+                    struct Debug 0x18 {
+                        MapId m_mapId;
+                        Context m_context;
+                        char* m_file [[utf8*]];
+                        uint32_t m_line;
+                        uint32_t m_bytesPerBlock;
+                    };
+
+                    PoolStack m_stack;
+                    void* m_mem @ 0xd0;
+                    uint64_t m_size;
+                    bool m_disablePoolAlloc;
+                    char* m_displayName @ 0xe8 [[utf8*]];
+                    Debug m_debug;
+                    HeapAllocatorWithOverflow m_HeapAllocator @ 0x110;
                 };
 
                 struct AllocStack 0x50 {

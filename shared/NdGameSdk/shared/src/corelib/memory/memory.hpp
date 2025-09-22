@@ -5,10 +5,9 @@
 #include "NdGameSdk/components/SdkComponent.hpp"
 
 #include "memory-map.hpp"
-#include "allocator-heap.hpp"
+#include "heaparena.hpp"
 #include "allocator-tagged-heap.hpp"
 #include "memory-area-win.hpp"
-#include "../containers/fixedsizeheap.hpp"
 
 #include <Utility/helper.hpp>
 
@@ -18,17 +17,9 @@
 #include <NdGameSdk/regenny/t1x/shared/corelib/memory/Allocator.hpp>
 #endif
 
-namespace NdGameSdk::corelib::memory 
-{
-	#define Memory_Source __FILE__, __LINE__, __func__
+namespace NdGameSdk::corelib::memory {
 
-	/* Extern classes */
-	class NdGameSdk_API BaseAllocator : public ISdkRegenny<regenny::shared::corelib::memory::BaseAllocator> {
-	public:
-		const char* GetName() const;
-		StringId64 GetHash() const;
-		bool IsInitialized() const;
-	};
+	#define Memory_Source __FILE__, __LINE__, __func__
 
 	class Memory : public ISdkComponent {
 	public:
@@ -39,12 +30,10 @@ namespace NdGameSdk::corelib::memory
 		using MapId = MemoryMapId;
 
 		/* Extern classes */
-		class NdGameSdk_API Allocator : public ISdkRegenny<regenny::shared::corelib::memory::Allocator, BaseAllocator> {
+		class NdGameSdk_API Allocator : public ISdkRegenny<regenny::shared::corelib::memory::Allocator> {
 		public:
 			using VTable = regenny::shared::corelib::memory::Allocator::VTable;
 
-			size_t GetHeapSize();
-			
 			template <typename ClassType = void>
 			ClassType* PostAllocate(size_t heap_size, uint64_t heap_alignmemt, const char* func, int line, const char* file) {
 				auto* pAllocator = this->Get();
@@ -57,8 +46,9 @@ namespace NdGameSdk::corelib::memory
 				);
 			}
 
-		private:
-			void PrintDebugAllocatorInfo();
+			const char* GetName() const;
+			StringId64 GetHash() const;
+			bool IsInitialized() const;
 		};
 
 		NdGameSdk_API bool IsMemoryMapMapped();
@@ -66,11 +56,17 @@ namespace NdGameSdk::corelib::memory
 
 		NdGameSdk_API MemoryMapEntry* GetMemoryMapEntry(MemoryMapId MapId);
 		NdGameSdk_API MemSize GetMemSize(MemoryMapId MapId);
-		NdGameSdk_API Allocator* GetAllocator(MemoryContextType context_type);
 
 		NdGameSdk_API void ModifyMemoryMap(MemoryMapEntry* MapEntry, MemSize newSizeForId);
 		NdGameSdk_API void ModifyMemoryMap(MemoryMapId MapId, MemSize newSizeForId);
 		NdGameSdk_API void IncreaseMemoryMap(MemoryMapId MapId, MemSize AddSizeForId);
+
+        template <typename TAllocator = Allocator*>
+        requires std::derived_from<std::remove_pointer_t<TAllocator>, Allocator>
+		NdGameSdk_API TAllocator* GetAllocator(MemoryContextType context_type) {
+			always_assert(Memory_GetAllocator == nullptr, "Function pointer was not set!");
+			return (TAllocator*)Memory_GetAllocator(&context_type);
+		}
 
 		// Always use PushAllocator and PopAllocator for allocation memory.
 		template <typename ClassType = void>
@@ -107,7 +103,6 @@ namespace NdGameSdk::corelib::memory
 		NdGameSdk_API void PushAllocator(MemoryContextType context_type, const char* file, int line_num, const char* func);
 		NdGameSdk_API void PopAllocator();
 
-		HeapAllocator::HeapArena m_HeapArena{};
 		Area::MemoryArea m_MemArea{};
 #if defined(T2R)
 		AllocatorTaggedHeap m_AllocatorTaggedHeap{};

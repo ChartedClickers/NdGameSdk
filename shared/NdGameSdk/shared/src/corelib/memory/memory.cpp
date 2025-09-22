@@ -1,4 +1,7 @@
 #include "memory.hpp"
+#include "allocator-heap.hpp"
+#include "../containers/fixedsizeheap.hpp"
+
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
 #include <codecvt>
@@ -7,7 +10,7 @@ namespace NdGameSdk::corelib::memory {
 
 	Memory::Memory() : m_cfg { g_SdkConfig.Memory }, ISdkComponent(TOSTRING(Memory)) {}
 
-	uintptr_t Memory_Allocate_ReturnAddr = NULL;
+	uintptr_t Memory_AllocateAtContext_ReturnAddr = NULL;
 	void Memory_AllocateAtContext_CC();
 
 	bool Memory::IsMemoryMapMapped() {
@@ -56,11 +59,6 @@ namespace NdGameSdk::corelib::memory {
 		auto MapEntry = GetMemoryMapEntry(MapId);
 		always_assert(MapEntry == nullptr, "Invalid Memory Map Id!");
 		return MapEntry->Size();
-	}
-
-	Memory::Allocator* Memory::GetAllocator(MemoryContextType context_type) {
-		always_assert(Memory_GetAllocator == nullptr, "Function pointer was not set!");
-		return Memory_GetAllocator(&context_type);
 	}
 
 	void Memory::ModifyMemoryMap(MemoryMapEntry* MapEntry, MemSize newSizeForId) {
@@ -184,19 +182,19 @@ namespace NdGameSdk::corelib::memory {
 		#endif
 
 			findpattern = Patterns::Memory_HeapAllocator_PushAllocator;
-			m_HeapArena.Memory_HeapAllocator_PushAllocator = (HeapAllocator::HeapArena::Memory_HeapAllocator_PushAllocator_ptr)Utility::FindAndPrintPattern(module,
+			HeapAllocator::Memory_HeapAllocator_PushAllocator = (HeapAllocator::Memory_HeapAllocator_PushAllocator_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::Memory_HeapAllocator_Allocate), findpattern.offset);
 
 			findpattern = Patterns::Memory_FixedSizeHeap_FreeIndex;
-			FixedSizeHeap_FreeIndex = (FixedSizeHeap_FreeIndex_ptr)Utility::FindAndPrintPattern(module,
+			FixedSizeHeap::Memory_FixedSizeHeap_FreeIndex = (FixedSizeHeap::Memory_FixedSizeHeap_FreeIndex_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::Memory_FixedSizeHeap_FreeIndex), findpattern.offset);
 
 			findpattern = Patterns::Memory_FixedSizeHeap_Copy;
-			FixedSizeHeap_Copy = (FixedSizeHeap_Copy_ptr)Utility::FindAndPrintPattern(module,
+			FixedSizeHeap::Memory_FixedSizeHeap_Copy = (FixedSizeHeap::Memory_FixedSizeHeap_Copy_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::Memory_FixedSizeHeap_Copy), findpattern.offset);
 
 			findpattern = Patterns::Memory_FixedSizeHeap_AddIndex;
-			FixedSizeHeap_AddIndex = (FixedSizeHeap_AddIndex_ptr)Utility::FindAndPrintPattern(module,
+			FixedSizeHeap::Memory_FixedSizeHeap_AddIndex = (FixedSizeHeap::Memory_FixedSizeHeap_AddIndex_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::Memory_FixedSizeHeap_AddIndex), findpattern.offset);
 
 			if (!SetMemoryMapJMP ||
@@ -211,10 +209,10 @@ namespace NdGameSdk::corelib::memory {
 				!Memory_PushAllocator ||
 				!Memory_PopAllocator ||
 				!Memory_GetAllocator ||
-				!m_HeapArena.Memory_HeapAllocator_PushAllocator ||
-				!FixedSizeHeap_FreeIndex ||
-				!FixedSizeHeap_Copy ||
-				!FixedSizeHeap_AddIndex
+				!HeapAllocator::Memory_HeapAllocator_PushAllocator ||
+				!FixedSizeHeap::Memory_FixedSizeHeap_FreeIndex ||
+				!FixedSizeHeap::Memory_FixedSizeHeap_Copy ||
+				!FixedSizeHeap::Memory_FixedSizeHeap_AddIndex
 				) { throw SdkComponentEx { std::format("Failed to find {}:: game functions!", GetName()), SdkComponentEx::ErrorCode::PatternFailed, true }; }
 
 			constexpr uint64_t size_mb = (1024ULL * 1024ULL);
@@ -353,7 +351,7 @@ namespace NdGameSdk::corelib::memory {
 						SdkComponentEx::ErrorCode::PatchFailed, true };
 				}
 
-				Memory_Allocate_ReturnAddr = m_AllocateHook->get_original();		
+				Memory_AllocateAtContext_ReturnAddr = m_AllocateHook->get_original();
 
 			#endif
 			}
@@ -378,33 +376,16 @@ namespace NdGameSdk::corelib::memory {
 		});
 	}
 
-	void Memory::Allocator::PrintDebugAllocatorInfo() {
-		//TODO 
-		/*
-		*  printf_s("Memory_GetCtx at 0x%p 0x%x: %40s (0x%016llx - 0x%016llx) %llu bytes\n",
-                    ret,
-                    i,
-                    ret->context_name,
-                    ret->start_addr,
-                    ret->end_addr,
-                    ret->heap_size);
-		*/
+	const char* Memory::Allocator::GetName() const {
+		return this->Get()->m_contextName;
 	}
 
-	size_t Memory::Allocator::GetHeapSize() {
-		return this->Get()->m_size;
+	StringId64 Memory::Allocator::GetHash() const {
+		return this->Get()->m_contextHash;
 	}
 
-	const char* BaseAllocator::GetName() const {
-		return this->Get()->m_context_name;
-	}
-
-	StringId64 BaseAllocator::GetHash() const {
-		return this->Get()->m_context_hash;
-	}
-
-	bool BaseAllocator::IsInitialized() const {
-		return this->Get()->m_Initialized;
+	bool Memory::Allocator::IsInitialized() const {
+		return this->Get()->m_initialized;
 	}
 
 	void __attribute__((naked)) Memory_AllocateAtContext_CC()
@@ -424,7 +405,7 @@ namespace NdGameSdk::corelib::memory {
 			mov eax, MemoryContextType::kAllocAppCpuLargePage;
 			mov[rdx], eax;
 		code_exit:;
-			jmp[rip + Memory_Allocate_ReturnAddr];
+			jmp[rip + Memory_AllocateAtContext_ReturnAddr];
 		}
 	}
 

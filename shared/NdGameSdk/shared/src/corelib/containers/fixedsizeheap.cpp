@@ -11,11 +11,11 @@ namespace NdGameSdk::corelib::containers {
 	}
 	
 	uint64_t FixedSizeHeap::Copy(FixedSizeHeap* srcHeap) {
-		always_assert(FixedSizeHeap_Copy == nullptr, "Function pointer was not set!");
-		return FixedSizeHeap_Copy(this, srcHeap);
+		always_assert(Memory_FixedSizeHeap_Copy == nullptr, "Function pointer was not set!");
+		return Memory_FixedSizeHeap_Copy(this, srcHeap);
 	}
 
-	INIT_FUNCTION_PTR(FixedSizeHeap_FreeIndex);
-	INIT_FUNCTION_PTR(FixedSizeHeap_Copy);
-	INIT_FUNCTION_PTR(FixedSizeHeap_AddIndex);
+	INIT_FUNCTION_PTR(FixedSizeHeap::Memory_FixedSizeHeap_FreeIndex);
+	INIT_FUNCTION_PTR(FixedSizeHeap::Memory_FixedSizeHeap_Copy);
+	INIT_FUNCTION_PTR(FixedSizeHeap::Memory_FixedSizeHeap_AddIndex);
 }

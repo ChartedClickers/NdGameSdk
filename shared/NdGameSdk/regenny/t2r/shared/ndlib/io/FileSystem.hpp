@@ -2,7 +2,7 @@
 #include <NdGameSdk/components/SdkRegenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
 #include "..\..\corelib\containers\FixedSizeHeap.hpp"
-#include "..\..\corelib\memory\Allocator.hpp"
+#include "..\..\corelib\memory\HeapAllocatorWithOverflow.hpp"
 #include "..\..\corelib\system\platform\ndsys.hpp"
 #include "FsResult.hpp"
 namespace regenny::shared::ndlib::io {
@@ -106,8 +106,7 @@ struct FileSystem {
     uint64_t m_workBufSize; // 0x108
     uint64_t m_workBuf; // 0x110
     private: char pad_118[0x8]; public:
-    regenny::shared::corelib::memory::Allocator m_allocator; // 0x120
-    private: char pad_1f0[0x30]; public:
+    regenny::shared::corelib::memory::HeapAllocatorWithOverflow m_allocator; // 0x120
 }; // Size: 0x220
 #pragma pack(pop)
 }

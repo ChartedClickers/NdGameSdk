@@ -17,7 +17,6 @@
 #include <Utility/system/clipboard.hpp>
 
 using namespace NdGameSdk::corelib::memory;
-using namespace NdGameSdk::corelib::memory::HeapAllocator;
 using namespace NdGameSdk::common;
 using namespace NdGameSdk::ndlib;
 using namespace NdGameSdk::ndlib::debug;

@@ -738,8 +738,8 @@ namespace NdGameSdk::ndlib::io {
 		return this->Get()->m_initialized;
 	}
 
-	Memory::Allocator& FileSystemWin::GetAllocator() {
-		return *reinterpret_cast<Memory::Allocator*>(&this->Get()->m_allocator);
+	HeapAllocatorWithOverflow& FileSystemWin::GetAllocator() {
+		return *reinterpret_cast<HeapAllocatorWithOverflow*>(&this->Get()->m_allocator);
 	}
 
 	bool FileSystemWin::Overlay::GetDisplayOverlay() const {

@@ -165,7 +165,7 @@ struct Package {
     // Metadata: utf8*
     char m_packname[128]; // 0x9c8
     StringId64 m_packid; // 0xa48
-    private: char pad_a50[0x1]; public:
+    bool m_loginFinalized; // 0xa50
     // Metadata: utf8*
     char m_packfilepath[128]; // 0xa51
     private: char pad_ad1[0x7]; public:

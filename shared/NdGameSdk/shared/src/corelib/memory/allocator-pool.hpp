@@ -19,26 +19,16 @@ namespace NdGameSdk::corelib::memory {
 	class NdGameSdk_API PoolAllocator : public ISdkRegenny<regenny::shared::corelib::memory::PoolAllocator, Memory::Allocator> {
 	public:
 		class PoolStack : public ISdkRegenny<regenny::shared::corelib::memory::PoolAllocator::PoolStack> {};
-		class Debug : public ISdkRegenny<regenny::shared::corelib::memory::PoolAllocator::Debug> {
-		public:
-			Memory::MapId GetMapId();
-			Memory::Context GetContext();
-			uint32_t GetBytesPerBlock();
-		};
-
-		MemSize GetSize() const;
-		std::string_view GetName();
 
 		PoolStack* GetPoolStack();
-		Debug* GetDebugInfo();
-		HeapAllocatorWithOverflow* GetHeapAllocator();
-
-		bool IsPoolAllocDisabled();
+		MemSize GetSize() const;
 
 		template <typename T = void>
 		T* GetMem() {
 			return reinterpret_cast<T*>(this->Get()->m_mem);
 		}
 	};
+
+	static_assert(sizeof(PoolAllocator) == 0xe0, "PoolAllocator size mismatch");
 	
 }

@@ -476,7 +476,7 @@ namespace regenny {
                     uint16_t m_flags @ 0x30;
                     uint8_t m_state;
                     void* m_pTracker @ 0x38;
-                    char* m_contextName;
+                    char* m_contextName [[utf8*]];
                     StringId64 m_contextHash;
                     bool m_initialized;
                 };
@@ -511,7 +511,7 @@ namespace regenny {
                     bool m_field114;
                 };
 
-                struct PoolAllocator : Allocator 0x210 {
+                struct PoolAllocator : Allocator 0xe0 {
 
                     struct PoolStack 0x68 {
                         uint32_t m_guard0;
@@ -532,21 +532,9 @@ namespace regenny {
                         uint8_t m_waitListEnabled;
                     };
 
-                    struct Debug 0x18 {
-                        MapId m_mapId;
-                        Context m_context;
-                        char* m_file [[utf8*]];
-                        uint32_t m_line;
-                        uint32_t m_bytesPerBlock;
-                    };
-
                     PoolStack m_stack;
                     void* m_mem @ 0xd0;
                     uint64_t m_size;
-                    bool m_disablePoolAlloc;
-                    char* m_displayName @ 0xe8 [[utf8*]];
-                    Debug m_debug;
-                    HeapAllocatorWithOverflow m_HeapAllocator @ 0x110;
                 };
 
                 struct AllocStack 0x50 {

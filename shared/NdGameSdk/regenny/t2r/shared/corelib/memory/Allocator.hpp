@@ -21,6 +21,7 @@ struct Allocator {
     uint8_t m_state; // 0x32
     private: char pad_33[0x5]; public:
     void* m_pTracker; // 0x38
+    // Metadata: utf8*
     char* m_contextName; // 0x40
     StringId64 m_contextHash; // 0x48
     bool m_initialized; // 0x50

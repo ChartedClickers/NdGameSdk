@@ -5,11 +5,11 @@
 namespace regenny::shared::ndlib::script::DC {
 struct Entry;
 }
-namespace regenny::shared::ndlib::script::DC {
-struct Header;
-}
 namespace regenny::shared::ndlib::script {
 struct ModuleInfo;
+}
+namespace regenny::shared::ndlib::script::DC {
+struct Header;
 }
 namespace regenny::shared::ndlib::script {
 #pragma pack(push, 1)

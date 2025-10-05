@@ -2,8 +2,10 @@
 #include "common-game-init.hpp"
 
 #include <NdGameSdk/shared/src/ndlib/render/dev/debugdraw-common.hpp>
-
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
+
+#include <algorithm>
+#include <cstring>
 
 namespace NdGameSdk::common {
 
@@ -92,52 +94,55 @@ namespace NdGameSdk::common {
 			m_SystemInitHook = Utility::MakeSafetyHookInline(SystemInit, CommonMainWin::SystemInit,
 				wstr(Patterns::CommonGame_CommonMainWin_SystemInit), wstr(SystemInit));
 
-			m_logger = SdkLogger::GetNdGameLogger();
-			spdlog::info("Installing logger for {}: {}", GetName(), m_logger->name());
+            if (Utility::sys::HasAttachedConsole()) {
 
-			if (CommonGamePrintF &&
-				SsManagerPrintF &&
-				SsManagerWarnPrintF &&
-				SsManagerErrorPrintF && 
-				ScriptManagerErrorPrintF
-				#if defined(T2R)
-				&& MemoryDumpTaggedHeapMemoryStatsPrintF && 
-                DebugPrintF
-				#elif defined(T1X)
-				&& CommonGameErrorPrintF
-				#endif
-				) {
+                m_logger = SdkLogger::GetNdGameLogger();
+                spdlog::info("{} Installing logger for NdGame: {}", GetName(), m_logger->name());
 
-				m_CommonGamePrintFHook = Utility::MakeSafetyHookInline(CommonGamePrintF, CommonMainWin::CommonGamePrintF,
-					wstr(Patterns::CommonGame_PrintF), wstr(CommonGamePrintF));
+                if (CommonGamePrintF &&
+                    SsManagerPrintF &&
+                    SsManagerWarnPrintF &&
+                    SsManagerErrorPrintF &&
+                    ScriptManagerErrorPrintF
+#if defined(T2R)
+                    && MemoryDumpTaggedHeapMemoryStatsPrintF &&
+                    DebugPrintF
+#elif defined(T1X)
+                    && CommonGameErrorPrintF
+#endif
+                    ) {
 
-				m_SsManagerPrintFHook = Utility::MakeSafetyHookInline(SsManagerPrintF, CommonMainWin::SsManagerPrintF,
-					wstr(Patterns::SsManager_PrintF), wstr(SsManagerPrintF));
+                    m_CommonGamePrintFHook = Utility::MakeSafetyHookInline(CommonGamePrintF, CommonMainWin::CommonGamePrintF,
+                        wstr(Patterns::CommonGame_PrintF), wstr(CommonGamePrintF));
 
-				m_SsManagerWarnPrintFHook = Utility::MakeSafetyHookInline(SsManagerWarnPrintF, CommonMainWin::SsManagerWarnPrintF,
-					wstr(Patterns::SsManager_WarnPrintF), wstr(SsManagerWarnPrintF));
+                    m_SsManagerPrintFHook = Utility::MakeSafetyHookInline(SsManagerPrintF, CommonMainWin::SsManagerPrintF,
+                        wstr(Patterns::SsManager_PrintF), wstr(SsManagerPrintF));
 
-				m_SsManagerErrorPrintFHook = Utility::MakeSafetyHookInline(SsManagerErrorPrintF, CommonMainWin::SsManagerErrorPrintF,
-					wstr(Patterns::SsManager_ErrorPrintF), wstr(SsManagerErrorPrintF));
+                    m_SsManagerWarnPrintFHook = Utility::MakeSafetyHookInline(SsManagerWarnPrintF, CommonMainWin::SsManagerWarnPrintF,
+                        wstr(Patterns::SsManager_WarnPrintF), wstr(SsManagerWarnPrintF));
 
-				m_ScriptManagerErrorPrintFHook = Utility::MakeSafetyHookInline(ScriptManagerErrorPrintF, CommonMainWin::ScriptManagerErrorPrintF,
-					wstr(Patterns::ScriptManager_ErrorPrintF), wstr(ScriptManagerErrorPrintF));
+                    m_SsManagerErrorPrintFHook = Utility::MakeSafetyHookInline(SsManagerErrorPrintF, CommonMainWin::SsManagerErrorPrintF,
+                        wstr(Patterns::SsManager_ErrorPrintF), wstr(SsManagerErrorPrintF));
 
-            #if defined(T2R)
-				m_MemoryDumpTaggedHeapMemoryStatsPrintFHook = Utility::MakeSafetyHookInline(MemoryDumpTaggedHeapMemoryStatsPrintF,
-					CommonMainWin::MemoryDumpTaggedHeapMemoryStatsPrintF,
-					wstr(Patterns::Memory_DumpTaggedHeapMemoryStatsPrintF), wstr(MemoryDumpTaggedHeapMemoryStatsPrintF));
+                    m_ScriptManagerErrorPrintFHook = Utility::MakeSafetyHookInline(ScriptManagerErrorPrintF, CommonMainWin::ScriptManagerErrorPrintF,
+                        wstr(Patterns::ScriptManager_ErrorPrintF), wstr(ScriptManagerErrorPrintF));
 
-				m_DebugPrintFHook = Utility::MakeSafetyHookInline(DebugPrintF, CommonMainWin::DebugPrintF, wstr(Patterns::DebugPrintF), wstr(DebugPrintF));
+#if defined(T2R)
+                    m_MemoryDumpTaggedHeapMemoryStatsPrintFHook = Utility::MakeSafetyHookInline(MemoryDumpTaggedHeapMemoryStatsPrintF,
+                        CommonMainWin::MemoryDumpTaggedHeapMemoryStatsPrintF,
+                        wstr(Patterns::Memory_DumpTaggedHeapMemoryStatsPrintF), wstr(MemoryDumpTaggedHeapMemoryStatsPrintF));
 
-            #elif defined(T1X)
-				m_CommonGameErrorPrintFHook = Utility::MakeSafetyHookInline(CommonGameErrorPrintF, CommonMainWin::CommonGameErrorPrintF,
-					wstr(Patterns::CommonGame_ErrorPrintF), wstr(CommonGameErrorPrintF));
-            #endif
+                    m_DebugPrintFHook = Utility::MakeSafetyHookInline(DebugPrintF, CommonMainWin::DebugPrintF, wstr(Patterns::DebugPrintF), wstr(DebugPrintF));
 
-            }
-            else {
-				spdlog::error("Failed to find all necessary patterns for NdGame logging!");
+#elif defined(T1X)
+                    m_CommonGameErrorPrintFHook = Utility::MakeSafetyHookInline(CommonGameErrorPrintF, CommonMainWin::CommonGameErrorPrintF,
+                        wstr(Patterns::CommonGame_ErrorPrintF), wstr(CommonGameErrorPrintF));
+#endif
+
+                }
+                else {
+                    spdlog::error("Failed to find all necessary patterns for NdGame logging!");
+                }
             }
 
 		});
@@ -155,6 +160,10 @@ namespace NdGameSdk::common {
 
 		return pCommonMainWin->m_SystemInitHook.thiscall<int32_t*>(Err, argc, argv);
 	}
+
+    inline bool is_readable_page(DWORD protect);
+    bool is_readable_range(const void* ptr, size_t bytes);
+    std::string safe_cstr_copy(const char* p, size_t max_len = 1024);
 
     std::string CommonMainWin::vformat(const char* fmt, va_list args) {
         if (!fmt) return "";
@@ -301,21 +310,28 @@ namespace NdGameSdk::common {
     void __fastcall CommonMainWin::SsManagerErrorPrintF(void* /*file*/, const char* fmt, void* argBuffer, void* /*unused*/) {
         if (!fmt) return;
 
-        const char* firstRaw = "[invalid]";
-        const char* secondRaw = "[invalid]";
+        // Validate we can read two pointer slots
+        const size_t slot_bytes = sizeof(const char*) * 2;
+        const bool has_slots = is_readable_range(argBuffer, slot_bytes);
 
-        __try {
-            char** buf = reinterpret_cast<char**>(argBuffer);
-            firstRaw = buf[0] ? buf[0] : "[invalid]";
-            secondRaw = buf[1] ? buf[1] : "[invalid]";
+        const char* first_ptr  = nullptr;
+        const char* second_ptr = nullptr;
+
+        if (has_slots) {
+            auto** buf = reinterpret_cast<const char**>(argBuffer);
+            first_ptr  = buf[0];
+            second_ptr = buf[1];
         }
-        __except (GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH) {}
+
+        const std::string first = safe_cstr_copy(first_ptr);
+        const std::string second = safe_cstr_copy(second_ptr);
 
         std::string result(fmt);
+
         size_t pos = result.find("%s");
-        if (pos != std::string::npos) result.replace(pos, 2, firstRaw);
+        if (pos != std::string::npos) result.replace(pos, 2, first);
         pos = result.find("%s");
-        if (pos != std::string::npos) result.replace(pos, 2, secondRaw);
+        if (pos != std::string::npos) result.replace(pos, 2, second);
 
         auto logger = SdkLogger::GetNdGameLogger();
         logger->error("[SSMGR] {}", result);
@@ -367,5 +383,72 @@ namespace NdGameSdk::common {
 		logger->error("{}", msg);
 	}
 #endif
+
+    inline bool is_readable_page(DWORD protect) {
+        if (protect & (PAGE_NOACCESS | PAGE_GUARD)) 
+            return false;
+        switch (protect & 0xFF) {
+        case PAGE_READONLY:
+        case PAGE_READWRITE:
+        case PAGE_WRITECOPY:
+        case PAGE_EXECUTE_READ:
+        case PAGE_EXECUTE_READWRITE:
+        case PAGE_EXECUTE_WRITECOPY:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    bool is_readable_range(const void* ptr, size_t bytes) {
+        if (!ptr || bytes == 0) return false;
+        auto addr = reinterpret_cast<uintptr_t>(ptr);
+        auto end = addr + bytes;
+
+        MEMORY_BASIC_INFORMATION mbi{};
+        while (addr < end) {
+            if (VirtualQuery(reinterpret_cast<LPCVOID>(addr), &mbi, sizeof(mbi)) == 0) return false;
+            if (mbi.State != MEM_COMMIT || !is_readable_page(mbi.Protect)) return false;
+
+            const auto region_end = reinterpret_cast<uintptr_t>(mbi.BaseAddress) + mbi.RegionSize;
+            if (region_end <= addr) return false;
+            addr = std::min<uintptr_t>(region_end, end);
+        }
+        return true;
+    }
+
+    std::string safe_cstr_copy(const char* p, size_t max_len) {
+        if (!p) return std::string{ "[null]" };
+        std::string out{};
+
+        out.reserve(std::min<size_t>(max_len, 256));
+        auto cur = reinterpret_cast<uintptr_t>(p);
+        const auto cap_end = cur + max_len;
+
+        while (cur < cap_end) {
+            MEMORY_BASIC_INFORMATION mbi{};
+            if (VirtualQuery(reinterpret_cast<LPCVOID>(cur), &mbi, sizeof(mbi)) == 0) return std::string{ "[invalid]" };
+            if (mbi.State != MEM_COMMIT || !is_readable_page(mbi.Protect)) return std::string{ "[invalid]" };
+
+            const auto region_start = reinterpret_cast<uintptr_t>(mbi.BaseAddress);
+            const auto region_end = region_start + mbi.RegionSize;
+            const auto bytes_left = cap_end - cur;
+            const auto read_end = std::min<uintptr_t>(region_end, cur + bytes_left);
+            const auto read_len = read_end - cur;
+
+            const char* c = reinterpret_cast<const char*>(cur);
+            if (const void* nul = memchr(c, '\0', read_len)) {
+                const auto add = static_cast<const char*>(nul) - c;
+                out.append(c, add);
+                return out;
+            }
+
+            out.append(c, read_len);
+            cur += read_len;
+        }
+
+        out.append("…");
+        return out;
+    }
 
 }

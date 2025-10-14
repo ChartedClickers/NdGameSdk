@@ -16,8 +16,10 @@ namespace NdGameSdk::ndlib::render::dev {
 	class DebugDrawCommon;
 }
 
-namespace NdGameSdk::ndlib::render::util
-{
+namespace NdGameSdk::ndlib::render::util {
+
+	// TODO: Refactor to corelib\util\msg.hpp
+
 	class MsgCon;
 
 	class NdGameSdk_API Msg {

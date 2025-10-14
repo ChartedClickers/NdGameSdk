@@ -15,6 +15,8 @@ using namespace NdGameSdk::ndlib::render::dev;
 
 namespace NdGameSdk::ndlib::render::util {
 
+	// TODO: Refactor to ndlib\util\msg-con-draw.hpp
+
 	class MsgConDraw : public ISdkSubComponent {
 	public:
 		explicit MsgConDraw();

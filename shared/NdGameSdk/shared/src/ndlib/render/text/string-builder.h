@@ -10,8 +10,10 @@
 #include <NdGameSdk/regenny/t1x/shared/ndlib/render/text/DebugStringBase.hpp>
 #endif
 
-namespace NdGameSdk::ndlib::render::text
-{
+namespace NdGameSdk::ndlib::render::text {
+
+    // TODO: Refactor this...
+
 	class NdGameSdk_API DebugStringBase : public ISdkRegenny<::regenny::shared::ndlib::render::text::DebugStringBase>
 	{
 

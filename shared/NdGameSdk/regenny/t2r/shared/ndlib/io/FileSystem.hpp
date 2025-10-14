@@ -4,7 +4,7 @@
 #include "..\..\corelib\containers\FixedSizeHeap.hpp"
 #include "..\..\corelib\memory\HeapAllocatorWithOverflow.hpp"
 #include "..\..\corelib\system\platform\ndsys.hpp"
-#include "FsResult.hpp"
+#include "..\..\corelib\util\Err.hpp"
 namespace regenny::shared::ndlib::io {
 #pragma pack(push, 1)
 struct FileSystem {
@@ -33,7 +33,7 @@ struct FileSystem {
 
     struct ReadOperation {
         HANDLE m_hEvent; // 0x0
-        regenny::shared::ndlib::io::FsResult m_FsResult; // 0x8
+        regenny::shared::corelib::util::Err m_FsResult; // 0x8
     }; // Size: 0x18
 
     struct RemapNode {

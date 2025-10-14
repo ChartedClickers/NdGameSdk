@@ -121,7 +121,6 @@ namespace NdGameSdk::ndlib::io {
 		bool MountArchiveSync(FsResult& outResult, const char* archivePath, const char* mountPath, FileSystemInternal::ArchiveMount* pArchiveMount, bool appendToEnd = false);
 		bool UnmountArchiveSync(FsResult& outResult, FileSystemInternal::ArchiveMount* pArchiveMount);
 
-		static const char* FsStrError(FsResult& pFsResult);
 	private:
 		void Initialize() override;
 		void Awake() override;
@@ -141,58 +140,58 @@ namespace NdGameSdk::ndlib::io {
 		/*Extern variables*/
 		static FileSystemData* g_FileSystemDataSlot;
 
-		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_PreadSync, FileSystemInternal* pFileSys, FsResult* pOutResult, FileSystemInternal::ReadOnlyFileHandle* pFileHandle,
+		MEMBER_FUNCTION_PTR(FsResult*, FileSystem_PreadSync, FileSystemInternal* pFileSys, FsResult* pOutResult, FileSystemInternal::ReadOnlyFileHandle* pFileHandle,
 			void* dst, uint64_t pfileRelativeOffset, uint64_t pRequestedBytes, uint64_t* pIoBytesDoneCell, FileSystemInternal::Priority prio);
-		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_PreadAsync, FileSystemInternal* pFileSys, FsResult* pOutResult, FileSystemInternal::ReadOnlyFileHandle& pFileHandle,
+		MEMBER_FUNCTION_PTR(FsResult*, FileSystem_PreadAsync, FileSystemInternal* pFileSys, FsResult* pOutResult, FileSystemInternal::ReadOnlyFileHandle& pFileHandle,
 			FileSystemInternal::ReadOperation* pReadOperation, void* dst, int64_t pfileRelativeOffset, int64_t pRequestedBytes,
 			uint64_t* pIoBytesDoneCell, FileSystemInternal::Priority prio, bool allowShortRead);
-		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_OpenSync, FileSystemInternal* pFileSys, FsResult* pOutResult, const char* path,
+		MEMBER_FUNCTION_PTR(FsResult*, FileSystem_OpenSync, FileSystemInternal* pFileSys, FsResult* pOutResult, const char* path,
 			FileSystemInternal::ReadOnlyFileHandle* pFileHandle, FileSystemInternal::Priority prio);
-		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_CloseSync, FileSystemInternal* pFileSys, FsResult* pOutResult, FileSystemInternal::ReadOnlyFileHandle* pFileHandle);
-        MEMBER_FUNCTION_PTR(int32_t*, FileSystem_OpenSyncImp, FileSystemInternal* pFileSys, FsResult* pOutResult, const char* path, 
+		MEMBER_FUNCTION_PTR(FsResult*, FileSystem_CloseSync, FileSystemInternal* pFileSys, FsResult* pOutResult, FileSystemInternal::ReadOnlyFileHandle* pFileHandle);
+        MEMBER_FUNCTION_PTR(FsResult*, FileSystem_OpenSyncImp, FileSystemInternal* pFileSys, FsResult* pOutResult, const char* path,
             uint32_t* pFh, FhOpenFlags openFlags, bool resolveMode);
-        MEMBER_FUNCTION_PTR(int32_t*, FileSystem_CloseSyncImp, FileSystemInternal* pFileSys, FsResult* pOutResult, uint32_t fh, bool flush);
-        MEMBER_FUNCTION_PTR(int32_t*, FileSystem_WriteSync, FileSystemInternal* pFileSys, FsResult* pFsResult, int32_t fh, const void* src,
+        MEMBER_FUNCTION_PTR(FsResult*, FileSystem_CloseSyncImp, FileSystemInternal* pFileSys, FsResult* pOutResult, uint32_t fh, bool flush);
+        MEMBER_FUNCTION_PTR(FsResult*, FileSystem_WriteSync, FileSystemInternal* pFileSys, FsResult* pFsResult, int32_t fh, const void* src,
 			int64_t length, int64_t* numWritten, uint8_t opFlags);
-		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_WriteAsync, FileSystemInternal* pFileSys, FsResult* pFsResult, int32_t fh, const void* src,
+		MEMBER_FUNCTION_PTR(FsResult*, FileSystem_WriteAsync, FileSystemInternal* pFileSys, FsResult* pFsResult, int32_t fh, const void* src,
 			int64_t length, int64_t* FiosOpId, bool flush);
-		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_WaitReadOperation, FileSystemInternal* pFileSys, FsResult* pOut, FileSystemInternal::ReadOperation* pReadOperation);
-		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_WaitFIOSOpId, FileSystemInternal* pFileSys, FsResult* pOut, int32_t opId);
+		MEMBER_FUNCTION_PTR(FsResult*, FileSystem_WaitReadOperation, FileSystemInternal* pFileSys, FsResult* pOut, FileSystemInternal::ReadOperation* pReadOperation);
+		MEMBER_FUNCTION_PTR(FsResult*, FileSystem_WaitFIOSOpId, FileSystemInternal* pFileSys, FsResult* pOut, int32_t opId);
 		MEMBER_FUNCTION_PTR(DWORD, FileSystem_PollReadOp, FileSystemInternal* pFileSys, FileSystemInternal::ReadOperation* pReadOperation, FsResult* pFsResult);
 		MEMBER_FUNCTION_PTR(void, FileSystem_ReleaseOp, FileSystemInternal* pFileSys, int32_t opId);
-		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_ReadSync, FileSystemInternal* pFileSys, FsResult* pOutResult, int32_t fh, void* dst, int64_t length, 
+		MEMBER_FUNCTION_PTR(FsResult*, FileSystem_ReadSync, FileSystemInternal* pFileSys, FsResult* pOutResult, int32_t fh, void* dst, int64_t length,
 			uint64_t* outBytesRead, uint8_t flags);
-        MEMBER_FUNCTION_PTR(int32_t*, FileSystem_ReadAsync, FileSystemInternal* pFileSys, FsResult* outErr, int32_t fh, const void* buffer, uint64_t length, 
+        MEMBER_FUNCTION_PTR(FsResult*, FileSystem_ReadAsync, FileSystemInternal* pFileSys, FsResult* outErr, int32_t fh, const void* buffer, uint64_t length,
             uint64_t* bytesThisSubmit, int32_t* outOpId, uint8_t submitFlag);
 
 		MEMBER_FUNCTION_PTR(bool, FileSystem_IsFileExists, FileSystemInternal* pFileSys, char* Path);
 		MEMBER_FUNCTION_PTR(int64_t, FileSystem_IsDirectoryExsist, FileSystemInternal* pFileSys, char* path);
-		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_GetSizeSync, FileSystemInternal* FileSys, FsResult* pFsResult, 
+		MEMBER_FUNCTION_PTR(FsResult*, FileSystem_GetSizeSync, FileSystemInternal* FileSys, FsResult* pFsResult,
 			FileSystemInternal::ReadOnlyFileHandle* pFileHandle, int64_t* outSize);
-		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_GetFileSizeSync, FileSystemInternal* pFileSys, FsResult* pOutResult,
+		MEMBER_FUNCTION_PTR(FsResult*, FileSystem_GetFileSizeSync, FileSystemInternal* pFileSys, FsResult* pOutResult,
 			char* Path, uint64_t* outSize);
 		MEMBER_FUNCTION_PTR(bool, FileSystem_IsDoneOpId, FileSystemInternal* pFileSys, int32_t opId, FsResult* pOutResult,
 			uint64_t* bytesTransferredOut);
-		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_IsDoneBatchKey, FileSystemInternal* pFileSys, FsResult* pOutResult,
+		MEMBER_FUNCTION_PTR(FsResult*, FileSystem_IsDoneBatchKey, FileSystemInternal* pFileSys, FsResult* pOutResult,
 			int32_t BatchKey);
 
 		MEMBER_FUNCTION_PTR(uint64_t, FileSystem_AddOverlay, FileSystemInternal* pFileSys, const char* toPath, const char* fromPath, bool appendToEnd);
 		MEMBER_FUNCTION_PTR(int64_t, FileSystem_RemoveOverlayById, FileSystemInternal* pFileSys, int32_t overlayId);
 
-		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_DeleteSync, FileSystemInternal* pFileSys, FsResult* pOutResult, const char* path);
-		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_RenameSync, FileSystemInternal* pFileSys, FsResult* pOutResult, const char* oldPath, const char* newPath);
+		MEMBER_FUNCTION_PTR(FsResult*, FileSystem_DeleteSync, FileSystemInternal* pFileSys, FsResult* pOutResult, const char* path);
+		MEMBER_FUNCTION_PTR(FsResult*, FileSystem_RenameSync, FileSystemInternal* pFileSys, FsResult* pOutResult, const char* oldPath, const char* newPath);
 		MEMBER_FUNCTION_PTR(int64_t, FileSystem_ResolvePath, char* pOriginalPath, char* pResolvedPath, uint64_t resolvedPathSize, bool skipAssetView);
 
-		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_BatchResolve, FileSystemInternal* FileSys, FsResult* pOutResult, FileSystemInternal::BatchResolveItem* items, 
+		MEMBER_FUNCTION_PTR(FsResult*, FileSystem_BatchResolve, FileSystemInternal* FileSys, FsResult* pOutResult, FileSystemInternal::BatchResolveItem* items,
 			int32_t count, int32_t* outBatchKey, char* source_function, char* source_file, uint32_t source_line);
-		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_BatchRelease, FileSystemInternal* pFileSys, FsResult* pOutResult, const int32_t* fhs, int32_t count, 
+		MEMBER_FUNCTION_PTR(FsResult*, FileSystem_BatchRelease, FileSystemInternal* pFileSys, FsResult* pOutResult, const int32_t* fhs, int32_t count,
 			int32_t* outBatchKey, char* source_function, char* source_file, uint32_t source_line);
-		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_BatchRead, FileSystemInternal* FileSys, FsResult* pOutResult, FileSystemInternal::BatchReadItem* items, 
+		MEMBER_FUNCTION_PTR(FsResult*, FileSystem_BatchRead, FileSystemInternal* FileSys, FsResult* pOutResult, FileSystemInternal::BatchReadItem* items,
 			int32_t count, int32_t* outBatchKey, char* source_function, char* source_file, uint32_t source_line);
 
-		MEMBER_FUNCTION_PTR(int32_t*, FileSystem_MountArchiveSync, FileSystemInternal* pFileSys, FsResult* pOutResult, const char* indexPath, const char* mountPrefix, 
+		MEMBER_FUNCTION_PTR(FsResult*, FileSystem_MountArchiveSync, FileSystemInternal* pFileSys, FsResult* pOutResult, const char* indexPath, const char* mountPrefix,
 			FileSystemInternal::ArchiveMount* ArchiveMount, bool preferForeground);
-        MEMBER_FUNCTION_PTR(int32_t*, FileSystem_UnmountArchiveSync, FileSystemInternal* FileSys, FsResult* outRes, FileSystemInternal::ArchiveMount* pArchiveMount);
+        MEMBER_FUNCTION_PTR(FsResult*, FileSystem_UnmountArchiveSync, FileSystemInternal* FileSys, FsResult* outRes, FileSystemInternal::ArchiveMount* pArchiveMount);
 
         friend class NdDevMenu;
     };

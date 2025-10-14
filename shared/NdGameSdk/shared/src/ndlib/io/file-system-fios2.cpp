@@ -15,7 +15,7 @@ namespace NdGameSdk::ndlib::io {
 		FileSystemInternal::ReadOnlyFileHandle* pFileHandle, FileSystemInternal::Priority prio) {
 		always_assert(FileSystem_OpenSync == nullptr, "FileSystem_OpenSync was not set!");
 
-		int32_t* ret = FileSystem_OpenSync(
+		FsResult* ret = FileSystem_OpenSync(
 			this->GetFileSystem(),
 			&outResult,
 			path,
@@ -23,40 +23,37 @@ namespace NdGameSdk::ndlib::io {
 			prio
 		);
 
-		const int32_t code = ret ? *ret : 0;
-		return code <= 0;
+		return ret->isOK();
 	}
 
 	bool FileSystem::CloseSync(FsResult& outResult, FileSystemInternal::ReadOnlyFileHandle& pFileHandle) {
 		always_assert(FileSystem_CloseSync == nullptr, "FileSystem_CloseSync was not set!");
-		int32_t* ret = FileSystem_CloseSync(
+		FsResult* ret = FileSystem_CloseSync(
 			this->GetFileSystem(),
 			&outResult,
 			&pFileHandle
 		);
 
-		const int32_t code = ret ? *ret : 0;
-		return code <= 0;
+		return ret->isOK();
 	}
 
 	bool FileSystem::GetSizeSync(FsResult& outResult, FileSystemInternal::ReadOnlyFileHandle& pFileHandle, int64_t* outSize) {
 		always_assert(FileSystem_GetSizeSync == nullptr, "FileSystem_GetSizeSync was not set!");
 
-		int32_t* ret = FileSystem_GetSizeSync(
+		FsResult* ret = FileSystem_GetSizeSync(
 			this->GetFileSystem(),
 			&outResult,
 			&pFileHandle,
 			outSize
 		);
 
-		const int32_t code = ret ? *ret : 0;
-		return code <= 0;
+		return ret->isOK();
 	}
 
 	bool FileSystem::PreadSync(FsResult& outResult, FileSystemInternal::ReadOnlyFileHandle* pFileHandle, void* dst, 
 		uint64_t fileRelativeOffset, uint64_t requestedBytes, uint64_t* ioBytesDoneCell, FileSystemInternal::Priority prio) {
 		always_assert(FileSystem_PreadSync == nullptr, "FileSystem_PreadSync was not set!");
-		int32_t* ret = FileSystem_PreadSync(
+		FsResult* ret = FileSystem_PreadSync(
 			this->GetFileSystem(),
 			&outResult,
 			pFileHandle,
@@ -67,8 +64,7 @@ namespace NdGameSdk::ndlib::io {
 			prio
 		);
 
-		const int32_t code = ret ? *ret : 0;
-		return code <= 0;
+		return ret->isOK();
 	}
 
 	bool FileSystem::IsFileExists(const char* Path) {
@@ -86,7 +82,7 @@ namespace NdGameSdk::ndlib::io {
 		always_assert(FileSystem_MountArchiveSync == nullptr, "FileSystem_MountArchiveSync was not set!");
 		
 		spdlog::info("Mounting archive '{}' at mount point '{}'...", archivePath, mountPath);
-		int32_t* ret = FileSystem_MountArchiveSync(
+		FsResult* ret = FileSystem_MountArchiveSync(
 			this->GetFileSystem(),
 			&outResult,
 			archivePath,
@@ -95,33 +91,26 @@ namespace NdGameSdk::ndlib::io {
 			appendToEnd
 		);
 
-		const int32_t code = ret ? *ret : 0;
-		return code <= 0;
+		return ret->isOK();
 	}
 
 	bool FileSystem::UnmountArchiveSync(FsResult& outResult, FileSystemInternal::ArchiveMount* pArchiveMount) {
 		always_assert(FileSystem_UnmountArchiveSync == nullptr, "FileSystem_UnmountArchiveSync was not set!");
 
 		spdlog::info("Unmounting archive at mount point '{}'...", pArchiveMount ? pArchiveMount->GetMountPath() : "(null)");
-		int32_t* ret = FileSystem_UnmountArchiveSync(
+		FsResult* ret = FileSystem_UnmountArchiveSync(
 			this->GetFileSystem(),
 			&outResult,
 			pArchiveMount
 		);
 
-		const int32_t code = ret ? *ret : 0;
-		return code <= 0;
-	}
-
-	const char* FileSystem::FsStrError(FsResult& pFsResult) {
-		always_assert(FileSystem_StrError == nullptr, "FileSystem_FsStrError was not set!");
-		return FileSystem_StrError(&pFsResult);
+		return ret->isOK();
 	}
 
 	bool FileSystem::OpenSyncImp(FsResult& outResult, const char* path, uint32_t* outFh, FhOpenFlags openFlags, bool resolveMode) {
 		always_assert(FileSystem_OpenSyncImp == nullptr, "FileSystem_OpenSyncImp was not set!");
 
-		int32_t* ret = FileSystem_OpenSyncImp(
+		FsResult* ret = FileSystem_OpenSyncImp(
 			this->GetFileSystem(),
 			&outResult,
 			path,
@@ -130,14 +119,13 @@ namespace NdGameSdk::ndlib::io {
 			resolveMode
 		);
 
-		const int32_t code = ret ? *ret : 0;
-		return code <= 0;
+		return ret->isOK();
 	}
 
 	bool FileSystem::WriteSync(FsResult& outResult, uint32_t fh, const void* src, int64_t length, int64_t* outBytesWritten, uint8_t opFlags) {
 		always_assert(FileSystem_WriteSync == nullptr, "FileSystem_WriteSync was not set!");
 
-		int32_t* ret = FileSystem_WriteSync(
+		FsResult* ret = FileSystem_WriteSync(
 			this->GetFileSystem(),
 			&outResult,
 			static_cast<int32_t>(fh),
@@ -147,35 +135,32 @@ namespace NdGameSdk::ndlib::io {
 			opFlags
 		);
 
-		const int32_t code = ret ? *ret : 0;
-		return code <= 0;
+		return ret->isOK();
 	}
 
 	bool FileSystem::DeleteSync(FsResult& outResult, const char* path) {
 		always_assert(FileSystem_DeleteSync == nullptr, "FileSystem_DeleteSync was not set!");
 
-		int32_t* ret = FileSystem_DeleteSync(
+		FsResult* ret = FileSystem_DeleteSync(
 			this->GetFileSystem(),
 			&outResult,
 			path
 		);
 
-		const int32_t code = ret ? *ret : 0;
-		return code <= 0;
+		return ret->isOK();
 	}
 
 	bool FileSystem::RenameSync(FsResult& outResult, const char* oldPath, const char* newPath) {
 		always_assert(FileSystem_RenameSync == nullptr, "FileSystem_RenameSync was not set!");
 
-		int32_t* ret = FileSystem_RenameSync(
+		FsResult* ret = FileSystem_RenameSync(
 			this->GetFileSystem(),
 			&outResult,
 			oldPath,
 			newPath
 		);
 
-		const int32_t code = ret ? *ret : 0;
-		return code <= 0;
+		return ret->isOK();
 	}
 
 	int64_t FileSystem::ResolvePath(const char* originalPath, char* resolvedPath, uint64_t resolvedPathSize, bool skipAssetView) {
@@ -186,15 +171,14 @@ namespace NdGameSdk::ndlib::io {
 	bool FileSystem::CloseSyncImp(FsResult& outResult, uint32_t fh, bool flush) {
 		always_assert(FileSystem_CloseSyncImp == nullptr, "FileSystem_CloseSyncImp was not set!");
 
-		int32_t* ret = FileSystem_CloseSyncImp(
+		FsResult* ret = FileSystem_CloseSyncImp(
 			this->GetFileSystem(),
 			&outResult,
 			static_cast<uint32_t>(fh),
 			flush
 		);
 
-		const int32_t code = ret ? *ret : 0;
-		return code <= 0;
+		return ret->isOK();
 	}
 
 	bool FileSystem::PreadAsync(FsResult& outResult, FileSystemInternal::ReadOnlyFileHandle& pFileHandle,
@@ -202,7 +186,7 @@ namespace NdGameSdk::ndlib::io {
 		int64_t requestedBytes, uint64_t* ioBytesDoneCell, FileSystemInternal::Priority prio, bool allowShortRead) {
 		always_assert(FileSystem_PreadAsync == nullptr, "FileSystem_PreadAsync was not set!");
 
-		int32_t* ret = FileSystem_PreadAsync(
+		FsResult* ret = FileSystem_PreadAsync(
 			this->GetFileSystem(),
 			&outResult,
 			pFileHandle,
@@ -215,8 +199,7 @@ namespace NdGameSdk::ndlib::io {
 			allowShortRead
 		);
 
-		const int32_t code = ret ? *ret : 0;
-		return code <= 0;
+		return ret->isOK();
 	}
 
 	DWORD FileSystem::PollReadOp(FileSystemInternal::ReadOperation* pReadOperation, FsResult* pFsResult) {
@@ -226,16 +209,14 @@ namespace NdGameSdk::ndlib::io {
 
 	bool FileSystem::Wait(FsResult& outResult, FileSystemInternal::ReadOperation* pReadOperation) {
 		always_assert(FileSystem_WaitReadOperation == nullptr, "FileSystem_WaitReadOperation was not set!");
-		int32_t* ret = FileSystem_WaitReadOperation(this->GetFileSystem(), &outResult, pReadOperation);
-		const int32_t code = ret ? *ret : 0;
-		return code <= 0;
+		FsResult* ret = FileSystem_WaitReadOperation(this->GetFileSystem(), &outResult, pReadOperation);
+		return ret->isOK();
 	}
 
 	bool FileSystem::Wait(FsResult& outResult, int32_t opId) {
 		always_assert(FileSystem_WaitFIOSOpId == nullptr, "FileSystem_WaitFIOSOpId was not set!");
-		int32_t* ret = FileSystem_WaitFIOSOpId(this->GetFileSystem(), &outResult, opId);
-		const int32_t code = ret ? *ret : 0;
-		return code <= 0;
+		FsResult* ret = FileSystem_WaitFIOSOpId(this->GetFileSystem(), &outResult, opId);
+		return ret->isOK();
 	}
 
 	StorageCore* FileSystemData::GetStorageCore() const {
@@ -407,8 +388,6 @@ namespace NdGameSdk::ndlib::io {
 	}
 
 	FileSystemData* FileSystem::g_FileSystemDataSlot = nullptr;
-
-	INIT_FUNCTION_PTR(FileSystem_StrError);
 
 #endif
 }

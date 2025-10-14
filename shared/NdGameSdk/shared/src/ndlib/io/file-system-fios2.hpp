@@ -1,15 +1,17 @@
 ﻿#pragma once
 #include "NdGameSdk/sdkderived.hpp"
+#include "NdGameSdk/shared/shared.hpp"
 #include "NdGameSdk/components/SdkRegenny.hpp"
 
 #if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/ndlib/io/FileSystemData.hpp>
 #include <NdGameSdk/regenny/t2r/shared/ndlib/io/StorageCore.hpp>
 #include <NdGameSdk/regenny/t2r/shared/ndlib/io/FileRecord.hpp>
-#include <NdGameSdk/regenny/t2r/shared/ndlib/io/FsResult.hpp>
 #include <NdGameSdk/regenny/t2r/shared/ndlib/io/FhOpenAccess.hpp>
 #include <NdGameSdk/regenny/t2r/shared/ndlib/io/FhOpenFlags.hpp>
 #endif
+
+#include <NdGameSdk/shared/src/corelib/util/error.hpp>
 
 #include "file-system-archive.hpp"
 
@@ -19,6 +21,8 @@
 
 #include <Utility/helper.hpp>
 #include <Utility/function_ptr.hpp>
+
+using namespace NdGameSdk::corelib::util;
 
 namespace regenny::shared::ndlib::io {
 #if defined(T2R)
@@ -98,7 +102,7 @@ namespace NdGameSdk::ndlib::io {
 #if defined(T2R)
 
 	class FileSystem;
-	using FsResult = regenny::shared::ndlib::io::FsResult;
+	using FsResult = Err;
 	using FhOpenAccess = regenny::shared::ndlib::io::FhOpenAccess;
 	using FhOpenFlags = regenny::shared::ndlib::io::FhOpenFlags;
 
@@ -258,8 +262,6 @@ namespace NdGameSdk::ndlib::io {
 		StorageCore* GetStorageCore() const;
 		ArchiveSystem* GetArchiveSystem() const;
 	};
-
-	TYPEDEF_EXTERN_FUNCTION_PTR(const char*, FileSystem_StrError, FsResult* pFsResult);
 
     static_assert(sizeof(FileRecord) == 0x270, "Invalid FileRecord size");
     static_assert(sizeof(StorageCore) == 0x120, "Invalid StorageCore size");

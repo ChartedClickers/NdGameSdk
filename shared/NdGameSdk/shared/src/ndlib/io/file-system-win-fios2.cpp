@@ -174,11 +174,6 @@ namespace NdGameSdk::ndlib::io {
 			ArchiveSystem::FileSystem_ArchiveSystem_Resolve = (ArchiveSystem::FileSystem_ArchiveSystem_Resolve_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::FileSystem_ArchiveSystem_Resolve), findpattern.offset);
 
-			// extern functions
-			findpattern = Patterns::FileSystem_StrError;
-			FileSystem_StrError = (FileSystem_StrError_ptr)Utility::FindAndPrintPattern(module,
-				findpattern.pattern, wstr(Patterns::FileSystem_StrError), findpattern.offset);
-
 			m_FileSystemInitHook = Utility::MakeSafetyHookInline(FileSystemInit, Init,
 				wstr(Patterns::FileSystem_Init), wstr(FileSystem::Init));
 
@@ -216,7 +211,6 @@ namespace NdGameSdk::ndlib::io {
 				!FileSystem_BatchRead ||
 				!FileSystem_MountArchiveSync ||
 				!FileSystem_UnmountArchiveSync ||
-				!FileSystem_StrError ||
 				!ArchiveSystem::FileSystem_ArchiveSystem_Add ||
 				!ArchiveSystem::FileSystem_ArchiveSystem_Remove ||
 				!ArchiveSystem::FileSystem_ArchiveSystem_Resolve) {
@@ -321,7 +315,7 @@ namespace NdGameSdk::ndlib::io {
 								FsResult outResult{};
 
 								if (!fs->MountArchiveSync(outResult, archivePathStr.c_str(), mountPrefixStr.c_str(), &pTestMount, true)) {
-									spdlog::error("MountArchiveSync failed for '{}': {}", archivePathStr, FileSystem::FsStrError(outResult));
+									spdlog::error("MountArchiveSync failed for '{}': {}", archivePathStr, outResult.Describe());
 									return false;
 								}
 
@@ -330,7 +324,7 @@ namespace NdGameSdk::ndlib::io {
 							else {
 								FsResult outResult{};
 								if (!fs->UnmountArchiveSync(outResult, &pTestMount)) {
-									spdlog::error("UnmountArchiveSync failed for '{}': {}", pTestMount.GetMountPath(), FileSystem::FsStrError(outResult));
+									spdlog::error("UnmountArchiveSync failed for '{}': {}", pTestMount.GetMountPath(), outResult.Describe());
 									return false;
 								}
 
@@ -354,7 +348,7 @@ namespace NdGameSdk::ndlib::io {
 
 							FhOpenFlags oflags = FhOpenAccess::FHO_ACCESS_READWRITE | (FhOpenFlags::FHOF_ALLOW_CREATE | FhOpenFlags::FHOF_TRUNCATE);
 							if (!fs->OpenSyncImp(fsRes, filePath.c_str(), &fh, oflags, /*resolveMode*/true)) {
-								spdlog::error("OpenSyncImp failed for '{}': {}", filePath, FileSystem::FsStrError(fsRes));
+								spdlog::error("OpenSyncImp failed for '{}': {}", filePath, fsRes.Describe());
 								return false;
 							}
 
@@ -367,7 +361,7 @@ namespace NdGameSdk::ndlib::io {
 							int64_t bytesWritten = 0;
 							const bool ok = fs->WriteSync(fsRes, fh, content.data(), static_cast<int64_t>(content.size()), &bytesWritten, /*opFlags*/0);
 							if (!ok) {
-								spdlog::error("WriteSync failed for '{}': {}", filePath, FileSystem::FsStrError(fsRes));
+								spdlog::error("WriteSync failed for '{}': {}", filePath, fsRes.Describe());
 								fs->CloseSyncImp(fsRes, fh, /*flush*/false);
 								return false;
 							}
@@ -400,7 +394,7 @@ namespace NdGameSdk::ndlib::io {
 							uint32_t fh = 0;
 							FhOpenFlags oflags = FhOpenAccess::FHO_ACCESS_READWRITE | (FhOpenFlags::FHOF_ALLOW_CREATE | FhOpenFlags::FHOF_TRUNCATE);
 							if (!fs->OpenSyncImp(fsRes, filePath.c_str(), &fh, oflags, /*resolveMode*/true)) {
-								spdlog::error("OpenSyncImp failed for '{}': {}", filePath, FileSystem::FsStrError(fsRes));
+								spdlog::error("OpenSyncImp failed for '{}': {}", filePath, fsRes.Describe());
 								return false;
 							}
 
@@ -409,7 +403,7 @@ namespace NdGameSdk::ndlib::io {
 							fs->CloseSyncImp(fsRes, fh, /*flush*/true);
 
 							if (!ok) {
-								spdlog::error("WriteSync failed for '{}': {}", filePath, FileSystem::FsStrError(fsRes));
+								spdlog::error("WriteSync failed for '{}': {}", filePath, fsRes.Describe());
 								return false;
 							}
 
@@ -435,7 +429,7 @@ namespace NdGameSdk::ndlib::io {
 
 							FsResult fsRes{};
 							if (!fs->RenameSync(fsRes, srcPath.c_str(), dstPath.c_str())) {
-								spdlog::error("RenameSync failed: '{}' -> '{}': {}", srcPath, dstPath, FileSystem::FsStrError(fsRes));
+								spdlog::error("RenameSync failed: '{}' -> '{}': {}", srcPath, dstPath, fsRes.Describe());
 								return false;
 							}
 
@@ -460,7 +454,7 @@ namespace NdGameSdk::ndlib::io {
 
 							FsResult fsRes{};
 							if (!fs->DeleteSync(fsRes, path.c_str())) {
-								spdlog::error("DeleteSync failed for '{}': {}", path, FileSystem::FsStrError(fsRes));
+								spdlog::error("DeleteSync failed for '{}': {}", path, fsRes.Describe());
 								return false;
 							}
 
@@ -482,13 +476,13 @@ namespace NdGameSdk::ndlib::io {
 							FileSystemInternal::ReadOnlyFileHandle fh{};
 
 							if (!fs->OpenSync(fsRes, filePath.c_str(), &fh)) {
-								spdlog::error("OpenSync failed for '{}': {}", filePath, FileSystem::FsStrError(fsRes));
+								spdlog::error("OpenSync failed for '{}': {}", filePath, fsRes.Describe());
 								return false;
 							}
 
 							int64_t size = 0;
 							if (!fs->GetSizeSync(fsRes, fh, &size)) {
-								spdlog::error("GetSizeSync failed for '{}': {}", filePath, FileSystem::FsStrError(fsRes));
+								spdlog::error("GetSizeSync failed for '{}': {}", filePath, fsRes.Describe());
 								fs->CloseSync(fsRes, fh);
 								return false;
 							}
@@ -512,7 +506,7 @@ namespace NdGameSdk::ndlib::io {
 							buffer[termIndex] = '\0';
 
 							if (!ok) {
-								spdlog::error("PreadSync failed for '{}': {}", filePath, FileSystem::FsStrError(fsRes));
+								spdlog::error("PreadSync failed for '{}': {}", filePath, fsRes.Describe());
 								fs->m_Memory->Free(buffer, HeapArena_Source);
 								fs->CloseSync(fsRes, fh);
 								return false;
@@ -621,12 +615,12 @@ namespace NdGameSdk::ndlib::io {
 							}
 
 							if (!S.fs->OpenSync(S.fsRes, S.path.c_str(), &S.fh)) {
-								spdlog::error("OpenSync failed for '{}': {}", S.path, FileSystem::FsStrError(S.fsRes));
+								spdlog::error("OpenSync failed for '{}': {}", S.path, S.fsRes.Describe());
 								return false;
 							}
 
 							if (!S.fs->GetSizeSync(S.fsRes, S.fh, &S.size) || S.size <= 0) {
-								spdlog::error("GetSizeSync failed or file empty for '{}': {} (size={})", S.path, FileSystem::FsStrError(S.fsRes), S.size);
+								spdlog::error("GetSizeSync failed or file empty for '{}': {} (size={})", S.path, S.fsRes.Describe(), S.size);
 								S.fs->CloseSync(S.fsRes, S.fh);
 								return false;
 							}
@@ -643,7 +637,7 @@ namespace NdGameSdk::ndlib::io {
 							const int64_t toRead = std::min<int64_t>(S.chunkSize, S.size);
 							const bool queued = S.fs->PreadAsync(S.fsRes, S.fh, &S.op, S.buffer, /*offset*/0, /*bytes*/toRead, &S.bytesDoneCell);
 							if (!queued) {
-								spdlog::error("PreadAsync failed for '{}': {}", S.path, FileSystem::FsStrError(S.fsRes));
+								spdlog::error("PreadAsync failed for '{}': {}", S.path, S.fsRes.Describe());
 								S.fs->m_Memory->Free(S.buffer, HeapArena_Source);
 								S.fs->CloseSync(S.fsRes, S.fh);
 								return false;
@@ -680,7 +674,7 @@ namespace NdGameSdk::ndlib::io {
 										/*offset*/static_cast<int64_t>(S.totalDone), /*bytes*/toRead, &S.bytesDoneCell);
 
 									if (!queued) {
-										spdlog::error("PreadAsync failed mid-stream for '{}': {}", S.path, FileSystem::FsStrError(S.fsRes));
+										spdlog::error("PreadAsync failed mid-stream for '{}': {}", S.path, S.fsRes.Describe());
 										if (S.buffer && S.mem) S.mem->Free(S.buffer, HeapArena_Source);
 										fs->CloseSync(S.fsRes, S.fh);
 										S = AsyncReadState{};
@@ -772,7 +766,7 @@ namespace NdGameSdk::ndlib::io {
 	}
 
 	FsResult& FileSystemWin::ReadOperation::GetFsResult() {
-		return this->Get()->m_FsResult;
+		return reinterpret_cast<FsResult&>(this->Get()->m_FsResult);
 	}
 
 #endif

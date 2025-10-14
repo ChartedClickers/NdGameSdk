@@ -206,6 +206,8 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern NdDevMenu_DMENU_s_IsKeyboardComponentActive = { NdDevMenu_DMENU_Menu_UpdateKeyboard.pattern, +0xfa };
 	static inline const SdkPattern NdDevMenu_DMENU_s_IsKeyboardSearchActive = { NdDevMenu_DMENU_Menu_UpdateKeyboard.pattern, +0x133 };
 
+	static inline const SdkPattern NDGI_Init = { L"48 89 5c 24 18 55 56 57 41 54 41 55 41 56 41 57 48 8d ac 24 20 fe ff ff 48 81 ec e0 02 00 00 c5 f8 29 b4 24 d0 02 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 85 c8" };
+
 	static inline const SdkPattern SettingsControl_Init = { L"48 89 5c 24 10 48 89 6c 24 18 48 89 74 24 20 57 41 54 41 55 41 56 41 57 48 81 ec 80 01 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 70 01 00 00 48 8b e9 45 33 ff 41 8b c7 48 87 81 50 9a 00 00 b9 8b 00 00 00 e8 ?? ?? ?? ?? 48 8b f8 48 b8 ?? ?? ?? ?? ?? ?? ?? ?? 48 f7 e7 48 8b df 48 2b da 48" };
 	static inline const SdkPattern SettingsControl_AddProcessSetting = { L"48 89 6c 24 10 48 89 74 24 18 57 41 56 41 57 48 83 ec 50 8b bc 24 98 00 00 00 41 8b f1 49 8b e8 4c 8b f2 4c 8b f9 81 ff 1d 79 00 00 72 7b 48 89 5c 24 70 e8 ?? ?? ?? ?? 48 8b d8 48 85 c0 74 04 b1 01 ff d3 e8 ?? ?? ?? ?? 48 85 c0 74 02 ff d0" };
 	static inline const SdkPattern SettingsControl_AddTimedSetting = { L"48 8b c4 53 48 83 ec 60 48 89 68 08 48 8b da 48 89 70 10 49 8b e9 8b b4 24 a0 00 00 00 4c 89 70 f0 4d 8b f0 4c 89 78 e8 4c 8b f9 81 fe 1d 79 00 00 72 7d 48 89 78 18 e8 ?? ?? ?? ?? 48 8b f8 48 85 c0 74 04 b1 01 ff d7" };
@@ -369,6 +371,8 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern NdDevMenu_Assert_UpdateSelectRegionByNameMenu = { L"cc 48 85 db 74 ?? 33 c9 ff d3 48 8d 05 ?? ?? ?? ?? c7 44 24 ?? 10 00 00 00 41 b9 8e 00 00 00" };
 	static inline const SdkPattern NdDevMenu_Assert_UpdateSelectIgcByNameMenu = { L"cc 48 85 db 74 ?? 33 c9 ff d3 48 8d 05 ?? ?? ?? ?? bb 10 00 00 00 41 b9 84 03 00 00" };
 	static inline const SdkPattern NdDevMenu_Assert_UpdateSelectSpawnerByNameMenu = { L"cc 48 85 db 74 ?? 33 c9 ff d3 48 8d 05 ?? ?? ?? ?? c7 44 24 ?? 10 00 00 00 41 b9 a3 00 00 00" };
+
+	static inline const SdkPattern NDGI_Init = { L"48 89 5c 24 18 55 56 57 41 54 41 55 41 56 41 57 48 8d 6c 24 d9 48 81 ec f0 00 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 45 1f 48 8b 05 ?? ?? ?? ?? 45 33 ed 4c 8b" };
 
 	static inline const SdkPattern SettingsControl_Init = { L"48 8b c4 48 89 68 08 48 89 70 10 48 89 78 18 4c 89 70 20 41 57 48 81 ec 80 01 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 70 01 00 00 33 c0 b9 88 00 00 00 48 87 05 ?? ?? ?? ?? e8 ?? ?? ?? ?? 48 85 c0 74 06 48 8b 68 08 eb 02 33 ed 48 b8" };
 	static inline const SdkPattern SettingsControl_AddProcessSetting = { L"48 8b c4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 56 48 83 ec 50 8b bc 24 88 00 00 00 41 8b f1 49 8b e8 4c 8b f2 81 ff 1b 79 00 00 72 73 48 8b 1d ?? ?? ?? ?? 48 85 db 74 04 b1 01 ff d3 48 8b 05 ?? ?? ?? ?? 48 85 c0 74 02 ff d0 48 8b 05" };

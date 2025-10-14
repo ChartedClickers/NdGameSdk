@@ -79,7 +79,7 @@ namespace NdGameSdk::corelib::containers {
             uint32_t bitPos = static_cast<uint32_t>(idx & 0x3F);
             uint64_t bitmap = raw->m_usage[qwordIx];
             always_assert(((bitmap >> bitPos) & 1) != 0,
-                "FixedSizeHeap::ElementAt – element not in use");
+                "FixedSizeHeap::ElementAt element not in use");
 
             // pointer math: base + idx * elementSize
             auto base = reinterpret_cast<uint8_t*>(raw->m_data);

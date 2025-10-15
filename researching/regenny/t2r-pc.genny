@@ -56,6 +56,7 @@ namespace regenny {
 
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\common\win
             namespace win {
+
                 struct NxApp 0x118 {
 
                     struct NixxesLogger 0x100250 {
@@ -547,6 +548,116 @@ namespace regenny {
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib\util
             namespace util {
 
+                struct Err {
+
+                    enum ErrDomain : uint16_t {
+                        CRT = 0x000, // C runtime strerror/errno
+                        AuxDefault = 0x4F1, // general aux family
+                        AuxEnvironment = 0x4F2, // environment/config
+                        AuxDatabase = 0x4F3, // SQL/DB
+                        AuxMessageIPC = 0x4F4, // messaging / IPC
+                        CgfxCompiler = 0x4F5, // CgFX compiler (callback-capable)
+                        AuxGameContent = 0x4F6, // gameplay/content/assets
+                        AuxAudio = 0x4F7, // audio/voice/haptics
+                        AuxReserved = 0x4F8, // reserved aux domain
+                        AuxUnknown = 0x4F9, // unknown aux domain
+                        PosixSocket = 0x701, // POSIX / sockets (errno/Winsock-like)
+                    };
+
+                    // ---- AuxDefault (0x4F1) subcodes ----
+                    enum ErrAuxDefaultError : uint16_t { 
+                        AuxDefault_GeneralError = 0x0000,
+                        AuxDefault_WrongState = 0x0001,
+                        AuxDefault_BadData = 0x0002,
+                        AuxDefault_Abort = 0x0003,
+                        AuxDefault_OutOfMemory = 0x0004,
+                        AuxDefault_NotFound = 0x0005,
+                        AuxDefault_NotInitialized = 0x0006,
+                        AuxDefault_AlreadyInitialized = 0x0007,
+                        AuxDefault_InvalidArgument = 0x0008, 
+                        AuxDefault_OutOfFios2FileHandles = 0x0009,
+                        AuxDefault_OutOfFios2OpHandles = 0x000A,
+                    };
+                    
+                    enum ErrAuxDefaultSuccess : uint16_t {
+                        AuxDefault_SuccessWithWarning = 0x0000,
+                        AuxDefault_SuccessAuxDefault = 0x0001,
+                        AuxDefault_InProgress = 0x0002,
+                        AuxDefault_UnknownDefaultSuccess = 0x0003,
+                    };
+
+                    // ---- AuxEnvironment (0x4F2) ----
+                    enum ErrEnvSuccess : uint16_t { Env_Success = 0x0000 };
+                    enum ErrEnvError : uint16_t { Env_UnknownError = 0x0000 };
+
+                    // ---- AuxDatabase (0x4F3) ----
+                    enum ErrDBSuccess : uint16_t { DB_Success = 0x0000 };
+                    enum ErrDBError : uint16_t {
+                        DB_GenericFailure = 0x0000,
+                        DB_CannotConnect = 0x0001,
+                        DB_TooManyRecords = 0x0002,
+                        DB_UnknownError = 0x0003,
+                    };
+
+                    // ---- AuxMessage / IPC (0x4F4) ---
+                    enum ErrMsgIPCSuccess : uint16_t { MsgIPC_ResponseReceivedForMessage = 0x0000 };
+                    enum ErrMsgIPCError : uint16_t {
+                        MsgIPC_SocketUnspecified = 0x0000,
+                        MsgIPC_NoMessageAvailable = 0x0001,
+                        MsgIPC_MustReplyBeforeMore = 0x0002,
+                        MsgIPC_SpecialCharUnrecognized = 0x0003,
+                        MsgIPC_ReplyTimeoutExceeded = 0x0004,
+                        MsgIPC_OutgoingBufferFull = 0x0005,
+                        MsgIPC_IncomingBufferUnderrun = 0x0006,
+                        MsgIPC_ReadStringBufferTooSmall = 0x0007,
+                        MsgIPC_DoubleResponseAttempt = 0x0008,
+                        MsgIPC_InvalidMessageId = 0x0009,
+                        MsgIPC_ResponseForOtherMessage = 0x000A,
+                        MsgIPC_ExtraResponsesSent = 0x000B,
+                    };
+
+                    // ---- CgFX (0x4F5) ----
+                    enum ErrCgfxSuccess : uint16_t { Cgfx_Success = 0x0000 };
+                    enum ErrCgfxError : uint16_t { Cgfx_GenericError = 0x0000 };
+
+                    // ---- AuxGameContent (0x4F6) ----
+                    enum ErrGameSuccess : uint16_t { Game_Success = 0x0000 };
+                    enum ErrGameError : uint16_t {
+                        Game_MissingLevelOrPackage = 0x0000,
+                        Game_AnimActorSymbolNotFound = 0x0001,
+                        Game_AnimActorLoginFailed = 0x0002,
+                        Game_ArtGroupNotFound = 0x0003,
+                        Game_ScriptIdNotFound = 0x0004,
+                        Game_PhysicsInitNoCollision = 0x0005,
+                        Game_MissingSpawner = 0x0006,
+                        Game_MissingStateScript = 0x0007,
+                        Game_MeshNotLoaded = 0x0008,
+                        Game_SkeletonNotLoaded = 0x0009,
+                        Game_SpawningSuppressed = 0x000A,
+                    };
+
+                    // ---- AuxAudio (0x4F7) ----
+                    enum ErrAudioSuccess : uint16_t { Audio_UnknownSuccess = 0x0000 };
+                    enum ErrAudioError : uint16_t {
+                        Audio_UnknownError = 0x0000,
+                        Audio_AudioNotEnabled = 0x0001,
+                        Audio_SystemNotInitialized = 0x0002,
+                        Audio_SystemAlreadyInitialized = 0x0003,
+                        Audio_AudioSystemNotStarted = 0x0004,
+                        Audio_OutOfSynths = 0x0005,
+                        Audio_OutOfVoices = 0x0006,
+                        Audio_InvalidVibrationHandle = 0x0007,
+                        Audio_InvalidVoiceHandle = 0x0008,
+                        Audio_InvalidPlugin = 0x0009,
+                        Audio_InvalidOscillator = 0x000A,
+                        Audio_InvalidArgument = 0x000B,
+                    };
+
+                    uint32_t m_code; // ND code
+                    uint32_t m_winCode; // Win32 code
+                    void* m_payload;
+                };
+
                 struct NameCache 0x50 {
                     void* vftable;
                     void* m_bucketTable;
@@ -586,25 +697,27 @@ namespace regenny {
             namespace containers {
                 
                 struct TaggedHeap 0xDB308 {
+
                     struct VTable {
                         virtual uint64_t GetBlockSize() @ 0x30
-                    } 
+                    };
+
                     VTable* vftable;
                 }
 
                 struct FixedSizeHeap 0x58 {
-                    void* m_data;
-                    void* m_block;
-                    uint64_t* m_usage;
-                    uint64_t m_usageSize;
-                    uint64_t m_granularity;
-                    uint32_t m_bitmapCount;
-                    uint64_t m_capacity @ 0x30;
+                    void* m_pData;
+                    void* m_pUsageAlloc;
+                    uint64_t* m_pUsage;
+                    uint64_t m_capacity;
+                    uint64_t m_capacityAligned;
+                    uint32_t m_usageWordCount;
+                    uint64_t m_numElements @ 0x30;
                     uint64_t m_elementSize;
-                    uint64_t m_count;
-                    uint64_t m_allocCount;
+                    uint64_t m_activeCount;
+                    uint64_t m_alignment;
                     uint64_t m_lastIndex;
-                } // fixedsizeheap.h
+                }; // fixedsizeheap.h
 
             }
 
@@ -1539,7 +1652,7 @@ namespace regenny {
 
 
                 // ScriptManager::ModuleInfo::Constructor
-                struct ModuleInfo 0x60 {
+                struct ModuleInfo 0x70 {
                     ModuleInfo* m_NextModule;
                     ModuleInfo* m_PrevModule;
                     char* m_name [[utf8*]];
@@ -1558,13 +1671,14 @@ namespace regenny {
                     bool m_isLoaded;
                 };
 
-                struct LookupDcEntry 0x28 {
-                    void* m_entryPtr; // DC::Entry.m_entryPtr
+                // ScriptManager::PointerBase
+                struct PointerBase 0x28 {
+                    void* m_ptr; // DC::Entry.m_entryPtr
                     ModuleInfo* m_module;
-                    StringId64 m_scriptId;
-                    StringId64 m_typeId;
+                    StringId64 m_symbolId; // actually it's named m_symbolId
+                    StringId64 m_moduleId; // where to look for symbol, can be 0 aka global symbol
                     uint32_t m_field20;
-                    uint8_t m_field24;
+                    bool m_resolveAttempted;
                 };
 
                 struct relocatableModule 0x30 {
@@ -1576,7 +1690,7 @@ namespace regenny {
                     char* m_ModuleInfoArrayDebug [[utf8*]];
                 };
                 
-                struct ScriptModule 0x70 {
+                struct ScriptModule 0x78 {
                     struct Loader 0x4e0 {
                         ModuleInfo* m_moduleinfo @ 0x440;
                         uint64_t m_moduleName;
@@ -1608,8 +1722,10 @@ namespace regenny {
                     uint32_t m_field64;
                     uint32_t m_field68;
                     uint32_t m_size;
+                    uint32_t m_LockCount;
                 };
 
+                // TODO: Refactor to FixedSizeHashTable 
                 struct ModuleBucket 0x98 {
                     uint64_t m_data;
                     corelib.containers.FixedSizeHeap m_heap;
@@ -1657,7 +1773,8 @@ namespace regenny {
                         uint64_t m_FunctionsNum;
                     }
 
-	                StringId64 m_hash @ 0x10;
+	                StringId64 m_JlsContext @ 0x10;
+                    corelib.job.JlsContext m_JlsIndex;
 	                bool m_EnableScriptTrace @ 0x40;
 	                bool m_Autoreloadbinfiles @ 0x42;
 	                bool m_DisplayRequestedModules;
@@ -1750,11 +1867,6 @@ namespace regenny {
                 struct FhSlot {
                     uint32_t m_fh;
                     FhCtx* m_ctx + 0x4;
-                };
-
-                struct FsResult 0x10 {
-                    uint32_t m_code;
-                    void* m_payload + 0x4;
                 };
 
                 struct PathString 0x20 {
@@ -1877,7 +1989,7 @@ namespace regenny {
 
                     struct ReadOperation 0x18 {
                         HANDLE m_hEvent;
-                        FsResult m_FsResult;
+                        corelib.util.Err m_FsResult;
                     };
 
                     struct RemapNode 0x20 {

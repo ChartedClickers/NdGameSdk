@@ -1928,13 +1928,13 @@ namespace regenny {
                      bool m_isLoaded;
                 }
 
-                struct LookupDcEntry 0x28 {
-                    void* m_entryPtr; // DC::Entry.m_entryPtr
+                struct PointerBase 0x28 {
+                    void* m_ptr; // DC::Entry.m_entryPtr
                     ModuleInfo* m_module;
-                    StringId64 m_scriptId;
-                    StringId64 m_typeId;
+                    StringId64 m_symbolId;
+                    StringId64 m_moduleId;
                     uint32_t m_field20;
-                    uint8_t m_field24;
+                    bool m_resolveAttempted;
                 };
 
                 struct relocatableModule 0x30 {
@@ -1946,7 +1946,7 @@ namespace regenny {
                     char* m_ModuleInfoArrayDebug [[utf8*]];
                 };
             
-                struct ScriptModule 0x70 {
+                struct ScriptModule 0x78 {
                     struct Loader 0x4e0 {
                         ModuleInfo* m_moduleinfo @ 0x440;
                         uint64_t m_moduleName;
@@ -1978,6 +1978,7 @@ namespace regenny {
                     uint32_t m_field64;
                     uint32_t m_field68;
                     uint32_t m_size;
+                    uint32_t m_LockCount;
                 };
 
 
@@ -2029,8 +2030,8 @@ namespace regenny {
                     }
 
                     uint64_t field_0;
-                    StringId64 m_hash @ 0x10; // ScriptManagerGlobals
-                    uint32_t field_18;
+                    StringId64 m_JlsContext @ 0x10; // ScriptManagerGlobals
+                    corelib.job.JlsContext m_JlsIndex;
                     uint64_t field_20 @ 0x20;
                     uint64_t field_30 @ 0x30;
                     bool m_EnableScriptTrace @ 0x40;

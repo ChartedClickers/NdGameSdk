@@ -1,5 +1,5 @@
 #pragma once
-#include <NdGameSdk/components/SdkRegenny.hpp>
+#include <NdGameSdk/sdkregenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
 #include "..\..\corelib\memory\Context.hpp"
 #include "..\..\corelib\system\platform\ndsys.hpp"

@@ -1,6 +1,5 @@
 #pragma once
 #include "NdGameSdk/sdk.hpp"
-#include "NdGameSdk/components/SdkRegenny.hpp"
 
 #include "Utility/color.hpp"   
 

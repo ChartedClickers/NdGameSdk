@@ -1,4 +1,4 @@
-#include <NdGameSdk/components/SdkRegenny.hpp>
+#include <NdGameSdk/sdkregenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
 
 type int 4 [[i32]]

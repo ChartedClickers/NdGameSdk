@@ -1,5 +1,4 @@
 #pragma once
-#include "NdGameSdk/components/SdkRegenny.hpp"
 
 #include <NdGameSdk/shared/src/corelib/memory/memory-map.hpp>
 

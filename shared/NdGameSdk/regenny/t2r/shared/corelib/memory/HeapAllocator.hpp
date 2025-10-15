@@ -1,5 +1,5 @@
 #pragma once
-#include <NdGameSdk/components/SdkRegenny.hpp>
+#include <NdGameSdk/sdkregenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
 #include "HeapAllocatorWithOverflow.hpp"
 namespace regenny::shared::corelib::memory {

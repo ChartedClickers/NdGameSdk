@@ -1,7 +1,5 @@
 #pragma once
 
-#include "NdGameSdk/components/SdkRegenny.hpp"
-
 #include <cstdint>
 #include <Utility/assertion/assert.hpp>
 

@@ -1,5 +1,4 @@
 #pragma once  
-#include "NdGameSdk/components/SdkRegenny.hpp"  
 
 #include <NdGameSdk/shared/src/ndlib/script/script-manager-eval.hpp>
 

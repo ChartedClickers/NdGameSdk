@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "NdGameSdk/components/SdkRegenny.hpp"
 
 #if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/ndlib/NdFrameState.hpp>

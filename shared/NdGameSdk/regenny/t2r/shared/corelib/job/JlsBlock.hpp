@@ -1,5 +1,5 @@
 #pragma once
-#include <NdGameSdk/components/SdkRegenny.hpp>
+#include <NdGameSdk/sdkregenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
 #include "JlsEntry.hpp"
 namespace regenny::shared::corelib::job {

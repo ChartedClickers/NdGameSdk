@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include "NdGameSdk/sdkderived.hpp"
 #include "NdGameSdk/shared/shared.hpp"
-#include "NdGameSdk/components/SdkRegenny.hpp"
 
 #if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/ndlib/io/FileSystemData.hpp>

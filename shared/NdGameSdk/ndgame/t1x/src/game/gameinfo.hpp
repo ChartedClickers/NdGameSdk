@@ -1,5 +1,4 @@
 #pragma once
-#include "NdGameSdk/components/SdkRegenny.hpp"
 
 #include <NdGameSdk/regenny/t1x/ndgame/game/GameInfo.hpp>
 #include <NdGameSdk/shared/src/ndlib/nd-game-info.hpp>

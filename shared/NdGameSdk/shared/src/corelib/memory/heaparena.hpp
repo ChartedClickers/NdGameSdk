@@ -1,7 +1,6 @@
 #pragma once
 
 #include "NdGameSdk/sdk.hpp"
-#include "NdGameSdk/components/SdkRegenny.hpp"  
 #include "memory-map.hpp"
 
 #if defined(T2R)

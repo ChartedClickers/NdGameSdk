@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "NdGameSdk/components/SdkRegenny.hpp"
 #include "NdGameSdk/database/database.hpp"
 #include "NdGameSdk/sdkstringid.hpp"
 

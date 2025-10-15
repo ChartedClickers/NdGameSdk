@@ -1,7 +1,6 @@
 #pragma once
 
 #include "NdGameSdk/sdk.hpp"
-#include "NdGameSdk/components/SdkRegenny.hpp"
 
 #include <Windows.h>
 #include <Utility/function_ptr.hpp>

@@ -71,7 +71,7 @@ namespace NdGameSdk::ndlib::render::util {
 		auto FrameParams = GetSharedComponents()->GetComponent<RenderFrameParams>();
 
 		WindowContext ctx{};
-		WindowContext::GetWindowContext(&ctx, WindowContext::ContextType::Context4,
+		WindowContext::GetWindowContext(&ctx, WindowContext::ContextType::DMenuThread,
 			FrameParams->GetRenderFrameParams()->Get()->m_DynamicRenderContext);
 
 		auto MsgCon_view = DebugDraw->GetMsgCon()->Get();

@@ -19,13 +19,6 @@ type StringId64 8 [[u64]]
    
 namespace regenny {
 
-    struct process 0x100 {}
-
-    struct RelocatableHeapRecord {
-        process* PTR;
-     }
-
-
     // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src
     namespace shared {
         
@@ -493,23 +486,172 @@ namespace regenny {
 
             // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\corelib\util
             namespace util {
-                struct MsgCon 0x118 {
+
+                struct Err {
+
+                    enum ErrDomain : uint16_t {
+                        CRT = 0x000, // C runtime strerror/errno
+                        AuxDefault = 0x4F1, // general aux family
+                        AuxEnvironment = 0x4F2, // environment/config
+                        AuxDatabase = 0x4F3, // SQL/DB
+                        AuxMessageIPC = 0x4F4, // messaging / IPC
+                        CgfxCompiler = 0x4F5, // CgFX compiler (callback-capable)
+                        AuxGameContent = 0x4F6, // gameplay/content/assets
+                        AuxAudio = 0x4F7, // audio/voice/haptics
+                        AuxReserved = 0x4F8, // reserved aux domain
+                        AuxUnknown = 0x4F9, // unknown aux domain
+                        PosixSocket = 0x701, // POSIX / sockets (errno/Winsock-like)
+                    };
+                    
+                    // ---- AuxDefault (0x4F1) subcodes ----
+                    enum ErrAuxDefaultError : uint16_t { 
+                        AuxDefault_GeneralError = 0x0000,
+                        AuxDefault_WrongState = 0x0001,
+                        AuxDefault_BadData = 0x0002,
+                        AuxDefault_Abort = 0x0003,
+                        AuxDefault_OutOfMemory = 0x0004,
+                        AuxDefault_NotFound = 0x0005,
+                        AuxDefault_NotInitialized = 0x0006,
+                        AuxDefault_AlreadyInitialized = 0x0007,
+                        AuxDefault_InvalidArgument = 0x0008, 
+                        AuxDefault_OutOfFios2FileHandles = 0x0009,
+                        AuxDefault_OutOfFios2OpHandles = 0x000A,
+                    };
+                    
+                    enum ErrAuxDefaultSuccess : uint16_t {
+                        AuxDefault_SuccessWithWarning = 0x0000,
+                        AuxDefault_SuccessAuxDefault = 0x0001,
+                        AuxDefault_InProgress = 0x0002,
+                        AuxDefault_UnknownDefaultSuccess = 0x0003,
+                    };
+
+                    // ---- AuxEnvironment (0x4F2) ----
+                    enum ErrEnvSuccess : uint16_t { Env_Success = 0x0000 };
+                    enum ErrEnvError : uint16_t { Env_UnknownError = 0x0000 };
+
+                    // ---- AuxDatabase (0x4F3) ----
+                    enum ErrDBSuccess : uint16_t { DB_Success = 0x0000 };
+                    enum ErrDBError : uint16_t {
+                        DB_GenericFailure = 0x0000,
+                        DB_CannotConnect = 0x0001,
+                        DB_TooManyRecords = 0x0002,
+                        DB_UnknownError = 0x0003,
+                    };
+
+                    // ---- AuxMessage / IPC (0x4F4) ---
+                    enum ErrMsgIPCSuccess : uint16_t { MsgIPC_ResponseReceivedForMessage = 0x0000 };
+                    enum ErrMsgIPCError : uint16_t {
+                        MsgIPC_SocketUnspecified = 0x0000,
+                        MsgIPC_NoMessageAvailable = 0x0001,
+                        MsgIPC_MustReplyBeforeMore = 0x0002,
+                        MsgIPC_SpecialCharUnrecognized = 0x0003,
+                        MsgIPC_ReplyTimeoutExceeded = 0x0004,
+                        MsgIPC_OutgoingBufferFull = 0x0005,
+                        MsgIPC_IncomingBufferUnderrun = 0x0006,
+                        MsgIPC_ReadStringBufferTooSmall = 0x0007,
+                        MsgIPC_DoubleResponseAttempt = 0x0008,
+                        MsgIPC_InvalidMessageId = 0x0009,
+                        MsgIPC_ResponseForOtherMessage = 0x000A,
+                        MsgIPC_ExtraResponsesSent = 0x000B,
+                    };
+
+                    // ---- CgFX (0x4F5) ----
+                    enum ErrCgfxSuccess : uint16_t { Cgfx_Success = 0x0000 };
+                    enum ErrCgfxError : uint16_t { Cgfx_GenericError = 0x0000 };
+
+                    // ---- AuxGameContent (0x4F6) ----
+                    enum ErrGameSuccess : uint16_t { Game_Success = 0x0000 };
+                    enum ErrGameError : uint16_t {
+                        Game_MissingLevelOrPackage = 0x0000,
+                        Game_AnimActorSymbolNotFound = 0x0001,
+                        Game_AnimActorLoginFailed = 0x0002,
+                        Game_ArtGroupNotFound = 0x0003,
+                        Game_ScriptIdNotFound = 0x0004,
+                        Game_PhysicsInitNoCollision = 0x0005,
+                        Game_MissingSpawner = 0x0006,
+                        Game_MissingStateScript = 0x0007,
+                        Game_MeshNotLoaded = 0x0008,
+                        Game_SkeletonNotLoaded = 0x0009,
+                        Game_SpawningSuppressed = 0x000A,
+                    };
+
+                    // ---- AuxAudio (0x4F7) ----
+                    enum ErrAudioSuccess : uint16_t { Audio_UnknownSuccess = 0x0000 };
+                    enum ErrAudioError : uint16_t {
+                        Audio_UnknownError = 0x0000,
+                        Audio_AudioNotEnabled = 0x0001,
+                        Audio_SystemNotInitialized = 0x0002,
+                        Audio_SystemAlreadyInitialized = 0x0003,
+                        Audio_AudioSystemNotStarted = 0x0004,
+                        Audio_OutOfSynths = 0x0005,
+                        Audio_OutOfVoices = 0x0006,
+                        Audio_InvalidVibrationHandle = 0x0007,
+                        Audio_InvalidVoiceHandle = 0x0008,
+                        Audio_InvalidPlugin = 0x0009,
+                        Audio_InvalidOscillator = 0x000A,
+                        Audio_InvalidArgument = 0x000B,
+                    };
+
+                    uint32_t m_code; // ND code
+                    uint32_t m_winCode; // Win32 code
+                    void* m_payload;
+                };
+                
+                struct MsgCon 0x40 {
+
+                    enum MsgOutput : uint32_t {
+                        kDefault = 0x0,
+                        kStdOut = 0x1,
+                        kStdconAuto = 0x2,
+                        kStdconPersistent = 0x3,
+                        kStdconPauseable = 0x4,
+                        kStdconNonPauseable = 0x5,
+                        kStdconNotRecorded = 0x6,
+                        kStdconHost = 0x7,
+                        kError = 0x8,
+                        kAudio = 0x9,
+                        kProcess = 0xa,
+                        kCamera = 0xb,
+                        kAnimation = 0xc,
+                        kAI = 0xd,
+                        kParticles = 0xe,
+                        kIO = 0xf,
+                        kHud = 0x15,
+                        kNet = 0x16,
+                        kNet2 = 0x17,
+                        kHavok = 0x18,
+                        kDialogue = 0x19,
+                        kMelee = 0x1a,
+                        kCinematic = 0x1b,
+                        kSave = 0x1c,
+                        kGraphics = 0x1d,
+                        kMusic = 0x1e,
+                        kFoliage = 0x1f,
+                        kLogStream = 0x20,
+                        kUnknown21 = 0x21,
+                        kJafAnim = 0x22
+                    };
+
                     void* vftable;
-                    float m_MsgConScale @0x10;
+                    float m_MsgConScale @ 0x10;
                     uint32_t m_MsgConLeftPad;
                     uint32_t m_MsgConHorizontalSize;
                     uint32_t m_MsgConVerticalSize;
                     uint32_t m_MsgConTopPad;
-                    bool m_PrintTimeInTTY @0x2e;
-                    bool m_PrintTTY @0x30;
+                    uint32_t m_scrollDelta;
+                    uint32_t m_scrollPos;
+                    bool m_scrollActive;
+                    bool m_PrintTimeInTTY @ 0x2e;
+                    bool m_PrintTTY @ 0x30;
                     bool m_RedisTTY;
                     bool m_DrawRedisTTYTimes;
                     bool m_DrawRedisTTYStatus;
-                    bool m_ApplyMsgConScaletoDebugText @0x36;
+                    bool m_field34;
+                    bool m_ApplyMsgConScaletoDebugText @ 0x36;
                     bool m_EnableMsgConLineWrap;
                     bool m_EnableMsgConAutoResize;
                     bool m_ShowCacheMissesDebugText;
-                }
+                };
             }
 
             // c:\branches\discbot??\t1x-pc-?.?.?\shared\src\corelib\containers

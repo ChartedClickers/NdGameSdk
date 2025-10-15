@@ -177,7 +177,7 @@ namespace NdGameSdk::ndlib::render::dev {
 
 			if (DebugDraw->m_DebugTextPrintV) {
 				WindowContext ctx{};
-				WindowContext::GetWindowContext(&ctx, WindowContext::ContextType::Context4, frame->Get()->m_DynamicRenderContext);
+				WindowContext::GetWindowContext(&ctx, WindowContext::ContextType::DMenuThread, frame->Get()->m_DynamicRenderContext);
 
 				const auto& layout = DebugDraw->m_DebugTextLayout;
 				char debug_text[256]{};

@@ -674,19 +674,57 @@ namespace regenny {
                     uint32_t m_cacheSize;
                 }; // string-cache.c
 
-                struct MsgCon 0x118 {
+                struct MsgCon 0x40 {
+
+                    enum MsgOutput : uint32_t {
+                        kDefault = 0x0,
+                        kStdOut = 0x1,
+                        kStdconAuto = 0x2,
+                        kStdconPersistent = 0x3,
+                        kStdconPauseable = 0x4,
+                        kStdconNonPauseable = 0x5,
+                        kStdconNotRecorded = 0x6,
+                        kStdconHost = 0x7,
+                        kError = 0x8,
+                        kAudio = 0x9,
+                        kProcess = 0xa,
+                        kCamera = 0xb,
+                        kAnimation = 0xc,
+                        kAI = 0xd,
+                        kParticles = 0xe,
+                        kIO = 0xf,
+                        kHud = 0x15,
+                        kNet = 0x16,
+                        kNet2 = 0x17,
+                        kHavok = 0x18,
+                        kDialogue = 0x19,
+                        kMelee = 0x1a,
+                        kCinematic = 0x1b,
+                        kSave = 0x1c,
+                        kGraphics = 0x1d,
+                        kMusic = 0x1e,
+                        kFoliage = 0x1f,
+                        kLogStream = 0x20,
+                        kUnknown21 = 0x21,
+                        kJafAnim = 0x22
+                    };
+
                     void* vftable;
-                    float m_MsgConScale @0x10;
+                    float m_MsgConScale @ 0x10;
                     uint32_t m_MsgConLeftPad;
                     uint32_t m_MsgConHorizontalSize;
                     uint32_t m_MsgConVerticalSize;
                     uint32_t m_MsgConTopPad;
-                    bool m_PrintTimeInTTY @0x2e;
-                    bool m_PrintTTY @0x30;
+                    uint32_t m_scrollDelta;
+                    uint32_t m_scrollPos;
+                    bool m_scrollActive;
+                    bool m_PrintTimeInTTY @ 0x2e;
+                    bool m_PrintTTY @ 0x30;
                     bool m_RedisTTY;
                     bool m_DrawRedisTTYTimes;
                     bool m_DrawRedisTTYStatus;
-                    bool m_ApplyMsgConScaletoDebugText @0x36;
+                    bool m_field34;
+                    bool m_ApplyMsgConScaletoDebugText @ 0x36;
                     bool m_EnableMsgConLineWrap;
                     bool m_EnableMsgConAutoResize;
                     bool m_ShowCacheMissesDebugText;

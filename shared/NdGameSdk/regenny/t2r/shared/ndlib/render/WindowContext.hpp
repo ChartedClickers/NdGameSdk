@@ -6,12 +6,13 @@ namespace regenny::shared::ndlib::render {
 #pragma pack(push, 1)
 struct WindowContext {
     regenny::shared::ndlib::render::WindowContextType m_ContextType; // 0x0
-    void* FrameParams; // 0x4
-    uint64_t field_10; // 0xc
-    uint64_t field_18; // 0x14
-    uint64_t field_20; // 0x1c
-    uint64_t field_28; // 0x24
-    private: char pad_2c[0x4]; public:
+    uint32_t m_flags; // 0x4
+    void* m_pContextSlot; // 0x8
+    void* m_pQueueHead; // 0x10
+    void* m_pQueueTail; // 0x18
+    uint32_t m_status; // 0x20
+    private: char pad_24[0x4]; public:
+    uint64_t m_field28; // 0x28
 }; // Size: 0x30
 #pragma pack(pop)
 }

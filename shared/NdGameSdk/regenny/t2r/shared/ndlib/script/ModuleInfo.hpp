@@ -26,6 +26,7 @@ struct ModuleInfo {
     bool m_IsLocal; // 0x5d
     bool m_DebugModule; // 0x5e
     bool m_isLoaded; // 0x5f
-}; // Size: 0x60
+    private: char pad_60[0x10]; public:
+}; // Size: 0x70
 #pragma pack(pop)
 }

@@ -111,9 +111,23 @@ namespace NdGameSdk::ndlib::script {
 			ModuleInfo_LookupModuleByDcEntry = (ModuleInfo_LookupModuleByDcEntry_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::ScriptManager_ModuleInfo_LookupModuleByDcEntry), findpattern.offset);
 
-			findpattern = Patterns::ScriptManager_ModuleInfo_LookupDcEntry;
-			ModuleInfo_LookupDcEntry = (ModuleInfo_LookupDcEntry_ptr)Utility::FindAndPrintPattern(module,
-				findpattern.pattern, wstr(Patterns::ScriptManager_ModuleInfo_LookupDcEntry), findpattern.offset);
+			findpattern = Patterns::ScriptManager_PointerBase_Initialize;
+			PointerBase::ScriptManager_PointerBase_Initialize = (PointerBase::ScriptManager_PointerBase_Initialize_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::ScriptManager_PointerBase_Initialize), findpattern.offset);
+
+			findpattern = Patterns::ScriptManager_PointerBase_Get;
+			PointerBase::ScriptManager_PointerBase_Get = (PointerBase::ScriptManager_PointerBase_Get_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::ScriptManager_PointerBase_Get), findpattern.offset);
+
+			findpattern = Patterns::ScriptManager_PointerBase_Resolve;
+			PointerBase::ScriptManager_PointerBase_Resolve = (PointerBase::ScriptManager_PointerBase_Resolve_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::ScriptManager_PointerBase_Resolve), findpattern.offset);
+    
+        #if defined(T2R)
+            findpattern = Patterns::ScriptManager_PointerBase_HasEntry;
+            PointerBase::ScriptManager_PointerBase_HasEntry = (PointerBase::ScriptManager_PointerBase_HasEntry_ptr)Utility::FindAndPrintPattern(module,
+                findpattern.pattern, wstr(Patterns::ScriptManager_PointerBase_HasEntry), findpattern.offset);
+        #endif
 
             findpattern = Patterns::ScriptManager_ModuleInfo_FetchModule;
 			ModuleInfo_FetchModule = (ModuleInfo_FetchModule_ptr)Utility::FindAndPrintPattern(module,
@@ -137,7 +151,12 @@ namespace NdGameSdk::ndlib::script {
                 !ScriptManager_BindValue ||
                 !ScriptManager_UnbindValue ||
                 !ModuleInfo_LookupModuleByDcEntry ||
-                !ModuleInfo_LookupDcEntry ||
+				!PointerBase::ScriptManager_PointerBase_Initialize ||
+				!PointerBase::ScriptManager_PointerBase_Get ||
+				!PointerBase::ScriptManager_PointerBase_Resolve ||
+                #if defined(T2R)
+				!PointerBase::ScriptManager_PointerBase_HasEntry ||
+                #endif
 				!ModuleInfo_FetchModule ||
                 !ScriptModule_FetchScriptModuleEntry
             ) {
@@ -974,6 +993,55 @@ namespace NdGameSdk::ndlib::script {
         return nullptr;
     }
 
+
+    void ScriptManager::PointerBase::Initialize(StringId64 symbol, StringId64 module) {
+		always_assert(ScriptManager_PointerBase_Initialize != nullptr, "Function pointer was not set!");
+		ScriptManager_PointerBase_Initialize(this, symbol, module);
+    }
+
+    void ScriptManager::PointerBase::Reset(StringId64 symbol) {
+		ClearState();
+		auto self = (*this);
+		self->m_symbolId = symbol;
+        Resolve();
+    }
+
+    bool ScriptManager::PointerBase::HasEntry() {
+    #if defined (T2R)
+		always_assert(ScriptManager_PointerBase_HasEntry != nullptr, "Function pointer was not set!");
+		return ScriptManager_PointerBase_HasEntry(this);
+    #else
+        return Get() != nullptr;
+    #endif
+    }
+
+    void ScriptManager::PointerBase::Resolve() {
+		always_assert(ScriptManager_PointerBase_Resolve != nullptr, "Function pointer was not set!");
+		ScriptManager_PointerBase_Resolve(this);
+    }
+
+    void ScriptManager::PointerBase::ClearState() {
+        auto self = (*this);
+        self->m_ptr = nullptr;
+        self->m_module = nullptr;
+        self->m_symbolId = {};
+        self->m_moduleId = {};
+        self->m_resolveAttempted = false;
+        self->m_field20 = 0xffffffffu;
+    }
+
+    ModuleInfo* ScriptManager::PointerBase::GetModule() {
+		return reinterpret_cast<ModuleInfo*>((*this)->m_module);
+    }
+
+    StringId64 ScriptManager::PointerBase::GetSymbolId() const {
+		return (*this)->m_symbolId;
+    }
+
+    StringId64 ScriptManager::PointerBase::GetModuleId() const {
+		return (*this)->m_moduleId;
+    }
+
     FixedSizeHeap* ModuleBucketMap::GetSymbolsHeap() const {
         return reinterpret_cast<FixedSizeHeap*>(&this->Get()->m_SymbolsHeap);
     }
@@ -1081,4 +1149,8 @@ namespace NdGameSdk::ndlib::script {
 
     std::string ScriptManager::s_DataBaseFile{"ScriptManager.json"};
 
+    INIT_FUNCTION_PTR(ScriptManager::PointerBase::ScriptManager_PointerBase_Initialize);
+    INIT_FUNCTION_PTR(ScriptManager::PointerBase::ScriptManager_PointerBase_Get);
+    INIT_FUNCTION_PTR(ScriptManager::PointerBase::ScriptManager_PointerBase_HasEntry);
+    INIT_FUNCTION_PTR(ScriptManager::PointerBase::ScriptManager_PointerBase_Resolve);
 }

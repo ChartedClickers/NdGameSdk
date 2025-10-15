@@ -5,10 +5,8 @@
 
 #if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/ndlib/script/ModuleInfo.hpp>
-#include <NdGameSdk/regenny/t2r/shared/ndlib/script/LookupDcEntry.hpp>
 #elif defined(T1X)
 #include <NdGameSdk/regenny/t1x/shared/ndlib/script/ModuleInfo.hpp>
-#include <NdGameSdk/regenny/t1x/shared/ndlib/script/LookupDcEntry.hpp>
 #endif
 
 #include <Utility/helper.hpp>
@@ -47,22 +45,6 @@ namespace NdGameSdk::ndlib::script {
 
 		static bool FetchModule(StringId64 pModuleId, MemoryContextType pContext);
 		static ModuleInfo* LookupModuleByDcEntry(StringId64 pTypeid, StringId64 pScriptId);
-		static LookupDcEntry* LookupDcEntry(LookupDcEntry* pLookupDcEntry, StringId64 pScriptId, StringId64 pTypeid);
-	};
-
-	class NdGameSdk_API LookupDcEntry : public ISdkRegenny<regenny::shared::ndlib::script::LookupDcEntry> {
-	public:
-		LookupDcEntry() = default;
-
-		template<typename T>
-		T* GetEntry() {
-			auto DcEntryPtr = this->Get()->m_entryPtr;
-			return reinterpret_cast<T*>(DcEntryPtr);
-		}
-
-		ModuleInfo* GetModule() const;
-		StringId64 GetScriptId() const;
-		StringId64 GetTypeId() const;
 	};
 
 	// If module exist in the FileSystem
@@ -72,9 +54,11 @@ namespace NdGameSdk::ndlib::script {
 	TYPEDEF_EXTERN_FUNCTION_PTR(bool, ModuleInfo_FetchModule, StringId64 pModuleId);
 #endif
 	TYPEDEF_EXTERN_FUNCTION_PTR(ModuleInfo*, ModuleInfo_LookupModuleByDcEntry, StringId64 pTypeid, StringId64 pScriptId);
-	TYPEDEF_EXTERN_FUNCTION_PTR(LookupDcEntry*, ModuleInfo_LookupDcEntry, LookupDcEntry* pLookupDcEntry, StringId64 pScriptId, StringId64 pTypeid);
 
+#if defined(T2R)
+	static_assert(sizeof(ModuleInfo) == 0x70, "Size of ModuleInfo is not correct.");
+#elif defined(T1X)
 	static_assert(sizeof(ModuleInfo) == 0x60, "Size of ModuleInfo is not correct.");
-	static_assert(sizeof(LookupDcEntry) == 0x28, "Size of LookupDcEntry is not correct.");
+#endif
 
 }

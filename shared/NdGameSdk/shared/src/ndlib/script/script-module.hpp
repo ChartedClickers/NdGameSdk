@@ -114,7 +114,12 @@ namespace NdGameSdk::ndlib::script {
     * TYPEDEF_EXTERN_FUNCTION_PTR(bool, ScriptModule_Login, struct ScriptManager::ScriptModule* module);
     */
 
-    static_assert(sizeof(ScriptModule) == 0x70, "Size of ScriptModule is not correct.");
+#if defined(T2R)
+    static_assert(sizeof(ScriptModule) == 0x78, "Size of ScriptModule is not correct.");
+#elif defined(T1X)
+	static_assert(sizeof(ScriptModule) == 0x70, "Size of ScriptModule is not correct.");
+#endif
+
     static_assert(sizeof(ModuleRequest) == 0x40, "Size of ModuleRequest is not correct.");
 
 }

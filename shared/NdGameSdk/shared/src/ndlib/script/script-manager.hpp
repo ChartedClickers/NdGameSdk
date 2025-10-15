@@ -15,8 +15,10 @@
 
 #if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/ndlib/script/ScriptManagerGlobals.hpp>
+#include <NdGameSdk/regenny/t2r/shared/ndlib/script/PointerBase.hpp>
 #elif defined(T1X)
 #include <NdGameSdk/regenny/t1x/shared/ndlib/script/ScriptManagerGlobals.hpp>
+#include <NdGameSdk/regenny/t1x/shared/ndlib/script/PointerBase.hpp>
 #endif
 
 #include "script-manager-eval.hpp"
@@ -43,6 +45,37 @@ namespace NdGameSdk::ndlib::script {
 		SdkEvent<> e_ModuleIndexInitialized{true};
 
 		SDK_DEPENDENCIES(CommonGame, NdDevMenu, Memory);
+
+		// Get pointer to DC module symbol
+		class PointerBase : public ISdkRegenny<regenny::shared::ndlib::script::PointerBase> {
+		public:
+
+			// ScriptManager::PointerBase::PointerBase
+			PointerBase() { ClearState(); }
+
+			template<typename T = void>
+			T* Get() const {
+				always_assert(ScriptManager_PointerBase_Get != nullptr, "Function pointer was not set!");
+				return reinterpret_cast<T*>(ScriptManager_PointerBase_Get(const_cast<PointerBase*>(this)));
+			}
+
+			void Initialize(StringId64 symbol, StringId64 module);
+			void Reset(StringId64 symbol);
+			bool HasEntry();
+			void Resolve();
+
+			ModuleInfo* GetModule();
+			StringId64 GetSymbolId() const;
+			StringId64 GetModuleId() const;
+		private:
+			void ClearState();
+			TYPEDEF_FUNCTION_PTR(void, ScriptManager_PointerBase_Initialize, PointerBase* pPointerBase, StringId64 symbol, StringId64 module);
+			TYPEDEF_FUNCTION_PTR(void*, ScriptManager_PointerBase_Get, PointerBase* pPointerBase);
+			TYPEDEF_FUNCTION_PTR(void, ScriptManager_PointerBase_Resolve, PointerBase* pPointerBase);
+			TYPEDEF_FUNCTION_PTR(bool, ScriptManager_PointerBase_HasEntry, PointerBase* pPointerBase);
+			friend class ScriptManager;
+		};
+
 
 		ModuleInfo* FindExportingModule(StringId64 pSymbol, bool pRestrictToModule, StringId64 pModule);
 

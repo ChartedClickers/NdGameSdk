@@ -1,6 +1,7 @@
 #pragma once
 #include <NdGameSdk/components/SdkRegenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
+#include "..\..\corelib\job\JlsContext.hpp"
 #include "ModuleBucketMap.hpp"
 #include "ModuleRequest.hpp"
 #include "ScriptModule.hpp"
@@ -13,8 +14,9 @@ struct ScriptManagerGlobals {
     }; // Size: 0x10
 
     private: char pad_0[0x10]; public:
-    StringId64 m_hash; // 0x10
-    private: char pad_18[0x28]; public:
+    StringId64 m_JlsContext; // 0x10
+    regenny::shared::corelib::job::JlsContext m_JlsIndex; // 0x18
+    private: char pad_1c[0x24]; public:
     bool m_EnableScriptTrace; // 0x40
     private: char pad_41[0x1]; public:
     bool m_Autoreloadbinfiles; // 0x42

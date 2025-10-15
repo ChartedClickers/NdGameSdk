@@ -51,6 +51,8 @@ struct ScriptModule {
     uint32_t m_field64; // 0x64
     uint32_t m_field68; // 0x68
     uint32_t m_size; // 0x6c
-}; // Size: 0x70
+    uint32_t m_LockCount; // 0x70
+    private: char pad_74[0x4]; public:
+}; // Size: 0x78
 #pragma pack(pop)
 }

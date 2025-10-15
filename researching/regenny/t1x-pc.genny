@@ -665,16 +665,16 @@ namespace regenny {
                 }
 
                 struct FixedSizeHeap 0x58 {
-                    void* m_data;
-                    void* m_block;
-                    uint64_t* m_usage;
-                    uint64_t m_usageSize;
-                    uint64_t m_granularity;
-                    uint32_t m_bitmapCount;
-                    uint64_t m_usageSize2 @ 0x30;
+                    void* m_pData;
+                    void* m_pUsageAlloc;
+                    uint64_t* m_pUsage;
+                    uint64_t m_capacity;
+                    uint64_t m_capacityAligned;
+                    uint32_t m_usageWordCount;
+                    uint64_t m_numElements @ 0x30;
                     uint64_t m_elementSize;
-                    uint64_t m_count;
-                    uint64_t m_allocCount;
+                    uint64_t m_activeCount;
+                    uint64_t m_alignment;
                     uint64_t m_lastIndex;
                 } // fixedsizeheap.h
             }

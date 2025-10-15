@@ -1,5 +1,4 @@
 #pragma once
-#include "NdGameSdk/components/SdkRegenny.hpp"  
 
 #if defined(T2R)  
 #include <NdGameSdk/regenny/t2r/shared/corelib/containers/FixedSizeHeap.hpp>  
@@ -77,12 +76,12 @@ namespace NdGameSdk::corelib::containers {
             uint64_t idx = static_cast<uint64_t>(entryIndex);
             uint64_t qwordIx = idx >> 6;
             uint32_t bitPos = static_cast<uint32_t>(idx & 0x3F);
-            uint64_t bitmap = raw->m_usage[qwordIx];
+            uint64_t bitmap = raw->m_pUsage[qwordIx];
             always_assert(((bitmap >> bitPos) & 1) != 0,
                 "FixedSizeHeap::ElementAt element not in use");
 
             // pointer math: base + idx * elementSize
-            auto base = reinterpret_cast<uint8_t*>(raw->m_data);
+            auto base = reinterpret_cast<uint8_t*>(raw->m_pData);
             return reinterpret_cast<U*>(base + idx * raw->m_elementSize);
         }
 

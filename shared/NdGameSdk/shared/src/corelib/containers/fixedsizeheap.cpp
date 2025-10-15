@@ -3,7 +3,7 @@
 namespace NdGameSdk::corelib::containers {
 	
 	uint64_t FixedSizeHeap::Count() const {
-		return this->Get()->m_count;
+		return this->Get()->m_activeCount;
 	}
 
 	uint64_t FixedSizeHeap::GetLastIndex() const {

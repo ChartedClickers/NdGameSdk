@@ -1,6 +1,7 @@
 #pragma once
 #include <NdGameSdk/sdkregenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
+#include "..\..\corelib\containers\FixedSizeHashTable.hpp"
 #include "..\..\corelib\containers\FixedSizeHeap.hpp"
 #include "..\..\corelib\memory\HeapAllocatorWithOverflow.hpp"
 #include "..\..\corelib\system\platform\ndsys.hpp"
@@ -36,24 +37,26 @@ struct FileSystem {
         regenny::shared::corelib::util::Err m_FsResult; // 0x8
     }; // Size: 0x18
 
-    struct RemapNode {
-        regenny::shared::ndlib::io::FileSystem::RemapNode* m_next; // 0x0
-        regenny::shared::ndlib::io::FileSystem::RemapNode* m_prev; // 0x8
-        uint64_t m_key; // 0x10
+    struct RemapNode : public regenny::shared::corelib::containers::FixedSizeHashTable::ListHead {
+        StringId64 m_key; // 0x10
+        // Metadata: utf8*
         char* m_value; // 0x18
     }; // Size: 0x20
 
-    struct RemapTable {
-        regenny::shared::ndlib::io::FileSystem::RemapNode** m_buckets; // 0x0
-        regenny::shared::corelib::containers::FixedSizeHeap m_heap; // 0x8
-        regenny::shared::ndlib::io::FileSystem::RemapNode* m_sentinel; // 0x60
-        uint64_t m_nodeSize; // 0x68
-        uint64_t m_capacity; // 0x70
-        regenny::shared::ndlib::io::FileSystem::RemapNode** m_bucketsBegin; // 0x78
-        regenny::shared::ndlib::io::FileSystem::RemapNode** m_bucketsEnd; // 0x80
-        uint64_t m_numEntries; // 0x88
-        uint32_t m_bucketCountMinus1; // 0x90
-        uint32_t m_flags; // 0x94
+    struct FixedSizeHashTable_corelib_containers_RemapNode {
+        regenny::shared::ndlib::io::FileSystem::RemapNode** m_Buckets; // 0x0
+        regenny::shared::corelib::containers::FixedSizeHeap m_Pool; // 0x8
+        regenny::shared::ndlib::io::FileSystem::RemapNode* m_Head; // 0x60
+        uint64_t m_NodeSize; // 0x68
+        uint64_t m_RequestedBuckets; // 0x70
+        regenny::shared::ndlib::io::FileSystem::RemapNode** m_Begin; // 0x78
+        regenny::shared::ndlib::io::FileSystem::RemapNode** m_End; // 0x80
+        uint64_t m_Count; // 0x88
+        uint32_t m_BucketCountAligned; // 0x90
+        regenny::shared::corelib::containers::FixedSizeHashTable::Flags m_PeakAndFlags; // 0x94
+    }; // Size: 0x98
+
+    struct RemapHashTable : public FixedSizeHashTable_corelib_containers_RemapNode {
     }; // Size: 0x98
 
     struct FileSystemOverlay {

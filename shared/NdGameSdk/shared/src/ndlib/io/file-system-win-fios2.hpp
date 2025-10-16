@@ -5,6 +5,7 @@
 
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
 #include <NdGameSdk/shared/src/corelib/memory/allocator-heap.hpp>
+#include <NdGameSdk/shared/src/corelib/containers/fixed-size-hashtable.hpp>
 #include <NdGameSdk/shared/src/ndlib/debug/nd-dmenu.hpp>
 
 #if defined(T2R)
@@ -18,6 +19,7 @@
 namespace NdGameSdk::ndlib { class EngineComponents; }
 
 using namespace NdGameSdk::corelib::memory;
+using namespace NdGameSdk::corelib::containers;
 using namespace NdGameSdk::gamelib::debug;
 using namespace NdGameSdk::ndlib;
 using namespace NdGameSdk::ndlib::debug;
@@ -48,6 +50,12 @@ namespace NdGameSdk::ndlib::io {
 		public:
 			HANDLE* GetEventHandle() const;
 			FsResult& GetFsResult();
+		};
+
+		class NdGameSdk_API RemapNode : public ISdkRegenny<regenny::shared::ndlib::io::FileSystem::RemapNode> {
+		public:
+			StringId64 GetKey() const;
+			const char* GetValue() const;
 		};
 
 		class BatchResolveItem : public ISdkRegenny<regenny::shared::ndlib::io::FileSystem::BatchResolveItem> {};
@@ -126,6 +134,11 @@ namespace NdGameSdk::ndlib::io {
 		void Awake() override;
 
 		FileSystemInternal* GetFileSystem() const;
+		
+		FixedSizeHashTable<FileSystemInternal::RemapNode>* GetRemapTable() {
+			always_assert(g_RemapTableSlot == nullptr, "g_RemapTableSlot was not set!");
+			return g_RemapTableSlot;
+		}
 
 		static DMENU::ItemSubmenu* CreateFileSystemMenu(NdDevMenu* pdmenu, DMENU::Menu* pMenu);
 
@@ -138,7 +151,8 @@ namespace NdGameSdk::ndlib::io {
 		InlineHook m_FileSystemInitHook{};
 
 		/*Extern variables*/
-		static FileSystemData* g_FileSystemDataSlot;
+		inline static FileSystemData** g_FileSystemDataSlot{ nullptr };
+		inline static FixedSizeHashTable<FileSystemInternal::RemapNode>* g_RemapTableSlot{ nullptr };
 
 		MEMBER_FUNCTION_PTR(FsResult*, FileSystem_PreadSync, FileSystemInternal* pFileSys, FsResult* pOutResult, FileSystemInternal::ReadOnlyFileHandle* pFileHandle,
 			void* dst, uint64_t pfileRelativeOffset, uint64_t pRequestedBytes, uint64_t* pIoBytesDoneCell, FileSystemInternal::Priority prio);
@@ -204,6 +218,7 @@ namespace NdGameSdk::ndlib::io {
 		static_assert(sizeof(FileSystemWin::ReadOnlyFileHandle) == 0x20, "Invalid ReadOnlyFileHandle size");
 		static_assert(sizeof(FileSystemWin::ReadOperation) == 0x18, "Invalid ReadOperation size");
 		static_assert(sizeof(FileSystemWin::ArchiveMount) == 0x10, "Invalid ArchiveMount size");
+		static_assert(sizeof(FileSystemWin::RemapNode) == 0x20, "Invalid RemapNode size");
 	#elif defined(T1X)
 	static_assert(sizeof(FileSystemWin::ArchiveMount) == 0x18, "Invalid ArchiveMount size");
 	#endif

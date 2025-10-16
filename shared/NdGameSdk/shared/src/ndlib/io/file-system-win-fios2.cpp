@@ -5,6 +5,8 @@
 #include <NdGameSdk/shared/src/ndlib/engine-components.hpp>
 #include <NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp>
 
+#include <Utility/global_resolver.hpp>
+
 namespace NdGameSdk::ndlib::io {
 
 #if defined(T2R)
@@ -32,10 +34,16 @@ namespace NdGameSdk::ndlib::io {
 				findpattern.pattern, wstr(Patterns::FileSystem_Init), findpattern.offset);
 
 			findpattern = Patterns::FileSystem_g_FileSystemData;
-			g_FileSystemDataSlot = (FileSystemData*)Utility::ReadLEA32(module,
-				findpattern.pattern, wstr(Patterns::FileSystem_g_FileSystemData), findpattern.offset, 3, 7);
+			g_FileSystemDataSlot = Utility::GlobalResolver::RipPtrSlotOrNull<FileSystemData>(
+				module, findpattern.pattern, wstr(Patterns::FileSystem_g_FileSystemData), findpattern.offset, 3, 7);
 
-			if (!FileSystemInit || !g_FileSystemDataSlot) {
+			findpattern = Patterns::FileSystem_g_RemapTable;
+			g_RemapTableSlot = Utility::GlobalResolver::RipSlotOrNull<FixedSizeHashTable<FileSystemInternal::RemapNode>>(
+				module, findpattern.pattern, wstr(Patterns::FileSystem_g_RemapTable), findpattern.offset, 3, 7);
+
+			if (!FileSystemInit ||
+				!g_FileSystemDataSlot ||
+				!g_RemapTableSlot) {
 				throw SdkComponentEx{ std::format("Failed to find {} addresses!", GetName()),
 					SdkComponentEx::ErrorCode::PatternFailed };
 			}
@@ -650,6 +658,29 @@ namespace NdGameSdk::ndlib::io {
 					},
 					FileSystemAddr, false, HeapArena_Source);
 
+				pdmenu->Create_DMENU_ItemFunction("Test RemapHashTable", pFileSystemMenu,
+					+[](DMENU::ItemFunction& pFunction, DMENU::Message pMessage)->bool {
+						if (pMessage == DMENU::Message::OnExecute) {
+							auto* fs = reinterpret_cast<FileSystem*>(pFunction.Data());
+							
+							auto RemapTable = fs->GetRemapTable();							
+							spdlog::info("RemapHashTable at {}: {} entries", 
+								static_cast<const void*>(RemapTable), RemapTable->Size());
+
+							RemapTable->ForEach([](const FileSystemInternal::RemapNode& node, uint32_t bucket) {
+								const char* value = node.GetValue();
+								spdlog::info("  [bucket {:3}] key={} value={}",
+									bucket,
+									node.GetKey(),
+									value ? value : "(null)");
+								});
+
+
+						}
+						return true;
+					},
+					FileSystemAddr, false, HeapArena_Source);
+
 			#endif
 				return pdmenu->Create_DMENU_ItemSubmenu(pFileSystemMenu->Name(),
 					pMenu, pFileSystemMenu, +[](DMENU::ItemSubmenu& submenu, DMENU::Message msg)->bool {
@@ -809,6 +840,14 @@ namespace NdGameSdk::ndlib::io {
 	regenny::shared::ndlib::io::FileSystem::ArchiveMount::Buffer* 
 		FileSystemWin::ArchiveMount::GetBuffer() const {
 		return this->Get()->m_pMountBuffer;
+	}
+
+	StringId64 FileSystemInternal::RemapNode::GetKey() const {
+		return this->Get()->m_key;
+	}
+
+	const char* FileSystemInternal::RemapNode::GetValue() const {
+		return this->Get()->m_value;
 	}
 
 #endif

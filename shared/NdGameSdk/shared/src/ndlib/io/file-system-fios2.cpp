@@ -7,8 +7,10 @@ namespace NdGameSdk::ndlib::io {
 #if defined(T2R)
 
 	FileSystemData* FileSystem::GetFileSystemData() {
-		always_assert(g_FileSystemDataSlot == nullptr, "g_FileSystemData was not set!");
-		return *reinterpret_cast<FileSystemData* volatile*>(g_FileSystemDataSlot);
+		always_assert(g_FileSystemDataSlot == nullptr, "g_FileSystemDataSlot was not set!");
+		auto* data = *g_FileSystemDataSlot;
+		always_assert(data == nullptr, "g_FileSystemData was null!");
+		return data;
 	}
 
 	bool FileSystem::OpenSync(FsResult& outResult, const char* path, 
@@ -386,8 +388,6 @@ namespace NdGameSdk::ndlib::io {
 	bool StorageCore::IsUsingDirectStorage() {
 		return this->Get()->m_useDirectStorage;
 	}
-
-	FileSystemData* FileSystem::g_FileSystemDataSlot = nullptr;
 
 #endif
 }

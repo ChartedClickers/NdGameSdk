@@ -1,6 +1,7 @@
 #include "memory.hpp"
 #include "allocator-heap.hpp"
 #include "../containers/fixedsizeheap.hpp"
+#include "../containers/fixed-size-hashtable.hpp"
 
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
@@ -8,7 +9,9 @@
 
 namespace NdGameSdk::corelib::memory {
 
-	Memory::Memory() : m_cfg { g_SdkConfig.Memory }, ISdkComponent(TOSTRING(Memory)) {}
+	Memory::Memory() : m_cfg { g_SdkConfig.Memory }, ISdkComponent(TOSTRING(Memory)) {
+		containers::detail::ContainerMemoryAccess::s_memory = this;
+	}
 
 	uintptr_t Memory_AllocateAtContext_ReturnAddr = NULL;
 	void Memory_AllocateAtContext_CC();
@@ -185,6 +188,10 @@ namespace NdGameSdk::corelib::memory {
 			HeapAllocator::Memory_HeapAllocator_PushAllocator = (HeapAllocator::Memory_HeapAllocator_PushAllocator_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::Memory_HeapAllocator_Allocate), findpattern.offset);
 
+			findpattern = Patterns::Memory_FixedSizeHeap_Init;
+			FixedSizeHeap::Memory_FixedSizeHeap_Init = (FixedSizeHeap::Memory_FixedSizeHeap_Init_ptr)Utility::FindAndPrintPattern(module,
+				findpattern.pattern, wstr(Patterns::Memory_FixedSizeHeap_Init), findpattern.offset);
+
 			findpattern = Patterns::Memory_FixedSizeHeap_FreeIndex;
 			FixedSizeHeap::Memory_FixedSizeHeap_FreeIndex = (FixedSizeHeap::Memory_FixedSizeHeap_FreeIndex_ptr)Utility::FindAndPrintPattern(module,
 				findpattern.pattern, wstr(Patterns::Memory_FixedSizeHeap_FreeIndex), findpattern.offset);
@@ -210,6 +217,7 @@ namespace NdGameSdk::corelib::memory {
 				!Memory_PopAllocator ||
 				!Memory_GetAllocator ||
 				!HeapAllocator::Memory_HeapAllocator_PushAllocator ||
+				!FixedSizeHeap::Memory_FixedSizeHeap_Init ||
 				!FixedSizeHeap::Memory_FixedSizeHeap_FreeIndex ||
 				!FixedSizeHeap::Memory_FixedSizeHeap_Copy ||
 				!FixedSizeHeap::Memory_FixedSizeHeap_AddIndex

@@ -757,6 +757,33 @@ namespace regenny {
                     uint64_t m_lastIndex;
                 }; // fixedsizeheap.h
 
+                struct FixedSizeHashTable<typename NodeT> {
+
+                    enum Flags : uint32_t {
+                        PeakMask = 0x7fffffff,
+                        Initialized = 0x80000000
+                    };
+
+                    NodeT** m_Buckets;
+                    FixedSizeHeap m_Pool;
+                    NodeT* m_Head;
+                    uint64_t m_NodeSize;
+                    uint64_t m_RequestedBuckets;
+                    NodeT** m_Begin;
+                    NodeT** m_End;
+                    uint64_t m_Count;
+                    uint32_t m_BucketCountAligned;
+                    Flags m_PeakAndFlags;
+                }; // fixed-size-hashtable.h
+
+                // internal stuff for FixedSizeHashTable
+                struct FixedSizeHashTable {
+                      struct ListHead 0x10 {
+                        void* m_next;
+                        void* m_prev;
+                    };
+                };
+                
             }
 
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib\system
@@ -1552,12 +1579,6 @@ namespace regenny {
                 
                 struct WindowContext 0x30 {
                     WindowContextType m_ContextType;
-                    void* FrameParams;
-                    uint64_t field_10;
-                    uint64_t field_18;
-                    uint64_t field_20;
-                    uint64_t field_28;
-                }
                     uint32_t m_flags;
                     void* m_pContextSlot;
                     void* m_pQueueHead;
@@ -2098,26 +2119,14 @@ namespace regenny {
                         HANDLE m_hEvent;
                         corelib.util.Err m_FsResult;
                     };
-
-                    struct RemapNode 0x20 {
-                        RemapNode* m_next;
-                        RemapNode* m_prev;
-                        uint64_t m_key;
-                        char* m_value;
+                    
+                    struct RemapNode : corelib.containers.FixedSizeHashTable.ListHead 0x10 {
+                        StringId64 m_key;
+                        char* m_value [[utf8*]];
                     };
 
-                    struct RemapTable 0x98 {
-                        RemapNode** m_buckets;
-                        corelib.containers.FixedSizeHeap m_heap;
-                        RemapNode* m_sentinel;
-                        uint64_t m_nodeSize;
-                        uint64_t m_capacity;
-                        RemapNode** m_bucketsBegin;
-                        RemapNode** m_bucketsEnd;
-                        uint64_t m_numEntries;
-                        uint32_t m_bucketCountMinus1;
-                        uint32_t m_flags;
-                    };
+                    // FixedSizeHashTable<struct FileSystem::RemapNode>
+                    struct RemapHashTable : corelib.containers.FixedSizeHashTable<RemapNode> {};
 
                     struct FileSystemOverlay 0x60 {
                         bool m_DisplayDataLoadingStatistics;

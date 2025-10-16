@@ -678,6 +678,33 @@ namespace regenny {
                     uint64_t m_lastIndex;
                 }; // fixedsizeheap.h
 
+                struct FixedSizeHashTable<typename NodeT> {
+
+                    enum Flags : uint32_t {
+                        PeakMask = 0x7fffffff,
+                        Initialized = 0x80000000
+                    };
+
+                    NodeT** m_Buckets;
+                    FixedSizeHeap m_Pool;
+                    NodeT* m_Head;
+                    uint64_t m_NodeSize;
+                    uint64_t m_RequestedBuckets;
+                    NodeT** m_Begin;
+                    NodeT** m_End;
+                    uint64_t m_Count;
+                    uint32_t m_BucketCountAligned;
+                    Flags m_PeakAndFlags;
+                }; // fixed-size-hashtable.h
+
+                // internal stuff for FixedSizeHashTable
+                struct FixedSizeHashTable {
+                      struct ListHead 0x10 {
+                        void* m_next;
+                        void* m_prev;
+                    };
+                };
+
             }
 
             // c:\branches\discbot??\t1x-pc-?.?.?\shared\src\corelib\system

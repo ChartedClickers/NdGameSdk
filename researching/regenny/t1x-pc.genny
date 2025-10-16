@@ -662,7 +662,7 @@ namespace regenny {
                         virtual uint64_t GetBlockSize() @ 0x30
                     } 
                     VTable* vftable;
-                }
+                };
 
                 struct FixedSizeHeap 0x58 {
                     void* m_pData;
@@ -676,7 +676,8 @@ namespace regenny {
                     uint64_t m_activeCount;
                     uint64_t m_alignment;
                     uint64_t m_lastIndex;
-                } // fixedsizeheap.h
+                }; // fixedsizeheap.h
+
             }
 
             // c:\branches\discbot??\t1x-pc-?.?.?\shared\src\corelib\system
@@ -691,7 +692,7 @@ namespace regenny {
                             void* m_nativeThread; // HANDLE*
                             uint32_t m_id;
                             uint32_t m_joinable;
-                        } // thread.h
+                        }; // thread.h
 
                         struct ThreadDesc 0x120 {
                             uint64_t m_stackSize;
@@ -699,12 +700,12 @@ namespace regenny {
                             uint32_t m_affinity;
                             uint32_t m_flags;
                             char m_name[0x100];
-                        }
+                        };
 
                         struct Fiber 0x10 {
                             void* m_nativeFiber;
                             void* m_CtxBlock;
-                        } // thread.h
+                        }; // thread.h
 
                         struct FiberContext 0x280 {
                             // Fiber context data
@@ -718,7 +719,7 @@ namespace regenny {
                             char m_field1c0[0x40];
                             char m_field200[0x40];
                             char m_field240[0x40];
-                        } // thread.h
+                        }; // thread.h
 
                         struct Mutex 0x40 {
                             enum Type : uint32_t {
@@ -730,7 +731,7 @@ namespace regenny {
                             uint32_t m_lockCount;
                             Type m_type;
                             bool m_initialized;
-                        } // mutex.h
+                        }; // mutex.h
 
                         struct MutexDesc 0x24 {
                             ndsys.Mutex.Type m_type;
@@ -740,7 +741,11 @@ namespace regenny {
                         struct ConditionVariable 0x20 {
                             void* m_ConditionVar; // CONDITION_VARIABLE*
                             bool m_initialized;
-                        } // condition-variable.h
+                        }; // condition-variable.h
+
+                        struct WaitLock 0x20 {
+                            uint64_t m_value;
+                        };
                     };
                 }
             }
@@ -753,10 +758,14 @@ namespace regenny {
                     workerThreadIndex = 0x1,
                     renderFrameParams = 0x2,
                     CurrentAllocator = 0x3,
+                    DontAssertOnAllocFail = 0x4,
                     ScriptStackFrame = 0x6,
-                    ScriptCFuncContext = 0x12,
+                    ScriptManagerGlobals = 0x7,
+                    ScriptCFuncContext = 0x8,
+                    ScriptDebug = 0xa,
                     ContextProcess = 0xc,
-                    ContextPlayer = 0xe
+                    ContextPlayer = 0xe,
+                    NavMeshGlobalLock = 0x17
                 };
 
                 // 16 bytes
@@ -1002,6 +1011,10 @@ namespace regenny {
                         SchedData m_SchedData;
                         regenny.shared.corelib.system.platform.ndsys.Mutex m_SchedDataLock[0x9] @ 0x26380;
                     };
+
+                    /*
+                    kMaxWorkerThreads = 0x18;
+                    */
                 }
             }
         }
@@ -1067,7 +1080,7 @@ namespace regenny {
                 char m_BranchName[0x40] [[utf8*]];
                 char m_SrcPath[0x400] [[utf8*]];
                 char m_DbPath[0x400] [[utf8*]];
-                char m_GamePath_unk2[0x400] [[utf8*]];
+                char m_GameInernalPath[0x400] [[utf8*]];
                 char m_CfgPath[0x400] +0x402 [[utf8*]];
                 char m_CfgFolderName[0x80] [[utf8*]];
                 char m_CfgDefaultsPath[0x80] [[utf8*]];
@@ -1344,9 +1357,20 @@ namespace regenny {
                     uint64_t m_poolSlice5;
                 }; // s_FrameParams
 
+                struct DeviceContextHandle 0x10 {
+                    void* m_pContext; // ndgi::DeviceContext*
+                    uint64_t m_field8;
+                }; 
+
+                struct DynamicContext 0x10 {
+                    void* m_pContext; // ndgi::DeviceContext*
+                    uint64_t m_field8;
+                };
+                
                 uint64_t m_frameNumber;
                 void* m_gfxEopTick @ 0x50;
-                void* m_DynamicRenderContext @ 0x6a80;
+                DeviceContextHandle* m_pGfxContext @ 0x6A78;
+                DynamicContext* m_DynamicRenderContext;
                 void* m_pRenderCamera @ 0x13758;
                 void* m_pUploadQueue @ 0x14eb8;
             } // frame-params.cpp
@@ -1614,27 +1638,50 @@ namespace regenny {
             // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\render
             namespace render {
 
-            enum WindowContextType : uint32_t
-            {
-                Context0 = 0x0,
-                Context1 = 0x1,
-                Context2 = 0x2,
-                Context3 = 0x3,
-                Context4 = 0x4,
-                Context5 = 0x5,
-                Context6 = 0x6,
-                Context7 = 0x7,
-                Context8 = 0x8
-            };
+                enum WindowContextType : uint32_t {
+                    Invalid = 0xffffffff,
+                    GameDebugDynamic = 0x1,
+                    GuiOffscreenOverride = 0x2,
+                    GameDebugDynTable = 0x3,
+                    DMenuThread = 0x4,
+                    MouseThread = 0x5,
+                    Hud2dOffscreen = 0x6,
+                    Hud3d = 0x7,
+                    Hud2d = 0x8,
+                    DebugOverDMenu = 0x9,
+                    UnderBlurBackbuffer = 0x10
+                };
 
-            struct WindowContext 0x30 {
-                WindowContextType m_ContextType;
-                void* FrameParams;
-                uint64_t field_10;
-                uint64_t field_18;
-                uint64_t field_20;
-                uint64_t field_28;
-            }
+                struct WindowContext 0x30 {
+                    WindowContextType m_ContextType;
+                    uint32_t m_flags;
+                    void* m_pContextSlot;
+                    void* m_pQueueHead;
+                    void* m_pQueueTail;
+                    uint32_t m_status;
+                    uint64_t m_field28 @ 0x28;
+                };
+
+            // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\render\ndgi
+            namespace ndgi {
+
+                // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\render\ndgi\win
+                namespace win {
+
+                    struct WinInitOptions 0x88 {
+                        uint64_t m_loaderCount;
+                        uint64_t m_deformerChunkBytes @ 0x18;
+                        uint32_t m_shaderBudgetMiB;
+                        uint8_t m_enablePsoCache;
+                        uint32_t m_shaderParallelism @ 0x30;
+                        uint32_t m_computeBudgetMiB;
+                        uint32_t m_computeParallelism;
+                        uint32_t m_computeIterCount;
+                        uint32_t m_dxilBudgetMiB;
+                        uint32_t m_dxilParallelism;
+                    };
+                };
+            };
 
 
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\render\text

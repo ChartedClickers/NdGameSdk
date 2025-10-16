@@ -15,11 +15,22 @@ struct FrameParams {
         private: char pad_38[0x330]; public:
     }; // Size: 0x368
 
+    struct DeviceContextHandle {
+        void* m_pContext; // 0x0
+        uint64_t m_field8; // 0x8
+    }; // Size: 0x10
+
+    struct DynamicContext {
+        void* m_pContext; // 0x0
+        uint64_t m_field8; // 0x8
+    }; // Size: 0x10
+
     uint64_t m_frameNumber; // 0x0
     private: char pad_8[0x50]; public:
     void* m_gfxEopTick; // 0x58
-    private: char pad_60[0x6a20]; public:
-    void* m_DynamicRenderContext; // 0x6a80
+    private: char pad_60[0x6a18]; public:
+    DeviceContextHandle* m_pGfxContext; // 0x6a78
+    DynamicContext* m_DynamicRenderContext; // 0x6a80
     private: char pad_6a88[0xca68]; public:
     void* m_pExposureMapComputeContext; // 0x134f0
     void* m_pExposureMapLastLabel; // 0x134f8

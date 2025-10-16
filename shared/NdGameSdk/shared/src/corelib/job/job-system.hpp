@@ -340,6 +340,7 @@ namespace NdGameSdk::corelib::job {
 		}
 
 		static constexpr WorkerMask kAllWorkers = ~WorkerMask{ 0 };
+		static constexpr uint32_t kMaxWorkerThreads = 0x18;
 	private:
 		void Initialize() override;
 		void Awake() override;

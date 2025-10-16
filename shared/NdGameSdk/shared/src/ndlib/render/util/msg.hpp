@@ -37,5 +37,5 @@ namespace NdGameSdk::ndlib::render::util {
 		void SetPrintTTY(bool status);
 	};
 
-	static_assert(sizeof(MsgCon) == 0x118, "Size of MsgCon is not correct.");
+	static_assert(sizeof(MsgCon) == 0x40, "Size of MsgCon is not correct.");
 }

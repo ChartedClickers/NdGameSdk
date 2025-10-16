@@ -4,6 +4,18 @@
 namespace regenny::shared::ndlib {
 #pragma pack(push, 1)
 struct NdFrameState {
+    enum FrameStage : uint32_t {
+        Begin = 0,
+        PreProcessUpdate = 1,
+        UpdateProcesses = 2,
+        PostProcessUpdate = 3,
+        PostRenderCamFin = 4,
+        PreRenderUpdate = 5,
+        KickRenderFrame = 6,
+        PostRenderUpdate = 7,
+        End = 8,
+    };
+
     struct NdKeyboardLayer {
         bool m_enabled; // 0x0
         bool m_DebugKeyboard; // 0x1

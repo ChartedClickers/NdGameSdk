@@ -54,16 +54,16 @@ namespace NdGameSdk::gamelib::level {
 			constexpr ptrdiff_t GameLoadingState_Offset = 0x988;
 			constexpr ptrdiff_t StepCounter_Offset = 0x9d0;
 
-			g_NumCoreArchives = Utility::GlobalResolver::SlotAt<uint64_t>(GameLoadingDataBase, NumCoreArchives_Offset, L"NumCoreArchives");
-			g_CoreArchives = Utility::GlobalResolver::SlotAt<FileSystemWin::ArchiveMount>(GameLoadingDataBase, CoreArchives_Offset, L"CoreArchives");
-			g_SpMpModeCurrent = Utility::GlobalResolver::SlotAt<SpMpMode>(GameLoadingDataBase, SpMpModeCurrent_Offset, L"SpMpModeCurrent");
-			g_SpMpModeDesired = Utility::GlobalResolver::SlotAt<SpMpMode>(GameLoadingDataBase, SpMpModeDesired_Offset, L"SpMpModeDesired");
+			g_NumCoreArchives = Utility::GlobalResolver::SlotAt<uint64_t>(GameLoadingDataBase, NumCoreArchives_Offset, L"g_NumCoreArchives");
+			g_CoreArchives = Utility::GlobalResolver::SlotAt<FileSystemWin::ArchiveMount>(GameLoadingDataBase, CoreArchives_Offset, L"g_CoreArchives");
+			g_SpMpModeCurrent = Utility::GlobalResolver::SlotAt<SpMpMode>(GameLoadingDataBase, SpMpModeCurrent_Offset, L"g_SpMpModeCurrent");
+			g_SpMpModeDesired = Utility::GlobalResolver::SlotAt<SpMpMode>(GameLoadingDataBase, SpMpModeDesired_Offset, L"g_SpMpModeDesired");
 
 			// ptr slots
-			g_WorldNameCurrent = Utility::GlobalResolver::PtrSlotAt<const char>(GameLoadingDataBase, WorldNameCurrent_Offset, L"WorldNameCurrent");
-			g_WorldNameTarget = Utility::GlobalResolver::PtrSlotAt<const char>(GameLoadingDataBase, WorldNameTarget_Offset, L"WorldNameTarget");
-			g_WorldCompanionNameTarget = Utility::GlobalResolver::PtrSlotAt<const char>(GameLoadingDataBase, WorldCompanionNameTarget_Offset, L"WorldCompanionNameTarget");
-			g_WorldNamePrevious = Utility::GlobalResolver::PtrSlotAt<const char>(GameLoadingDataBase, WorldNamePrevious_Offset, L"WorldNamePrevious");
+			g_WorldNameCurrent = Utility::GlobalResolver::PtrSlotAt<const char>(GameLoadingDataBase, WorldNameCurrent_Offset, L"g_WorldNameCurrent");
+			g_WorldNameTarget = Utility::GlobalResolver::PtrSlotAt<const char>(GameLoadingDataBase, WorldNameTarget_Offset, L"g_WorldNameTarget");
+			g_WorldCompanionNameTarget = Utility::GlobalResolver::PtrSlotAt<const char>(GameLoadingDataBase, WorldCompanionNameTarget_Offset, L"g_WorldCompanionNameTarget");
+			g_WorldNamePrevious = Utility::GlobalResolver::PtrSlotAt<const char>(GameLoadingDataBase, WorldNamePrevious_Offset, L"g_WorldNamePrevious");
 
 			g_pGameLoadingState = Utility::GlobalResolver::PtrSlotAt<CounterHandle>(GameLoadingDataBase, GameLoadingState_Offset, L"g_pGameLoadingState");
 			g_pStepCounter = Utility::GlobalResolver::PtrSlotAt<CounterHandle>(GameLoadingDataBase, StepCounter_Offset, L"g_pStepCounter");

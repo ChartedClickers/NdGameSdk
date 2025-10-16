@@ -61,6 +61,11 @@ struct ndsys {
         private: char pad_9[0x17]; public:
     }; // Size: 0x20
 
+    struct WaitLock {
+        uint64_t m_value; // 0x0
+        private: char pad_8[0x18]; public:
+    }; // Size: 0x20
+
 }; // Size: 0x0
 #pragma pack(pop)
 }

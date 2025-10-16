@@ -14,11 +14,22 @@ struct FrameParams {
         uint64_t m_poolSlice5; // 0x30
     }; // Size: 0x38
 
+    struct DeviceContextHandle {
+        void* m_pContext; // 0x0
+        uint64_t m_field8; // 0x8
+    }; // Size: 0x10
+
+    struct DynamicContext {
+        void* m_pContext; // 0x0
+        uint64_t m_field8; // 0x8
+    }; // Size: 0x10
+
     uint64_t m_frameNumber; // 0x0
     private: char pad_8[0x48]; public:
     void* m_gfxEopTick; // 0x50
-    private: char pad_58[0x6a28]; public:
-    void* m_DynamicRenderContext; // 0x6a80
+    private: char pad_58[0x6a20]; public:
+    DeviceContextHandle* m_pGfxContext; // 0x6a78
+    DynamicContext* m_DynamicRenderContext; // 0x6a80
     private: char pad_6a88[0xccd0]; public:
     void* m_pRenderCamera; // 0x13758
     private: char pad_13760[0x1758]; public:

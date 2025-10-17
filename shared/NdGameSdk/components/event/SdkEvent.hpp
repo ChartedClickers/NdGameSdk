@@ -13,8 +13,6 @@
 
 #include "SdkAction.hpp"
 #include "NdGameSdk/sdk.hpp"
-#include "NdGameSdk/components/SdkComponent.hpp"
-#include "NdGameSdk/components/SdkSubComponent.hpp"
 
 using namespace std;
 using namespace boost::signals2;

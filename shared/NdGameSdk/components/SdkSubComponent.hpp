@@ -20,8 +20,16 @@ namespace NdGameSdk {
     public:
         virtual ~ISdkSubComponent() = default;
 
+        enum class InitPolicy {
+            Automatic,
+            Manual,
+        };
+
         NdGameSdk_API std::string_view GetName() const;
         NdGameSdk_API bool IsInitialized() const;
+
+        InitPolicy GetInitPolicy() const noexcept { return m_initPolicy; }
+        bool ShouldAutoInitialize() const noexcept { return m_initPolicy == InitPolicy::Automatic; }
 
         template<typename CompT>
         CompT* GetParentComponent() const noexcept {
@@ -71,7 +79,11 @@ namespace NdGameSdk {
         }
 
     protected:
-        ISdkSubComponent(std::string_view name);
+        ISdkSubComponent(std::string_view name, InitPolicy pInitPolicy = InitPolicy::Automatic);
+
+        void SetInitPolicy(InitPolicy policy) noexcept { m_initPolicy = policy; }
+        void RequestManualInitialization() noexcept { m_initPolicy = InitPolicy::Manual; }
+        void RequestAutomaticInitialization() noexcept { m_initPolicy = InitPolicy::Automatic; }
 
         template <typename... Args>
         void InvokeSdkEvent(SdkEvent<Args...>& event, Args... args) {
@@ -100,9 +112,10 @@ namespace NdGameSdk {
         void AttachOwnerComponent(ISdkComponent* parent);
 
         std::string m_name;
-        
+
         ISdkComponent* m_parent{nullptr};
         bool m_Initialized{false};
+        InitPolicy m_initPolicy{ InitPolicy::Automatic };
 
         friend class ISdkComponent;
     };

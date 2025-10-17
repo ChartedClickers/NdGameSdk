@@ -30,8 +30,6 @@ namespace NdGameSdk::ndlib::profiling {
 				throw SdkComponentEx{ std::format("Failed to find {}:: game functions!", GetName()), SdkComponentEx::ErrorCode::PatternFailed };
 			}
 
-			InitSubComponents();
-
 		});
 	}
 

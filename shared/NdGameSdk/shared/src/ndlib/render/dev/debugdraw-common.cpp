@@ -93,7 +93,7 @@ namespace NdGameSdk::ndlib::render::dev {
 				throw SdkComponentEx{ std::format("Failed to find {}:: game functions!", GetName()), SdkComponentEx::ErrorCode::PatternFailed };
 			}
 
-			this->InitSubComponents();
+			this->InitSubComponentsOnly<MsgConDraw, PrimServerManager>();
 
 			findpattern = Patterns::GameDebugDraw_StaticContextHook;
 			auto GameDebugDrawJMP = (void*)Utility::FindAndPrintPattern(module

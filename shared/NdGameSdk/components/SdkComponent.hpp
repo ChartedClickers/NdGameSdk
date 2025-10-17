@@ -21,6 +21,7 @@
 #include <NdGameSdk/sdkconfig.hpp>
 #include <NdGameSdk/sdkderived.hpp>
 #include <NdGameSdk/sdkexception.hpp>
+#include <NdGameSdk/components/SdkSubComponent.hpp>
 #include <NdGameSdk/components/SdkComponentFactory.hpp>
 #include <NdGameSdk/components/event/SdkEvent.hpp>
 
@@ -30,7 +31,6 @@ namespace NdGameSdk::ndlib { class FrameParams; }
 namespace NdGameSdk {
 
     class ISdkComponent;
-    class ISdkSubComponent;
     template <typename... Args>
     class SdkEvent;
 
@@ -100,13 +100,22 @@ namespace NdGameSdk {
             return std::nullopt;
         }
 
+        using SubComponentInitPolicy = ISdkSubComponent::InitPolicy;
+
         template<typename SubT>
         NdGameSdk_API SubT* GetSubComponent() {
             static_assert(SdkDerived::is_derived_from_ISdkSubComponent<SubT>::value, "SubT must derive from ISdkSubComponent");
             auto it = m_subcomponents.find(typeid(SubT));
             return (it != m_subcomponents.end())
-                ? static_cast<SubT*>(it->second.get())
+                ? static_cast<SubT*>(it->second.instance.get())
                 : nullptr;
+        }
+
+        template<typename SubT>
+        bool HasSubComponent() const noexcept
+        {
+            static_assert(SdkDerived::is_derived_from_ISdkSubComponent<SubT>::value, "SubT must derive from ISdkSubComponent");
+            return m_subcomponents.find(typeid(SubT)) != m_subcomponents.end();
         }
 
         template <typename ComponentType, typename EventType, typename MemberFunc, typename ClassType = void>
@@ -178,12 +187,26 @@ namespace NdGameSdk {
         template<typename SubT, typename... Args>
         SubT* AddSubComponent(Args&&... a)
         {
-            static_assert(SdkDerived::is_derived_from_ISdkSubComponent<SubT>::value, "SubT must derive from ISdkSubComponent");
             auto sub = std::make_unique<SubT>(std::forward<Args>(a)...);
-            sub->AttachOwnerComponent(this);
-            SubT* rawPtr = sub.get();
-            m_subcomponents[typeid(SubT)] = std::move(sub);
-            return rawPtr;
+            auto policy = sub->GetInitPolicy();
+            return RegisterSubComponent<SubT>(std::move(sub), policy);
+        }
+
+        template<typename SubT, typename... Args>
+        SubT* AddSubComponentWithPolicy(SubComponentInitPolicy policy, Args&&... a)
+        {
+            auto sub = std::make_unique<SubT>(std::forward<Args>(a)...);
+            sub->SetInitPolicy(policy);
+            return RegisterSubComponent<SubT>(std::move(sub), policy);
+        }
+
+        template<typename SubT>
+        void SetSubComponentInitPolicy(SubComponentInitPolicy policy)
+        {
+            auto it = m_subcomponents.find(typeid(SubT));
+            if (it == m_subcomponents.end()) return;
+            if (it->second.instance)
+                it->second.instance->SetInitPolicy(policy);
         }
 
         template<typename SubT>
@@ -243,7 +266,33 @@ namespace NdGameSdk {
         std::string m_name;
         bool m_Initialized;
 
-        std::unordered_map<std::type_index, std::unique_ptr<ISdkSubComponent>> m_subcomponents;
+        template<typename SubT>
+        SubT* RegisterSubComponent(std::unique_ptr<SubT> sub, SubComponentInitPolicy policy) {
+            static_assert(SdkDerived::is_derived_from_ISdkSubComponent<SubT>::value, "SubT must derive from ISdkSubComponent");
+            sub->AttachOwnerComponent(this);
+            sub->SetInitPolicy(policy);
+            SubT* rawPtr = sub.get();
+            auto id = std::type_index(typeid(SubT));
+            if (auto it = m_subcomponents.find(id); it != m_subcomponents.end()) {
+                spdlog::warn("Replacing subcomponent {} on {}", id.name(), GetName());
+            }
+            m_subcomponents[id] = { std::move(sub) };
+            if (policy == SubComponentInitPolicy::Automatic && m_Initialized) {
+                InitSubComponentPtr(reinterpret_cast<ISdkSubComponent*>(rawPtr));
+            }
+            return rawPtr;
+        }
+
+        struct SubComponentEntry {
+            std::unique_ptr<ISdkSubComponent> instance;
+
+            bool ShouldAutoInitialize() const noexcept
+            {
+                return instance && instance->ShouldAutoInitialize();
+            }
+        };
+
+        std::unordered_map<std::type_index, SubComponentEntry> m_subcomponents;
 
         static const std::vector<ISdkComponent*>& GetSdkComponents();
         static void InitSubComponentPtr(ISdkSubComponent* sub);

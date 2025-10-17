@@ -54,9 +54,11 @@ namespace NdGameSdk {
                     spdlog::info("Initialize {}", comp->GetName());
                     comp->Initialize();
                     comp->m_Initialized = true;
+                    comp->InitSubComponents();
                     ++progress;
                 }
                 catch (const SdkComponentEx& ex) {
+                    comp->m_Initialized = false;
                     if (ex.IsCritical()) {
                         spdlog::critical("Critical initialization error in {}: {}", comp->GetName(), ex.what());
                         throw;
@@ -64,9 +66,11 @@ namespace NdGameSdk {
                     handleInitFailure(ex.what());
                 }
                 catch (const std::exception& ex) {
+                    comp->m_Initialized = false;
                     handleInitFailure(ex.what());
                 }
                 catch (...) {
+                    comp->m_Initialized = false;
                     handleInitFailure("Unknown error");
                 }
             }

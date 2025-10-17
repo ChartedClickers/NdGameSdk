@@ -20,13 +20,13 @@ namespace NdGameSdk::common {
 		auto SharedComponents = ISdkComponent::GetSharedComponents();
 		m_EngineComponents = GetDependencyComponent<EngineComponents>(SharedComponents);
 
+		const auto manualInit = ISdkComponent::SubComponentInitPolicy::Manual;
 		#if defined(T2R)
-		m_NxAppHooks = AddSubComponent<NxAppHooks>();
+		m_NxAppHooks = AddSubComponentWithPolicy<NxAppHooks>(manualInit);
 		#endif
-
-		m_IAllocator = AddSubComponent<IAllocator>();
-		m_CommonGameLoop = AddSubComponent<CommonGameLoop>();
-		m_CommonMainWin = AddSubComponent<CommonMainWin>();
+        m_IAllocator = AddSubComponentWithPolicy<IAllocator>(manualInit);
+        m_CommonGameLoop = AddSubComponentWithPolicy<CommonGameLoop>(manualInit);
+        m_CommonMainWin = AddSubComponentWithPolicy<CommonMainWin>(manualInit);
 
 	}
 

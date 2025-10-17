@@ -15,19 +15,6 @@
 
 namespace NdGameSdk::corelib::containers {
 
-	class FixedSizeHeap;
-	template<typename NodeT> class FixedSizeHashTable;
-
-	namespace detail {
-		struct ContainerMemoryAccess {
-		private:
-			static inline corelib::memory::Memory* s_memory{ nullptr };
-			friend class ::NdGameSdk::corelib::containers::FixedSizeHeap;
-			template<typename> friend class ::NdGameSdk::corelib::containers::FixedSizeHashTable;
-			friend class NdGameSdk::corelib::memory::Memory;
-		};
-	}
-
     class NdGameSdk_API FixedSizeHeap : public ISdkRegenny<regenny::shared::corelib::containers::FixedSizeHeap> {
     public:
         FixedSizeHeap() = default;
@@ -48,13 +35,14 @@ namespace NdGameSdk::corelib::containers {
 
             const uint64_t allocationSize = alignedElemSize * numElements;
 
+            auto& memory = corelib::memory::Memory::RequireInstance<corelib::memory::Memory>();
             T* dataBase = pDataBase;
             if (dataBase == nullptr && allocationSize > 0) {
                 if (memContext != nullptr && *memContext != corelib::memory::Memory::Context::kAllocInvalid) {
-                    dataBase = detail::ContainerMemoryAccess::s_memory->AllocateAtContext<T*>(allocationSize, alignment, *memContext);
+                    dataBase = memory.AllocateAtContext<T*>(allocationSize, alignment, *memContext);
                 }
                 else {
-                    dataBase = detail::ContainerMemoryAccess::s_memory->Allocate<T*>(allocationSize, alignment, source_func, static_cast<int>(source_line), source_file);
+                    dataBase = memory.Allocate<T*>(allocationSize, alignment, source_func, static_cast<int>(source_line), source_file);
                 }
             }
 

@@ -9,9 +9,7 @@
 
 namespace NdGameSdk::corelib::memory {
 
-	Memory::Memory() : m_cfg { g_SdkConfig.Memory }, ISdkComponent(TOSTRING(Memory)) {
-		containers::detail::ContainerMemoryAccess::s_memory = this;
-	}
+	Memory::Memory() : m_cfg { g_SdkConfig.Memory }, ISdkComponent(TOSTRING(Memory)) {}
 
 	uintptr_t Memory_AllocateAtContext_ReturnAddr = NULL;
 	void Memory_AllocateAtContext_CC();

@@ -17,6 +17,11 @@
 #include <NdGameSdk/regenny/t1x/shared/corelib/memory/Allocator.hpp>
 #endif
 
+namespace NdGameSdk::corelib::containers {
+	class FixedSizeHeap;
+	template<typename> class FixedSizeHashTable;
+}
+
 namespace NdGameSdk::corelib::memory {
 
 	#define Memory_Source __FILE__, __LINE__, __func__
@@ -111,6 +116,7 @@ namespace NdGameSdk::corelib::memory {
 
 	private:
 		void Initialize() override;
+
 		bool m_MemoryMapMapped{};
 		MemoryCfg m_cfg{};
 
@@ -141,6 +147,10 @@ namespace NdGameSdk::corelib::memory {
 #if defined(T1X)
 		MEMBER_FUNCTION_PTR(MemoryMapEntry*, Memory_FindMemoryMap, MemoryMapId);
 #endif
+
+		friend class corelib::containers::FixedSizeHeap;
+		template<typename>
+		friend class corelib::containers::FixedSizeHashTable;
 
 	};
 

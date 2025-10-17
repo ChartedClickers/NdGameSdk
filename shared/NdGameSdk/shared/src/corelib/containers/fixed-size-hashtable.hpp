@@ -86,7 +86,7 @@ namespace NdGameSdk::corelib::containers {
 			NodeT* headStorage = nullptr) {
 
 			auto* raw = this->Get();
-			auto* memory = detail::ContainerMemoryAccess::s_memory;
+			auto& memory = corelib::memory::Memory::RequireInstance<corelib::memory::Memory>();
 			
 			const auto peakMask = static_cast<uint32_t>(Flags::PeakMask);
 			raw->m_PeakAndFlags = static_cast<Flags>(static_cast<uint32_t>(raw->m_PeakAndFlags) & peakMask);
@@ -112,14 +112,14 @@ namespace NdGameSdk::corelib::containers {
 			NodeT** buckets = bucketStorage;
 			if (buckets == nullptr) {
 				buckets = reinterpret_cast<NodeT**>(
-					memory->Allocate<NodeT**>(bucketBytes, alignof(NodeT*), sourceFunc, static_cast<int>(sourceLine), sourceFile));
+					memory.Allocate<NodeT**>(bucketBytes, alignof(NodeT*), sourceFunc, static_cast<int>(sourceLine), sourceFile));
 				always_assert(buckets == nullptr, "FixedSizeHashTable::Initialize bucket allocation failed");
 			}
 
 			NodeT* head = headStorage;
 			if (head == nullptr) {
 				head = reinterpret_cast<NodeT*>(
-					memory->Allocate<NodeT**>(static_cast<size_t>(nodeSize), alignment, sourceFunc, static_cast<int>(sourceLine), sourceFile));
+					memory.Allocate<NodeT**>(static_cast<size_t>(nodeSize), alignment, sourceFunc, static_cast<int>(sourceLine), sourceFile));
 				always_assert(head == nullptr, "FixedSizeHashTable::Initialize head allocation failed");
 			}
 

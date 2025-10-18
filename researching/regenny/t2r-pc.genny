@@ -821,7 +821,25 @@ namespace regenny {
                     uint32_t m_numElements;
                 }; // robinhood-hash-table.inl
                 
-                
+                // template<typename T> 
+                struct StaticArray<typename T> 0x10 {
+                    T* m_data;
+                    uint32_t m_size;
+                }; // static-array.h
+
+                // template<typename T>
+                struct ListArray<typename T> 0x10 {
+                    uint32_t m_size;
+                    uint32_t m_capacity;
+                    T* m_data;
+                }; // list-array.h
+
+                // template<size_t NumBits>
+                struct BitArray<size_t NumBits> {
+                    // BitArray must have at least 1 bit
+                    uint64_t m_bits[(NumBits + 63) / 64];
+                };
+
             }
 
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib\system

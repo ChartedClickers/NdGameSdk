@@ -3,10 +3,8 @@
 #include <NdGameSdk/sdkstringid.hpp>
 namespace regenny::shared::corelib::containers {
 #pragma pack(push, 1)
-struct StaticArray {
-    void* m_data; // 0x0
-    uint32_t m_size; // 0x8
-    private: char pad_c[0x4]; public:
-}; // Size: 0x10
+struct BitArray {
+    uint64_t m_bits[1]; // 0x0
+}; // Size: 0x8
 #pragma pack(pop)
 }

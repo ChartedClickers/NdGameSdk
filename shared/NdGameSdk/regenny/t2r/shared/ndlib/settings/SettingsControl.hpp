@@ -1,7 +1,9 @@
 #pragma once
 #include <NdGameSdk/sdkregenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
+#include "..\..\corelib\containers\FixedSizeHashTable.hpp"
 #include "..\..\corelib\containers\FixedSizeHeap.hpp"
+#include "..\..\corelib\system\platform\ndsys.hpp"
 namespace regenny::shared::ndlib::settings {
 #pragma pack(push, 1)
 struct SettingsControl {
@@ -33,29 +35,22 @@ struct SettingsControl {
         StringId64 m_key; // 0x98
     }; // Size: 0xa0
 
-    struct HashNode {
-        regenny::shared::ndlib::settings::SettingsControl::HashNode* m_pNext; // 0x0
-        regenny::shared::ndlib::settings::SettingsControl::HashNode* m_pPrev; // 0x8
+    struct HashNode : public regenny::shared::corelib::containers::FixedSizeHashTable::ListHead {
         regenny::shared::ndlib::settings::SettingsControl::Setting* m_pFirst; // 0x10
         regenny::shared::ndlib::settings::SettingsControl::Setting* m_pLast; // 0x18
     }; // Size: 0x20
 
-    struct HashIt {
-        regenny::shared::ndlib::settings::SettingsControl::HashNode** m_ppSlot; // 0x0
-        regenny::shared::ndlib::settings::SettingsControl::HashNode* m_pNode; // 0x8
-    }; // Size: 0x10
-
-    struct SettingsHash {
-        regenny::shared::ndlib::settings::SettingsControl::HashNode** m_table; // 0x0
-        regenny::shared::corelib::containers::FixedSizeHeap m_pool; // 0x8
-        regenny::shared::ndlib::settings::SettingsControl::HashNode* m_head; // 0x60
-        uint64_t m_elemSize; // 0x68
-        uint64_t m_capacity; // 0x70
-        regenny::shared::ndlib::settings::SettingsControl::HashNode** m_begin; // 0x78
-        regenny::shared::ndlib::settings::SettingsControl::HashNode** m_end; // 0x80
-        uint64_t m_count; // 0x88
-        uint32_t m_roundedCap; // 0x90
-        uint32_t m_flags; // 0x94
+    struct FixedSizeHashTable_corelib_containers_HashNode {
+        regenny::shared::ndlib::settings::SettingsControl::HashNode** m_Buckets; // 0x0
+        regenny::shared::corelib::containers::FixedSizeHeap m_Pool; // 0x8
+        regenny::shared::ndlib::settings::SettingsControl::HashNode* m_Head; // 0x60
+        uint64_t m_NodeSize; // 0x68
+        uint64_t m_RequestedBuckets; // 0x70
+        regenny::shared::ndlib::settings::SettingsControl::HashNode** m_Begin; // 0x78
+        regenny::shared::ndlib::settings::SettingsControl::HashNode** m_End; // 0x80
+        uint64_t m_Count; // 0x88
+        uint32_t m_BucketCountAligned; // 0x90
+        regenny::shared::corelib::containers::FixedSizeHashTable::Flags m_PeakAndFlags; // 0x94
     }; // Size: 0x98
 
     uint64_t m_usedMask[75][64]; // 0x0
@@ -65,22 +60,12 @@ struct SettingsControl {
     uint32_t m_numUsedBuckets; // 0x998c
     uint32_t m_maxNumSettings; // 0x9990
     private: char pad_9994[0xc]; public:
-    HashNode** m_settingHashTable; // 0x99a0
-    regenny::shared::corelib::containers::FixedSizeHeap m_hashNodePool; // 0x99a8
-    HashNode* m_hashListHead; // 0x9a00
-    uint64_t m_hashElemSize; // 0x9a08
-    uint64_t m_hashCapacity; // 0x9a10
-    HashNode** m_hashBegin; // 0x9a18
-    HashNode** m_hashEnd; // 0x9a20
-    uint64_t m_hashCount; // 0x9a28
-    uint32_t m_hashRoundedCap; // 0x9a30
-    uint32_t m_hashMaxAndFlags; // 0x9a34
+    FixedSizeHashTable_corelib_containers_HashNode m_settingHashTable; // 0x99a0
     uint8_t m_rtFlag; // 0x9a38
-    private: char pad_9a39[0x3]; public:
-    uint32_t m_rtCounter; // 0x9a3c
-    uint32_t m_nextSequence; // 0x9a40
-    private: char pad_9a44[0xc]; public:
-    uint8_t m_waitListLock[32]; // 0x9a50
+    uint32_t m_rtCounter; // 0x9a39
+    uint32_t m_nextSequence; // 0x9a3d
+    private: char pad_9a41[0xf]; public:
+    regenny::shared::corelib::system::platform::ndsys::WaitLock m_waitListLock; // 0x9a50
 }; // Size: 0x9a70
 #pragma pack(pop)
 }

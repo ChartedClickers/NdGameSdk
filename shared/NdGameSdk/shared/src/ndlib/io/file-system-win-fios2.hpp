@@ -52,7 +52,7 @@ namespace NdGameSdk::ndlib::io {
 			FsResult& GetFsResult();
 		};
 
-		class NdGameSdk_API RemapNode : public ISdkRegenny<regenny::shared::ndlib::io::FileSystem::RemapNode> {
+		class NdGameSdk_API RemapNode : public ISdkRegenny<regenny::shared::ndlib::io::FileSystem::RemapNode, FixedSizeHashTable<RemapNode>::ListHead> {
 		public:
 			StringId64 GetKey() const;
 			const char* GetValue() const;
@@ -218,7 +218,7 @@ namespace NdGameSdk::ndlib::io {
 		static_assert(sizeof(FileSystemWin::ReadOnlyFileHandle) == 0x20, "Invalid ReadOnlyFileHandle size");
 		static_assert(sizeof(FileSystemWin::ReadOperation) == 0x18, "Invalid ReadOperation size");
 		static_assert(sizeof(FileSystemWin::ArchiveMount) == 0x10, "Invalid ArchiveMount size");
-		static_assert(sizeof(FileSystemWin::RemapNode) == 0x20, "Invalid RemapNode size");
+		static_assert(sizeof(FileSystemWin::RemapNode) == sizeof(FixedSizeHashTable<FileSystemWin::RemapNode>::ListHead) + 0x10, "Invalid RemapNode size");
 	#elif defined(T1X)
 	static_assert(sizeof(FileSystemWin::ArchiveMount) == 0x18, "Invalid ArchiveMount size");
 	#endif

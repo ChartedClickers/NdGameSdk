@@ -103,14 +103,6 @@ namespace NdGameSdk::ndlib::settings {
 		return this->Get()->m_numUsedBuckets;
     }
 
-    uint32_t GameSettingsControl::HashRoundedCap() {
-		return this->Get()->m_hashRoundedCap;
-    }
-
-    uint64_t GameSettingsControl::HashCount() {
-		return this->Get()->m_hashCount;
-    }
-
     GameSettingsControl* SettingsControl::s_sSettingsControl = nullptr;
 
 }

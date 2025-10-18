@@ -663,13 +663,13 @@ namespace NdGameSdk::ndlib::io {
 						if (pMessage == DMENU::Message::OnExecute) {
 							auto* fs = reinterpret_cast<FileSystem*>(pFunction.Data());
 							
-							auto RemapTable = fs->GetRemapTable();							
+							auto RemapTable = fs->GetRemapTable();
 							spdlog::info("RemapHashTable at {}: {} entries", 
 								static_cast<const void*>(RemapTable), RemapTable->Size());
 
 							RemapTable->ForEach([](const FileSystemInternal::RemapNode& node, uint32_t bucket) {
 								const char* value = node.GetValue();
-								spdlog::info("  [bucket {:3}] key={} value={}",
+								spdlog::info("  [bucket {:3}] key=0x{:016x} value={}",
 									bucket,
 									node.GetKey(),
 									value ? value : "(null)");

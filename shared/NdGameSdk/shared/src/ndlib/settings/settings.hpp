@@ -40,7 +40,7 @@ namespace NdGameSdk::ndlib::settings {
 	/* Extern classes */
     class NdGameSdk_API GameSettingsControl : public ISdkRegenny<regenny::shared::ndlib::settings::SettingsControl> {
     public:
-        using SettingFlags= regenny::shared::ndlib::settings::SettingsControl::SettingFlags;
+        using SettingFlags = regenny::shared::ndlib::settings::SettingsControl::SettingFlags;
 
         class Setting : public ISdkRegenny<regenny::shared::ndlib::settings::SettingsControl::Setting> {
         public:
@@ -53,28 +53,8 @@ namespace NdGameSdk::ndlib::settings {
             void* DataPtr();
         };
 
-        class HashNode : public ISdkRegenny<regenny::shared::ndlib::settings::SettingsControl::HashNode> {
-        public:
-            HashNode* Next() const { return reinterpret_cast<HashNode*>(this->Get()->m_pNext); }
-            HashNode* Prev() const { return reinterpret_cast<HashNode*>(this->Get()->m_pPrev); }
-            Setting* First()const { return reinterpret_cast<Setting*>(this->Get()->m_pFirst); }
-            Setting* Last() const { return reinterpret_cast<Setting*>(this->Get()->m_pLast); }
-        };
-
-        class HashIt : public ISdkRegenny<regenny::shared::ndlib::settings::SettingsControl::HashIt> {};
-
-        class SettingsHash : public ISdkRegenny<regenny::shared::ndlib::settings::SettingsControl::SettingsHash> {
-        public:
-            uint32_t RoundedCap() const { return this->Get()->m_roundedCap; }
-            uint64_t Count() const { return this->Get()->m_count; }
-            HashNode** Table() { return reinterpret_cast<HashNode**>(this->Get()->m_table); }
-            HashNode* Head() { return reinterpret_cast<HashNode*>(this->Get()->m_head); }
-        };
-
         uint32_t MaxNumSettings();
         uint32_t NumUsedBuckets();
-        uint32_t HashRoundedCap();
-        uint64_t HashCount();
     };
 
     class SettingsControl final : public ISdkComponent {

@@ -1390,30 +1390,9 @@ namespace regenny {
                         StringId64 m_key @ 0x98;
                     };
 
-                    struct HashNode 0x20 {
-                        HashNode* m_pNext;
-                        HashNode* m_pPrev;
+                    struct HashNode : corelib.containers.FixedSizeHashTable.ListHead 0x10 {
                         Setting* m_pFirst;
                         Setting* m_pLast;
-                    };
-
-                    struct HashIt 0x10 {
-                        HashNode** m_ppSlot;
-                        HashNode* m_pNode;
-                    };
-
-                    // TODO: Refactor to FixedSizeHashTable
-                    struct SettingsHash 0x98 {
-                        HashNode** m_table;
-                        corelib.containers.FixedSizeHeap m_pool;
-                        HashNode* m_head;
-                        uint64_t m_elemSize;
-                        uint64_t m_capacity;
-                        HashNode** m_begin;
-                        HashNode** m_end;
-                        uint64_t m_count;
-                        uint32_t m_roundedCap;
-                        uint32_t m_flags;
                     };
 
                     uint64_t m_usedMask[0x4b][0x40];
@@ -1422,20 +1401,12 @@ namespace regenny {
                     uint32_t m_bucketTag[0x4b];
                     uint32_t m_numUsedBuckets;
                     uint32_t m_maxNumSettings;
-                    HashNode** m_settingHashTable @ 0x99a0;
-                    corelib.containers.FixedSizeHeap m_hashNodePool;
-                    HashNode* m_hashListHead;
-                    uint64_t m_hashElemSize;
-                    uint64_t m_hashCapacity;
-                    HashNode** m_hashBegin;
-                    HashNode** m_hashEnd;
-                    uint64_t m_hashCount;
-                    uint32_t m_hashRoundedCap;
-                    uint32_t m_hashMaxAndFlags;
+                    // FixedSizeHashTable<struct SettingsControl::HashNode>
+                    corelib.containers.FixedSizeHashTable<HashNode> m_settingHashTable @ 0x99a0;
                     uint8_t m_rtFlag;
-                    uint32_t m_rtCounter @ 0x9a3c;
+                    uint32_t m_rtCounter;
                     uint32_t m_nextSequence;
-                    uint8_t m_waitListLock[0x20] @ 0x9a50;
+                    corelib.system.platform.ndsys.WaitLock m_waitListLock @ 0x9a50;
                 }; // settings.cpp
             }
 

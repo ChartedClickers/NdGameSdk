@@ -12,49 +12,12 @@
 #include <algorithm>
 #include <cstring>
 #include <limits>
+#include <type_traits>
 #include <utility>
 
 namespace NdGameSdk::corelib::containers {
 
 	namespace detail {
-
-		template<typename NodeT>
-		struct FixedSizeHashTableLinks {
-			using RawListHead = regenny::shared::corelib::containers::FixedSizeHashTable::ListHead;
-
-			static RawListHead* AsHead(NodeT* node) {
-				return reinterpret_cast<RawListHead*>(node);
-			}
-
-			static const RawListHead* AsHead(const NodeT* node) {
-				return reinterpret_cast<const RawListHead*>(node);
-			}
-
-			static NodeT* Next(NodeT* node) {
-				return node ? reinterpret_cast<NodeT*>(AsHead(node)->m_next) : nullptr;
-			}
-
-			static NodeT* Next(const NodeT* node) {
-				return node ? reinterpret_cast<NodeT*>(AsHead(node)->m_next) : nullptr;
-			}
-
-			static NodeT* Prev(NodeT* node) {
-				return node ? reinterpret_cast<NodeT*>(AsHead(node)->m_prev) : nullptr;
-			}
-
-			static NodeT* Prev(const NodeT* node) {
-				return node ? reinterpret_cast<NodeT*>(AsHead(node)->m_prev) : nullptr;
-			}
-
-			static void SetNext(NodeT* node, NodeT* next) {
-				AsHead(node)->m_next = next;
-			}
-
-			static void SetPrev(NodeT* node, NodeT* prev) {
-				AsHead(node)->m_prev = prev;
-			}
-		};
-
 		template<typename Fn, typename NodeRef>
 		inline void InvokeBucketVisitor(Fn&& fn, NodeRef&& nodeRef, uint32_t bucketIndex) {
 			if constexpr (std::is_invocable_v<Fn, NodeRef, uint32_t>) {
@@ -73,9 +36,48 @@ namespace NdGameSdk::corelib::containers {
 	public:
 		using RawTable = regenny::shared::corelib::containers::FixedSizeHashTable;
 		using Flags = RawTable::Flags;
-		using ListHead = RawTable::ListHead;
+		using RawListHead = RawTable::ListHead;
 		using size_type = uint64_t;
 		using node_type = NodeT;
+
+		struct ListHead : public ISdkRegenny<RawListHead> {
+			NodeT* Next() {
+				auto* raw = this->Get();
+				return raw ? reinterpret_cast<NodeT*>(raw->m_next) : nullptr;
+			}
+
+			const NodeT* Next() const {
+				auto* raw = this->Get();
+				return raw ? reinterpret_cast<const NodeT*>(raw->m_next) : nullptr;
+			}
+
+			NodeT* Prev() {
+				auto* raw = this->Get();
+				return raw ? reinterpret_cast<NodeT*>(raw->m_prev) : nullptr;
+			}
+
+			const NodeT* Prev() const {
+				auto* raw = this->Get();
+				return raw ? reinterpret_cast<const NodeT*>(raw->m_prev) : nullptr;
+			}
+
+		private:
+			void SetNextInternal(NodeT* next) {
+				auto* raw = this->Get();
+				if (raw != nullptr) {
+					raw->m_next = reinterpret_cast<void*>(next);
+				}
+			}
+
+			void SetPrevInternal(NodeT* prev) {
+				auto* raw = this->Get();
+				if (raw != nullptr) {
+					raw->m_prev = reinterpret_cast<void*>(prev);
+				}
+			}
+
+			friend class FixedSizeHashTable;
+		};
 
 		void Initialize(uint64_t requestedBuckets,
 			uint64_t nodeAlignment = 0x10,
@@ -87,7 +89,7 @@ namespace NdGameSdk::corelib::containers {
 
 			auto* raw = this->Get();
 			auto& memory = corelib::memory::Memory::RequireInstance<corelib::memory::Memory>();
-			
+
 			const auto peakMask = static_cast<uint32_t>(Flags::PeakMask);
 			raw->m_PeakAndFlags = static_cast<Flags>(static_cast<uint32_t>(raw->m_PeakAndFlags) & peakMask);
 
@@ -124,8 +126,8 @@ namespace NdGameSdk::corelib::containers {
 			}
 
 			std::memset(head, 0, static_cast<size_t>(nodeSize));
-			detail::FixedSizeHashTableLinks<NodeT>::SetNext(head, head);
-			detail::FixedSizeHashTableLinks<NodeT>::SetPrev(head, head);
+			SetNextNode(head, head);
+			SetPrevNode(head, head);
 
 			raw->m_Buckets = reinterpret_cast<void**>(buckets);
 			raw->m_Begin = reinterpret_cast<void**>(buckets);
@@ -291,7 +293,7 @@ namespace NdGameSdk::corelib::containers {
 				}
 
 				if (m_current != nullptr) {
-					m_current = detail::FixedSizeHashTableLinks<std::remove_const_t<NodeT>>::Next(m_current);
+					m_current = NextNode(m_current);
 					if (m_current != nullptr) {
 						return;
 					}
@@ -356,7 +358,7 @@ namespace NdGameSdk::corelib::containers {
 				NodeT* node = buckets[bucket];
 				while (node != nullptr) {
 					detail::InvokeBucketVisitor(fn, *node, bucket);
-					node = detail::FixedSizeHashTableLinks<NodeT>::Next(node);
+					node = NextNode(node);
 				}
 			}
 		}
@@ -369,7 +371,7 @@ namespace NdGameSdk::corelib::containers {
 				const NodeT* node = buckets[bucket];
 				while (node != nullptr) {
 					detail::InvokeBucketVisitor(fn, *node, bucket);
-					node = detail::FixedSizeHashTableLinks<NodeT>::Next(node);
+					node = NextNode(node);
 				}
 			}
 		}
@@ -407,11 +409,11 @@ namespace NdGameSdk::corelib::containers {
 			ClearNode(newNode, static_cast<size_t>(NodeSize()));
 
 			NodeT* const oldHead = *lookup.head;
-			detail::FixedSizeHashTableLinks<NodeT>::SetPrev(newNode, nullptr);
-			detail::FixedSizeHashTableLinks<NodeT>::SetNext(newNode, oldHead);
+			SetPrevNode(newNode, nullptr);
+			SetNextNode(newNode, oldHead);
 
 			if (oldHead != nullptr) {
-				detail::FixedSizeHashTableLinks<NodeT>::SetPrev(oldHead, newNode);
+				SetPrevNode(oldHead, newNode);
 			}
 
 			*lookup.head = newNode;
@@ -437,13 +439,12 @@ namespace NdGameSdk::corelib::containers {
 			}
 
 			NodeT* node = lookup.node;
-			NodeT* const next = detail::FixedSizeHashTableLinks<NodeT>::Next(node);
+			NodeT* const next = NextNode(node);
 
 			*lookup.slot = next;
 
 			if (next != nullptr) {
-				detail::FixedSizeHashTableLinks<NodeT>::SetPrev(next,
-					detail::FixedSizeHashTableLinks<NodeT>::Prev(node));
+				SetPrevNode(next, PrevNode(node));
 			}
 
 			if constexpr (!std::is_same_v<std::decay_t<CleanupFn>, std::nullptr_t>) {
@@ -462,6 +463,63 @@ namespace NdGameSdk::corelib::containers {
 		}
 
 	private:
+		static ListHead* AsList(NodeT* node) {
+			return static_cast<ListHead*>(node);
+		}
+
+		static const ListHead* AsList(const NodeT* node) {
+			return static_cast<const ListHead*>(node);
+		}
+
+		static RawListHead* RawHead(NodeT* node) {
+			auto* list = AsList(node);
+			return list ? list->Get() : nullptr;
+		}
+
+		static const RawListHead* RawHead(const NodeT* node) {
+			auto* list = AsList(node);
+			return list ? list->Get() : nullptr;
+		}
+
+		static NodeT* NextNode(NodeT* node) {
+			auto* list = AsList(node);
+			return list ? list->Next() : nullptr;
+		}
+
+		static const NodeT* NextNode(const NodeT* node) {
+			auto* list = AsList(node);
+			return list ? list->Next() : nullptr;
+		}
+
+		static NodeT* PrevNode(NodeT* node) {
+			auto* list = AsList(node);
+			return list ? list->Prev() : nullptr;
+		}
+
+		static const NodeT* PrevNode(const NodeT* node) {
+			auto* list = AsList(node);
+			return list ? list->Prev() : nullptr;
+		}
+
+		static void SetNextNode(NodeT* node, NodeT* next) {
+			auto* list = AsList(node);
+			if (list != nullptr) {
+				list->SetNextInternal(next);
+			}
+		}
+
+		static void SetPrevNode(NodeT* node, NodeT* prev) {
+			auto* list = AsList(node);
+			if (list != nullptr) {
+				list->SetPrevInternal(prev);
+			}
+		}
+
+		static NodeT** NextSlot(NodeT* node) {
+			auto* raw = RawHead(node);
+			return raw ? reinterpret_cast<NodeT**>(&raw->m_next) : nullptr;
+		}
+
 		struct LookupResult {
 			NodeT* node{ nullptr };
 			NodeT** slot{ nullptr };
@@ -494,8 +552,8 @@ namespace NdGameSdk::corelib::containers {
 					return out;
 				}
 
-				cursor = reinterpret_cast<NodeT**>(&detail::FixedSizeHashTableLinks<NodeT>::AsHead(node)->m_next);
-				node = detail::FixedSizeHashTableLinks<NodeT>::Next(node);
+				cursor = NextSlot(node);
+				node = NextNode(node);
 			}
 
 			out.slot = cursor;
@@ -518,7 +576,8 @@ namespace NdGameSdk::corelib::containers {
 				if (matchFn(*node, key)) {
 					return node;
 				}
-				node = detail::FixedSizeHashTableLinks<NodeT>::Next(node);
+
+				node = NextNode(node);
 			}
 
 			return nullptr;
@@ -533,6 +592,10 @@ namespace NdGameSdk::corelib::containers {
 		NodeT* AllocateNode() {
 			return Pool().template AddIndex<NodeT>();
 		}
+
+		//static_assert(std::is_base_of_v<FixedSizeHashTable<NodeT>, NodeT>, "FixedSizeHashTable NodeT must derive from FixedSizeHashTable<NodeT>");
+		static_assert(sizeof(regenny::shared::corelib::containers::FixedSizeHashTable) == 0x98, "FixedSizeHashTable regenny size mismatch");
+		static_assert(sizeof(ListHead) == 0x10, "FixedSizeHashTable ListHead size mismatch");
 
 	};
 

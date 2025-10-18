@@ -7,27 +7,27 @@ namespace regenny::shared::gamelib::level {
 struct DataLoading {
     struct PackageDataLoadingVTable {
         virtual bool PackageLoginResItem(regenny::shared::ndlib::io::Package* pPackage, regenny::shared::ndlib::io::Package::ResItem* pResItem) = 0;
-        private: virtual void virtual_function_1() = 0; public:
-        private: virtual void virtual_function_2() = 0; public:
-        private: virtual void virtual_function_3() = 0; public:
-        private: virtual void virtual_function_4() = 0; public:
+        virtual bool FinalizePackageLogin(regenny::shared::ndlib::io::Package* pPackage, void* pContext, void* pUserData) = 0;
+        virtual bool PreparePackageForLogout(regenny::shared::ndlib::io::Package* pPackage) = 0;
+        virtual bool PackageLogoutResItem(regenny::shared::ndlib::io::Package* pPackage, regenny::shared::ndlib::io::Package::ResItem* pResItem) = 0;
+        virtual void UnloadTextureTable(regenny::shared::ndlib::io::Package* pPackage, regenny::shared::ndlib::io::Package::PakVramItemTable* pVramTable) = 0;
         private: virtual void virtual_function_5() = 0; public:
-        private: virtual void virtual_function_6() = 0; public:
-        private: virtual void virtual_function_7() = 0; public:
-        private: virtual void virtual_function_8() = 0; public:
-        private: virtual void virtual_function_9() = 0; public:
+        virtual bool RunBeginVramCmd(void* pPackageCmd, void* pCmdUserData) = 0;
+        virtual bool QueueVramCmd(void* pPackageCmd, void* pCmdPayload, uint32_t arg4, uint32_t arg5) = 0;
+        virtual bool ExecuteVramCmd(void* pPackageCmd) = 0;
+        virtual bool BuildTextureBitmasks(regenny::shared::ndlib::io::Package* pPackage) = 0;
         virtual void ReleaseLoadedVramPages() = 0;
     }; // Size: 0x8
 
     struct Config {
-        uint32_t m_memsize; // 0x0
+        uint32_t m_memoryCacheSize; // 0x0
         uint32_t m_freepackageslots; // 0x4
-        uint32_t m_field8; // 0x8
-        uint32_t m_fieldc; // 0xc
-        uint32_t m_field10; // 0x10
-        uint32_t m_field14; // 0x14
-        uint32_t m_field18; // 0x18
-        uint32_t m_field1c; // 0x1c
+        uint32_t m_wantLoadReserve; // 0x8
+        uint32_t m_wantLoadLockedReserve; // 0xc
+        uint32_t m_levelRequestReserve; // 0x10
+        uint32_t m_levelDefCollectionBuckets; // 0x14
+        uint32_t m_LevelDefCollectionSlots; // 0x18
+        uint32_t m_MaxDependentNodeCount; // 0x1c
     }; // Size: 0x20
 
 }; // Size: 0x0

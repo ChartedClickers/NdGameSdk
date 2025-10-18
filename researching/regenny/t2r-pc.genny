@@ -2634,32 +2634,30 @@ namespace regenny {
             namespace level {
 
                 struct DataLoading {
+
                     struct Config 0x20 {
-                        uint32_t m_memsize;
+                        uint32_t m_memoryCacheSize;
                         uint32_t m_freepackageslots;
-                        uint32_t m_field8;
-                        uint32_t m_fieldc;
-                        uint32_t m_field10;
-                        uint32_t m_field14;
-                        uint32_t m_field18;
-                        uint32_t m_field1c;
+                        uint32_t m_wantLoadReserve;
+                        uint32_t m_wantLoadLockedReserve;
+                        uint32_t m_levelRequestReserve;
+                        uint32_t m_levelDefCollectionBuckets;
+                        uint32_t m_LevelDefCollectionSlots;
+                        uint32_t m_MaxDependentNodeCount;
                     };
 
                     struct PackageDataLoadingVTable {
-                        virtual bool PackageLoginResItem(ndlib.io.Package* pPackage, ndlib.io.Package.ResItem* pResItem) @ 0
-                        /*
-                        void* data_????????? = FinalizePackageLogin
-                        void* data_????????? = bool __cdecl PreparePackageForLogout(class PackageMgr *,class Package *)
-                        void* data_????????? = sub_?????????
-                        void* data_????????? = void __cdecl TextureMgrPub::Unload(class Package *,const struct PakVramItemTable *)
-                        void* data_????????? = sub_?????????
-                        void* data_????????? = bool __cdecl RunBeginVramLoadingCmd(struct PackageManagerCmd *)
-                        void* data_????????? = void __cdecl VramPageConsumed(void *)
-                        void* data_????????? = void __cdecl TextureMgrPub::Cmd(const struct PackageManagerCmd &)
-                        void* data_????????? = sub_?????????
-                        */
-                        virtual void ReleaseLoadedVramPages() @ 10
-                    } 
+                        virtual bool PackageLoginResItem(ndlib.io.Package* pPackage, ndlib.io.Package.ResItem* pResItem) @ 0;
+                        virtual bool FinalizePackageLogin(ndlib.io.Package* pPackage, void* pContext, void* pUserData) @ 1;
+                        virtual bool PreparePackageForLogout(ndlib.io.Package* pPackage) @ 2;
+                        virtual bool PackageLogoutResItem(ndlib.io.Package* pPackage, ndlib.io.Package.ResItem* pResItem) @ 3;
+                        virtual void UnloadTextureTable(ndlib.io.Package* pPackage, ndlib.io.Package.PakVramItemTable* pVramTable) @ 4;
+                        virtual bool RunBeginVramCmd(void* pPackageCmd, void* pCmdUserData) @ 6;
+                        virtual bool QueueVramCmd(void* pPackageCmd, void* pCmdPayload, uint32_t arg4, uint32_t arg5) @ 7;
+                        virtual bool ExecuteVramCmd(void* pPackageCmd) @ 8;
+                        virtual bool BuildTextureBitmasks(ndlib.io.Package* pPackage) @ 9;
+                        virtual void ReleaseLoadedVramPages() @ 10;
+                    };
 
                 }; // data-loading.cpp
 

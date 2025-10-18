@@ -570,6 +570,26 @@ namespace NdGameSdk::ndlib::io {
 				pdmenu->Create_DMENU_ItemFunction("Test Login Package", PackageManagerMenu, &TestLoginPackage, PackageManagerAddr, false, HeapArena_Source);
 				pdmenu->Create_DMENU_ItemFunction("Test Parse Resources", PackageManagerMenu, &TestParseResources, PackageManagerAddr, false, HeapArena_Source);
 
+				pdmenu->Create_DMENU_ItemFunction("Test PakNameLookup", PackageManagerMenu,
+					+[](DMENU::ItemFunction& pFunction, DMENU::Message pMessage)->bool {
+						if (pMessage == DMENU::Message::OnExecute) {
+							auto mgr = reinterpret_cast<PackageManager*>(pFunction.Data());
+							if (mgr) {
+
+								auto& table = mgr->GetPackageMgr()->GetPakNameLookup();
+								spdlog::info("PakNameLookup size: {}", table.Size());
+
+								table.ForEach([](const StringId64& key, uint32_t value) {
+									spdlog::info("  key=0x{:016x} value={}", static_cast<uint64_t>(key), value);
+									});
+
+							}
+
+						}
+						return true;
+					},
+					PackageManagerAddr, false, HeapArena_Source);
+
             #endif
 				return pdmenu->Create_DMENU_ItemSubmenu(PackageManagerMenu->Name(),
 					pMenu, PackageManagerMenu, NULL, NULL, nullptr, HeapArena_Source);
@@ -804,7 +824,7 @@ namespace NdGameSdk::ndlib::io {
 					if (Package* pkg = pm->GetPackageById(pid)) {
 						
 						if (pkg->GetNumRequests() > 2) {
-							pkg->Get()->m_numRequests = 2;
+							pkg->Get()->m_refCt = 2;
 						}
 
 						pm->RequestLogoutPackage(pid);
@@ -923,6 +943,14 @@ namespace NdGameSdk::ndlib::io {
 
 	PackageProcessingInfo** PackageMgr::GetPendingPackageVramRelease() {
 		return reinterpret_cast<PackageProcessingInfo**>(this->Get()->m_PendingPackageVramRelease);
+	}
+
+	RobinHoodHashTable<StringId64, uint32_t>& PackageMgr::GetPakNameLookup() const {
+		return reinterpret_cast<RobinHoodHashTable<StringId64, uint32_t>&>(this->Get()->m_pakNameLookup);
+	}
+
+	RobinHoodHashTable<StringId64, uint32_t>& PackageMgr::GetNickNameLookup() const {
+		return reinterpret_cast<RobinHoodHashTable<StringId64, uint32_t>&>(this->Get()->m_nickNameLookup);
 	}
 
 	bool PackageMgr::PackageLoginResItem(Package* pPackage, Package::ResItem* pResItem) {

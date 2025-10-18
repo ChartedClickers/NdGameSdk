@@ -21,6 +21,7 @@ namespace NdGameSdk::ndlib::io {
 	public:
 		using PakItem = regenny::shared::ndlib::io::Package::PakItem;
         using Status = regenny::shared::ndlib::io::Package::Status;
+		using LoginStage = regenny::shared::ndlib::io::Package::LoginStage;
 
         enum ItemId : StringId64 {
 			PAK_LOGIN_TABLE = SID("PAK_LOGIN_TABLE"),
@@ -136,11 +137,15 @@ namespace NdGameSdk::ndlib::io {
 		const char* GetName() const;
 		const char* GetPackPath() const;
 
+		bool IsLoginFinalized() const;
+
 		StringId64 GetPackId() const;
 		StringId64 GetPackPathId() const;
 
 		Status GetStatus() const;
         std::string GetStatusString();
+
+		LoginStage GetLoginStage() const;
 
         static std::string GetStatusString(Status status);
 

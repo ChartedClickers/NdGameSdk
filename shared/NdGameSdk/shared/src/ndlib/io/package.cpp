@@ -23,7 +23,7 @@ namespace NdGameSdk::ndlib::io {
 	}
 
 	uint32_t Package::GetNumRequests() const {
-		return this->Get()->m_numRequests;
+		return this->Get()->m_refCt;
 	}
 
 	void* Package::GetVirtualMemoryAddressRange() const {
@@ -42,6 +42,10 @@ namespace NdGameSdk::ndlib::io {
 		return this->Get()->m_packfilepath;
 	}
 
+	bool Package::IsLoginFinalized() const {
+		return this->Get()->m_loginFinalized;
+	}
+
 	StringId64 Package::GetPackId() const {
 		return this->Get()->m_packid;
 	}
@@ -56,6 +60,10 @@ namespace NdGameSdk::ndlib::io {
 
 	std::string Package::GetStatusString() {
 		return GetStatusString(this->GetStatus());
+	}
+
+	Package::LoginStage Package::GetLoginStage() const {
+		return this->Get()->m_loginStage;
 	}
 
 	std::string Package::GetStatusString(Status status) {

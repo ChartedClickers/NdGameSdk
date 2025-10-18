@@ -1,6 +1,7 @@
 #pragma once
 #include <NdGameSdk/sdkregenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
+#include "..\..\corelib\containers\RobinHoodHashTable.hpp"
 #include "..\..\corelib\memory\Context.hpp"
 #include "..\..\corelib\system\platform\ndsys.hpp"
 #include "..\..\gamelib\level\DataLoading.hpp"
@@ -51,17 +52,6 @@ struct PackageMgr {
         uint64_t m_capacity; // 0x30
     }; // Size: 0x38
 
-    struct PkgNameLookupHdr {
-        regenny::shared::ndlib::io::PackageMgr::PkgNameLookupEntry** m_buckets; // 0x0
-        uint64_t* m_bitMask; // 0x8
-        regenny::shared::ndlib::io::PackageMgr::PkgNameLookupEntry* m_freeList; // 0x10
-        void* m_allocator; // 0x18
-        uint32_t m_bucketMask; // 0x20
-        private: char pad_24[0x4]; public:
-        uint32_t m_capacity; // 0x28
-        uint32_t m_size; // 0x2c
-    }; // Size: 0x30
-
     struct PackageRequest {
         enum RequestType : uint32_t {
             Login = 0,
@@ -104,6 +94,20 @@ struct PackageMgr {
         uint8_t* m_RingBuffer; // 0x18
     }; // Size: 0x20
 
+    struct RobinHoodHashTable_corelib_containers_StringId64_uint32_t {
+        struct Slot {
+            uint64_t m_hash; // 0x0
+            StringId64 m_key; // 0x8
+            uint32_t m_value; // 0x10
+            private: char pad_14[0x4]; public:
+        }; // Size: 0x18
+
+        Slot* m_Slots; // 0x0
+        regenny::shared::corelib::containers::RobinHoodHashTable::OccMask m_occ; // 0x8
+        uint32_t m_numBuckets; // 0x28
+        uint32_t m_numElements; // 0x2c
+    }; // Size: 0x30
+
     uint32_t m_freepackageslots; // 0x0
     uint32_t m_allocationRingBufferSize; // 0x4
     regenny::shared::corelib::memory::Context m_RingBufferContext; // 0x8
@@ -122,8 +126,8 @@ struct PackageMgr {
     PackageRequestInfo m_RequestInfo; // 0x50
     regenny::shared::ndlib::io::Package* m_packages; // 0x68
     regenny::shared::ndlib::io::PackageProcessingInfo* m_packageinfos; // 0x70
-    PkgNameLookupHdr m_pakNameLookup; // 0x78
-    PkgNameLookupHdr m_nickNameLookup; // 0xa8
+    RobinHoodHashTable_corelib_containers_StringId64_uint32_t m_pakNameLookup; // 0x78
+    RobinHoodHashTable_corelib_containers_StringId64_uint32_t m_nickNameLookup; // 0xa8
     private: char pad_d8[0x8]; public:
     ProcessingRingBuffer m_processingLoadQueue; // 0xe0
     ProcessingRingBuffer m_processingUpdateQueue; // 0xf8

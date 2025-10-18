@@ -2328,6 +2328,15 @@ namespace regenny {
                         PackageStatusUnloading = 0x5
                     };
 
+                    enum LoginStage : uint32_t {
+                        CopyBackgroundLoginOffset = 0x0,
+                        AwaitBackgroundControllers = 0x1,
+                        SyncPackageBindings = 0x2,
+                        LoginBackgroundInstances = 0x3,
+                        FinalizeBackgroundAndPopulator = 0x4,
+                        CompleteStreamingHandshake = 0x5
+                    };
+
                     struct PakHeader 0x40 {
                         uint32_t m_magic;
                         uint32_t m_hdrSize;
@@ -2371,7 +2380,8 @@ namespace regenny {
                     };
 
                     uint64_t m_field8 @ 0x8;
-                    uint64_t m_size; // Chunk size
+                    uint32_t m_size; // Chunk size
+                    LoginStage m_loginStage;
                     uint32_t m_numAllocatedPages;
                     uint32_t m_field1c;
                     uint32_t m_LoginTableFlags[0x258]; 
@@ -2387,10 +2397,11 @@ namespace regenny {
                     gamelib.level.Level* m_Level; // level this package belongs to
                     char m_packname[0x80] @ 0x9c8 [[utf8*]];
                     StringId64 m_packid @ 0xa48;
-                    char m_packfilepath[0x80] + 0x1 [[utf8*]];
+                    bool m_loginFinalized;
+                    char m_packfilepath[0x80] [[utf8*]];
                     StringId64 m_packfilepathid @ 0xad8;
                     PakVramItemTable* m_VramItemTable;
-                    uint32_t m_numRequests; // number of requests for this package
+                    uint32_t m_refCt; // number of requests for this package
                     Status m_status;
                 } // package.cpp
 
@@ -2485,16 +2496,6 @@ namespace regenny {
                         uint64_t m_capacity;
                     };
 
-                    struct PkgNameLookupHdr 0x30 {
-                        PkgNameLookupEntry** m_buckets;
-                        uint64_t* m_bitMask;
-                        PkgNameLookupEntry* m_freeList;
-                        void* m_allocator;
-                        uint32_t m_bucketMask;
-                        uint32_t m_capacity @ 0x28;
-                        uint32_t m_size;
-                    };
-
                     struct PackageRequest 0xa0 {
 
                         enum RequestType : uint32_t {
@@ -2551,8 +2552,9 @@ namespace regenny {
                     PackageRequestInfo m_RequestInfo;
                     Package* m_packages; // array of Package
                     PackageProcessingInfo* m_packageinfos; // array of PackageProcessingInfo
-                    PkgNameLookupHdr m_pakNameLookup;
-                    PkgNameLookupHdr m_nickNameLookup;
+                    // RobinHoodHashTable<class StringId64,unsigned int,struct StringIdHasher,struct equality<class StringId64,class StringId64>>
+                    corelib.containers.RobinHoodHashTable<StringId64, uint32_t> m_pakNameLookup;
+                    corelib.containers.RobinHoodHashTable<StringId64, uint32_t> m_nickNameLookup;
                     ProcessingRingBuffer m_processingLoadQueue @ 0xe0;
                     ProcessingRingBuffer m_processingUpdateQueue;
                     ProcessingRingBuffer m_processingUnloadQueue @ 0x130;

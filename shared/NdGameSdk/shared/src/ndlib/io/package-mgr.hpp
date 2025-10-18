@@ -5,6 +5,7 @@
 
 #include <NdGameSdk/shared/src/corelib/system/NdSystem.hpp>
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
+#include <NdGameSdk/shared/src/corelib/containers/robinhood-hash-table.hpp>
 #include <NdGameSdk/shared/src/corelib/job/job-system.hpp>
 #include <NdGameSdk/shared/src/ndlib/frame-params.hpp>
 #include <NdGameSdk/shared/src/ndlib/debug/nd-dmenu.hpp>
@@ -27,6 +28,7 @@ namespace NdGameSdk::ndlib { class EngineComponents; }
 
 using namespace NdGameSdk::corelib::system::platform;
 using namespace NdGameSdk::corelib::memory;
+using namespace NdGameSdk::corelib::containers;
 using namespace NdGameSdk::corelib::job;
 using namespace NdGameSdk::gamelib::debug;
 using namespace NdGameSdk::gamelib::level;
@@ -147,6 +149,9 @@ namespace NdGameSdk::ndlib::io {
 
 		int GetPackageReleaseVramCount();
 		PackageProcessingInfo** GetPendingPackageVramRelease();
+
+		RobinHoodHashTable<StringId64, uint32_t>& GetPakNameLookup() const;
+		RobinHoodHashTable<StringId64, uint32_t>& GetNickNameLookup() const;
 
 		/*Virtual Funcs*/
 		bool PackageLoginResItem(Package* pPackage, Package::ResItem* pResItem);

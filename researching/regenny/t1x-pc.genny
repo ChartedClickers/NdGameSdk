@@ -705,6 +705,41 @@ namespace regenny {
                     };
                 };
 
+                // Internal stuff for RobinHoodHashTable
+                struct RobinHoodHashTable {
+                    struct OccMask 0x20 {
+                        uint64_t* m_words;
+                        uint64_t m_capacity;
+                        uint64_t m_capacityAligned64;
+                        uint32_t m_wordCount;
+                    };
+
+                    struct OccScan 0x20 {
+                        OccMask* m_pbs;
+                        uint64_t m_currWord;
+                        uint32_t m_wordCount;
+                        uint32_t m_wordIdx;
+                        uint32_t m_limit;
+                        uint32_t m_index;
+                    };
+
+                };
+
+                // RobinHoodHashTable<class KeyT, class ValueT, struct HashT<class KeyT>, struct equality<class KeyT,class KeyT>>
+                struct RobinHoodHashTable<typename KeyT, typename ValueT> 0x30 {
+
+                    struct Slot 0x18 {
+                        // kEmptyHash = 0xfffffffffffffffe
+                        uint64_t m_hash;
+                        KeyT m_key;
+                        ValueT m_value;
+                    };
+
+                    Slot* m_Slots;
+                    RobinHoodHashTable.OccMask m_occ;
+                    uint32_t m_numBuckets;
+                    uint32_t m_numElements;
+                }; // robinhood-hash-table.inl
             }
 
             // c:\branches\discbot??\t1x-pc-?.?.?\shared\src\corelib\system

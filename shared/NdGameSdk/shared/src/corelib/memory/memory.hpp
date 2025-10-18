@@ -20,6 +20,7 @@
 namespace NdGameSdk::corelib::containers {
 	class FixedSizeHeap;
 	template<typename> class FixedSizeHashTable;
+	template<typename, typename, typename, typename> class RobinHoodHashTable;
 }
 
 namespace NdGameSdk::corelib::memory {
@@ -151,6 +152,8 @@ namespace NdGameSdk::corelib::memory {
 		friend class corelib::containers::FixedSizeHeap;
 		template<typename>
 		friend class corelib::containers::FixedSizeHashTable;
+		template<typename, typename, typename, typename>
+		friend class corelib::containers::RobinHoodHashTable;
 
 	};
 

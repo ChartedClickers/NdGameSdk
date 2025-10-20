@@ -16,6 +16,7 @@ type wchar_t 2
 type float 4 [[f32]]
 type double 8
 type vec4 16 [[u128]]
+type vec3 12 [[u96]]
 type StringId64 8 [[u64]]
 type HANDLE 8 [[u64]]
 type CRITICAL_SECTION 40
@@ -779,7 +780,7 @@ namespace regenny {
 
                 // internal stuff for FixedSizeHashTable
                 struct FixedSizeHashTable {
-                      struct ListHead 0x10 {
+                    struct ListHead 0x10 {
                         void* m_next;
                         void* m_prev;
                     };
@@ -839,6 +840,18 @@ namespace regenny {
                     // BitArray must have at least 1 bit
                     uint64_t m_bits[(NumBits + 63) / 64];
                 };
+
+                /*Shared Nodes*/
+                
+                struct Node_StringId64_StringId64 : FixedSizeHashTable.ListHead 0x20 {
+                    StringId64 m_key;
+                    StringId64 m_value;
+                };
+
+                // FixedSizeHashTable<SizeT,class StringId64,class StringId64,0,struct HashTableTraits<class StringId64,class StringId64>>
+                struct FixedSizeHashTable_StringId64_StringId64 : FixedSizeHashTable<Node_StringId64_StringId64> {};
+
+                /*Shared Nodes*/
 
             }
 
@@ -1586,6 +1599,67 @@ namespace regenny {
                 };
 
             }
+            
+            // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\text
+            namespace text {
+
+                struct StringIdSelection 0x40 {
+                    void* vftable;
+                    uint32_t m_capacity @ 0x10;
+                    uint32_t m_count;
+                    StringId64* m_pIds;
+                    corelib.system.platform.ndsys.WaitLock m_lock;
+                };
+
+            }
+
+            // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\lights
+            namespace lights {
+
+                struct LightTable 0x70 {
+                    struct PointLight 0x54 {
+                        vec3 m_color;
+                        vec3 m_pos;
+                        vec3 m_dir;
+                        vec3 m_center;
+                        uint32_t m_flags;
+                        float m_radius;
+                        float m_shapeRadius;
+                        float m_startDistance;
+                        float m_startRange;
+                        float m_intensity;
+                        float m_minRoughness;
+                        float m_specScale;
+                        float m_shapeRadiusEyeScale;
+                    };
+
+                    struct AreaLight : PointLight 0x5c {
+                        float m_width;
+                        float m_height;
+                    };
+
+                    struct SpotLight : PointLight 0x64 {
+                        float m_coneAngle;
+                        float m_penumbraAngle;
+                        float m_dropOff;
+                    };
+
+                    struct DirLight : PointLight {};
+
+                    uint32_t m_version;
+                    char* m_name @ 0x8 [[utf8*]];
+                    uint32_t m_pointCount;
+                    uint32_t m_areaCount;
+                    uint32_t m_spotCount;
+                    uint32_t m_dirCount;
+                    uint32_t m_projectorCount;
+                    PointLight* m_pointArray @ 0x28;
+                    AreaLight* m_areaArray;
+                    SpotLight* m_spotArray;
+                    DirLight* m_dirArray;
+                    void* m_projArray;
+                };
+            }
 
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\render
             namespace render {
@@ -1635,7 +1709,13 @@ namespace regenny {
                     };
                 };
 
-                // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\render\text
+                struct Background 0x170 {}; // background.h
+
+                namespace interface {
+                    struct BgGeometry 0x5d8 {}; // bg-geometry.cpp
+                }
+
+                // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\render\text (Not confirmed path)
                 namespace text {
                     struct DebugStringBase 0x48 {
                         void* vftable;
@@ -2619,6 +2699,26 @@ namespace regenny {
                     corelib.system.platform.ndsys.ConditionVariable m_PrefetchCondVar;
                     bool m_ShutdownRequested;
                 }; // prefetch.cpp
+
+                enum AssetType : uint32_t {
+                    Actor = 0x0,
+                    Level = 0x1,
+                    SoundBank = 0x2,
+                    IrPack = 0x3,
+                    Music = 0x4,
+                    Speech = 0x5,
+                    Movie = 0x6,
+                    Text = 0x7,
+                    Misc = 0x8,
+                    Gameplay = 0x9,
+                    Dc = 0xa,
+                    Shaders = 0xb,
+                    PipelineExecutables = 0xc
+                }; // asset-view.h
+
+                struct AssetView {
+                }; // asset-view.cpp
+
             }
 
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\memory
@@ -2681,33 +2781,526 @@ namespace regenny {
 
                 }; // data-loading.cpp
 
-                // Not Researched (placeholder yet)
-                struct LevelMgr 0x481f20 {
+                struct LevelSpec {
 
-                    struct Configuration 0x10 {
-                        uint32_t m_field0;
-                        uint32_t m_field4;
-                        uint32_t m_field8;
-                        uint32_t m_fieldc;
+                    enum Layer : uint8_t {
+                        Base = 0x1,
+                        Phys = 0x2,
+                        Ingame = 0x4
                     };
 
-                    corelib.containers.FixedSizeHeap m_heap; // possibly for levels
-                    void* m_field60 @ 0x60;  
-                }; // level-mgr.cpp
-                
-                // Not Researched (placeholder yet)
+                    /*
+                    kMaxPackagesPerLevel = 0x7
+                    kMaxActorsPerLevel = 0x200
+                    kMaxCachePerLevel = 0x80
+                    kMaxSoundBanksPerLevel = 0x100
+                    kMaxPartModulesPerLevel = 0x80
+                    kMaxModulesPerLevel = 0x200
+                    kMaxVoxCharactersPerLevel = 0x40
+                    kMaxLutTablesPerLevel = 0x180                    
+                    */
+                }; // level-def.h
+
+                struct ParseInfo {}; // level-def.h
+
+                struct LevelDef 0xe0 {
+
+                    enum State : uint32_t {
+                        Idle = 0x0,
+                        Queued = 0x1,
+                        ResolveDone = 0x2,
+                        SizeKnown = 0x3,
+                        Reading = 0x4,
+                        ParsePending = 0x5,
+                        Ready = 0x6,
+                        Failed = 0x7
+                    };
+
+                    enum Flags : uint8_t {
+                        None = 0x0,
+                        DisablePartPackages = 0x1
+                    };
+
+                    struct ActorDefs 0x10 {
+                        char* m_pName [[utf8*]];
+                        StringId64 m_id;
+                    };
+                    
+                    struct PackageDef 0x18 {
+                        char* m_pName [[utf8*]];
+                        StringId64 m_id;
+                        LevelSpec.Layer m_layer;
+                        bool m_optional;
+                    };
+
+                    struct ParticleModuleDef 0x10 {
+                        StringId64 m_id;
+                        bool m_ignore;
+                    };
+
+                    struct SoundBankDef 0x10 {
+                        char* m_pName [[utf8*]];
+                        uint8_t m_type;
+                    };
+
+                    struct AsyncTxtLoad 0x58 {
+                        corelib.memory.Allocator* m_allocator;
+                        ndlib.io.FileSystem.ReadOnlyFileHandle m_handle;
+                        ndlib.io.FileSystem.ReadOperation m_readOp;
+                        uint64_t m_fileSize;
+                        uint64_t m_bytesRead;
+                        char* m_buffer;
+                    };
+
+                    uint64_t m_field8;
+                    char* m_name [[utf8*]];
+                    StringId64 m_id;
+                    // StaticArray<struct LevelDef::PackageDef>
+                    corelib.containers.StaticArray<PackageDef> m_packageDefs;
+                    // StaticArray<struct LevelDef::ActorDefs>
+                    corelib.containers.StaticArray<ActorDefs> m_actorDefs;
+                    // StaticArray<class StringId64>
+                    corelib.containers.StaticArray<StringId64> m_caches;
+                    // StaticArray<class StringId64>
+                    corelib.containers.StaticArray<StringId64> m_moduleIds;
+                    // StaticArray<class StringId64>
+                    corelib.containers.StaticArray<StringId64> m_renderSettingsForLutTablesIds;
+                    // StaticArray<struct LevelDef::ParticleModuleDef>
+                    corelib.containers.StaticArray<ParticleModuleDef> m_particleModuleDef;
+                    // StaticArray<struct LevelDef::SoundBankDef>
+                    corelib.containers.StaticArray<SoundBankDef> m_soundBankDefs;
+                    // StaticArray<struct LevelDef::SoundBankDef>
+                    corelib.containers.StaticArray<SoundBankDef> m_voxCharactersSoundBankDefs;
+                    char* m_associatedPartModuleName @ 0xa8 [[utf8*]];
+                    AsyncTxtLoad* m_AsyncTxtLoad;
+                    State m_state;
+                    Flags m_bits;
+                    vec4 m_boundsMin @ 0xc0;
+                    vec4 m_boundsMax;
+                }; // level-def.cpp
+
+                struct LevelDefLoader 0x1690 {
+                    
+                    enum State : uint32_t {
+                        Idle = 0x0,
+                        Loading = 0x1,
+                        Completed = 0x2
+                    };
+
+                    struct BatchRequest 0x600 {
+                        uint32_t m_pendingResolveIds[0x10];
+                        ndlib.io.FileSystem.BatchResolveItem m_resolveItems[0x10];
+                        ndlib.io.FileSystem.BatchReadItem m_readItems[0x10];
+                        uint32_t m_releaseIds[0x10];
+                        void* m_fileBuffers[0x10];
+                        uint64_t m_fileSizes[0x10];
+                        void* m_readOps[0x10];
+                        LevelDef* m_levelDefs[0x10];
+                    };
+
+                    BatchRequest m_batchRequest @ 0x1000;
+                    uint32_t m_batchKey;
+                    uint32_t m_batchCount;
+                    State m_state;
+                    corelib.system.platform.ndsys.Thread m_thread @ 0x1610;
+                    corelib.system.platform.ndsys.Mutex m_mutex;
+                    corelib.memory.PoolAllocator* m_allocator;
+                    bool m_stopRequested;
+                    corelib.system.platform.ndsys.ConditionVariable m_batchReadyCv @ 0x1670;
+
+                };
+
+                struct LevelDefCollection 0x75b0 {
+                    bool m_UseLevelDefAsyncLoad;
+                    LevelDef* m_pendingQueue[0xbb8] @ 0x8;
+                    uint32_t m_pendingCount;
+                    void* m_allocatorBacking @ 0x5dd0;
+                    // RobinHoodHashTable<class StringId64,class LevelDef const *,struct StringIdHasher,struct equality<class StringId64,class StringId64>>
+                    corelib.containers.RobinHoodHashTable<StringId64, LevelDef> m_table;
+                    corelib.memory.PoolAllocator m_allocator @ 0x5e10;
+                    bool m_DisablePoolAlloc;
+                    LevelDefLoader m_DefLoader @ 0x5f00;
+                    uint64_t m_field7590;
+                    uint64_t m_field75a0 @ 0x75a0;
+                };
+
+                struct WantLoadInfo 0x28 {
+                    enum Flags : uint8_t {
+                        Portal = 0x1,
+                        Spawn = 0x2,
+                        FGVisible = 0x8,
+                        Propagate = 0x10,
+                        Locked = 0x20,
+                        Display = 0x40
+                    };
+
+                    enum Type : uint8_t {
+                        None = 0x0,
+                        Level = 0x1,
+                        Actor = 0x2,
+                        TaskGraph = 0x4
+                    };
+
+                    char* m_name [[utf8*]];
+                    StringId64 m_nameId;
+                    LevelDef* m_pLevelDef;
+                    // typedef void (* LevelMgr::LevelLoadedCallback)(struct Level* pLevel);
+                    void* m_onLoadedCallback;
+                    Type m_type;
+                    Flags m_flags + 0x1;
+                    LevelSpec.Layer m_layerMask + 0x1;
+                }; // want-load.cpp
+
+                struct LoadRegistry 0x320 {
+
+                    // typedef void (* `LoadRegistry::ReloadCallback`)(StringId64 nameId, enum AssetType pAssetType, void* userData, bool finished);
+
+                    struct WantLoads 0xa8 {
+
+                        struct Node : corelib.containers.FixedSizeHashTable.ListHead 0x38 {
+                            StringId64 m_KeyNameId;
+                            uint64_t m_RefCount;
+                            WantLoadInfo m_Info;
+                        };
+
+                        // ListArray<class WantLoadInfo *>
+                        corelib.containers.ListArray<WantLoadInfo> m_list;
+                        // FixedSizeHashTable<class LoadRegistry::WantLoads::Node>
+                        corelib.containers.FixedSizeHashTable<Node> m_table;
+                    };
+
+                    struct ReloadNode : corelib.containers.FixedSizeHashTable.ListHead 0x20 {
+                        StringId64 m_NameId;
+                        // LoadRegistry::ReloadCallback
+                        void* m_Callback;
+                        void* m_UserData;
+                        ndlib.io.AssetType m_AssetType;
+                        bool m_Dispatched;
+                    };
+
+                    WantLoads m_WantLoads;
+                    WantLoads m_WantLoadsLocked;
+                    corelib.system.platform.ndsys.WaitLock m_WantLoadsLock;
+                    ndlib.script.PointerBase m_levelsets;
+                    bool m_ChangedThisFrame;
+                    // FixedSizeHashTable<class LoadRegistry::ReloadNode>
+                    corelib.containers.FixedSizeHashTable<ReloadNode> m_ReloadMap @ 0x1a0;
+                    // FixedSizeHashTable<1500,class StringId64,class StringId64,0,struct HashTableTraits<class StringId64,class StringId64>>
+                    corelib.containers.FixedSizeHashTable_StringId64_StringId64 m_DisplayMap;
+                    uint64_t m_tickAccumulator;
+                    corelib.system.platform.ndsys.WaitLock m_ReloadLock @ 0x2e0;
+                    bool m_DebugLevelSets_MsgCon;
+                    bool m_DebugLevelSets_ShowNested;
+                    bool m_DebugLevelSets_ShowLevelSetInfo;
+                    bool m_DebugLevelSets_ShowBlockmesh;
+                    bool m_UseColorForArtStatus;
+                    bool m_FreezeLevelSet;
+                    bool m_ShowHelp;
+                    bool m_ShowWantLoads;
+                    bool m_ShowLockedWantLoads;
+                    bool m_ShowMissingWantLoads;
+                    bool m_IncludeBackgrounds;
+                    bool m_IncludeActors;
+                    bool m_IncludeFlags;
+                    bool m_IncludeLayers;
+                    bool m_field30e;
+                    bool m_DumpWantLoadChanges;
+                    bool m_ShowLoadETA;
+                    bool m_DisplayListDirty;
+                    bool m_DisableGeometryLayerLoading @ 0x313;
+                }; // load-registry.cpp
+
                 struct Level 0xac0 {
-                    char* m_PackageName @ 0x48 [[utf8*]];
-                    StringId64 m_PackageId;
-                    void* m_pFgGeometry @ 0xf8;
+
+                    enum TypeFlags : uint16_t {
+                        None = 0x0,
+                        StreamingWorld = 0x2, // world/foreground streaming logic
+                        BackgroundLevel = 0x4,
+                        DisplayLevel = 0x8,
+                        SubtypeMask = 0xc
+
+                        /*
+                        inline bool IsStreamingWorld(uint16_t flags)     { return (flags & 0x0002) != 0; }
+                        inline bool IsDisplayLevel(uint16_t flags)       { return (flags & 0x000C) == 0x0008; }
+                        inline bool IsBackgroundLevel(uint16_t flags)    { return (flags & 0x000C) == 0x0004; }
+                        */
+
+                    };
+
+                    enum LevelDisplayControl : uint16_t {
+                        DisplayRequested = 0x1,
+                        BlockDisplay = 0x4,
+                        IsWantPreload = 0x40
+                    };
+
+                    enum StateFlagBits : uint8_t {
+                        SpawnerWorkQueued = 0x2,
+                        UnloadRequested = 0x4,
+                        LoginInProgress = 0x8,
+                        DependentsActive = 0x10,
+                        PackagesPinned = 0x20,
+                        PreloadLock = 0x40
+                    };
+
+                    enum RuntimeBits : uint8_t {
+                        TreatAsLoaded = 0x1,
+                        DisplayControlDirty = 0x2,
+                        BackgroundStreamActive = 0x20,
+                        BackgroundLoginQueued = 0x40
+                    };
+
+                    enum Status : uint64_t {
+                        Empty = 0x0,
+                        Initialized = 0x1,
+                        Loading = 0x2,
+                        WaitingForLevelSoundBanks = 0x3,
+                        WaitingForLevelSoundBanksVoxUnload = 0x4,
+                        DoingLogin = 0x5,
+                        LoadSoundBanks = 0x6,
+                        WaitForSoundBanks = 0x7,
+                        WaitForActors = 0x8,
+                        UnknownStatus = 0x9,
+                        PreLoaded = 0xa,
+                        Loaded = 0xb,
+                        LoadedDisplay = 0xc,
+                        Unloading = 0xd,
+                        UnloadingWaiting = 0xe,
+                        UnloadingLogOut = 0xf,
+                        UnloadingWaitForProcessToDie = 0x10,
+                        UnloadingReleasePackages = 0x11,
+                        Zombie = 0x12,
+                        StalledByReplay = 0x13,
+                        InterruptedLoading = 0x14,
+                        Error = 0x15,
+                        Invalid = 0x16
+                    };
+
+                    struct Info 0x8 {
+                        enum Flags : uint32_t {
+                            BgDrivenByFgLogin = 0x1,
+                            BackgroundConfig02 = 0x4,
+                            BackgroundConfig05 = 0x20,
+                            BackgroundConfig06 = 0x40,
+                            BackgroundConfig07 = 0x80,
+                            BlockDisplay = 0x200,
+                            BackgroundConfig0A = 0x400
+                        };
+
+                        Flags m_value;
+                    };
+
+                    struct DependentProcessNode 0x20 {
+                        void* m_ProcessRef; // Reference to the process
+                        uint32_t m_ProcessId;
+                        DependentProcessNode* m_pNext @ 0x10;
+                        DependentProcessNode* m_ppPrev;
+                    };
+
+                    struct SoundBankTable 0x10 {
+                        uint64_t m_numSoundBanks;
+                        char* m_soundBanks [[utf8**]];
+                    };
+
+                    TypeFlags m_typeFlags;
+                    LevelDisplayControl m_displayControlFlags;
+                    LevelSpec.Layer m_activeContentFlags;
+                    LevelSpec.Layer m_desiredContentFlags;
+                    StateFlagBits m_stateFlag;
+                    RuntimeBits m_runtimeFlags;
+                    uint32_t m_featureDbIndex;
+                    uint32_t m_navMeshLoginIndex;
+                    uint32_t m_voxelizationIndex @ 0x14;
+                    uint32_t m_coverActionPackIndex;
+                    uint32_t m_featurePerchIndex;
+                    vec4 m_backgroundLoginOffset @ 0x30;
+                    Status m_state;
+                    char* m_LevelName [[utf8*]];
+                    StringId64 m_LevelId;
+                    // ListArray<class StringId64>
+                    corelib.containers.ListArray<StringId64> m_PackageNameIds;
+                    uint64_t m_packagesFinalizedCount;
+                    void* m_pSoundBankInfo;
+                    void* m_pLevelSoundBankInfo;
+                    void* m_pVoxSoundBankInfo;
+                    LevelDef* m_pLevelDef;
+                    uint64_t m_dependentsLock;
+                    DependentProcessNode* m_dependentProcHead @ 0xb0;
+                    uint32_t m_reloadTicket;
+                    uint64_t m_loginStartTicks @ 0xc0;
+                    uint64_t m_fieldc8;
+                    uint64_t m_loginStartFrame;
+                    uint64_t m_lastBgDrivenUpdateTicks;
+                    uint64_t m_audioWaitFrame;
+                    void* m_pMaterial;
+                    void* m_pTextureVram;
+                    void* m_pFgGeometry;
                     void* m_pEntitySpawners;
-                    void* m_field108;
+                    void* m_pRegionTable;
                     void* m_field110;
-                    void* m_ppLightTables;
+                    ndlib.lights.LightTable* m_pLightTable;
                     void* m_field120;
                     void* m_field128;
                     void* m_pBackground;
+                    void* m_pNavMeshTable;
+                    void* m_pVoxelizationArray;
+                    uint8_t m_lightTableSlotCount;
+                    uint8_t m_featureDbCount;
+                    void* m_featureDbSlots[0x8] @ 0x150;
+                    void* m_featureDbRuntimes[0x10];
+                    uint32_t m_coverActionPackCapacity;
+                    uint32_t m_perchActionPackCapacity;
+                    void* m_pCoverActionPackPool;
+                    void* m_pPerchActionPackPool;
+                    void* m_VisSphere;
+                    uint32_t m_VisJointIndex;
+                    uint32_t m_CubemapJointIndex;
+                    StringId64 m_ParentingJoint;
+                    SoundBankTable* m_soundBankTable;
+                    // typedef void (* LevelMgr::LevelLoadedCallback)(struct Level* pLevel);
+                    void* m_onLoadedCallBack;
+                    void* m_Populator;
+                    float m_loginAccumTime;
+                    uint32_t m_pLoadDistance;
+                    Info m_levelInfo;
+                    uint64_t m_unloadReadyFrame;
+                    uint32_t m_stateTicks;
+                    bool m_navMeshReady;
+                    bool m_backgroundLogoutPending;
+                    bool m_navMeshesRegistered;
+                    uint32_t m_voxCharacterCount @ 0x278;
+                    bool m_resetPending;
+                    uint64_t m_loginTableFlags[0x100] @ 0x280;
+                    StringId64 m_PackageNameIdsBuffer[0x7];
+                    void* m_pCollisionDebugInfo;
                 }; // level.cpp
+
+                struct LevelLoadObserver 0x18 {
+                    // void (* m_vtable)(struct LevelLoadObserver*, struct Level*);
+                    void* m_vtable;
+                    LevelLoadObserver* m_next;
+                    LevelLoadObserver* m_prev;
+                };
+
+
+                struct BlockmeshMgr 0x240 {
+                    struct LoadObserver : LevelLoadObserver 0x20 {
+                        BlockmeshMgr* m_pBlockmeshMgr;
+                    };
+                };  // blockmesh-mgr.cpp
+
+                struct LevelMgr 0x7A120 {
+
+                    // typedef void (* LevelMgr::LevelLoadedCallback)(struct Level* pLevel);
+
+                    struct Configuration 0x10 {
+                        uint32_t m_wantLoadReserve; // active want-load slots
+                        uint32_t m_wantLoadLockedReserve; // locked want-load slots
+                        uint32_t m_levelRequestReserve;  // Request array capacity
+                        uint32_t m_maxDependentNodeCount; // Level::AllocDependentNodes() budget
+                    };
+
+                    struct LevelLookupNode : corelib.containers.FixedSizeHashTable.ListHead 0x10 {
+                        StringId64 m_Key;
+                        Level* m_Level;
+                    };
+
+                    struct Request 0x18 {
+
+                        enum LoadingType : uint32_t {
+                            Unload = 0x0,
+                            Load = 0x1,
+                            ChangeFlags = 0x2,
+                            Update = 0x3
+                        };
+
+                        Level* m_level;
+                        WantLoadInfo* m_WantLoadInfo;
+                        LoadingType m_loadingType;
+                        bool m_processed;
+                    };
+
+                    struct SoundBankInfos 0x410 {
+                        void** m_items;
+                        uint32_t m_count;
+                        uint32_t m_capacity;
+                        void* m_inline[0x80];
+                    };
+
+                    struct MiniSoundBankInfos 0x50 {
+                        void** m_items;
+                        uint32_t m_count;
+                        uint32_t m_capacity;
+                        void* m_inline[0x8];
+                    };
+
+                    corelib.containers.FixedSizeHeap m_levelPool;
+                    // ListArray<class Request *>
+                    corelib.containers.ListArray<Request> m_requests;
+                    // ListArray<class WantLoadInfo *>
+                    corelib.containers.ListArray<WantLoadInfo> m_wantLoadsTmp;
+                    // FixedSizeHashTable<class LevelMgr::LevelLookupNode>
+                    corelib.containers.FixedSizeHashTable<LevelLookupNode> m_activeLevelMap;
+                    // FixedSizeHashTable<class LevelMgr::LevelLookupNode>
+                    corelib.containers.FixedSizeHashTable<LevelLookupNode> m_pendingLevelMap;
+                    // ListArray<class Level *>
+                    corelib.containers.ListArray<Level> m_loadedLevels;
+                    // ListArray<class Level *>
+                    corelib.containers.ListArray<Level> m_pendingLevels;
+                    // ListArray<class Level *>
+                    corelib.containers.ListArray<Level> m_displayReadyLevels;
+                    // ListArray<class Level *>
+                    corelib.containers.ListArray<Level> m_entitySpawnerLevels;
+                    uint32_t m_loadedLevelCursor;
+                    corelib.system.platform.ndsys.WaitLock m_updateLock @ 0x1f0;
+                    corelib.system.platform.ndsys.WaitLock m_activeMapLock;
+                    uint32_t m_maxLevelSlots;
+                    StringId64* m_levelSelectionStorage;
+                    StringId64* m_levelSelectionStorage2;
+                    Level* m_pendingReloadLevel; // Not usage, possibly deprecated and replace by LoadRegistry::ReloadAsset
+                    bool m_reloadSkippedThisFrame;
+                    ndlib.text.StringIdSelection m_field260 @ 0x260; // Not usage, possible for Select Level dmenu functions (it is pobbile restore)
+                    ndlib.text.StringIdSelection m_field2a0; // Not usage
+                    uint32_t m_spawnedLevelsThisFrame;
+                    uint32_t m_maxSpawnedLevelsPerFrame;
+                    uint32_t m_prevFrameSpawnedCount;
+                    SoundBankInfos m_soundBankSlots[0x1000] @ 0x2f0;
+                    // BitArray<4096>
+                    corelib.containers.BitArray<4096> m_aSoundBankInfoBits;
+                    MiniSoundBankInfos m_miniSoundBankSlots[0x800];
+                    // BitArray<2048>
+                    corelib.containers.BitArray<2048> m_aMiniSoundBankInfoBits;
+                    ndlib.render.Background m_backgrounds[0xa0];
+                    // BitArray<160>
+                    corelib.containers.BitArray<160> m_backgroundInUseBits;
+                    ndlib.render.interface.BgGeometry m_bgGeometries[0xa0];
+                    float m_criticalLoadBudgetSec;
+                    uint64_t m_nextPumpGateTicks;
+                    void* m_field481318;
+                    uint64_t m_lastTodoListTicks;
+                    BlockmeshMgr m_BlockmeshMgr;
+                    LevelLoadObserver m_levelLoadObserver;
+                    void* m_commandHistory;
+                    vec4 m_blockmeshViewRow0 @ 0x481590;
+                    vec4 m_blockmeshViewRow1;
+                    uint32_t m_blockmeshRefreshCountdown;
+                    corelib.system.platform.ndsys.WaitLock m_criticalLoadLock @ 0x4815c0;
+                    // ListArray<class StringId64>
+                    corelib.containers.ListArray<StringId64> m_criticalLoadIds;
+                    uint64_t m_pendingPackageMask[0x100];
+                    bool m_pumpRespectFrameBudget;
+                    bool m_pumpEnableBgDriven;
+                    bool m_pumpUseDynamicBudget;
+                    bool m_field481df3;
+                    bool m_levelSelectionDirty;
+                    bool m_showVerboseLevelLogin @ 0x481f03;
+                    bool m_debugAutoSpawn;
+                    bool m_showSuperVerboseLevelLogin;
+                    bool m_forceLoadArtLevels @ 0x481f09;
+                    bool m_showLoadingRequests;
+                    uint32_t m_pumpMaxWorkCount @ 0x481f10;
+                }; // level-mgr.cpp
+
+
 
                 struct GameLoading {
 

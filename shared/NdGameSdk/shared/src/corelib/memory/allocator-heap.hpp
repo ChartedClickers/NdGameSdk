@@ -35,6 +35,6 @@ namespace NdGameSdk::corelib::memory {
 		friend class Memory;
 	};
 
-	static_assert(sizeof(HeapAllocatorWithOverflow) == 0x100, "HeapAllocatorWithOverflow size mismatch!");
-	static_assert(sizeof(HeapAllocator) == 0x120, "HeapAllocator size mismatch!");
+	static_assert(sizeof(HeapAllocatorWithOverflow) - sizeof(Memory::Allocator) == 0xA0, "HeapAllocatorWithOverflow size mismatch!");
+	static_assert(sizeof(HeapAllocator) - sizeof(HeapAllocatorWithOverflow) == 0x20, "HeapAllocator size mismatch!");
 }

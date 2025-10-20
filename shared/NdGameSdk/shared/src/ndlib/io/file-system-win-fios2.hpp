@@ -7,6 +7,7 @@
 #include <NdGameSdk/shared/src/corelib/memory/allocator-heap.hpp>
 #include <NdGameSdk/shared/src/corelib/containers/fixed-size-hashtable.hpp>
 #include <NdGameSdk/shared/src/ndlib/debug/nd-dmenu.hpp>
+#include <NdGameSdk/shared/src/ndlib/engine-components.hpp>
 
 #if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/ndlib/io/FileSystem.hpp>
@@ -15,8 +16,6 @@
 #endif
 
 #include "file-system-fios2.hpp"
-
-namespace NdGameSdk::ndlib { class EngineComponents; }
 
 using namespace NdGameSdk::corelib::memory;
 using namespace NdGameSdk::corelib::containers;

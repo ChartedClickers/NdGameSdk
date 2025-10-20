@@ -1,6 +1,12 @@
 #include "engine-components.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
+#include "nd-game-info.hpp"
+#include "nd-frame-state.hpp"
+#include "io/file-system-win-fios2.hpp"
+#include "io/package-mgr.hpp"
+#include "io/prefetch.hpp"
+
 #include <Utility/helper.hpp>
 
 namespace NdGameSdk::ndlib {

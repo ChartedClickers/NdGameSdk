@@ -1,6 +1,8 @@
 #pragma once
 #include <NdGameSdk/sdkregenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
+#include "..\..\corelib\containers\FixedSizeHashTable.hpp"
+#include "..\..\corelib\containers\FixedSizeHeap.hpp"
 namespace regenny::shared::gamelib::level {
 #pragma pack(push, 1)
 struct GameLoading {
@@ -28,24 +30,51 @@ struct GameLoading {
         kModeMP = 2,
     };
 
-    struct ChunkSetNode {
-        regenny::shared::gamelib::level::GameLoading::ChunkSetNode* m_next; // 0x0
-        regenny::shared::gamelib::level::GameLoading::ChunkSetNode* m_prev; // 0x8
+    struct ChunkSetNode : public regenny::shared::corelib::containers::FixedSizeHashTable::ListHead {
         // Metadata: utf8*
         char* m_name; // 0x10
         uint64_t m_chunkMaskLo; // 0x18
         uint64_t m_chunkMaskHi; // 0x20
-        private: char pad_28[0x8]; public:
-    }; // Size: 0x30
+    }; // Size: 0x28
 
-    struct ChunkIdNode {
-        regenny::shared::gamelib::level::GameLoading::ChunkIdNode* m_next; // 0x0
-        regenny::shared::gamelib::level::GameLoading::ChunkIdNode* m_prev; // 0x8
+    struct ChunkIdNode : public regenny::shared::corelib::containers::FixedSizeHashTable::ListHead {
         uint32_t m_id; // 0x10
         private: char pad_14[0x4]; public:
         // Metadata: utf8*
         char* m_name; // 0x18
     }; // Size: 0x20
+
+    struct FixedSizeHashTable_corelib_containers_ChunkSetNode {
+        regenny::shared::gamelib::level::GameLoading::ChunkSetNode** m_Buckets; // 0x0
+        regenny::shared::corelib::containers::FixedSizeHeap m_Pool; // 0x8
+        regenny::shared::gamelib::level::GameLoading::ChunkSetNode* m_Head; // 0x60
+        uint64_t m_NodeSize; // 0x68
+        uint64_t m_RequestedBuckets; // 0x70
+        regenny::shared::gamelib::level::GameLoading::ChunkSetNode** m_Begin; // 0x78
+        regenny::shared::gamelib::level::GameLoading::ChunkSetNode** m_End; // 0x80
+        uint64_t m_Count; // 0x88
+        uint32_t m_BucketCountAligned; // 0x90
+        regenny::shared::corelib::containers::FixedSizeHashTable::Flags m_PeakAndFlags; // 0x94
+    }; // Size: 0x98
+
+    struct ChunkSetHashTable : public FixedSizeHashTable_corelib_containers_ChunkSetNode {
+    }; // Size: 0x98
+
+    struct FixedSizeHashTable_corelib_containers_ChunkIdNode {
+        regenny::shared::gamelib::level::GameLoading::ChunkIdNode** m_Buckets; // 0x0
+        regenny::shared::corelib::containers::FixedSizeHeap m_Pool; // 0x8
+        regenny::shared::gamelib::level::GameLoading::ChunkIdNode* m_Head; // 0x60
+        uint64_t m_NodeSize; // 0x68
+        uint64_t m_RequestedBuckets; // 0x70
+        regenny::shared::gamelib::level::GameLoading::ChunkIdNode** m_Begin; // 0x78
+        regenny::shared::gamelib::level::GameLoading::ChunkIdNode** m_End; // 0x80
+        uint64_t m_Count; // 0x88
+        uint32_t m_BucketCountAligned; // 0x90
+        regenny::shared::corelib::containers::FixedSizeHashTable::Flags m_PeakAndFlags; // 0x94
+    }; // Size: 0x98
+
+    struct ChunkIdHashTable : public FixedSizeHashTable_corelib_containers_ChunkIdNode {
+    }; // Size: 0x98
 
 }; // Size: 0x0
 #pragma pack(pop)

@@ -2214,6 +2214,31 @@ namespace regenny {
                     void* m_grpDefault;
                 };
 
+                struct LoadingHeap 0x1b0 {
+                    bool m_drawEnabled;
+                    bool m_failAlloc;
+                    corelib.containers.FixedSizeHeap m_mainHeap @ 0x8;
+                    corelib.containers.FixedSizeHeap m_overflowHeap;
+                    corelib.containers.FixedSizeHeap m_debugHeap;
+                    bool m_initialized;
+                    bool m_overflowActive;
+                    uint32_t m_peakMainPages @ 0x114;
+                    uint32_t m_peakCombinedUsage;
+                    uint32_t m_peakDebugPages;
+                    uint32_t m_peakOverflowUsage;
+                    uint32_t m_mainPageCount;
+                    uint32_t m_hiddenPageCount;
+                    uint32_t m_overflowPageCount;
+                    uint32_t m_debugPageCount;
+                    void* m_mainPhysical @ 0x138;
+                    void* m_overflowPhysical;
+                    void* m_debugPhysical;
+                    uint8_t* m_linearizedLoadingHeapBase;
+                    uint8_t* m_linearizedOverflowHeapBase;
+                    uint8_t* m_linearizedDebugHeapBase;
+                    corelib.system.platform.ndsys.Mutex m_mutex @ 0x170;
+                }; // loadingheap.cpp
+
                 struct LoadingHeapMgr {
                     enum LevelHeapType : uint32_t {
                         main = 0x0,
@@ -2596,6 +2621,30 @@ namespace regenny {
                 }; // prefetch.cpp
             }
 
+            // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\memory
+            namespace memory {
+                
+                struct LevelMemAllocator : corelib.memory.Allocator 0x450 {
+                   
+                    struct CacheBlock 0x28 {
+                        void* m_pBuffer;
+                        void* m_pCursor;
+                        uint64_t m_bufferSize;
+                        uint64_t m_bytesRequested;
+                        uint64_t m_bytesAccounted;
+                    };
+
+                    CacheBlock m_cacheBlock[0x18]; // ndjob::kMaxWorkerThreads
+                    uint32_t m_blockSize;
+                    bool m_blockAllocatorActive;
+                    bool m_useCacheBlocks @ 0x428;
+                    io.PackageMgr* m_packageMgr @ 0x430;
+                    io.LoadingHeap* m_LoadingHeap;
+                    io.Package* m_package;
+                }; // allocator-levelmem.cpp
+
+            }
+
         }
 
         // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\gamelib
@@ -2694,21 +2743,23 @@ namespace regenny {
 
                     // Intrusive nodes allocated by LoadChunksTxt()
                     // name -> bitset of chunk IDs
-                    struct ChunkSetNode 0x30 {
-                        ChunkSetNode* m_next;
-                        ChunkSetNode* m_prev;
+                    struct ChunkSetNode : corelib.containers.FixedSizeHashTable.ListHead 0x18 {
                         char* m_name [[utf8*]]; 
                         uint64_t m_chunkMaskLo;
                         uint64_t m_chunkMaskHi;
                     };
 
                     // id -> name
-                    struct ChunkIdNode 0x20 {
-                        ChunkIdNode* m_next;
-                        ChunkIdNode* m_prev;
+                    struct ChunkIdNode : corelib.containers.FixedSizeHashTable.ListHead 0x10 {
                         uint32_t m_id;
                         char* m_name @ 0x18 [[utf8*]];
                     };
+
+                    // FixedSizeHashTable<class GameLoading::ChunkSetNode>
+                    struct ChunkSetHashTable : corelib.containers.FixedSizeHashTable<ChunkSetNode> {};
+
+                    // FixedSizeHashTable<class GameLoading::ChunkIdNode>
+                    struct ChunkIdHashTable : corelib.containers.FixedSizeHashTable<ChunkIdNode> {};
 
                     // Global/Statics:
                     // - Initial archive pipeline: bin, shaders, common, mp-common, sp-common, first world, dicts.

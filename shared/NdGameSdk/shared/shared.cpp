@@ -7,6 +7,7 @@
 #include "src/ndlib/frame-params.hpp"
 #include "src/ndlib/render/ndgi/win/ndgi-win-device.hpp"
 #include "src/ndlib/io/file-system-win-fios2.hpp"
+#include "src/ndlib/io/loadingheap-mgr.hpp"
 #include "src/ndlib/io/package-mgr.hpp"
 #include "src/ndlib/script/script-manager.hpp"
 #include "src/ndlib/render/dev/debugdraw-common.hpp"
@@ -32,6 +33,7 @@ namespace NdGameSdk {
 		SharedComponents->AddComponent<ndlib::render::dev::DebugDrawCommon>();
 		SharedComponents->AddComponent<ndlib::script::ScriptManager>();
 		SharedComponents->AddComponent<ndlib::settings::SettingsControl>();
+		SharedComponents->AddComponent<ndlib::io::LoadingHeapMgr>();
 
 #if defined(T1X)
 		auto ParticleMgr = SharedComponents->AddComponent<gamelib::render::particle::ParticleManager>();

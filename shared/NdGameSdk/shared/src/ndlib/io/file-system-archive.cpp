@@ -1,5 +1,6 @@
 #include "file-system-archive.hpp"
 #include "file-system-fios2.hpp"
+#include "file-system-win-fios2.hpp"
 #include "psarc/psarc_reader.hpp"
 #include "psarc/psarc_dsar.hpp"
 #include "psarc/psarc_parser.hpp"
@@ -11,6 +12,7 @@
 #include <spdlog/spdlog.h>
 
 #include <NdGameSdk/shared/src/ndlib/engine-components.hpp>
+#include <NdGameSdk/shared/src/ndlib/nd-game-info.hpp>
 
 namespace NdGameSdk::ndlib::io {
 #if defined(T2R)

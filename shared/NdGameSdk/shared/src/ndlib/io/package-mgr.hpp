@@ -9,6 +9,7 @@
 #include <NdGameSdk/shared/src/corelib/job/job-system.hpp>
 #include <NdGameSdk/shared/src/ndlib/frame-params.hpp>
 #include <NdGameSdk/shared/src/ndlib/debug/nd-dmenu.hpp>
+#include <NdGameSdk/shared/src/ndlib/engine-components.hpp>
 
 #if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/ndlib/io/PackageMgr.hpp>
@@ -23,8 +24,6 @@
 #include "package.hpp"
 #include "package-util.hpp"
 #include "file-system-win-fios2.hpp"
-
-namespace NdGameSdk::ndlib { class EngineComponents; }
 
 using namespace NdGameSdk::corelib::system::platform;
 using namespace NdGameSdk::corelib::memory;

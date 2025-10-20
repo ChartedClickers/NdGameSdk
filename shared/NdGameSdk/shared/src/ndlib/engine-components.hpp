@@ -15,16 +15,20 @@
 #include <NdGameSdk/regenny/t2r/shared/ndlib/EngineComponents.hpp>
 #endif
 
-#include "nd-game-info.hpp"
-#include "nd-frame-state.hpp"
-#include "io/file-system-win-fios2.hpp"
-#include "io/package-mgr.hpp"
-#include "io/prefetch.hpp"
 #include "nd-config.hpp"
 
 using EngineComponent = ::regenny::shared::ndlib::EngineComponents::Component;
 
 namespace NdGameSdk::ndlib {
+
+	class NdGameInfo;
+	class NdFrameState;
+
+	namespace io {
+		class FileSystemWin;
+		class PackageMgr;
+		class PrefetchMgr;
+	}
 
     class EngineComponents : public ISdkComponent {
 	public:

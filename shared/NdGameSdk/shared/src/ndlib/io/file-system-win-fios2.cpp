@@ -3,6 +3,7 @@
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
 #include <NdGameSdk/shared/src/ndlib/engine-components.hpp>
+#include <NdGameSdk/shared/src/ndlib/nd-game-info.hpp>
 #include <NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp>
 
 #include <Utility/global_resolver.hpp>

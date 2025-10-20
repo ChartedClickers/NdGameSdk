@@ -29,6 +29,6 @@ namespace NdGameSdk::corelib::memory {
 		}
 	};
 
-	static_assert(sizeof(PoolAllocator) == 0xe0, "PoolAllocator size mismatch");
+	static_assert(sizeof(PoolAllocator) - sizeof(Memory::Allocator) == 0x80, "PoolAllocator size mismatch");
 	
 }

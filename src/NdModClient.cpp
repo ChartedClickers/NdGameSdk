@@ -1,6 +1,7 @@
 #include <NdGameSdk/sdk.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
 #include <NdGameSdk/shared/src/ndlib/engine-components.hpp>
+#include <NdGameSdk/shared/src/ndlib/nd-game-info.hpp>
 #include <NdGameSdk/shared/src/common/common-game-init.hpp>
 
 #include "NdModClient.hpp"

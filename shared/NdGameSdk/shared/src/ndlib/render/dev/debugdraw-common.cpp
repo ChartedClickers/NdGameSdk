@@ -3,6 +3,7 @@
 
 #include <NdGameSdk/shared/src/ndlib/profiling/profile-ctrl.hpp>
 #include <NdGameSdk/shared/src/corelib/job/job-system.hpp>
+#include <NdGameSdk/shared/src/ndlib/nd-game-info.hpp>
 
 namespace NdGameSdk::ndlib::render::dev {
 

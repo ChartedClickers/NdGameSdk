@@ -8,6 +8,7 @@
 #include <NdGameSdk/shared/src/ndlib/io/package-mgr.hpp>
 #include <NdGameSdk/shared/src/ndlib/io/file-system-win-fios2.hpp>
 #include <NdGameSdk/shared/src/ndlib/profiling/profile-ctrl.hpp>
+#include <NdGameSdk/shared/src/ndlib/nd-game-info.hpp>
 #include <NdGameSdk/shared/src/gamelib/level/game-loading.hpp>
 
 #include <cstddef> 

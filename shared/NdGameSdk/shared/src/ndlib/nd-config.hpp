@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cstdint>
-#include <Utility/assertion/assert.hpp>
+#include "NdGameSdk/sdk.hpp"
+#include "NdGameSdk/components/SdkComponent.hpp"
 
 #if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/ndlib/NdConfig.hpp>
@@ -9,25 +9,34 @@
 #include <NdGameSdk/regenny/t1x/shared/ndlib/NdConfig.hpp>
 #endif
 
+#include <cstdint>
+#include <Utility/assertion/assert.hpp>
+
 #include "debug/nd-dmenu.hpp"
 
 namespace NdGameSdk::ndlib {
-	class NdConfig {
+
+	class NdGameSdk_API NdConfig : ISdkRegenny<regenny::shared::ndlib::NdConfig> {
 	public:
-		using Config = ::regenny::shared::ndlib::NdConfig::Config;
+		NdConfig() = default;
+		NdConfig(const NdConfig&) = delete;
+		NdConfig& operator=(const NdConfig&) = delete;
+		NdConfig(NdConfig&&) = delete;
+		NdConfig& operator=(NdConfig&&) = delete;
 
-		NdGameSdk_API ndlib::debug::DMENU& GetDmenu();
-		NdGameSdk_API ndlib::debug::DMENU::MenuGroup& GetNdDevMenu();
-
-		template <typename TConfig>
-		NdGameSdk_API TConfig* GetConfig(Config index) {
-			always_assert(g_ndConfig == nullptr, "g_ndConfig was not set!");
-			return (TConfig*)(g_ndConfig[index]);
-		}
-
-	private:
-		friend class EngineComponents;
-		// g_ndConfig+0xConfig*8
-		uintptr_t** g_ndConfig{};
+		ndlib::debug::DMENU& GetDmenu();
+		ndlib::debug::DMENU::MenuGroup& GetNdDevMenu();
 	};
+
+	class NdConfigComponent : public ISdkComponent {
+	public:
+		NdConfigComponent();
+		NdGameSdk_API ndlib::NdConfig& GetNdConfig();
+
+		/*Extern variables*/
+		static NdConfig* g_ndConfig;
+	private:
+		void Initialize() override;
+	};
+
 }

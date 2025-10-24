@@ -68,11 +68,11 @@ namespace NdGameSdk::common {
 
 	void CommonGameLoop::GameDebugUpdate(SafetyHookContext& ctx) {
 
-		static EngineComponents* pEngineComponents = GetSharedComponents()->GetComponent<EngineComponents>();
+		static NdConfigComponent* pNdConfigComponent = GetSharedComponents()->GetComponent<NdConfigComponent>();
 		static NdDevMenu* pNdDevMenu = GetSharedComponents()->GetComponent<NdDevMenu>();
 
 		if (pNdDevMenu) {
-			auto NdConfig = pEngineComponents->m_ndConfig;
+			auto& NdConfig = pNdConfigComponent->GetNdConfig();
 			pNdDevMenu->DMENU_Menu_Update(&NdConfig.GetDmenu());
 		}
 

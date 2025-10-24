@@ -30,6 +30,9 @@ struct EngineComponents {
         ParticleDebug = 29,
     };
 
-}; // Size: 0x0
+    void* m_ptrs[33]; // 0x0
+    uint32_t m_sizes[33]; // 0x108
+    private: char pad_18c[0x4]; public:
+}; // Size: 0x190
 #pragma pack(pop)
 }

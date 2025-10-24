@@ -32,7 +32,15 @@ namespace regenny {
 
             namespace script {
                 struct ScriptModule{};
-             }
+            }
+
+            namespace debug {
+                struct DMENU {
+                    struct Component{};
+                    struct Menu{};
+                    struct MenuGroup{};
+                };
+            }
         }
 
         namespace gamelib {
@@ -484,6 +492,113 @@ namespace regenny {
 
             }
 
+            // c:\branches\discbot??\t1x-pc-?.?.?\shared\src\corelib\containers
+            namespace containers {
+                
+                struct TaggedHeap 0xDB308 {
+                    struct VTable {
+                        virtual uint64_t GetBlockSize() @ 0x30
+                    } 
+                    VTable* vftable;
+                };
+
+                struct FixedSizeHeap 0x58 {
+                    void* m_pData;
+                    void* m_pUsageAlloc;
+                    uint64_t* m_pUsage;
+                    uint64_t m_capacity;
+                    uint64_t m_capacityAligned;
+                    uint32_t m_usageWordCount;
+                    uint64_t m_numElements @ 0x30;
+                    uint64_t m_elementSize;
+                    uint64_t m_activeCount;
+                    uint64_t m_alignment;
+                    uint64_t m_lastIndex;
+                }; // fixedsizeheap.h
+
+                struct FixedSizeHashTable<typename NodeT> {
+
+                    enum Flags : uint32_t {
+                        PeakMask = 0x7fffffff,
+                        Initialized = 0x80000000
+                    };
+
+                    NodeT** m_Buckets;
+                    FixedSizeHeap m_Pool;
+                    NodeT* m_Head;
+                    uint64_t m_NodeSize;
+                    uint64_t m_RequestedBuckets;
+                    NodeT** m_Begin;
+                    NodeT** m_End;
+                    uint64_t m_Count;
+                    uint32_t m_BucketCountAligned;
+                    Flags m_PeakAndFlags;
+                }; // fixed-size-hashtable.h
+
+                // internal stuff for FixedSizeHashTable
+                struct FixedSizeHashTable {
+                      struct ListHead 0x10 {
+                        void* m_next;
+                        void* m_prev;
+                    };
+                };
+
+                // Internal stuff for RobinHoodHashTable
+                struct RobinHoodHashTable {
+                    struct OccMask 0x20 {
+                        uint64_t* m_words;
+                        uint64_t m_capacity;
+                        uint64_t m_capacityAligned64;
+                        uint32_t m_wordCount;
+                    };
+
+                    struct OccScan 0x20 {
+                        OccMask* m_pbs;
+                        uint64_t m_currWord;
+                        uint32_t m_wordCount;
+                        uint32_t m_wordIdx;
+                        uint32_t m_limit;
+                        uint32_t m_index;
+                    };
+
+                };
+
+                // RobinHoodHashTable<class KeyT, class ValueT, struct HashT<class KeyT>, struct equality<class KeyT,class KeyT>>
+                struct RobinHoodHashTable<typename KeyT, typename ValueT> 0x30 {
+
+                    struct Slot 0x18 {
+                        // kEmptyHash = 0xfffffffffffffffe
+                        uint64_t m_hash;
+                        KeyT m_key;
+                        ValueT m_value;
+                    };
+
+                    Slot* m_Slots;
+                    RobinHoodHashTable.OccMask m_occ;
+                    uint32_t m_numBuckets;
+                    uint32_t m_numElements;
+                }; // robinhood-hash-table.inl
+
+                // template<typename T> 
+                struct StaticArray<typename T> 0x10 {
+                    T* m_data;
+                    uint32_t m_size;
+                }; // static-array.h
+
+                // template<typename T>
+                struct ListArray<typename T> 0x10 {
+                    uint32_t m_size;
+                    uint32_t m_capacity;
+                    T* m_data;
+                }; // list-array.h
+
+                // template<size_t NumBits>
+                struct BitArray<size_t NumBits> {
+                    // BitArray must have at least 1 bit
+                    uint64_t m_bits[(NumBits + 63) / 64];
+                };
+            }
+
             // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\corelib\util
             namespace util {
 
@@ -596,6 +711,15 @@ namespace regenny {
                     uint32_t m_winCode; // Win32 code
                     void* m_payload;
                 };
+
+                struct StringCache 0x50 {
+                    void* vftable;
+                    containers.RobinHoodHashTable<StringId64, uint32_t> m_table;
+                    char* m_writePtr;
+                    uint32_t m_offset;
+                    uint32_t m_stringCount;
+                    uint32_t m_cacheSize;
+                }; // string-cache.cpp
                 
                 struct MsgCon 0x40 {
 
@@ -651,113 +775,6 @@ namespace regenny {
                     bool m_EnableMsgConLineWrap;
                     bool m_EnableMsgConAutoResize;
                     bool m_ShowCacheMissesDebugText;
-                };
-            }
-
-            // c:\branches\discbot??\t1x-pc-?.?.?\shared\src\corelib\containers
-            namespace containers {
-                
-                struct TaggedHeap 0xDB308 {
-                    struct VTable {
-                        virtual uint64_t GetBlockSize() @ 0x30
-                    } 
-                    VTable* vftable;
-                };
-
-                struct FixedSizeHeap 0x58 {
-                    void* m_pData;
-                    void* m_pUsageAlloc;
-                    uint64_t* m_pUsage;
-                    uint64_t m_capacity;
-                    uint64_t m_capacityAligned;
-                    uint32_t m_usageWordCount;
-                    uint64_t m_numElements @ 0x30;
-                    uint64_t m_elementSize;
-                    uint64_t m_activeCount;
-                    uint64_t m_alignment;
-                    uint64_t m_lastIndex;
-                }; // fixedsizeheap.h
-
-                struct FixedSizeHashTable<typename NodeT> {
-
-                    enum Flags : uint32_t {
-                        PeakMask = 0x7fffffff,
-                        Initialized = 0x80000000
-                    };
-
-                    NodeT** m_Buckets;
-                    FixedSizeHeap m_Pool;
-                    NodeT* m_Head;
-                    uint64_t m_NodeSize;
-                    uint64_t m_RequestedBuckets;
-                    NodeT** m_Begin;
-                    NodeT** m_End;
-                    uint64_t m_Count;
-                    uint32_t m_BucketCountAligned;
-                    Flags m_PeakAndFlags;
-                }; // fixed-size-hashtable.h
-
-                // internal stuff for FixedSizeHashTable
-                struct FixedSizeHashTable {
-                      struct ListHead 0x10 {
-                        void* m_next;
-                        void* m_prev;
-                    };
-                };
-
-                // Internal stuff for RobinHoodHashTable
-                struct RobinHoodHashTable {
-                    struct OccMask 0x20 {
-                        uint64_t* m_words;
-                        uint64_t m_capacity;
-                        uint64_t m_capacityAligned64;
-                        uint32_t m_wordCount;
-                    };
-
-                    struct OccScan 0x20 {
-                        OccMask* m_pbs;
-                        uint64_t m_currWord;
-                        uint32_t m_wordCount;
-                        uint32_t m_wordIdx;
-                        uint32_t m_limit;
-                        uint32_t m_index;
-                    };
-
-                };
-
-                // RobinHoodHashTable<class KeyT, class ValueT, struct HashT<class KeyT>, struct equality<class KeyT,class KeyT>>
-                struct RobinHoodHashTable<typename KeyT, typename ValueT> 0x30 {
-
-                    struct Slot 0x18 {
-                        // kEmptyHash = 0xfffffffffffffffe
-                        uint64_t m_hash;
-                        KeyT m_key;
-                        ValueT m_value;
-                    };
-
-                    Slot* m_Slots;
-                    RobinHoodHashTable.OccMask m_occ;
-                    uint32_t m_numBuckets;
-                    uint32_t m_numElements;
-                }; // robinhood-hash-table.inl
-
-                // template<typename T> 
-                struct StaticArray<typename T> 0x10 {
-                    T* m_data;
-                    uint32_t m_size;
-                }; // static-array.h
-
-                // template<typename T>
-                struct ListArray<typename T> 0x10 {
-                    uint32_t m_size;
-                    uint32_t m_capacity;
-                    T* m_data;
-                }; // list-array.h
-
-                // template<size_t NumBits>
-                struct BitArray<size_t NumBits> {
-                    // BitArray must have at least 1 bit
-                    uint64_t m_bits[(NumBits + 63) / 64];
                 };
             }
 
@@ -1103,7 +1120,7 @@ namespace regenny {
         // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib
         namespace ndlib {
     
-            struct EngineComponents {
+            struct EngineComponents 0x190 {
                 enum Component : uint32_t {
                     NdGameInfo = 0x0,
                     NdFrameState = 0x1,
@@ -1128,21 +1145,20 @@ namespace regenny {
                     Gui2 = 0x17,
                     TextureMgrPub = 0x18,
                     ParticleDebug = 0x1D
-                }; // engine-components.hpp
-            }
+                };
+
+                void* m_ptrs[0x21];
+                uint32_t m_sizes[0x21];
+            }; // engine-components.hpp
         
-            struct NdConfig {
-                enum Config : uint32_t {
-                    NetInfo = 0x0, // m_pNetInfo
-                    DMENU = 0x1,
-                    NdDevMenu = 0x2,
-                    NameCache = 0x7, // m_pNameCache
-                    BUILD_NUMBER = 0x1e,
-                    GameTitle = 0x20,
-                    Profiling = 0xd1,
-                    IsGameConfigured = 0xd2
-                }; // (nd-config.hpp)
-            }
+            struct NdConfig 0x238 {
+                void* m_pNetInfo;
+                debug.DMENU* m_DMENU;
+                debug.DMENU.MenuGroup* m_DevMenu;
+                uint64_t m_field18;
+                debug.DMENU.MenuGroup* m_FavoriteDevMenu;
+                corelib.util.StringCache* m_pNameCache @ 0x38;
+            }; // nd-config.hpp
         
             struct NdGameInfo 0x45c0 {
                 void* vftable;

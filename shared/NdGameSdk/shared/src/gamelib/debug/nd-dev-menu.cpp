@@ -374,7 +374,7 @@ namespace NdGameSdk::gamelib::debug {
 
 	void NdDevMenu::OnGameInitialized(bool successful) {
 		if (successful) {
-			auto& DMENU = m_EngineComponents->m_ndConfig.GetDmenu();
+			auto& DMENU = m_NdConfigComponent->GetNdConfig().GetDmenu();
 
 			auto DevMenu = DMENU.DevMenu()->RootMenu();
 			AppendSdkSubMenusCallback AppendCallback = boost::bind(&NdDevMenu::AppendSdkSubMenus, this, DevMenu, 
@@ -387,6 +387,7 @@ namespace NdGameSdk::gamelib::debug {
 		auto SharedComponents = ISdkComponent::GetSharedComponents();
 		m_Memory = GetDependencyComponent<Memory>(SharedComponents);
 		m_EngineComponents = GetDependencyComponent<EngineComponents>(SharedComponents);
+		m_NdConfigComponent = GetDependencyComponent<NdConfigComponent>(SharedComponents);
 		m_CommonGame = GetDependencyComponent<CommonGame>(SharedComponents);
 	}
 
@@ -718,7 +719,7 @@ namespace NdGameSdk::gamelib::debug {
 				[](SafetyHookContext& ctx)
 				{
 					auto NdDevMenuComponent = GetSharedComponents()->GetComponent<NdDevMenu>();
-					DMENU::MenuGroup* NdDevMenu = &NdDevMenuComponent->m_EngineComponents->m_ndConfig.GetNdDevMenu();
+					DMENU::MenuGroup* NdDevMenu = &NdDevMenuComponent->m_NdConfigComponent->GetNdConfig().GetNdDevMenu();
 
 					DMENU::MenuGroup* MenuGroup = reinterpret_cast<DMENU::MenuGroup*>(ctx.rdi);
 					DMENU::Menu* Menu = reinterpret_cast<DMENU::Menu*>(ctx.rbx);

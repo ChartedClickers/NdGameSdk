@@ -1,12 +1,48 @@
 #include "nd-config.hpp"
+#include "./NdGameSdk/shared/sharedpatterns.hpp"
+
+#include <Utility/global_resolver.hpp>
 
 namespace NdGameSdk::ndlib {
 
+	NdConfigComponent::NdConfigComponent() : ISdkComponent("NdConfig") {}
+
+	void NdConfigComponent::Initialize() {
+		static std::once_flag Initialized;
+		std::call_once(Initialized, [this] {
+			
+			spdlog::info("Initializing {} component...", GetName());
+
+			Patterns::SdkPattern findpattern{};
+
+			findpattern = Patterns::NdConfig_g_ndConfig;
+			g_ndConfig = Utility::GlobalResolver::RipSlotOrNull<NdConfig>(Utility::memory::get_executable(), findpattern.pattern,
+				wstr(Patterns::EngineComponents_s_ndConfig), findpattern.offset, 3, 7);
+
+			if (!g_ndConfig) {
+				throw SdkComponentEx{ std::format("Failed to find {}:: game variables!", GetName()),
+					SdkComponentEx::ErrorCode::PatternFailed };
+			}
+
+		});
+	}
+
+	NdConfig& NdConfigComponent::GetNdConfig() {
+		always_assert(g_ndConfig == nullptr, "g_ndConfig was not set!");
+		return *g_ndConfig;
+	}
+
 	ndlib::debug::DMENU& NdConfig::GetDmenu() {
-		return *GetConfig<ndlib::debug::DMENU>(Config::DMENU);
+		auto* dmenu = reinterpret_cast<ndlib::debug::DMENU*>(this->Get()->m_DMENU);
+		always_assert(dmenu == nullptr, "NdConfig::m_DMENU was null");
+		return *dmenu;
 	}
 
 	ndlib::debug::DMENU::MenuGroup& NdConfig::GetNdDevMenu() {
-		return *GetConfig<ndlib::debug::DMENU::MenuGroup>(Config::NdDevMenu);
+		auto* devMenu = reinterpret_cast<ndlib::debug::DMENU::MenuGroup*>(this->Get()->m_DevMenu);
+		always_assert(devMenu == nullptr, "NdConfig::m_DevMenu was null");
+		return *devMenu;
 	}
+
+	NdConfig* NdConfigComponent::g_ndConfig = nullptr;
 }

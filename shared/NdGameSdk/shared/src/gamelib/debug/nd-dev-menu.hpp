@@ -9,8 +9,8 @@
 #include <NdGameSdk/shared/src/common/common-game-init.hpp>
 #include <NdGameSdk/shared/src/common/common-game-loop.hpp>
 #include <NdGameSdk/shared/src/ndlib/engine-components.hpp>
+#include <NdGameSdk/shared/src/ndlib/nd-config.hpp>
 #include <NdGameSdk/shared/src/ndlib/debug/nd-dmenu.hpp>
-
 
 #include <map>
 #include <Utility/helper.hpp>
@@ -46,7 +46,7 @@ namespace NdGameSdk::gamelib::debug {
 		SdkEvent<NdDevMenu*, DMENU::MenuGroup*> e_AppendMenuGroup;
 	    SdkEvent<NdDevMenu*, AppendSdkSubMenusCallback> e_AppendSdkMenu{true};
 
-		SDK_DEPENDENCIES(CommonGame, EngineComponents, Memory);
+		SDK_DEPENDENCIES(CommonGame, EngineComponents, NdConfigComponent, Memory);
 
 		NdGameSdk_API bool IsGameDebugMenu();
 
@@ -149,6 +149,7 @@ namespace NdGameSdk::gamelib::debug {
 		std::unordered_map<uintptr_t, DmenuComponentType> m_DmenuComponentTypeMap{};
 
 		EngineComponents* m_EngineComponents;
+		NdConfigComponent* m_NdConfigComponent;
 		Memory* m_Memory;
 		CommonGame* m_CommonGame;
 

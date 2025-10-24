@@ -6,7 +6,7 @@ namespace regenny::shared::corelib::containers {
 struct ListArray {
     uint32_t m_size; // 0x0
     uint32_t m_capacity; // 0x4
-    void* m_data; // 0x8
+    void** m_data; // 0x8
 }; // Size: 0x10
 #pragma pack(pop)
 }

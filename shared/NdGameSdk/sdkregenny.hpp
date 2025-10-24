@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <glm/vec4.hpp>
+#include <glm/vec3.hpp>
 
 using namespace glm;
 

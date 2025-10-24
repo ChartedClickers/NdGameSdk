@@ -4,6 +4,7 @@
 #include "src/corelib/memory/memory.hpp"
 #include "src/corelib/job/job-system.hpp"
 #include "src/ndlib/engine-components.hpp"
+#include "src/ndlib/nd-config.hpp"
 #include "src/ndlib/frame-params.hpp"
 #include "src/ndlib/render/ndgi/win/ndgi-win-device.hpp"
 #include "src/ndlib/io/file-system-win-fios2.hpp"
@@ -27,6 +28,7 @@ namespace NdGameSdk {
 		SharedComponents->AddComponent<corelib::system::NdSystem>();
 		auto MemComponent = SharedComponents->AddComponent<corelib::memory::Memory>();
 		SharedComponents->AddComponent<ndlib::EngineComponents>();
+		SharedComponents->AddComponent<ndlib::NdConfigComponent>();
 		SharedComponents->AddComponent<ndlib::RenderFrameParams>();
 		SharedComponents->AddComponent<ndlib::render::ndgi::win::NDGI>();
 		SharedComponents->AddComponent<corelib::job::NdJob>();

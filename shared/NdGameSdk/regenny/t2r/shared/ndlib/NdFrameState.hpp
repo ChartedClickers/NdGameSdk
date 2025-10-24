@@ -16,6 +16,19 @@ struct NdFrameState {
         End = 8,
     };
 
+    struct TimeSlot {
+        float m_rate; // 0x0
+        float m_invRate; // 0x4
+        float m_accumFraction; // 0x8
+        uint8_t m_flags; // 0xc
+        private: char pad_d[0x3]; public:
+        uint64_t m_tickAccumulator; // 0x10
+        uint64_t m_lastFrameTicks; // 0x18
+        float m_fracCarry; // 0x20
+        float m_lastDelta; // 0x24
+        private: char pad_28[0x50]; public:
+    }; // Size: 0x78
+
     struct NdKeyboardLayer {
         bool m_enabled; // 0x0
         bool m_DebugKeyboard; // 0x1
@@ -50,7 +63,11 @@ struct NdFrameState {
     uint32_t m_speed; // 0x2c
     private: char pad_30[0x10]; public:
     uint64_t m_gameFrameNumber; // 0x40
-    private: char pad_48[0xe578]; public:
+    private: char pad_48[0x8]; public:
+    FrameStage m_FrameStage; // 0x50
+    private: char pad_54[0xc]; public:
+    TimeSlot m_TimeSlots[10]; // 0x60
+    private: char pad_510[0xe0b0]; public:
     bool m_KeyboardDevMode; // 0xe5c0
     private: char pad_e5c1[0x244f]; public:
     NdKeyboardLayer m_IMEKeyboard; // 0x10a10

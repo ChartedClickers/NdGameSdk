@@ -5,7 +5,7 @@ namespace NdGameSdk::Patterns {
 
 #if defined(T2R)
 	static inline const SdkPattern EngineComponents_s_table = { L"48 89 74 24 20 41 54 41 56 41 57 48 83 ec 30 8b f1 45 8b f8 4c 8d 25 ?? ?? ?? ?? 4c 8b f2 48 85 d2 0f 84 ?? ?? ?? ??", +0x14 };
-	static inline const SdkPattern EngineComponents_s_ndConfig = { L"48 8d 0d ?? ?? ?? ?? b8 04 00 00 00 48 8d 89 80 00 00 00 c5 f8 10 03 48 8d 9b 80 00 00 00 c5 f8 11 41 80 c5 f8 10 4b 90 c5 f8 11 49 90 c5 f8 10 43 a0 c5 f8 11 41 a0 c5 f8 10 4b b0 c5 f8 11 49 b0 c5 f8 10 43 c0 c5 f8 11 41 c0 c5 f8 10 4b d0 c5 f8 11 49" };
+	static inline const SdkPattern NdConfig_g_ndConfig = { L"48 8d 0d ?? ?? ?? ?? b8 04 00 00 00 48 8d 89 80 00 00 00 c5 f8 10 03 48 8d 9b 80 00 00 00 c5 f8 11 41 80 c5 f8 10 4b 90 c5 f8 11 49 90 c5 f8 10 43 a0 c5 f8 11 41 a0 c5 f8 10 4b b0 c5 f8 11 49 b0 c5 f8 10 43 c0 c5 f8 11 41 c0 c5 f8 10 4b d0 c5 f8 11 49" };
 
 	static inline const SdkPattern CommonGame_GameInit = { L"40 53 48 83 ec 30 48 8b d9 48 8d 4c 24 20 e8 ?? ?? ?? ?? 8b 10 85 d2 7e 11 c5 f8 10 00 c5 f8 11 03 48 8b c3 48 83 c4 30 5b c3" };
 	static inline const SdkPattern CommonGame_ProfileCtrl_Initialize = { L"e8 ?? ?? ?? ?? 48 8b 0d ?? ?? ?? ?? 48 8b 01 48 8b d3 ff 90 b0 01 00 00 48 89 75 20 c7 44 24 40 01 00 00 00 48 c7 44 24 38 ff ff ff ff c6 44 24 30 03 4c 89 74 24 28 c7 44 24 20 e7 0e 00 00 4c 8d 0d ?? ?? ?? ?? 4c 8d 45", +0x87 };
@@ -246,7 +246,7 @@ namespace NdGameSdk::Patterns {
 
 #elif defined(T1X)
 	static inline const SdkPattern EngineComponents_s_table = { L"48 89 6c 24 18 56 41 56 41 57 48 83 ec 30 8b f1 45 8b", +0x13 };
-	static inline const SdkPattern EngineComponents_s_ndConfig = { L"b8 04 00 00 00 48 8d ?? ?? ?? ?? ?? 8d 50 7c c5 f8 10 03 c5 f8 11 01 c5 f8 10 4b 10 c5 f8 11 49 10 c5 f8 10 43 20 c5 f8 11 41 20 c5 f8 10 4b 30 c5 f8 11 49 30 c5 f8 10 43 40 c5 f8 11 41 40 c5 f8 10 4b 50 c5 f8 11 49 50 c5 f8 10 43 60 c5 f8 11 41 60", +0x5 };
+	static inline const SdkPattern NdConfig_g_ndConfig = { L"b8 04 00 00 00 48 8d ?? ?? ?? ?? ?? 8d 50 7c c5 f8 10 03 c5 f8 11 01 c5 f8 10 4b 10 c5 f8 11 49 10 c5 f8 10 43 20 c5 f8 11 41 20 c5 f8 10 4b 30 c5 f8 11 49 30 c5 f8 10 43 40 c5 f8 11 41 40 c5 f8 10 4b 50 c5 f8 11 49 50 c5 f8 10 43 60 c5 f8 11 41 60", +0x5 };
 
 	static inline const SdkPattern CommonGame_GameInit = { L"40 53 48 83 ec 40 80 3d ?? ?? ?? ?? 00 48 8b d9 74 0c 48 8d 4c 24 20 e8 ?? ?? ?? ?? eb 0a 48 8d 4c 24 30"};
 	static inline const SdkPattern CommonGame_PrimServer_Create = { L"ff 90 b0 01 00 00 48 83 65 08 00 4c 8d 0d ?? ?? ?? ?? 44 89 64 24 40 4c 8d 45 08 48 83 4c 24 38 ff 48 8d 8d c0 00 00 00 c6 44 24 30 03 41" };

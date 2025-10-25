@@ -6,10 +6,10 @@ namespace regenny::shared::ndlib::io {
 struct PackageMgr;
 }
 namespace regenny::shared::ndlib::io {
-struct LoadingHeap;
+struct Package;
 }
 namespace regenny::shared::ndlib::io {
-struct Package;
+struct LoadingHeap;
 }
 namespace regenny::shared::ndlib::memory {
 #pragma pack(push, 1)

@@ -1,11 +1,11 @@
 #pragma once
 #include <NdGameSdk/sdkregenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
-namespace regenny::shared::ndlib {
-struct FrameParams;
-}
 namespace regenny::shared::ndlib::render {
 struct WindowContext;
+}
+namespace regenny::shared::ndlib {
+struct FrameParams;
 }
 namespace regenny::shared::ndlib::render::text {
 struct DebugStringBase;

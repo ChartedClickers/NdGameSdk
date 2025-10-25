@@ -683,6 +683,12 @@ namespace regenny {
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib\util
             namespace util {
 
+                // FixedArray<typename T, uint32_t TCapacity>
+                struct FixedArray<typename T, uint32_t TCapacity> 0x10 {
+                    T m_items[TCapacity];
+                    uint32_t m_count;
+                }; // fixed-array.h
+                
                 struct Err {
 
                     enum ErrDomain : uint16_t {

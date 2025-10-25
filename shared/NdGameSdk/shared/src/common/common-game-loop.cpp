@@ -46,9 +46,10 @@ namespace NdGameSdk::common {
 		using NdKeyboardKey = NdFrameState::NdKeyboardLayer::Key;
 
 #if SDK_DEBUG
-		static CommonGameLoop* pCommonGameLoop = GetSharedComponents()->
-			GetComponent<CommonGame>()->GetSubComponent<CommonGameLoop>();
-		auto NdFrameState = pCommonGameLoop->m_EngineComponents->GetNdFrameState();
+		auto* pCommonGameLoop = Instance<CommonGame, CommonGameLoop>();
+		if (!pCommonGameLoop) { return; }
+
+		auto& NdFrameState = pCommonGameLoop->m_EngineComponents->GetNdFrameState();
 		auto kbd = NdFrameState.GetIMEKeyboard();
 
 		if (kbd->isDebugKeyboard()) {

@@ -1113,7 +1113,7 @@ namespace regenny {
                     /*
                     kMaxWorkerThreads = 0x18;
                     */
-                }
+                };
             }
         }
 
@@ -1149,16 +1149,7 @@ namespace regenny {
 
                 void* m_ptrs[0x21];
                 uint32_t m_sizes[0x21];
-            }; // engine-components.hpp
-        
-            struct NdConfig 0x238 {
-                void* m_pNetInfo;
-                debug.DMENU* m_DMENU;
-                debug.DMENU.MenuGroup* m_DevMenu;
-                uint64_t m_field18;
-                debug.DMENU.MenuGroup* m_FavoriteDevMenu;
-                corelib.util.StringCache* m_pNameCache @ 0x38;
-            }; // nd-config.hpp
+            }; // engine-components.h
         
             struct NdGameInfo 0x45c0 {
                 void* vftable;
@@ -1403,7 +1394,16 @@ namespace regenny {
                 StringId64 AudioStringId @ 0x4180;
                 bool m_ShowStats @ 0x43af [[bool*]];
                 char m_GameStudio[0x40] @ 0x4463 [[utf8*]];
-            }
+            };
+
+            struct NdConfig 0x238 {
+                void* m_pNetInfo;
+                debug.DMENU* m_DMENU;
+                debug.DMENU.MenuGroup* m_DevMenu;
+                uint64_t m_field18;
+                debug.DMENU.MenuGroup* m_FavoriteDevMenu;
+                corelib.util.StringCache* m_pNameCache @ 0x38;
+            }; // nd-config.h
         
             struct NdFrameState 0x288a0 {
 
@@ -1440,7 +1440,7 @@ namespace regenny {
                 NdKeyboardLayer m_GameKeyboard;
                 NdKeyboardLayer m_kbdLayer4;
                 NdKeyboardLayer m_kbdLayer5;
-            }
+            };
         
             struct FrameParams 0x17580 {
 
@@ -1470,7 +1470,7 @@ namespace regenny {
                 DynamicContext* m_DynamicRenderContext;
                 void* m_pRenderCamera @ 0x13758;
                 void* m_pUploadQueue @ 0x14eb8;
-            } // frame-params.cpp
+            }; // frame-params.cpp
 
             // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\settings
             namespace settings {

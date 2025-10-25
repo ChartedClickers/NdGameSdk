@@ -1196,7 +1196,7 @@ namespace regenny {
                     /*
                     kMaxWorkerThreads = 0x18;
                     */
-                }
+                };
             }
         }
 
@@ -1232,7 +1232,7 @@ namespace regenny {
 
                 void* m_ptrs[0x21];
                 uint32_t m_sizes[0x21];
-            }; // engine-components.hpp
+            }; // engine-components.h
 
             struct NdGameInfo 0x4660 {
                 void* vftable;
@@ -1315,7 +1315,7 @@ namespace regenny {
                 bool m_field197 @ 0x197;
                 bool m_field198;
                 gamelib.level.DataLoading.Config m_pDataConfig @ 0x248;
-            }; // nd-config.hpp
+            }; // nd-config.h
 
             struct NdFrameState 0x29518 {
 

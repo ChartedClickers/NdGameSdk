@@ -53,22 +53,24 @@ namespace NdGameSdk {
 		return CachedComponents;
 	}
 
-        void ISdkComponent::InitSubComponents() {
-
-			for (auto& [_, entry] : m_subcomponents) {
-				if (!entry.ShouldAutoInitialize() || !entry.instance) { continue; }
-				InitSubComponentPtr(entry.instance.get());
+	void ISdkComponent::InitSubComponents() {
+		for (auto& [_, entry] : m_subcomponents) {
+			if (!entry.instance) { continue; }
+			if (!entry.ShouldAutoInitialize()) {
+				spdlog::debug("Skip auto initialization of subcomponent {} (manual policy) on {}", 
+					entry.instance->GetName(), GetName());
+				continue;
 			}
-        }
+			InitSubComponentPtr(entry.instance.get());
+		}
+    }
 
-        void ISdkComponent::InitSubComponentById(const std::type_index& id) {
-			auto it = m_subcomponents.find(id);
-			if (it == m_subcomponents.end()) return;
-			if (!it->second.instance) return;
-			InitSubComponentPtr(it->second.instance.get());
-        }
-
-
+    void ISdkComponent::InitSubComponentById(const std::type_index& id) {
+		auto it = m_subcomponents.find(id);
+		if (it == m_subcomponents.end()) return;
+		if (!it->second.instance) return;
+		InitSubComponentPtr(it->second.instance.get());
+    }
 
 	void ISdkComponent::InitSubComponentPtr(ISdkSubComponent* subraw) {
 		if (!subraw || subraw->IsInitialized()) return;

@@ -112,6 +112,19 @@ namespace NdGameSdk {
         }
 
         template<typename SubT>
+        SubT* GetOrInitSubComponent(bool allowManualInitialization = false) {
+            auto* sub = GetSubComponent<SubT>();
+            if (!sub) { return nullptr; }
+            if (!sub->IsInitialized()) {
+                const bool canInit = sub->ShouldAutoInitialize() || allowManualInitialization;
+                if (canInit) {
+                    InitSubComponentPtr(reinterpret_cast<ISdkSubComponent*>(sub));
+                }
+            }
+            return sub;
+        }
+
+        template<typename SubT>
         bool HasSubComponent() const noexcept
         {
             static_assert(SdkDerived::is_derived_from_ISdkSubComponent<SubT>::value, "SubT must derive from ISdkSubComponent");
@@ -286,8 +299,7 @@ namespace NdGameSdk {
         struct SubComponentEntry {
             std::unique_ptr<ISdkSubComponent> instance;
 
-            bool ShouldAutoInitialize() const noexcept
-            {
+            bool ShouldAutoInitialize() const noexcept {
                 return instance && instance->ShouldAutoInitialize();
             }
         };

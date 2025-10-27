@@ -27,6 +27,7 @@ namespace NdGameSdk {
 
         NdGameSdk_API std::string_view GetName() const;
         NdGameSdk_API bool IsInitialized() const;
+        NdGameSdk_API bool IsAwakened() const;
 
         InitPolicy GetInitPolicy() const noexcept { return m_initPolicy; }
         bool ShouldAutoInitialize() const noexcept { return m_initPolicy == InitPolicy::Automatic; }
@@ -107,12 +108,14 @@ namespace NdGameSdk {
         NdGameSdk_API static SdkComponentFactory* GetNdGameComponents();
        
     private:
-        virtual void Init() = 0;
         void AttachOwnerComponent(ISdkComponent* parent);
+        virtual void Awake() {}
+        virtual void Init() = 0;
 
         std::string m_name;
 
         ISdkComponent* m_parent{nullptr};
+        bool m_Awakened{false};
         bool m_Initialized{false};
         InitPolicy m_initPolicy{ InitPolicy::Automatic };
 

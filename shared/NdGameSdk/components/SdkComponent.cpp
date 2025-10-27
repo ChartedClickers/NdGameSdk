@@ -56,6 +56,7 @@ namespace NdGameSdk {
 	void ISdkComponent::InitSubComponents() {
 		for (auto& [_, entry] : m_subcomponents) {
 			if (!entry.instance) { continue; }
+			AwakeSubComponentPtr(entry.instance.get());
 			if (!entry.ShouldAutoInitialize()) {
 				spdlog::debug("Skip auto initialization of subcomponent {} (manual policy) on {}", 
 					entry.instance->GetName(), GetName());
@@ -69,11 +70,19 @@ namespace NdGameSdk {
 		auto it = m_subcomponents.find(id);
 		if (it == m_subcomponents.end()) return;
 		if (!it->second.instance) return;
+		AwakeSubComponentPtr(it->second.instance.get());
 		InitSubComponentPtr(it->second.instance.get());
     }
 
+	void ISdkComponent::AwakeSubComponentPtr(ISdkSubComponent* subraw) {
+		if (!subraw || subraw->IsAwakened()) return;
+		subraw->Awake();
+		subraw->m_Awakened = true;
+	}
+
 	void ISdkComponent::InitSubComponentPtr(ISdkSubComponent* subraw) {
 		if (!subraw || subraw->IsInitialized()) return;
+		AwakeSubComponentPtr(subraw);
 		spdlog::info("Initialize SubComponent: {}", subraw->GetName());
 		try {
 			subraw->Init();

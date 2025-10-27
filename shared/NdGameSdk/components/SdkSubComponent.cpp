@@ -4,7 +4,7 @@
 namespace NdGameSdk {
 
     ISdkSubComponent::ISdkSubComponent(std::string_view name, InitPolicy pInitPolicy) 
-        : m_name{ name }, m_initPolicy{ pInitPolicy }, m_Initialized { false } {};
+        : m_name{ name }, m_parent{ nullptr }, m_Awakened{ false }, m_Initialized{ false }, m_initPolicy{ pInitPolicy } {};
 
 	void ISdkSubComponent::AttachOwnerComponent(ISdkComponent* parent) {
 
@@ -43,5 +43,9 @@ namespace NdGameSdk {
 	bool ISdkSubComponent::IsInitialized() const {
 		return m_Initialized;
 	}
+
+    bool ISdkSubComponent::IsAwakened() const {
+        return m_Awakened;
+    }
 	
 }

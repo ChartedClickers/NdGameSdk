@@ -198,24 +198,21 @@ namespace NdGameSdk {
         }
 
         template<typename SubT, typename... Args>
-        SubT* AddSubComponent(Args&&... a)
-        {
+        SubT* AddSubComponent(Args&&... a) {
             auto sub = std::make_unique<SubT>(std::forward<Args>(a)...);
             auto policy = sub->GetInitPolicy();
             return RegisterSubComponent<SubT>(std::move(sub), policy);
         }
 
         template<typename SubT, typename... Args>
-        SubT* AddSubComponentWithPolicy(SubComponentInitPolicy policy, Args&&... a)
-        {
+        SubT* AddSubComponentWithPolicy(SubComponentInitPolicy policy, Args&&... a) {
             auto sub = std::make_unique<SubT>(std::forward<Args>(a)...);
             sub->SetInitPolicy(policy);
             return RegisterSubComponent<SubT>(std::move(sub), policy);
         }
 
         template<typename SubT>
-        void SetSubComponentInitPolicy(SubComponentInitPolicy policy)
-        {
+        void SetSubComponentInitPolicy(SubComponentInitPolicy policy) {
             auto it = m_subcomponents.find(typeid(SubT));
             if (it == m_subcomponents.end()) return;
             if (it->second.instance)
@@ -223,8 +220,7 @@ namespace NdGameSdk {
         }
 
         template<typename SubT>
-        SubT* InitSubComponent()
-        {
+        SubT* InitSubComponent() {
             auto* ptr = GetSubComponent<SubT>();
             if (!ptr) return nullptr;
             InitSubComponentPtr(reinterpret_cast<ISdkSubComponent*>(ptr));
@@ -232,14 +228,12 @@ namespace NdGameSdk {
         }
 
         template<typename... Subs>
-        void InitSubComponentsOnly()
-        {
+        void InitSubComponentsOnly() {
             (InitSubComponent<Subs>(), ...);
         }
 
         template<typename CompT>
-        static CompT* Instance() noexcept
-        {
+        static CompT* Instance() noexcept {
             static std::atomic<CompT*> p{ nullptr };
             auto* v = p.load(std::memory_order_acquire);
             if (!v) {
@@ -284,16 +278,20 @@ namespace NdGameSdk {
             static_assert(SdkDerived::is_derived_from_ISdkSubComponent<SubT>::value, "SubT must derive from ISdkSubComponent");
             sub->AttachOwnerComponent(this);
             sub->SetInitPolicy(policy);
-            SubT* rawPtr = sub.get();
+
             auto id = std::type_index(typeid(SubT));
             if (auto it = m_subcomponents.find(id); it != m_subcomponents.end()) {
                 spdlog::warn("Replacing subcomponent {} on {}", id.name(), GetName());
             }
-            m_subcomponents[id] = { std::move(sub) };
+
+            auto& entry = m_subcomponents[id];
+            entry.instance = std::move(sub);
+
+            AwakeSubComponentPtr(entry.instance.get());
             if (policy == SubComponentInitPolicy::Automatic && m_Initialized) {
-                InitSubComponentPtr(reinterpret_cast<ISdkSubComponent*>(rawPtr));
+                InitSubComponentPtr(entry.instance.get());
             }
-            return rawPtr;
+            return static_cast<SubT*>(entry.instance.get());
         }
 
         struct SubComponentEntry {
@@ -307,6 +305,7 @@ namespace NdGameSdk {
         std::unordered_map<std::type_index, SubComponentEntry> m_subcomponents;
 
         static const std::vector<ISdkComponent*>& GetSdkComponents();
+        static void AwakeSubComponentPtr(ISdkSubComponent* sub);
         static void InitSubComponentPtr(ISdkSubComponent* sub);
 
         static SdkComponentFactory s_SharedComponents;

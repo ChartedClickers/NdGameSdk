@@ -1151,6 +1151,8 @@ namespace NdGameSdk::ndlib::script {
 
     INIT_FUNCTION_PTR(ScriptManager::PointerBase::ScriptManager_PointerBase_Initialize);
     INIT_FUNCTION_PTR(ScriptManager::PointerBase::ScriptManager_PointerBase_Get);
+    #if defined (T2R)
     INIT_FUNCTION_PTR(ScriptManager::PointerBase::ScriptManager_PointerBase_HasEntry);
+    #endif
     INIT_FUNCTION_PTR(ScriptManager::PointerBase::ScriptManager_PointerBase_Resolve);
 }

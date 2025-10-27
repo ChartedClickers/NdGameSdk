@@ -16,9 +16,11 @@ namespace NdGameSdk::common {
 	class IAllocator : public ISdkSubComponent {
 	public:
 		explicit IAllocator();
-		void Init() override;
 	private:
-		Memory* m_Memory;
+		void Awake() override;
+		void Init() override;
+
+		Memory* m_Memory{ nullptr };
 
 		MidHook m_IAllocator_InitTaggedHeapsHook{};
 

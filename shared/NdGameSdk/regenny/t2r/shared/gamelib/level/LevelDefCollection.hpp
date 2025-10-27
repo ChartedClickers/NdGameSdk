@@ -8,6 +8,11 @@
 namespace regenny::shared::gamelib::level {
 #pragma pack(push, 1)
 struct LevelDefCollection {
+    struct FixedArray_corelib_util_level___LevelDef_ptr___3000 {
+        regenny::shared::gamelib::level::LevelDef* m_items[3000]; // 0x0
+        uint32_t m_count; // 0x5dc0
+    }; // Size: 0x5dc4
+
     struct RobinHoodHashTable_corelib_containers_StringId64_LevelDef {
         struct Slot {
             uint64_t m_hash; // 0x0
@@ -23,8 +28,7 @@ struct LevelDefCollection {
 
     bool m_UseLevelDefAsyncLoad; // 0x0
     private: char pad_1[0x7]; public:
-    regenny::shared::gamelib::level::LevelDef* m_pendingQueue[3000]; // 0x8
-    uint32_t m_pendingCount; // 0x5dc8
+    FixedArray_corelib_util_level___LevelDef_ptr___3000 m_pendingQueue; // 0x8
     private: char pad_5dcc[0x4]; public:
     void* m_allocatorBacking; // 0x5dd0
     RobinHoodHashTable_corelib_containers_StringId64_LevelDef m_table; // 0x5dd8

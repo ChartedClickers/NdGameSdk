@@ -72,7 +72,9 @@ namespace NdGameSdk::ndlib::script {
 			TYPEDEF_FUNCTION_PTR(void, ScriptManager_PointerBase_Initialize, PointerBase* pPointerBase, StringId64 symbol, StringId64 module);
 			TYPEDEF_FUNCTION_PTR(void*, ScriptManager_PointerBase_Get, PointerBase* pPointerBase);
 			TYPEDEF_FUNCTION_PTR(void, ScriptManager_PointerBase_Resolve, PointerBase* pPointerBase);
+		#if defined(T2R)
 			TYPEDEF_FUNCTION_PTR(bool, ScriptManager_PointerBase_HasEntry, PointerBase* pPointerBase);
+		#endif
 			friend class ScriptManager;
 		};
 

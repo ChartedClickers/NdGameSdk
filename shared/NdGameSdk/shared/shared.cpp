@@ -10,6 +10,8 @@
 #include "src/ndlib/io/file-system-win-fios2.hpp"
 #include "src/ndlib/io/loadingheap-mgr.hpp"
 #include "src/ndlib/io/package-mgr.hpp"
+#include "src/gamelib/level/data-loading.hpp"
+#include "src/gamelib/level/game-loading.hpp"
 #include "src/ndlib/script/script-manager.hpp"
 #include "src/ndlib/render/dev/debugdraw-common.hpp"
 #include "src/ndlib/profiling/profile-ctrl.hpp"
@@ -17,7 +19,6 @@
 #include "src/common/common-game-init.hpp"
 #include "src/gamelib/debug/nd-dev-menu.hpp"
 #include "src/gamelib/render/particle/particle.hpp"
-#include "src/gamelib/level/game-loading.hpp"
 
 namespace NdGameSdk {
 
@@ -41,10 +42,13 @@ namespace NdGameSdk {
 		auto ParticleMgr = SharedComponents->AddComponent<gamelib::render::particle::ParticleManager>();
 #elif defined(T2R)
 		SharedComponents->AddComponent<ndlib::io::FileSystem>();
+		SharedComponents->AddComponent<gamelib::level::DataLoading>();
 		SharedComponents->AddComponent<ndlib::io::PackageManager>();
+
 	#if SDK_DEBUG
 		SharedComponents->AddComponent<ndlib::profiling::ProfileController>();
 	#endif
+
 #endif
 
 		SharedComponents->AddComponent<common::CommonGame>();

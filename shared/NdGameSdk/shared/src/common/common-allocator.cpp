@@ -5,9 +5,10 @@
 
 namespace NdGameSdk::common {
 
-	IAllocator::IAllocator() : ISdkSubComponent(TOSTRING(IAllocator))  {
-		auto SharedComponents = GetSharedComponents();
-		m_Memory = SharedComponents->GetComponent<Memory>();
+	IAllocator::IAllocator() : ISdkSubComponent(TOSTRING(IAllocator)) {}
+
+	void IAllocator::Awake() {
+		m_Memory = GetSharedComponents()->GetComponent<Memory>();
 	}
 
 	void IAllocator::Init()

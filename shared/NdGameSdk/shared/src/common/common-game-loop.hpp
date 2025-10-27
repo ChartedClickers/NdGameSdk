@@ -17,13 +17,17 @@ namespace NdGameSdk::common {
 	class CommonGameLoop : public ISdkSubComponent {
 	public:
 		explicit CommonGameLoop();
-		void Init() override;
 	private:
+		void Awake() override;
+		void Init() override;
 
+		/*Extern Functs*/
+		// void __cdecl GameLoopUpdate(unsigned __int64)
 		static void GameLoopUpdate(SafetyHookContext& ctx);
+		// void __cdecl GameDebugUpdate(bool)
 		static void GameDebugUpdate(SafetyHookContext& ctx);
 
-		EngineComponents* m_EngineComponents;
+		EngineComponents* m_EngineComponents{ nullptr };
 		MidHook m_GameLoopUpdate{};
 		MidHook m_GameDebugUpdate{};
 	};

@@ -34,15 +34,31 @@ namespace NdGameSdk::ndlib {
 
 	ndlib::debug::DMENU& NdConfig::GetDmenu() {
 		auto* dmenu = reinterpret_cast<ndlib::debug::DMENU*>(this->Get()->m_DMENU);
-		always_assert(dmenu == nullptr, "NdConfig::m_DMENU was null");
+		always_assert(dmenu == nullptr, "m_DMENU was null");
 		return *dmenu;
 	}
 
 	ndlib::debug::DMENU::MenuGroup& NdConfig::GetNdDevMenu() {
 		auto* devMenu = reinterpret_cast<ndlib::debug::DMENU::MenuGroup*>(this->Get()->m_DevMenu);
-		always_assert(devMenu == nullptr, "NdConfig::m_DevMenu was null");
+		always_assert(devMenu == nullptr, "m_DevMenu was null");
 		return *devMenu;
 	}
+
+#if defined(T2R)
+
+	gamelib::level::LevelDefCollectionInternal& NdConfig::GetLevelDefCollection() {
+		auto* levelDefCollection = reinterpret_cast<gamelib::level::LevelDefCollectionInternal*>(this->Get()->m_LevelDefCollection);
+		always_assert(levelDefCollection == nullptr, "m_LevelDefCollection was null");
+		return *levelDefCollection;
+	}
+
+	gamelib::level::LoadRegistryInternal& NdConfig::GetLoadRegistry() {
+		auto* loadRegistry = reinterpret_cast<gamelib::level::LoadRegistryInternal*>(this->Get()->m_LoadRegistry);
+		always_assert(loadRegistry == nullptr, "m_LoadRegistry was null");
+		return *loadRegistry;
+	}
+
+#endif 
 
 	NdConfig* NdConfigComponent::g_ndConfig = nullptr;
 }

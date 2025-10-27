@@ -3,9 +3,10 @@
 
 namespace NdGameSdk::common {
 
-	CommonGameLoop::CommonGameLoop() : ISdkSubComponent(TOSTRING(CommonGameLoop))  {
-		auto SharedComponents = GetSharedComponents();
-		m_EngineComponents = SharedComponents->GetComponent<EngineComponents>();
+	CommonGameLoop::CommonGameLoop() : ISdkSubComponent(TOSTRING(CommonGameLoop)) {}
+
+	void CommonGameLoop::Awake() {
+		m_EngineComponents = GetSharedComponents()->GetComponent<EngineComponents>();
 	}
 
 	void CommonGameLoop::Init() {

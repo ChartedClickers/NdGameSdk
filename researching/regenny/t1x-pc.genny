@@ -2448,6 +2448,26 @@ namespace regenny {
                 corelib.system.platform.ndsys.ConditionVariable m_PrefetchCondVar;
                 bool m_ShutdownRequested;
             }; // prefetch.cpp
+
+            enum AssetType : uint32_t {
+                Actor = 0x0,
+                Level = 0x1,
+                SoundBank = 0x2,
+                IrPack = 0x3,
+                Music = 0x4,
+                Speech = 0x5,
+                Movie = 0x6,
+                Text = 0x7,
+                Misc = 0x8,
+                Gameplay = 0x9,
+                Dc = 0xa,
+                Shaders = 0xb,
+                PipelineExecutables = 0xc
+            }; // asset-view.h
+            
+            struct AssetView {
+            }; // asset-view.cpp
+
         }
     
         }

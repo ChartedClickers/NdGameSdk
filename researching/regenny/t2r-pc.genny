@@ -2971,8 +2971,8 @@ namespace regenny {
 
                 struct LevelDefCollection 0x75b0 {
                     bool m_UseLevelDefAsyncLoad;
-                    LevelDef* m_pendingQueue[0xbb8] @ 0x8;
-                    uint32_t m_pendingCount;
+                    // FixedArray<struct LevelDef*, 3000>
+                    corelib.util.FixedArray<level.LevelDef*, 3000> m_pendingQueue @ 0x8;
                     void* m_allocatorBacking @ 0x5dd0;
                     // RobinHoodHashTable<class StringId64,class LevelDef const *,struct StringIdHasher,struct equality<class StringId64,class StringId64>>
                     corelib.containers.RobinHoodHashTable<StringId64, LevelDef> m_table;

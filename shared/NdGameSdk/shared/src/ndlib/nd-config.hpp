@@ -14,6 +14,11 @@
 
 #include "debug/nd-dmenu.hpp"
 
+namespace NdGameSdk::gamelib::level {
+	class LevelDefCollectionInternal;
+	class LoadRegistryInternal;
+}
+
 namespace NdGameSdk::ndlib {
 
 	class NdGameSdk_API NdConfig : ISdkRegenny<regenny::shared::ndlib::NdConfig> {
@@ -26,6 +31,12 @@ namespace NdGameSdk::ndlib {
 
 		ndlib::debug::DMENU& GetDmenu();
 		ndlib::debug::DMENU::MenuGroup& GetNdDevMenu();
+
+	#if defined(T2R)
+		gamelib::level::LevelDefCollectionInternal& GetLevelDefCollection();
+		gamelib::level::LoadRegistryInternal& GetLoadRegistry();
+	#endif
+
 	};
 
 	class NdConfigComponent : public ISdkComponent {

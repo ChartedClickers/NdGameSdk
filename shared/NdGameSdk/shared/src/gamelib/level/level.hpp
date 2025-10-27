@@ -6,6 +6,7 @@
 
 namespace NdGameSdk::gamelib::level {
 #if defined(T2R)
+
     class Level : public ISdkRegenny<regenny::shared::gamelib::level::Level>
     {
     public:

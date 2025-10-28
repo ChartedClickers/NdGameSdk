@@ -78,6 +78,7 @@ namespace NdGameSdk::ndlib::io {
 				StringId64 packId, 
 				const char* name,
 				Level* level = nullptr,
+				Package::PackagePartFlags partFlags = Package::PackagePartFlags::None,
 				PackageCategory category = PackageCategory::Initial
 			) {
 				auto self = this->Get();
@@ -85,10 +86,12 @@ namespace NdGameSdk::ndlib::io {
 				self->m_packid = packId;
 				std::strncpy(self->m_name, name, sizeof(self->m_name) - 1);
 				self->m_Level = reinterpret_cast<regenny::shared::gamelib::level::Level*>(level);
+				self->m_PartFlags = partFlags;
 				self->m_category = category;
 			}
 
 			RequestType GetRequestType() const;
+			Package::PackagePartFlags GetPartFlags() const;
 			StringId64 GetPackId() const;
 		};
 
@@ -249,7 +252,7 @@ namespace NdGameSdk::ndlib::io {
 		bool ArePackageQueuesIdle() const;
 
 		bool RequestLoadPackage(const char* pPackageName, Level* pLevel = nullptr,
-			PackageMgr::PackageCategory pCategory = PackageMgr::PackageCategory::Initial);
+			Package::PackagePartFlags pPartFlags = Package::PackagePartFlags::None, PackageMgr::PackageCategory pCategory = PackageMgr::PackageCategory::Initial);
 		bool RequestLogoutPackage(StringId64 pPackId);
 		bool RequestReloadPackage(StringId64 pPackId);
 
@@ -328,7 +331,7 @@ namespace NdGameSdk::ndlib::io {
 		MEMBER_FUNCTION_PTR(uint32_t, PackageMgr_LogoutPackage, PackageMgr* pPackageMgr, PackageProcessingInfo* pPackageInfo);
 
 		MEMBER_FUNCTION_PTR(bool, PackageMgr_PackageQueuesIdle, PackageMgr* pPackageMgr);
-		MEMBER_FUNCTION_PTR(void, PackageMgr_RequestLoadPackage, PackageMgr* pPackageMgr, const char* pPackageName, Level* pLevel, uint32_t isNumberedPart, PackageMgr::PackageCategory pCategory);
+		MEMBER_FUNCTION_PTR(void, PackageMgr_RequestLoadPackage, PackageMgr* pPackageMgr, const char* pPackageName, Level* pLevel, Package::PackagePartFlags pPartFlags, PackageMgr::PackageCategory pCategory);
 		MEMBER_FUNCTION_PTR(void, PackageMgr_RequestLogoutPackage, PackageMgr* pPackageMgr, StringId64 pPackId);
 		MEMBER_FUNCTION_PTR(void, PackageMgr_RequestReloadPackage, PackageMgr* pPackageMgr, StringId64 pPackId);
 		MEMBER_FUNCTION_PTR(void, PackageMgr_AddRequest, PackageMgr::PackageRequestInfo* pRequestInfo, PackageMgr::PackageRequest* pPackageRequest);

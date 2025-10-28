@@ -6,9 +6,7 @@
 #include "..\..\corelib\system\platform\ndsys.hpp"
 #include "..\..\gamelib\level\DataLoading.hpp"
 #include "LoadingHeapMgr.hpp"
-namespace regenny::shared::ndlib::io {
-struct Package;
-}
+#include "Package.hpp"
 namespace regenny::shared::ndlib::io {
 struct PackageProcessingInfo;
 }
@@ -64,7 +62,8 @@ struct PackageMgr {
         // Metadata: utf8*
         char m_name[128]; // 0x10
         regenny::shared::ndlib::io::PackageMgr::PackageCategory m_category; // 0x90
-        uint32_t m_isNumberedPart; // 0x94
+        regenny::shared::ndlib::io::Package::PackagePartFlags m_PartFlags; // 0x94
+        private: char pad_95[0x3]; public:
         regenny::shared::gamelib::level::Level* m_Level; // 0x98
     }; // Size: 0xa0
 

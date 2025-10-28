@@ -295,10 +295,10 @@ namespace NdGameSdk::ndlib::io {
 	#endif
 	}
 
-	bool PackageManager::RequestLoadPackage(const char* pPackageName, Level* pLevel, PackageMgr::PackageCategory pCategory) {
+	bool PackageManager::RequestLoadPackage(const char* pPackageName, Level* pLevel, Package::PackagePartFlags pPartFlags, PackageMgr::PackageCategory pCategory) {
 	#if defined(T2R) || defined(T1X)
 		always_assert(PackageMgr_RequestLoadPackage == nullptr, "Function pointer was not set!");
-		PackageMgr_RequestLoadPackage(GetPackageMgr(), pPackageName, pLevel, 0x0, pCategory);
+		PackageMgr_RequestLoadPackage(GetPackageMgr(), pPackageName, pLevel, pPartFlags, pCategory);
 		return true;
 	#else
 		PackageMgr::PackageRequest packageRequest {
@@ -306,6 +306,7 @@ namespace NdGameSdk::ndlib::io {
 			SID(pPackageName),
 			pPackageName,
 			pLevel,
+			pPartFlags,
 			pCategory
 		};
 
@@ -418,7 +419,7 @@ namespace NdGameSdk::ndlib::io {
 
 				if (!pm->GetPackageById(SID(packageName))) {
 					spdlog::info("Package '{}' not found, requesting load...", packageName);
-					if (pm->RequestLoadPackage(packageName, nullptr, PackageMgr::PackageCategory::GlobalPak)) {
+					if (pm->RequestLoadPackage(packageName, nullptr, Package::PackagePartFlags::None, PackageMgr::PackageCategory::GlobalPak)) {
 						spdlog::info("Load request for package '{}' sent successfully.", packageName);
 						pFunction.SetActive(true);
 					}
@@ -731,7 +732,7 @@ namespace NdGameSdk::ndlib::io {
 				// login
 				for (size_t i = 0; i < batch; ++i) {
 					const char* name = ctx->names[cursor + i];
-					pm->RequestLoadPackage(name, nullptr, PackageMgr::PackageCategory::GlobalPak);
+					pm->RequestLoadPackage(name, nullptr, Package::PackagePartFlags::None, PackageMgr::PackageCategory::GlobalPak);
 					ctx->batchIds[i] = ctx->ids[cursor + i];
 					spdlog::info("[PkgDump] login '{}'", name);
 				}
@@ -1033,6 +1034,10 @@ namespace NdGameSdk::ndlib::io {
 
 	PackageMgr::PackageRequest::RequestType PackageMgr::PackageRequest::GetRequestType() const {
 		return this->Get()->m_RequestType;
+	}
+
+	Package::PackagePartFlags PackageMgr::PackageRequest::GetPartFlags() const {
+		return this->Get()->m_PartFlags;
 	}
 
 	StringId64 PackageMgr::PackageRequest::GetPackId() const {

@@ -108,6 +108,12 @@ struct Package {
         CompleteStreamingHandshake = 5,
     };
 
+    enum PackagePartFlags : uint8_t {
+        None = 0,
+        OptionalPart = 1,
+        DictionaryChunk = 2,
+    };
+
     struct PakHeader {
         uint32_t m_magic; // 0x0
         uint32_t m_hdrSize; // 0x4
@@ -183,7 +189,8 @@ struct Package {
     PakVramItemTable* m_VramItemTable; // 0xae0
     uint32_t m_refCt; // 0xae8
     Status m_status; // 0xaec
-    private: char pad_aed[0x1013]; public:
+    PackagePartFlags m_PartFlags; // 0xaed
+    private: char pad_aee[0x1012]; public:
 }; // Size: 0x1b00
 #pragma pack(pop)
 }

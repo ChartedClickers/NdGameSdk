@@ -66,6 +66,14 @@ namespace NdGameSdk::ndlib::io {
 		return this->Get()->m_loginStage;
 	}
 
+	Package::PackagePartFlags Package::GetPackagePartFlags() const {
+		return GetPackagePartFlagsView().Requested();
+	}
+
+	Package::PartFlagsView Package::GetPackagePartFlagsView() const {
+		return PartFlagsView(static_cast<uint8_t>(this->Get()->m_PartFlags));
+	}
+
 	std::string Package::GetStatusString(Status status) {
 	#if defined(T2R) || defined(T1X)
 		always_assert(PackageMgr_Package_GetStatusString == nullptr, "Function pointer was not set!");
@@ -130,6 +138,29 @@ namespace NdGameSdk::ndlib::io {
 
 	uint32_t PakLoginTableEntry::ResourcePair::GetItemOfs() const {
 		return this->Get()->m_itemOfs;
+	}
+
+	Package::PackagePartFlags Package::PartFlagsView::Requested() const {
+		uint8_t bits = 0;
+		if (RequestsOptional()) {
+			bits |= static_cast<uint8_t>(PackagePartFlags::OptionalPart);
+		}
+		if (RequestsDictionary()) {
+			bits |= static_cast<uint8_t>(PackagePartFlags::DictionaryChunk);
+		}
+		return static_cast<PackagePartFlags>(bits);
+	}
+
+	bool Package::PartFlagsView::RequestsOptional() const {
+		return (m_storage & 0x8u) != 0;
+	}
+
+	bool Package::PartFlagsView::RequestsDictionary() const {
+		return (m_storage & 0x10u) != 0;
+	}
+
+	bool Package::PartFlagsView::IsActiveUsage() const {
+		return (m_storage & 0x4u) != 0;
 	}
 
 	INIT_FUNCTION_PTR(PackageMgr_Package_ResolvePakItem);

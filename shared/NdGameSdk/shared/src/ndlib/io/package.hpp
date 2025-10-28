@@ -22,6 +22,21 @@ namespace NdGameSdk::ndlib::io {
 		using PakItem = regenny::shared::ndlib::io::Package::PakItem;
         using Status = regenny::shared::ndlib::io::Package::Status;
 		using LoginStage = regenny::shared::ndlib::io::Package::LoginStage;
+		using PackagePartFlags = regenny::shared::ndlib::io::Package::PackagePartFlags;
+
+		class PartFlagsView {
+		public:
+			explicit PartFlagsView(uint8_t storage) : m_storage(storage) {}
+
+			PackagePartFlags Requested() const;
+			bool RequestsOptional() const;
+			bool RequestsDictionary() const;
+			bool IsActiveUsage() const;
+			uint8_t Storage() const { return m_storage; }
+
+		private:
+			uint8_t m_storage;
+		};
 
         enum ItemId : StringId64 {
 			PAK_LOGIN_TABLE = SID("PAK_LOGIN_TABLE"),
@@ -146,6 +161,8 @@ namespace NdGameSdk::ndlib::io {
         std::string GetStatusString();
 
 		LoginStage GetLoginStage() const;
+		PackagePartFlags GetPackagePartFlags() const;
+		PartFlagsView GetPackagePartFlagsView() const;
 
         static std::string GetStatusString(Status status);
 

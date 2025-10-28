@@ -34,23 +34,27 @@ namespace NdGameSdk::ndlib {
 		});
 	}
 
-	ndlib::NdGameInfo& EngineComponents::GetNdGameInfo() {
-		return *GetEngineComponent<ndlib::NdGameInfo>(EngineComponent::NdGameInfo);
+	NdGameInfo& EngineComponents::GetNdGameInfo() {
+		return *GetEngineComponent<NdGameInfo>(EngineComponent::NdGameInfo);
 	}
 
-	ndlib::NdFrameState& EngineComponents::GetNdFrameState() {
-		return *GetEngineComponent<ndlib::NdFrameState>(EngineComponent::NdFrameState);
+	NdFrameState& EngineComponents::GetNdFrameState() {
+		return *GetEngineComponent<NdFrameState>(EngineComponent::NdFrameState);
 	}
 	
-	ndlib::io::FileSystemWin& EngineComponents::GetFileSystem() {
-		return *GetEngineComponent<ndlib::io::FileSystemWin>(EngineComponent::FileSystem);
+	FileSystem& EngineComponents::GetFileSystem() {
+		return *GetEngineComponent<FileSystem>(EngineComponent::FileSystem);
 	}
 
-	ndlib::io::PackageMgrInternal& EngineComponents::GetPackageMgr() {
-		return *GetEngineComponent<ndlib::io::PackageMgrInternal>(EngineComponent::PackageMgr);
+	PrefetchMgr& EngineComponents::GetPrefetchMgr() {
+		return *GetEngineComponent<PrefetchMgr>(EngineComponent::PrefetchMgr);
 	}
 
-	ndlib::io::PrefetchMgr& EngineComponents::GetPrefetchMgr() {
-		return *GetEngineComponent<ndlib::io::PrefetchMgr>(EngineComponent::PrefetchMgr);
+	PackageMgr& EngineComponents::GetPackageMgr() {
+		return *GetEngineComponent<PackageMgr>(EngineComponent::PackageMgr);
+	}
+
+	LevelMgr& EngineComponents::GetLevelMgr() {
+		return *GetEngineComponent<LevelMgr>(EngineComponent::LevelMgr);
 	}
 }

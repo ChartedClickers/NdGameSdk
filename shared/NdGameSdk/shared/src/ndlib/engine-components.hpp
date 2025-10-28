@@ -15,7 +15,9 @@
 #include <NdGameSdk/regenny/t1x/shared/ndlib/EngineComponents.hpp>
 #endif
 
-using EngineComponent = ::regenny::shared::ndlib::EngineComponents::Component;
+namespace NdGameSdk::gamelib::level {
+	class LevelMgrInternal;
+}
 
 namespace NdGameSdk::ndlib {
 
@@ -28,17 +30,24 @@ namespace NdGameSdk::ndlib {
 		class PrefetchMgr;
 	}
 
+	using EngineComponent = ::regenny::shared::ndlib::EngineComponents::Component;
+	using LevelMgr = ::NdGameSdk::gamelib::level::LevelMgrInternal;
+	using FileSystem = io::FileSystemWin;
+	using PackageMgr = io::PackageMgrInternal;
+	using io::PrefetchMgr;
+
 	class EngineComponentsTable : public ISdkRegenny<regenny::shared::ndlib::EngineComponents> {};
 
     class EngineComponents : public ISdkComponent {
 	public:
 		EngineComponents();
 
-		NdGameSdk_API ndlib::NdGameInfo& GetNdGameInfo();
-		NdGameSdk_API ndlib::NdFrameState& GetNdFrameState();
-		NdGameSdk_API ndlib::io::FileSystemWin& GetFileSystem();
-		NdGameSdk_API ndlib::io::PackageMgrInternal& GetPackageMgr();
-		NdGameSdk_API ndlib::io::PrefetchMgr& GetPrefetchMgr();
+		NdGameSdk_API NdGameInfo& GetNdGameInfo();
+		NdGameSdk_API NdFrameState& GetNdFrameState();
+		NdGameSdk_API FileSystem& GetFileSystem();
+		NdGameSdk_API PrefetchMgr& GetPrefetchMgr();
+		NdGameSdk_API PackageMgr& GetPackageMgr();
+		NdGameSdk_API LevelMgr& GetLevelMgr();
 
 		template <typename TComponent>
 		NdGameSdk_API TComponent* GetEngineComponent(EngineComponent type) {

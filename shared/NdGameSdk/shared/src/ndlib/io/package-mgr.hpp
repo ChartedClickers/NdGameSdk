@@ -3,6 +3,13 @@
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/components/SdkComponent.hpp"
 
+#if defined(T2R)
+#include <NdGameSdk/regenny/t2r/shared/ndlib/io/PackageMgr.hpp>
+#include <NdGameSdk/regenny/t2r/shared/ndlib/io/PackageProcessingInfo.hpp>
+#elif defined(T1X)
+#include <NdGameSdk/regenny/t1x/shared/ndlib/io/PackageMgr.hpp>
+#endif
+
 #include <NdGameSdk/shared/src/corelib/system/NdSystem.hpp>
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
 #include <NdGameSdk/shared/src/corelib/containers/robinhood-hash-table.hpp>
@@ -11,13 +18,6 @@
 #include <NdGameSdk/shared/src/ndlib/debug/nd-dmenu.hpp>
 #include <NdGameSdk/shared/src/ndlib/engine-components.hpp>
 
-#if defined(T2R)
-#include <NdGameSdk/regenny/t2r/shared/ndlib/io/PackageMgr.hpp>
-#include <NdGameSdk/regenny/t2r/shared/ndlib/io/PackageProcessingInfo.hpp>
-#elif defined(T1X)
-#include <NdGameSdk/regenny/t1x/shared/ndlib/io/PackageMgr.hpp>
-#endif
-
 #include <future>
 #include <boost/function.hpp>
 
@@ -25,16 +25,16 @@
 #include "package-util.hpp"
 #include "file-system-win-fios2.hpp"
 
-using namespace NdGameSdk::corelib::system::platform;
-using namespace NdGameSdk::corelib::memory;
-using namespace NdGameSdk::corelib::containers;
-using namespace NdGameSdk::corelib::job;
-using namespace NdGameSdk::gamelib::debug;
-using namespace NdGameSdk::gamelib::level;
-using namespace NdGameSdk::ndlib;
-using namespace NdGameSdk::ndlib::debug;
-
 namespace NdGameSdk::ndlib::io {
+
+	using namespace corelib::system::platform;
+	using namespace corelib::memory;
+	using namespace corelib::containers;
+	using namespace corelib::job;
+	using namespace gamelib::debug;
+	using namespace gamelib::level;
+	using namespace ndlib;
+	using namespace ndlib::debug;
 
 #if defined(T2R)
 	/* Extern classes */

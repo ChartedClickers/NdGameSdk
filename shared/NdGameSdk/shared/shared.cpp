@@ -43,7 +43,7 @@ namespace NdGameSdk {
 #elif defined(T2R)
 		SharedComponents->AddComponent<ndlib::io::FileSystem>();
 		SharedComponents->AddComponent<gamelib::level::DataLoading>();
-		SharedComponents->AddComponent<ndlib::io::PackageManager>();
+		SharedComponents->AddComponent<ndlib::io::PackageMgr>();
 
 	#if SDK_DEBUG
 		SharedComponents->AddComponent<ndlib::profiling::ProfileController>();

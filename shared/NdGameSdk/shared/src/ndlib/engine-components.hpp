@@ -24,7 +24,7 @@ namespace NdGameSdk::ndlib {
 
 	namespace io {
 		class FileSystemWin;
-		class PackageMgr;
+		class PackageMgrInternal;
 		class PrefetchMgr;
 	}
 
@@ -37,7 +37,7 @@ namespace NdGameSdk::ndlib {
 		NdGameSdk_API ndlib::NdGameInfo& GetNdGameInfo();
 		NdGameSdk_API ndlib::NdFrameState& GetNdFrameState();
 		NdGameSdk_API ndlib::io::FileSystemWin& GetFileSystem();
-		NdGameSdk_API ndlib::io::PackageMgr& GetPackageMgr();
+		NdGameSdk_API ndlib::io::PackageMgrInternal& GetPackageMgr();
 		NdGameSdk_API ndlib::io::PrefetchMgr& GetPrefetchMgr();
 
 		template <typename TComponent>

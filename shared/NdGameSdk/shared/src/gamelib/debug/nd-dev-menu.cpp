@@ -352,7 +352,7 @@ namespace NdGameSdk::gamelib::debug {
 		ScriptManager::CreateScriptManagerMenu(this, NdGameSdkMenu);
 		NdJob::CreateJobSystemMenu(this, NdGameSdkMenu);
 #if defined(T2R)
-		PackageManager::CreatePackageManagerMenu(this, NdGameSdkMenu);
+		PackageMgr::CreatePackageManagerMenu(this, NdGameSdkMenu);
 		FileSystem::CreateFileSystemMenu(this, NdGameSdkMenu);
 #endif
 		GameLoading::CreateGameLoadingMenu(this, NdGameSdkMenu);

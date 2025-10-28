@@ -8,7 +8,7 @@ namespace NdGameSdk::ndlib::io {
 		return PackageMgr_GetPakHdrPageEntry(pPakHdr, arg2, index);
 	}
 
-	Package::ResPage* ResolvePakPage(PackageMgr* pPackageMgr, Package* pPackage, uint32_t LoginTableIdx) {
+	Package::ResPage* ResolvePakPage(PackageMgrInternal* pPackageMgr, Package* pPackage, uint32_t LoginTableIdx) {
 		always_assert(PackageMgr_ResolvePakPagePtr == nullptr, "Function pointer was not set!");
 		return PackageMgr_ResolvePakPagePtr(pPackageMgr, pPackage, LoginTableIdx);
 	}

@@ -49,7 +49,7 @@ namespace NdGameSdk::ndlib::memory {
 		bool IsBlockAllocatorActive() const;
 		bool IsUseCacheBlocks() const;
 
-		PackageMgr* GetPackageMgr();
+		PackageMgrInternal* GetPackageMgr();
 		LoadingHeap* GetLoadingHeap();
 		Package* GetPackage();
 	};

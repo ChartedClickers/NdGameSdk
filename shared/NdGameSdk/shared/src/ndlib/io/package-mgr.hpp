@@ -53,7 +53,7 @@ namespace NdGameSdk::ndlib::io {
 	};
 #endif
 
-	class NdGameSdk_API PackageMgr : public ISdkRegenny<regenny::shared::ndlib::io::PackageMgr> {
+	class NdGameSdk_API PackageMgrInternal : public ISdkRegenny<regenny::shared::ndlib::io::PackageMgr> {
 	public:
 	#if defined(T2R)
 		using PackageCategory = regenny::shared::ndlib::io::PackageMgr::PackageCategory;
@@ -207,7 +207,7 @@ namespace NdGameSdk::ndlib::io {
 		}
 
 		PackageRange Packages() const {
-			auto* head = const_cast<PackageMgr*>(this)->PackageHead();
+			auto* head = const_cast<PackageMgrInternal*>(this)->PackageHead();
 			auto  count = static_cast<std::size_t>(GetFreePackageSlots());
 			return { { head, 0 }, { head, count } };
 		}
@@ -219,7 +219,7 @@ namespace NdGameSdk::ndlib::io {
 		}
 
 		PackageProcessingRange ProcessingInfos() const {
-			auto* head = const_cast<PackageMgr*>(this)->PackageHeadProcessingInfo();
+			auto* head = const_cast<PackageMgrInternal*>(this)->PackageHeadProcessingInfo();
 			auto  count = static_cast<std::size_t>(GetFreePackageSlots());
 			return { { head,0 }, { head,count } };
 		}
@@ -230,12 +230,12 @@ namespace NdGameSdk::ndlib::io {
 
 #if defined(T2R)
 
-	class NdGameSdk_API PackageManager : public ISdkComponent {
+	class NdGameSdk_API PackageMgr : public ISdkComponent {
 	public:
-		using PackageLoginResItemCallback = boost::function<bool(PackageMgr*, Package*, Package::ResItem*)>;
+		using PackageLoginResItemCallback = boost::function<bool(PackageMgrInternal*, Package*, Package::ResItem*)>;
 
-		PackageManager();
-		SdkEvent<PackageManager*> e_PackageManagerInitialized{true};
+		PackageMgr();
+		SdkEvent<PackageMgr*> e_PackageManagerInitialized{true};
 		SDK_DEPENDENCIES(EngineComponents, Memory, RenderFrameParams, NdJob);
 		
 		struct DumpHandle {
@@ -252,7 +252,7 @@ namespace NdGameSdk::ndlib::io {
 		bool ArePackageQueuesIdle() const;
 
 		bool RequestLoadPackage(const char* pPackageName, Level* pLevel = nullptr,
-			Package::PackagePartFlags pPartFlags = Package::PackagePartFlags::None, PackageMgr::PackageCategory pCategory = PackageMgr::PackageCategory::Initial);
+			Package::PackagePartFlags pPartFlags = Package::PackagePartFlags::None, PackageMgrInternal::PackageCategory pCategory = PackageMgrInternal::PackageCategory::Initial);
 		bool RequestLogoutPackage(StringId64 pPackId);
 		bool RequestReloadPackage(StringId64 pPackId);
 
@@ -260,9 +260,9 @@ namespace NdGameSdk::ndlib::io {
 		void Initialize() override;
 		void Awake() override;
 
-		PackageMgr* GetPackageMgr() const;
+		PackageMgrInternal* GetPackageMgrInternal() const;
 		bool ProcessLoginQueue(float budgetSec = 0x3f800000);
-		bool AddPackageRequest(PackageMgr::PackageRequest* pPackageRequest);
+		bool AddPackageRequest(PackageMgrInternal::PackageRequest* pPackageRequest);
 
 		std::expected<std::vector<Package::ResItem*>, std::string> ParseResources(PackageProcessingInfo* ppi);
 		DumpHandle DumpPackageResourcesAsync(
@@ -304,7 +304,7 @@ namespace NdGameSdk::ndlib::io {
 		static DMENU::ItemSubmenu* CreatePackageManagerMenu(NdDevMenu* pdmenu, DMENU::Menu* pMenu);
 
 		/*Extern Functs*/
-		static void Init(PackageMgr* pPackageMgr, PackageMgr::Configuration* pConfiguration);
+		static void Init(PackageMgrInternal* pPackageMgr, PackageMgrInternal::Configuration* pConfiguration);
 
 		EngineComponents* m_EngineComponents;
 		RenderFrameParams* m_RenderFrameParams;
@@ -318,31 +318,31 @@ namespace NdGameSdk::ndlib::io {
 		static bool* g_ShowPackageMemoryDetails;
 		static bool* g_LoadDebugPackagePages;
 
-		MEMBER_FUNCTION_PTR(Package*, PackageMgr_GetPackageById, PackageMgr* pPackageMgr, StringId64 PackId);
-		MEMBER_FUNCTION_PTR(PackageProcessingInfo*, PackageMgr_GetProcessingInfoFromPackage, PackageMgr* pPackageMgr, Package* pPackage);
-		MEMBER_FUNCTION_PTR(Package::Status, PackageMgr_GetPackageStatusById, PackageMgr* pPackageMgr, StringId64 PackId);
-		MEMBER_FUNCTION_PTR(Package*, PackageMgr_GetPackageByIndex, PackageMgr* pPackageMgr, uint32_t index, bool MustBeLoaded);
+		MEMBER_FUNCTION_PTR(Package*, PackageMgr_GetPackageById, PackageMgrInternal* pPackageMgr, StringId64 PackId);
+		MEMBER_FUNCTION_PTR(PackageProcessingInfo*, PackageMgr_GetProcessingInfoFromPackage, PackageMgrInternal* pPackageMgr, Package* pPackage);
+		MEMBER_FUNCTION_PTR(Package::Status, PackageMgr_GetPackageStatusById, PackageMgrInternal* pPackageMgr, StringId64 PackId);
+		MEMBER_FUNCTION_PTR(Package*, PackageMgr_GetPackageByIndex, PackageMgrInternal* pPackageMgr, uint32_t index, bool MustBeLoaded);
 		
 		MEMBER_FUNCTION_PTR(void, PackageMgr_UpdatePackageStatus, PackageProcessingInfo* pPackageInfo, PackageProcessingInfo::LoadingStatus status);
 		MEMBER_FUNCTION_PTR(void, PackageMgr_SetPackageStatus, PackageProcessingInfo* pPackageInfo);
 
-		MEMBER_FUNCTION_PTR(bool, PackageMgr_ProcessLoginQueue, PackageMgr* pPackageMgr, float budgetSec);
-		MEMBER_FUNCTION_PTR(PackageProcessingInfo*, PackageMgr_PreparePackageForLoading, PackageMgr* pPackageMgr, const char* pPackageName, uint32_t arg3);
-		MEMBER_FUNCTION_PTR(uint32_t, PackageMgr_LogoutPackage, PackageMgr* pPackageMgr, PackageProcessingInfo* pPackageInfo);
+		MEMBER_FUNCTION_PTR(bool, PackageMgr_ProcessLoginQueue, PackageMgrInternal* pPackageMgr, float budgetSec);
+		MEMBER_FUNCTION_PTR(PackageProcessingInfo*, PackageMgr_PreparePackageForLoading, PackageMgrInternal* pPackageMgr, const char* pPackageName, uint32_t arg3);
+		MEMBER_FUNCTION_PTR(uint32_t, PackageMgr_LogoutPackage, PackageMgrInternal* pPackageMgr, PackageProcessingInfo* pPackageInfo);
 
-		MEMBER_FUNCTION_PTR(bool, PackageMgr_PackageQueuesIdle, PackageMgr* pPackageMgr);
-		MEMBER_FUNCTION_PTR(void, PackageMgr_RequestLoadPackage, PackageMgr* pPackageMgr, const char* pPackageName, Level* pLevel, Package::PackagePartFlags pPartFlags, PackageMgr::PackageCategory pCategory);
-		MEMBER_FUNCTION_PTR(void, PackageMgr_RequestLogoutPackage, PackageMgr* pPackageMgr, StringId64 pPackId);
-		MEMBER_FUNCTION_PTR(void, PackageMgr_RequestReloadPackage, PackageMgr* pPackageMgr, StringId64 pPackId);
-		MEMBER_FUNCTION_PTR(void, PackageMgr_AddRequest, PackageMgr::PackageRequestInfo* pRequestInfo, PackageMgr::PackageRequest* pPackageRequest);
+		MEMBER_FUNCTION_PTR(bool, PackageMgr_PackageQueuesIdle, PackageMgrInternal* pPackageMgr);
+		MEMBER_FUNCTION_PTR(void, PackageMgr_RequestLoadPackage, PackageMgrInternal* pPackageMgr, const char* pPackageName, Level* pLevel, Package::PackagePartFlags pPartFlags, PackageMgrInternal::PackageCategory pCategory);
+		MEMBER_FUNCTION_PTR(void, PackageMgr_RequestLogoutPackage, PackageMgrInternal* pPackageMgr, StringId64 pPackId);
+		MEMBER_FUNCTION_PTR(void, PackageMgr_RequestReloadPackage, PackageMgrInternal* pPackageMgr, StringId64 pPackId);
+		MEMBER_FUNCTION_PTR(void, PackageMgr_AddRequest, PackageMgrInternal::PackageRequestInfo* pRequestInfo, PackageMgrInternal::PackageRequest* pPackageRequest);
 
 		friend class NdDevMenu;
 	};
 
 	TYPEDEF_EXTERN_FUNCTION_PTR(const char*, PackageMgr_PackageProcessingInfo_GetStatusString, PackageProcessingInfo::LoadingStatus status);
 
-	static_assert(sizeof(PackageMgr) == 0x4f70, "PackageMgr size mismatch! Please check the SDK version and the game version.");
-	static_assert(sizeof(PackageMgr::Configuration) == 0x50, "PackageMgr::Configuration size mismatch! Please check the SDK version and the game version.");
+	static_assert(sizeof(PackageMgrInternal) == 0x4f70, "PackageMgr size mismatch! Please check the SDK version and the game version.");
+	static_assert(sizeof(PackageMgrInternal::Configuration) == 0x50, "PackageMgr::Configuration size mismatch! Please check the SDK version and the game version.");
 	static_assert(sizeof(PackageProcessingInfo) == 0xad0, "PackageProcessingInfo size mismatch! Please check the SDK version and the game version.");
 
 #endif

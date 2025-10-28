@@ -16,8 +16,8 @@ namespace NdGameSdk::ndlib::memory {
 		return this->Get()->m_useCacheBlocks;
 	}
 
-	PackageMgr* LevelMemAllocator::GetPackageMgr() {
-		return reinterpret_cast<PackageMgr*>(this->Get()->m_packageMgr);
+	PackageMgrInternal* LevelMemAllocator::GetPackageMgr() {
+		return reinterpret_cast<PackageMgrInternal*>(this->Get()->m_packageMgr);
 	}
 
 	LoadingHeap* LevelMemAllocator::GetLoadingHeap() {

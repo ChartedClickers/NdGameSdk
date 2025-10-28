@@ -8,9 +8,9 @@
 namespace NdGameSdk::ndlib::io {
 
 #if defined(T2R)
-	PackageManager::PackageManager() : ISdkComponent(TOSTRING(PackageManager)) {}
+	PackageMgr::PackageMgr() : ISdkComponent(TOSTRING(PackageMgr)) {}
 
-	void PackageManager::Awake() {
+	void PackageMgr::Awake() {
 		auto SharedComponents = ISdkComponent::GetSharedComponents();
 		m_EngineComponents = GetDependencyComponent<EngineComponents>(SharedComponents);
 		m_Memory = GetDependencyComponent<Memory>(SharedComponents);
@@ -18,7 +18,7 @@ namespace NdGameSdk::ndlib::io {
 		m_JobSystem = GetDependencyComponent<NdJob>(SharedComponents);
 	}
 
-	void PackageManager::Initialize() {
+	void PackageMgr::Initialize() {
 		static std::once_flag Initialized;
 		std::call_once(Initialized, [this] {
 			spdlog::info("Initializing {} patterns...", GetName());
@@ -139,7 +139,7 @@ namespace NdGameSdk::ndlib::io {
 			}
 
 			m_PackageMgrInitHook = Utility::MakeSafetyHookInline(PackageMgrInit, Init,
-				wstr(Patterns::PackageMgr_Init), wstr(PackageManager::Init));
+				wstr(Patterns::PackageMgr_Init), wstr(PackageMgr::Init));
 
 			if (!m_PackageMgrInitHook) {
 				throw SdkComponentEx{ "Failed to create hooks!", SdkComponentEx::ErrorCode::PatchFailed };
@@ -152,25 +152,25 @@ namespace NdGameSdk::ndlib::io {
 		});
 	}
 
-	PackageMgr* PackageManager::GetPackageMgr() const {
+	PackageMgrInternal* PackageMgr::GetPackageMgrInternal() const {
 		return &m_EngineComponents->GetPackageMgr();
 	}
 
-	bool PackageManager::ProcessLoginQueue(float budgetSec) {
+	bool PackageMgr::ProcessLoginQueue(float budgetSec) {
 		always_assert(PackageMgr_ProcessLoginQueue == nullptr, "Function pointer was not set!");
-		return PackageMgr_ProcessLoginQueue(GetPackageMgr(), budgetSec);
+		return PackageMgr_ProcessLoginQueue(GetPackageMgrInternal(), budgetSec);
 	}
 
-	bool PackageManager::AddPackageRequest(PackageMgr::PackageRequest* pPackageRequest) {
+	bool PackageMgr::AddPackageRequest(PackageMgrInternal::PackageRequest* pPackageRequest) {
 		always_assert(PackageMgr_AddRequest == nullptr, "Function pointer was not set!");
-		PackageMgr_AddRequest(&GetPackageMgr()->GetPackageRequestInfo(), pPackageRequest);
+		PackageMgr_AddRequest(&GetPackageMgrInternal()->GetPackageRequestInfo(), pPackageRequest);
 		return true;
 	}
 
 	std::expected<std::vector<Package::ResItem*>, std::string> 
-		PackageManager::ParseResources(PackageProcessingInfo* ppi) {
+		PackageMgr::ParseResources(PackageProcessingInfo* ppi) {
 
-		PackageMgr* InternalMgr = GetPackageMgr();
+		PackageMgrInternal* InternalMgr = GetPackageMgrInternal();
 		Package* pkg = ppi->GetPackage();
 
 		always_assert(pkg == nullptr, "PackageProcessingInfo did not have a package set!");
@@ -231,14 +231,14 @@ namespace NdGameSdk::ndlib::io {
 		return ResOut;
 	}
 
-	PackageManager::DumpHandle PackageManager::DumpPackageResourcesAsync(
+	PackageMgr::DumpHandle PackageMgr::DumpPackageResourcesAsync(
 	std::span<const std::string> packages, PackageLoginResItemCallback onResItem,
 	uint32_t maxConcurrentLogins, uint32_t maxWaitFrames, uint32_t TimeoutMs, bool wait) {
 		DumpHandle out{};
 		if (packages.empty()) 
 			return out;
 
-		PackageMgr* InternalMgr = GetPackageMgr();
+		PackageMgrInternal* InternalMgr = GetPackageMgrInternal();
 
 		auto* ctx = m_Memory->AllocateAtContext<Dumper::Ctx>(sizeof(Dumper::Ctx), 0x10, InternalMgr->GetMemoryContext());
 		if (!ctx) return out;
@@ -281,12 +281,12 @@ namespace NdGameSdk::ndlib::io {
 		return out;
 	}
 
-	bool PackageManager::ArePackageQueuesIdle() const {
+	bool PackageMgr::ArePackageQueuesIdle() const {
 	#if defined(T2R) || defined(T1X)
 		always_assert(PackageMgr_PackageQueuesIdle == nullptr, "Function pointer was not set!");
-		return PackageMgr_PackageQueuesIdle(GetPackageMgr());
+		return PackageMgr_PackageQueuesIdle(GetPackageMgrInternal());
 	#else
-		auto InternalMgr = GetPackageMgr();
+		auto InternalMgr = GetPackageMgrInternal();
 		return InternalMgr->GetPackageRequestInfo().GetNumRequests() <= 0 &&
 			InternalMgr->GetProcessingLoadQueue().GetProcessingCount() <= 0 &&
 			InternalMgr->GetProcessingUpdateQueue().GetProcessingCount() <= 0 &&
@@ -295,14 +295,14 @@ namespace NdGameSdk::ndlib::io {
 	#endif
 	}
 
-	bool PackageManager::RequestLoadPackage(const char* pPackageName, Level* pLevel, Package::PackagePartFlags pPartFlags, PackageMgr::PackageCategory pCategory) {
+	bool PackageMgr::RequestLoadPackage(const char* pPackageName, Level* pLevel, Package::PackagePartFlags pPartFlags, PackageMgrInternal::PackageCategory pCategory) {
 	#if defined(T2R) || defined(T1X)
 		always_assert(PackageMgr_RequestLoadPackage == nullptr, "Function pointer was not set!");
-		PackageMgr_RequestLoadPackage(GetPackageMgr(), pPackageName, pLevel, pPartFlags, pCategory);
+		PackageMgr_RequestLoadPackage(GetPackageMgrInternal(), pPackageName, pLevel, pPartFlags, pCategory);
 		return true;
 	#else
-		PackageMgr::PackageRequest packageRequest {
-			PackageMgr::PackageRequest::RequestType::Login,
+		PackageMgrInternal::PackageRequest packageRequest {
+			PackageMgrInternal::PackageRequest::RequestType::Login,
 			SID(pPackageName),
 			pPackageName,
 			pLevel,
@@ -314,16 +314,16 @@ namespace NdGameSdk::ndlib::io {
 	#endif
 	}
 
-	bool PackageManager::RequestLogoutPackage(StringId64 pPackId) {
+	bool PackageMgr::RequestLogoutPackage(StringId64 pPackId) {
 	#if defined(T2R) || defined(T1X)
 		always_assert(PackageMgr_RequestLogoutPackage == nullptr, "Function pointer was not set!");
-		PackageMgr_RequestLogoutPackage(GetPackageMgr(), pPackId);
+		PackageMgr_RequestLogoutPackage(GetPackageMgrInternal(), pPackId);
 		return true;
 	#else
 		auto pPackage = GetPackageById(pPackId);
 		if (pPackage) {
-			PackageMgr::PackageRequest packageRequest{
-				PackageMgr::PackageRequest::RequestType::Logout,
+			PackageMgrInternal::PackageRequest packageRequest{
+				PackageMgrInternal::PackageRequest::RequestType::Logout,
 				pPackage->GetPackId(),
 				pPackage->GetName(),
 				nullptr
@@ -334,16 +334,16 @@ namespace NdGameSdk::ndlib::io {
 	#endif
 	}
 
-	bool PackageManager::RequestReloadPackage(StringId64 pPackId) {
+	bool PackageMgr::RequestReloadPackage(StringId64 pPackId) {
 #if defined(T2R) || defined(T1X)
 		always_assert(PackageMgr_RequestReloadPackage == nullptr, "Function pointer was not set!");
-		PackageMgr_RequestReloadPackage(GetPackageMgr(), pPackId);
+		PackageMgr_RequestReloadPackage(GetPackageMgrInternal(), pPackId);
 		return true;
 #else
 		auto pPackage = GetPackageById(pPackId);
 		if (pPackage) {
-			PackageMgr::PackageRequest packageRequest{
-				PackageMgr::PackageRequest::RequestType::Logout,
+			PackageMgrInternal::PackageRequest packageRequest{
+				PackageMgrInternal::PackageRequest::RequestType::Logout,
 				pPackage->GetPackId(),
 				pPackage->GetName(),
 				nullptr
@@ -351,8 +351,8 @@ namespace NdGameSdk::ndlib::io {
 
 			AddPackageRequest(&packageRequest);
 
-			PackageMgr::PackageRequest packageRequest{
-				PackageMgr::PackageRequest::RequestType::Login,
+			PackageMgrInternal::PackageRequest packageRequest{
+				PackageMgrInternal::PackageRequest::RequestType::Login,
 				pPackage->GetPackId(),
 				pPackage->GetName(),
 				pPackage->GetLevel()
@@ -368,9 +368,9 @@ namespace NdGameSdk::ndlib::io {
 #endif
 	}
 
-	bool PackageManager::TestDumpPackages(DMENU::ItemFunction& pFunction, DMENU::Message pMessage) {
+	bool PackageMgr::TestDumpPackages(DMENU::ItemFunction& pFunction, DMENU::Message pMessage) {
 		if (pMessage == DMENU::Message::OnExecute) {
-			auto pm = reinterpret_cast<PackageManager*>(pFunction.Data());
+			auto pm = reinterpret_cast<PackageMgr*>(pFunction.Data());
 			if (pm) {
 
 				spdlog::info("TestDumpPackages : launching DumpPackageResources (NdJobWorkerThread async)");
@@ -381,7 +381,7 @@ namespace NdGameSdk::ndlib::io {
 					"t2r-anim-nor-sewers"
 				};
 
-				auto cb = [](PackageMgr*, Package* pkg, Package::ResItem* ri) -> bool {
+				auto cb = [](PackageMgrInternal*, Package* pkg, Package::ResItem* ri) -> bool {
 					std::string_view name = ri->GetResourceName();
 					spdlog::info("[Dump]  {:<28} {}", pkg->GetName(), name);
 					return true;
@@ -410,16 +410,16 @@ namespace NdGameSdk::ndlib::io {
 		return true;
 	}
 
-	bool PackageManager::TestLoginPackage(DMENU::ItemFunction& pFunction, DMENU::Message pMessage) {
+	bool PackageMgr::TestLoginPackage(DMENU::ItemFunction& pFunction, DMENU::Message pMessage) {
 		if (pMessage == DMENU::Message::OnExecute) {
-			auto pm = reinterpret_cast<PackageManager*>(pFunction.Data());
+			auto pm = reinterpret_cast<PackageMgr*>(pFunction.Data());
 			if (pm) {
 
 				const char* packageName = "t2r-anim-ratking";
 
 				if (!pm->GetPackageById(SID(packageName))) {
 					spdlog::info("Package '{}' not found, requesting load...", packageName);
-					if (pm->RequestLoadPackage(packageName, nullptr, Package::PackagePartFlags::None, PackageMgr::PackageCategory::GlobalPak)) {
+					if (pm->RequestLoadPackage(packageName, nullptr, Package::PackagePartFlags::None, PackageMgrInternal::PackageCategory::GlobalPak)) {
 						spdlog::info("Load request for package '{}' sent successfully.", packageName);
 						pFunction.SetActive(true);
 					}
@@ -439,7 +439,7 @@ namespace NdGameSdk::ndlib::io {
 		}
 
 		if (pMessage == DMENU::Message::OnOpen) {
-			auto pm = reinterpret_cast<PackageManager*>(pFunction.Data());
+			auto pm = reinterpret_cast<PackageMgr*>(pFunction.Data());
 			if (pm) {
 				const char* packageName = "t2r-anim-ratking";
 				auto pPackage = pm->GetPackageById(SID(packageName));
@@ -455,24 +455,24 @@ namespace NdGameSdk::ndlib::io {
 		return true;
 	}
 
-	bool PackageManager::TestParseResources(DMENU::ItemFunction& pFunction, DMENU::Message pMessage) {
+	bool PackageMgr::TestParseResources(DMENU::ItemFunction& pFunction, DMENU::Message pMessage) {
 		if (pMessage == DMENU::Message::OnExecute) {
-			auto PackageMgr = reinterpret_cast<PackageManager*>(pFunction.Data());
-			if (PackageMgr) {
+			auto pPackageMgr = reinterpret_cast<PackageMgr*>(pFunction.Data());
+			if (pPackageMgr) {
 				spdlog::info("TestParseResources called!");
 
 				const char* packageName = "t2r-anim-ratking";
 
-				auto pPackage = PackageMgr->GetPackageById(SID(packageName));
+				auto pPackage = pPackageMgr->GetPackageById(SID(packageName));
 
 				if (pPackage) {
 					spdlog::info("Package '{}' found, fetching processing info...", packageName);
-					auto pProcessingInfo = PackageMgr->FetchPackageProcessingInfo(pPackage);
+					auto pProcessingInfo = pPackageMgr->FetchPackageProcessingInfo(pPackage);
 					if (pProcessingInfo) {
 						spdlog::info("Processing info for package '{}': Status = {}", packageName, pProcessingInfo->GetStatusString());
 
 						if (pProcessingInfo->GetStatus() == PackageProcessingInfo::LoadingStatus::LoadingPackageStatusLoaded) {
-							auto res = PackageMgr->ParseResources(pProcessingInfo);
+							auto res = pPackageMgr->ParseResources(pProcessingInfo);
 							for (Package::ResItem* item : res.value_or({})) {
 								if (item) {
 									spdlog::info("Resource Item: Type = {}, Name = {}, Size = {} bytes",
@@ -498,14 +498,14 @@ namespace NdGameSdk::ndlib::io {
 		return true;
 	}
 
-	Package* PackageManager::GetPackageById(StringId64 PackId) {
+	Package* PackageMgr::GetPackageById(StringId64 PackId) {
 		always_assert(PackageMgr_GetPackageById == nullptr, "Function pointer was not set!");
-		return PackageMgr_GetPackageById(GetPackageMgr(), PackId);
+		return PackageMgr_GetPackageById(GetPackageMgrInternal(), PackId);
 	}
 
-	PackageProcessingInfo* PackageManager::FetchPackageProcessingInfo(Package* pPackage) {
+	PackageProcessingInfo* PackageMgr::FetchPackageProcessingInfo(Package* pPackage) {
 		if (!pPackage) return nullptr;
-		auto* InternalMgr = GetPackageMgr();
+		auto* InternalMgr = GetPackageMgrInternal();
 
 	#if defined(T2R) || defined(T1X)
 		always_assert(PackageMgr_GetProcessingInfoFromPackage == nullptr, "Function pointer was not set!");
@@ -521,8 +521,8 @@ namespace NdGameSdk::ndlib::io {
 	#endif
 	}
 
-	int PackageManager::GetNumUsedPackageSlots() const {
-		auto* InternalMgr = GetPackageMgr();
+	int PackageMgr::GetNumUsedPackageSlots() const {
+		auto* InternalMgr = GetPackageMgrInternal();
 
 		const int capacity = InternalMgr->GetFreePackageSlots();
 		const Package* cur = InternalMgr->PackageHead();
@@ -535,17 +535,17 @@ namespace NdGameSdk::ndlib::io {
 		return used;
 	}
 
-	int PackageManager::GetNumFreePackageSlots() const {
-		auto* InternalMgr = GetPackageMgr();
+	int PackageMgr::GetNumFreePackageSlots() const {
+		auto* InternalMgr = GetPackageMgrInternal();
 		return InternalMgr->GetFreePackageSlots() - GetNumUsedPackageSlots();
 	}
 
-	bool PackageManager::HasFreePackageSlot() const {
+	bool PackageMgr::HasFreePackageSlot() const {
 		return GetNumFreePackageSlots() > 0;
 	}
 
-	void PackageManager::Init(PackageMgr* pPackageMgr, PackageMgr::Configuration* pConfiguration) {
-		auto pPackageManager = Instance<PackageManager>();
+	void PackageMgr::Init(PackageMgrInternal* pPackageMgr, PackageMgrInternal::Configuration* pConfiguration) {
+		auto pPackageManager = Instance<PackageMgr>();
 		pPackageManager->m_PackageMgrInitHook.thiscall<void>(pPackageMgr, pConfiguration);
 
 		NdSystem* pSystem = GetSharedComponents()->GetComponent<NdSystem>();
@@ -560,8 +560,8 @@ namespace NdGameSdk::ndlib::io {
 		pPackageManager->InvokeSdkEvent(pPackageManager->e_PackageManagerInitialized, pPackageManager);
 	}
 		
-	DMENU::ItemSubmenu* PackageManager::CreatePackageManagerMenu(NdDevMenu* pdmenu, DMENU::Menu* pMenu) {
-		auto pPackageManager = Instance<PackageManager>();
+	DMENU::ItemSubmenu* PackageMgr::CreatePackageManagerMenu(NdDevMenu* pdmenu, DMENU::Menu* pMenu) {
+		auto pPackageManager = Instance<PackageMgr>();
 		if (pPackageManager) {
 			uint64_t PackageManagerAddr = reinterpret_cast<uint64_t>(static_cast<void*>(pPackageManager));
 			DMENU::Menu* PackageManagerMenu = pdmenu->Create_DMENU_Menu(pPackageManager->GetName().data(), HeapArena_Source);
@@ -574,10 +574,10 @@ namespace NdGameSdk::ndlib::io {
 				pdmenu->Create_DMENU_ItemFunction("Test PakNameLookup", PackageManagerMenu,
 					+[](DMENU::ItemFunction& pFunction, DMENU::Message pMessage)->bool {
 						if (pMessage == DMENU::Message::OnExecute) {
-							auto mgr = reinterpret_cast<PackageManager*>(pFunction.Data());
+							auto mgr = reinterpret_cast<PackageMgr*>(pFunction.Data());
 							if (mgr) {
 
-								auto& table = mgr->GetPackageMgr()->GetPakNameLookup();
+								auto& table = mgr->GetPackageMgrInternal()->GetPakNameLookup();
 								spdlog::info("PakNameLookup size: {}", table.Size());
 
 								table.ForEach([](const StringId64& key, uint32_t value) {
@@ -599,17 +599,17 @@ namespace NdGameSdk::ndlib::io {
 		return nullptr;
 	}
 
-	void __cdecl PackageManager::Dumper::ResEntry(ResWork* pResWork) {
-		PackageManager* pm = Instance<PackageManager>();
+	void __cdecl PackageMgr::Dumper::ResEntry(ResWork* pResWork) {
+		PackageMgr* pm = Instance<PackageMgr>();
 		if (!pResWork || !pResWork->cb) return;
-		pResWork->cb(pm->GetPackageMgr(), pResWork->pkg, pResWork->res);
+		pResWork->cb(pm->GetPackageMgrInternal(), pResWork->pkg, pResWork->res);
 	}
 
-	void __cdecl PackageManager::Dumper::Coordinator(Ctx* ctx) {
+	void __cdecl PackageMgr::Dumper::Coordinator(Ctx* ctx) {
 		if (!ctx) return;
 
-		PackageManager* pm = Instance<PackageManager>();
-		PackageMgr* mgr = pm->GetPackageMgr();
+		PackageMgr* pm = Instance<PackageMgr>();
+		PackageMgrInternal* mgr = pm->GetPackageMgrInternal();
 		NdJob* js = pm->m_JobSystem;
 		Memory* mem = pm->m_Memory;
 
@@ -732,7 +732,7 @@ namespace NdGameSdk::ndlib::io {
 				// login
 				for (size_t i = 0; i < batch; ++i) {
 					const char* name = ctx->names[cursor + i];
-					pm->RequestLoadPackage(name, nullptr, Package::PackagePartFlags::None, PackageMgr::PackageCategory::GlobalPak);
+					pm->RequestLoadPackage(name, nullptr, Package::PackagePartFlags::None, PackageMgrInternal::PackageCategory::GlobalPak);
 					ctx->batchIds[i] = ctx->ids[cursor + i];
 					spdlog::info("[PkgDump] login '{}'", name);
 				}
@@ -854,9 +854,9 @@ namespace NdGameSdk::ndlib::io {
 		mem->PopAllocator();
 	}
 
-	void PackageManager::Dumper::FreeCtx(Ctx* ctx) {
-		auto* pm = Instance<PackageManager>();
-		always_assert(pm == nullptr, "PackageManager instance missing in FreeCtx");
+	void PackageMgr::Dumper::FreeCtx(Ctx* ctx) {
+		auto* pm = Instance<PackageMgr>();
+		always_assert(pm == nullptr, "PackageMgr instance missing in FreeCtx");
 
 		Memory* mem = pm->m_Memory;
 		mem->Free(ctx->namesRaw, HeapArena_Source);
@@ -866,99 +866,99 @@ namespace NdGameSdk::ndlib::io {
 		mem->Free(ctx, HeapArena_Source);
 	}
 
-	int PackageMgr::GetFreePackageSlots() const {
+	int PackageMgrInternal::GetFreePackageSlots() const {
 		return this->Get()->m_freepackageslots;
 	}
 
-	int PackageMgr::GetAllocationRingBufferSize() const {
+	int PackageMgrInternal::GetAllocationRingBufferSize() const {
 		return this->Get()->m_allocationRingBufferSize;
 	}
 
-	Memory::Context& PackageMgr::GetRingBufferContext() const {
+	Memory::Context& PackageMgrInternal::GetRingBufferContext() const {
 		return this->Get()->m_RingBufferContext;
 	}
 
-	Memory::Context& PackageMgr::GetMemoryContext() const {
+	Memory::Context& PackageMgrInternal::GetMemoryContext() const {
 		return this->Get()->m_memoryContext;
 	}
 
-	Package* PackageMgr::PackageHead() {
+	Package* PackageMgrInternal::PackageHead() {
 		return reinterpret_cast<Package*>(this->Get()->m_packages);
 	}
 
-	const Package* PackageMgr::PackageHead() const {
+	const Package* PackageMgrInternal::PackageHead() const {
 		return reinterpret_cast<const Package*>(this->Get()->m_packages);
 	}
 
-	PackageProcessingInfo* PackageMgr::PackageHeadProcessingInfo() {
+	PackageProcessingInfo* PackageMgrInternal::PackageHeadProcessingInfo() {
 		return reinterpret_cast<PackageProcessingInfo*>(this->Get()->m_packageinfos);
 	}
 
-	const PackageProcessingInfo* PackageMgr::PackageHeadProcessingInfo() const {
+	const PackageProcessingInfo* PackageMgrInternal::PackageHeadProcessingInfo() const {
 		return reinterpret_cast<const PackageProcessingInfo*>(this->Get()->m_packageinfos);
 	}
 
-	PackageMgr::PackageRequestInfo& PackageMgr::GetPackageRequestInfo() {
+	PackageMgrInternal::PackageRequestInfo& PackageMgrInternal::GetPackageRequestInfo() {
 		return reinterpret_cast<PackageRequestInfo&>(this->Get()->m_RequestInfo);
 	}
 
-	PackageMgr::ProcessingRingBuffer& PackageMgr::GetProcessingLoadQueue() const {
+	PackageMgrInternal::ProcessingRingBuffer& PackageMgrInternal::GetProcessingLoadQueue() const {
 		return reinterpret_cast<ProcessingRingBuffer&>(this->Get()->m_processingLoadQueue);
 	}
 
-	PackageMgr::ProcessingRingBuffer& PackageMgr::GetProcessingUpdateQueue() const {
+	PackageMgrInternal::ProcessingRingBuffer& PackageMgrInternal::GetProcessingUpdateQueue() const {
 		return reinterpret_cast<ProcessingRingBuffer&>(this->Get()->m_processingUpdateQueue);
 	}
 
-	PackageMgr::ProcessingRingBuffer& PackageMgr::GetProcessingUnloadQueue() const {
+	PackageMgrInternal::ProcessingRingBuffer& PackageMgrInternal::GetProcessingUnloadQueue() const {
 		return reinterpret_cast<ProcessingRingBuffer&>(this->Get()->m_processingUnloadQueue);
 	}
 
-	Mutex* PackageMgr::GetLoadingLock() const {
+	Mutex* PackageMgrInternal::GetLoadingLock() const {
 		return reinterpret_cast<Mutex*>(&this->Get()->m_LoadingLock);
 	}
 
-	Mutex* PackageMgr::GetLoginLock() const {
+	Mutex* PackageMgrInternal::GetLoginLock() const {
 		return reinterpret_cast<Mutex*>(&this->Get()->m_LoginLock);
 	}
 
-	int PackageMgr::Configuration::GetFreePackageSlots() const {
+	int PackageMgrInternal::Configuration::GetFreePackageSlots() const {
 		return this->Get()->m_freepackageslots;
 	}
 
-	int PackageMgr::Configuration::GetAllocationRingBufferSize() const {
+	int PackageMgrInternal::Configuration::GetAllocationRingBufferSize() const {
 		return this->Get()->m_allocationRingBufferSize;
 	}
 
-	void PackageMgr::Configuration::SetFreePackageSlots(int slots) {
+	void PackageMgrInternal::Configuration::SetFreePackageSlots(int slots) {
 		this->Get()->m_freepackageslots = slots;
 	}
 
-	void PackageMgr::Configuration::SetAllocationRingBufferSize(int size) {
+	void PackageMgrInternal::Configuration::SetAllocationRingBufferSize(int size) {
 		this->Get()->m_allocationRingBufferSize = size;
 	}
 
-	int PackageMgr::GetPackageReleaseVramCount() {
+	int PackageMgrInternal::GetPackageReleaseVramCount() {
 		return this->Get()->m_PendingPackageVramReleaseCount;
 	}
 
-	PackageProcessingInfo** PackageMgr::GetPendingPackageVramRelease() {
+	PackageProcessingInfo** PackageMgrInternal::GetPendingPackageVramRelease() {
 		return reinterpret_cast<PackageProcessingInfo**>(this->Get()->m_PendingPackageVramRelease);
 	}
 
-	RobinHoodHashTable<StringId64, uint32_t>& PackageMgr::GetPakNameLookup() const {
+	RobinHoodHashTable<StringId64, uint32_t>& PackageMgrInternal::GetPakNameLookup() const {
 		return reinterpret_cast<RobinHoodHashTable<StringId64, uint32_t>&>(this->Get()->m_pakNameLookup);
 	}
 
-	RobinHoodHashTable<StringId64, uint32_t>& PackageMgr::GetNickNameLookup() const {
+	RobinHoodHashTable<StringId64, uint32_t>& PackageMgrInternal::GetNickNameLookup() const {
 		return reinterpret_cast<RobinHoodHashTable<StringId64, uint32_t>&>(this->Get()->m_nickNameLookup);
 	}
 
-	bool PackageMgr::PackageLoginResItem(Package* pPackage, Package::ResItem* pResItem) {
+	bool PackageMgrInternal::PackageLoginResItem(Package* pPackage, Package::ResItem* pResItem) {
 		return this->Get()->m_PackageLoginResFuncs->PackageLoginResItem(pPackage->Get(), pResItem->Get());
 	}
 
-	void PackageMgr::ReleaseLoadedVramPages() {
+	void PackageMgrInternal::ReleaseLoadedVramPages() {
 		this->Get()->m_PackageLoginResFuncs->ReleaseLoadedVramPages();
 	}
 
@@ -1032,59 +1032,59 @@ namespace NdGameSdk::ndlib::io {
 	#endif
 	}
 
-	PackageMgr::PackageRequest::RequestType PackageMgr::PackageRequest::GetRequestType() const {
+	PackageMgrInternal::PackageRequest::RequestType PackageMgrInternal::PackageRequest::GetRequestType() const {
 		return this->Get()->m_RequestType;
 	}
 
-	Package::PackagePartFlags PackageMgr::PackageRequest::GetPartFlags() const {
+	Package::PackagePartFlags PackageMgrInternal::PackageRequest::GetPartFlags() const {
 		return this->Get()->m_PartFlags;
 	}
 
-	StringId64 PackageMgr::PackageRequest::GetPackId() const {
+	StringId64 PackageMgrInternal::PackageRequest::GetPackId() const {
 		return this->Get()->m_packid;
 	}
 
-	uint32_t PackageMgr::PackageRequestInfo::GetTotalRequests() const {
+	uint32_t PackageMgrInternal::PackageRequestInfo::GetTotalRequests() const {
 		return this->Get()->m_totalrequested;
 	}
 
-	uint32_t PackageMgr::PackageRequestInfo::GetOverAllRequests() const {
+	uint32_t PackageMgrInternal::PackageRequestInfo::GetOverAllRequests() const {
 		return this->Get()->m_overallrequested;
 	}
 
-	uint32_t PackageMgr::PackageRequestInfo::GetNumRequests() const {
+	uint32_t PackageMgrInternal::PackageRequestInfo::GetNumRequests() const {
 		return this->Get()->m_numPackagesRequested;
 	}
 
-	uint32_t PackageMgr::PackageRequestInfo::GetLimitRequests() const {
+	uint32_t PackageMgrInternal::PackageRequestInfo::GetLimitRequests() const {
 		return this->Get()->m_maxrequestlimit;
 	}
 
-	PackageMgr::PackageRequest* PackageMgr::PackageRequestInfo::GetRequests() {
-		return reinterpret_cast<PackageMgr::PackageRequest*>(this->Get()->m_PackagesRequested);
+	PackageMgrInternal::PackageRequest* PackageMgrInternal::PackageRequestInfo::GetRequests() {
+		return reinterpret_cast<PackageMgrInternal::PackageRequest*>(this->Get()->m_PackagesRequested);
 	}
 
-	int PackageMgr::ProcessingRingBuffer::GetProcessingCount() const {
+	int PackageMgrInternal::ProcessingRingBuffer::GetProcessingCount() const {
 		return this->Get()->m_numQueued;
 	}
 
-	PackageProcessingInfo** PackageMgr::ProcessingRingBuffer::GetSlotArray() const {
+	PackageProcessingInfo** PackageMgrInternal::ProcessingRingBuffer::GetSlotArray() const {
 		return reinterpret_cast<PackageProcessingInfo**>(this->Get()->m_slots);
 	}
 
-	uint32_t PackageMgr::ProcessingRingBuffer::Capacity() const {
+	uint32_t PackageMgrInternal::ProcessingRingBuffer::Capacity() const {
 		return this->Get()->m_capacity;
 	}
 
-	uint32_t PackageMgr::ProcessingRingBuffer::Head() const {
+	uint32_t PackageMgrInternal::ProcessingRingBuffer::Head() const {
 		return this->Get()->m_head;
 	}
 
-	bool* PackageManager::g_ShowPackageStatus = nullptr;
-	bool* PackageManager::g_ShowPackageMemoryDetails = nullptr;
-	bool* PackageManager::g_LoadDebugPackagePages = nullptr;
+	bool* PackageMgr::g_ShowPackageStatus = nullptr;
+	bool* PackageMgr::g_ShowPackageMemoryDetails = nullptr;
+	bool* PackageMgr::g_LoadDebugPackagePages = nullptr;
 
-	Mutex PackageManager::Dumper::s_DumperMutex{};
+	Mutex PackageMgr::Dumper::s_DumperMutex{};
 
 	INIT_FUNCTION_PTR(PackageMgr_PackageProcessingInfo_GetStatusString);
 

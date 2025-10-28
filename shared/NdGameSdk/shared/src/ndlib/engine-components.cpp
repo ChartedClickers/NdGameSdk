@@ -46,8 +46,8 @@ namespace NdGameSdk::ndlib {
 		return *GetEngineComponent<ndlib::io::FileSystemWin>(EngineComponent::FileSystem);
 	}
 
-	ndlib::io::PackageMgr& EngineComponents::GetPackageMgr() {
-		return *GetEngineComponent<ndlib::io::PackageMgr>(EngineComponent::PackageMgr);
+	ndlib::io::PackageMgrInternal& EngineComponents::GetPackageMgr() {
+		return *GetEngineComponent<ndlib::io::PackageMgrInternal>(EngineComponent::PackageMgr);
 	}
 
 	ndlib::io::PrefetchMgr& EngineComponents::GetPrefetchMgr() {

@@ -68,6 +68,8 @@ namespace NdGameSdk::gamelib::level {
 		MEMBER_FUNCTION_PTR(LevelDef*, LevelDefCollection_AsyncLoad, LevelDefCollectionInternal* pLevelDefCollection, LevelDef* pLevelDef);
 	};
 
+	static_assert(sizeof(LevelDefCollectionInternal) == 0x75b0, "Size of LevelDefCollection is not correct.");
+
 #endif
 
 }

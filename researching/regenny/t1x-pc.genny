@@ -2478,6 +2478,8 @@ namespace regenny {
             // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\gamelib\level
             namespace level {
 
+                struct LevelMgr {}; // Not verified for t1x
+
                 struct GameLoading {
 
                     enum TransitionStatus : uint32_t {

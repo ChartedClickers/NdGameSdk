@@ -103,5 +103,10 @@ namespace NdGameSdk::gamelib::level {
 		MEMBER_FUNCTION_PTR(bool, LoadRegistry_AreWantLoadLevelsFullySpawned, LoadRegistryInternal* pLoadRegistry);
 	};
 
+	static_assert(sizeof(LoadRegistryInternal) == 0x320, "Size of LoadRegistry is incorrect");
+	static_assert(sizeof(LoadRegistryInternal::WantLoads) == 0xa8, "Size of LoadRegistry::WantLoads is incorrect");
+	static_assert(sizeof(LoadRegistryInternal::WantLoads::Node) - sizeof(FixedSizeHashTable<LoadRegistryInternal::WantLoads::Node>::ListHead) == 0x38, "Size of LoadRegistry::WantLoads::Node is incorrect");
+	static_assert(sizeof(LoadRegistryInternal::ReloadNode) - sizeof(FixedSizeHashTable<LoadRegistryInternal::ReloadNode>::ListHead) == 0x20, "Size of LoadRegistry::ReloadNode is incorrect");
+
 #endif
 }

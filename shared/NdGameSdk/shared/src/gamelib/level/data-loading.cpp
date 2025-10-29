@@ -3,6 +3,7 @@
 
 #include "level-def-collection.hpp"
 #include "load-registry.hpp"
+#include "level-util.hpp"
 
 namespace NdGameSdk::gamelib::level {
 #if defined(T2R)
@@ -32,6 +33,34 @@ namespace NdGameSdk::gamelib::level {
 
 			if (!DataLoadingInitialize) {
 				throw SdkComponentEx { std::format("Failed to find addresses!"), SdkComponentEx::ErrorCode::PatternFailed };
+			}
+
+			findpattern = Patterns::DataLoading_LevelUtil_LoadActorByName;
+			LevelUtil::DataLoading_LevelUtil_LoadActorByName = (LevelUtil::DataLoading_LevelUtil_LoadActorByName_ptr)Utility::FindAndPrintPattern(module
+				, findpattern.pattern, wstr(Patterns::DataLoading_LevelUtil_LoadActorByName), findpattern.offset);
+
+			findpattern = Patterns::DataLoading_LevelUtil_UnloadActor;
+			LevelUtil::DataLoading_LevelUtil_UnloadActor = (LevelUtil::DataLoading_LevelUtil_UnloadActor_ptr)Utility::FindAndPrintPattern(module
+				, findpattern.pattern, wstr(Patterns::DataLoading_LevelUtil_UnloadActor), findpattern.offset);
+
+			findpattern = Patterns::DataLoading_LevelUtil_ReloadLevel;
+			LevelUtil::DataLoading_LevelUtil_ReloadLevel = (LevelUtil::DataLoading_LevelUtil_ReloadLevel_ptr)Utility::FindAndPrintPattern(module
+				, findpattern.pattern, wstr(Patterns::DataLoading_LevelUtil_ReloadLevel), findpattern.offset);
+
+			findpattern = Patterns::DataLoading_LevelUtil_CacheFilenames;
+			LevelUtil::DataLoading_LevelUtil_CacheFilenames = (LevelUtil::DataLoading_LevelUtil_CacheFilenames_ptr)Utility::FindAndPrintPattern(module
+				, findpattern.pattern, wstr(Patterns::DataLoading_LevelUtil_CacheFilenames), findpattern.offset);
+
+			findpattern = Patterns::DataLoading_LevelUtil_LoadLevelSet;
+			LevelUtil::DataLoading_LevelUtil_LoadLevelSet = (LevelUtil::DataLoading_LevelUtil_LoadLevelSet_ptr)Utility::FindAndPrintPattern(module
+				, findpattern.pattern, wstr(Patterns::DataLoading_LevelUtil_LoadLevelSet), findpattern.offset);
+
+			if (!LevelUtil::DataLoading_LevelUtil_LoadActorByName ||
+				!LevelUtil::DataLoading_LevelUtil_UnloadActor ||
+				!LevelUtil::DataLoading_LevelUtil_ReloadLevel ||
+				!LevelUtil::DataLoading_LevelUtil_CacheFilenames ||
+				!LevelUtil::DataLoading_LevelUtil_LoadLevelSet) {
+				throw SdkComponentEx{ "Failed to find LevelUtil:: game functions!", SdkComponentEx::ErrorCode::PatternFailed};
 			}
 
 			m_DataLoadingInitializeHook = Utility::MakeSafetyHookInline(DataLoadingInitialize, DataLoading::InitializeInternal,

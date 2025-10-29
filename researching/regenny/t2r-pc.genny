@@ -3036,7 +3036,7 @@ namespace regenny {
                         corelib.containers.FixedSizeHashTable<Node> m_table;
                     };
 
-                    struct ReloadNode : corelib.containers.FixedSizeHashTable.ListHead 0x20 {
+                    struct ReloadNode : corelib.containers.FixedSizeHashTable.ListHead 0x30 {
                         StringId64 m_NameId;
                         // LoadRegistry::ReloadCallback
                         void* m_Callback;
@@ -3085,13 +3085,6 @@ namespace regenny {
                         BackgroundLevel = 0x4,
                         DisplayLevel = 0x8,
                         SubtypeMask = 0xc
-
-                        /*
-                        inline bool IsStreamingWorld(uint16_t flags)     { return (flags & 0x0002) != 0; }
-                        inline bool IsDisplayLevel(uint16_t flags)       { return (flags & 0x000C) == 0x0008; }
-                        inline bool IsBackgroundLevel(uint16_t flags)    { return (flags & 0x000C) == 0x0004; }
-                        */
-
                     };
 
                     enum LevelDisplayControl : uint16_t {
@@ -3116,7 +3109,7 @@ namespace regenny {
                         BackgroundLoginQueued = 0x40
                     };
 
-                    enum Status : uint64_t {
+                    enum Status : uint32_t {
                         Empty = 0x0,
                         Initialized = 0x1,
                         Loading = 0x2,
@@ -3168,6 +3161,12 @@ namespace regenny {
                         char* m_soundBanks [[utf8**]];
                     };
 
+                    struct BgDrivenByFgCandidate 0x10 {
+                        Level* m_pLevel;
+                        uint32_t m_candidateIndex;
+                        float m_distance @ 0xc;
+                    };
+
                     TypeFlags m_typeFlags;
                     LevelDisplayControl m_displayControlFlags;
                     LevelSpec.Layer m_activeContentFlags;
@@ -3181,7 +3180,7 @@ namespace regenny {
                     uint32_t m_featurePerchIndex;
                     vec4 m_backgroundLoginOffset @ 0x30;
                     Status m_state;
-                    char* m_LevelName [[utf8*]];
+                    char* m_LevelName @ 0x48 [[utf8*]];
                     StringId64 m_LevelId;
                     // ListArray<class StringId64>
                     corelib.containers.ListArray<StringId64> m_PackageNameIds;
@@ -3190,8 +3189,8 @@ namespace regenny {
                     void* m_pLevelSoundBankInfo;
                     void* m_pVoxSoundBankInfo;
                     LevelDef* m_pLevelDef;
-                    uint64_t m_dependentsLock;
-                    DependentProcessNode* m_dependentProcHead @ 0xb0;
+                    corelib.system.platform.ndsys.WaitLock m_dependentsLock;
+                    DependentProcessNode* m_dependentProcHead;
                     uint32_t m_reloadTicket;
                     uint64_t m_loginStartTicks @ 0xc0;
                     uint64_t m_fieldc8;
@@ -3304,6 +3303,7 @@ namespace regenny {
                     // ListArray<class Request *>
                     corelib.containers.ListArray<Request> m_requests;
                     // ListArray<class WantLoadInfo *>
+                    // temporary mirror of WantLoadInfo entries, it’s populated ad hoc inside `GenerateTodoLists`
                     corelib.containers.ListArray<WantLoadInfo> m_wantLoadsTmp;
                     // FixedSizeHashTable<class LevelMgr::LevelLookupNode>
                     corelib.containers.FixedSizeHashTable<LevelLookupNode> m_activeLevelMap;
@@ -3366,8 +3366,6 @@ namespace regenny {
                     bool m_showLoadingRequests;
                     uint32_t m_pumpMaxWorkCount @ 0x481f10; // Max Spawns Per Frame
                 }; // level-mgr.cpp
-
-
 
                 struct GameLoading {
 

@@ -84,5 +84,7 @@ namespace NdGameSdk::gamelib::level {
 		friend class LoadRegistry;
 	};
 
+	static_assert(sizeof(WantLoadInfo) == 0x28, "Size of WantLoadInfo is not correct.");
+
 #endif
 }

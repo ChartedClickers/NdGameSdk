@@ -47,7 +47,8 @@ struct LoadRegistry {
         void* m_UserData; // 0x20
         regenny::shared::ndlib::io::AssetType m_AssetType; // 0x28
         bool m_Dispatched; // 0x2c
-    }; // Size: 0x2d
+        private: char pad_2d[0x3]; public:
+    }; // Size: 0x30
 
     struct FixedSizeHashTable_corelib_containers_ReloadNode {
         regenny::shared::gamelib::level::LoadRegistry::ReloadNode** m_Buckets; // 0x0

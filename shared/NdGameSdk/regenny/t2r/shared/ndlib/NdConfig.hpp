@@ -4,13 +4,13 @@
 #include "..\gamelib\level\DataLoading.hpp"
 #include "debug\DMENU.hpp"
 namespace regenny::shared::gamelib::level {
-struct LevelDefCollection;
-}
-namespace regenny::shared::gamelib::level {
 struct LoadRegistry;
 }
 namespace regenny::shared::corelib::util {
 struct StringCache;
+}
+namespace regenny::shared::gamelib::level {
+struct LevelDefCollection;
 }
 namespace regenny::shared::ndlib {
 #pragma pack(push, 1)

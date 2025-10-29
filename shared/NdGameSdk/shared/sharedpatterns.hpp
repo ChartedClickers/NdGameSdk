@@ -155,6 +155,11 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern LoadingHeapMgr_GetLoadingHeap = { L"40 57 48 83 EC 30 8B F9 8B D1 85 C9 0F 84 ?? ?? ?? ?? 83 EA 01 0F 84 ?? ?? ?? ?? 83 FA 01 0F 84 ?? ?? ?? ??" };
 
 	static inline const SdkPattern DataLoading_Initialize = { L"48 89 5c 24 10 48 89 74 24 18 48 89 7c 24 20 55 41 54 41 55 41 56 41 57 48 8d ac 24 20 ff ff ff 48 81 ec e0 01 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 85 d0 00 00 00 4c 8b f1 33 d2 33 c9 e8 ?? ?? ?? ?? 48 8b f0" };
+	static inline const SdkPattern DataLoading_LevelUtil_LoadLevelSet = { L"48 89 5c 24 10 48 89 74 24 18 57 b8 b0 ea 00 00 e8 ?? ?? ?? ?? 48 2b e0 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 a0 ea 00 00" };
+	static inline const SdkPattern DataLoading_LevelUtil_LoadActorByName = { L"48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 57 48 83 ec 50 40 32 ff 41 0f b6 e8 48 8b f1 bb 02 00 00 00" };
+	static inline const SdkPattern DataLoading_LevelUtil_UnloadActor = { L"48 89 5c 24 10 48 89 74 24 18 57 48 83 ec 50 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 40 45 33 c0" };
+	static inline const SdkPattern DataLoading_LevelUtil_ReloadLevel = { L"40 53 48 83 ec 20 48 8b d9 e8 ?? ?? ff ff 33 d2 48 8b cb 84 c0 74 24" };
+	static inline const SdkPattern DataLoading_LevelUtil_CacheFilenames = { L"48 89 5c 24 10 48 89 74 24 18 55 57 41 56 48 8d ac 24 d0 fe ff ff 48 81 ec 30 02 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 85 20 01 00 00 48 8b d9" };
 
 	static inline const SdkPattern LevelDefCollection_GetLevelDef = { L"48 89 5c 24 10 57 48 83 ec 20 48 8b d9 e8 ?? ?? ?? ?? 4c 8b 05 ?? ?? ?? ?? 48 81 c3 10 5e 00 00" };
 	static inline const SdkPattern LevelDefCollection_AllocateLevelDef = { L"48 89 5c 24 18 55 56 57 41 54 41 55 41 56 41 57 48 8d 6c 24 d9 48 81 ec 00 01 00 00 45 0f b6 e9 49 8b f0 4c 8b f2 48 8b f9 4c 8d b9 d8 5d 00 00" };
@@ -179,6 +184,23 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern LoadRegistry_GatherWantLoads = { L"48 89 5c 24 10 48 89 6c 24 18 48 89 74 24 20 57 48 83 ec 30 41 0f b6 f0 48 8b ea 48 8b f9 33 d2 8d 4a 01" };
 	static inline const SdkPattern LoadRegistry_AreWantLoadLevelsFullySpawned = { L"48 89 5c 24 10 48 89 6c 24 18 48 89 74 24 20 57 48 83 ec 30 48 8b f9 48 8d a9 50 01 00 00 48 89 6c 24 40 48 8d 05 ?? ?? ?? ?? 48 89 44 24 20 41 b9 44 04 00 00 4c 8d 05" };
 	static inline const SdkPattern LoadRegistry_WantLoadInfo_Constructor = { L"40 53 48 83 ec 20 33 c0 4c 89 01 66 83 fa 02 4c 89 49 08 4d 8b d9 66 89 51 20 4d 8b d0 66 89 41 22 41 0f 95 c1 48 89 41 18 4d 8b c3 c6 41 24 07 49 8b d2 c6 41 22 29 48 8b d9 e8 ?? ?? ?? ?? 48 8b c3 48 83 c4 20 5b c3" };
+
+	static inline const SdkPattern LevelMgr_Init = { L"48 89 5c 24 10 48 89 6c 24 18 56 57 41 56 48 83 ec 40 48 8b f2 48 8b f9 48 81 c1 f0 15 48 00 33 d2 41 b8 00 08 00 00 e8 ?? ?? ?? ?? 48 8d 8f f0 02 41 00 33 d2 41 b8 00 02 00 00 e8 ?? ?? ?? ?? 48 8d 8f f0 84 43 00 33 d2 41 b8 00 01 00 00 e8 ?? ?? ?? ?? 33 c0 48 8d 8f 06 1f 48 00" };
+	static inline const SdkPattern LevelMgr_Update = { L"48 8b c4 48 89 58 18 55 56 57 41 54 41 55 41 56 41 57 48 81 ec 00 01 00 00 c5 f8 29 70 b8 c5 f8 29 78 a8 c5 78 29 40 98 c5 78 29 48 88 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 b0 00 00 00 45 0f b6 f8 c5 f8 28 f9" };
+	static inline const SdkPattern LevelMgr_Sync = { L"48 89 5c 24 10 48 89 74 24 18 57 48 81 ec c0 00 00 00 c5 f8 29 b4 24 b0 00 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 a8 00 00 00 0f b6 f2 48 8b f9 c5 fa 10 35 ?? ?? ?? ??" };
+	static inline const SdkPattern LevelMgr_GetLevelSafe = { L"48 89 5c 24 10 48 89 74 24 18 57 48 83 ec 30 48 8b da 48 8b f9 48 8d 05 ?? ?? ?? ?? 48 89 44 24 20 41 b9 49 02 00 00 4c 8d 05 ?? ?? ?? ?? 48 8d 91 10 02 00 00 48 81 c1 10 02 00 00 e8 ?? ?? ?? ??" };
+	static inline const SdkPattern LevelMgr_GetNumCriticalLoads = { L"48 89 5c 24 08 57 48 83 ec 30 48 8b d9 48 8d b9 c0 15 48 00 48 8d 05 ?? ?? ?? ?? 48 89 44 24 20 41 b9 1e 09 00 00 4c 8d 05 ?? ?? ?? ?? 48 8b d7 48 8b cf e8 ?? ?? ?? ?? 8b 9b e0 15 48 00 48 8b cf e8 ?? ?? ?? ??" };
+	static inline const SdkPattern LevelMgr_AddCriticalLoadLevel = { L"48 89 5c 24 10 48 89 74 24 18 57 48 83 ec 30 48 8b da 48 8b f9 48 8d 05 ?? ?? ?? ?? 48 89 44 24 20 41 b9 15 09 00 00 4c 8d 05 ?? ?? ?? ?? 48 8d 91 c0 15 48 00 48 81 c1 c0 15 48 00 e8 ?? ?? ?? ?? 48 8b 87 e8 15 48 00 8b 8f e0 15 48 00" };
+	static inline const SdkPattern LevelMgr_ShouldPauseForCriticalLoads = { L"48 89 5c 24 10 57 48 83 ec 30 48 8b d9 48 8d b9 c0 15 48 00 48 89 7c 24 40 48 8d 05 ?? ?? ?? ?? 48 89 44 24 20 41 b9 24 09 00 00 4c 8d 05 ?? ?? ?? ?? 48 8b d7 48 8b cf" };
+	static inline const SdkPattern LevelMgr_Level_GoStatus = { L"48 89 5c 24 10 57 48 83 ec 20 48 8b d9 39 51 40 0f 84 ?? ?? ?? ?? 89 51 40 c7 81 70 02 00 00 00 00 00 00 83 fa 15" };
+	static inline const SdkPattern LevelMgr_Level_GetDependentNode = { L"48 89 5c 24 10 48 89 6c 24 18 56 57 41 56 48 83 ec 40 48 8d 2d ?? ?? ?? ?? 48 89 6c 24 60 48 8d 05 ?? ?? ?? ?? 48 89 44 24 20 41 b9 aa 10 00 00" };
+	static inline const SdkPattern LevelMgr_Level_FreeDependentNode = { L"48 89 5c 24 08 57 48 83 ec 30 48 8b d9 48 8d 3d ?? ?? ?? ?? 48 89 7c 24 48 48 8d 05 ?? ?? ?? ?? 48 89 44 24 20 41 b9 d0 10 00 00" };
+	static inline const SdkPattern LevelMgr_Level_AttachProcess = { L"48 89 5c 24 18 48 89 6c 24 20 56 57 41 54 41 56 41 57 48 83 ec 60 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 58 48 8b ea 4c 8b f1 f6 42 0c 01" };
+	static inline const SdkPattern LevelMgr_Level_DetachProcess = { L"48 89 5c 24 18 55 56 57 41 54 41 55 41 56 41 57 48 83 ec 50 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 48 4c 8b fa 48 8b d9" };
+	static inline const SdkPattern LevelMgr_Level_DetachProcesses = { L"48 89 5c 24 10 48 89 6c 24 18 48 89 74 24 20 57 41 54 41 55 41 56 41 57 48 83 ec 50 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 48 48 8b d9 48 8d 35 ?? ?? ?? ?? 4c 8b ce 41 b8 6d 0f 00 00 48 8d 15 ?? ?? ?? ?? 48 8d 4c 24 40 e8 ?? ?? ?? ?? 90 48 8d bb 90" };
+	static inline const SdkPattern LevelMgr_Level_ReloadInGameData = { L"48 8b c4 48 89 58 10 48 89 68 18 48 89 70 20 57 41 54 41 55 41 56 41 57 48 81 ec 30 05 00 00 c5 f8 29 70 c8 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 10 05 00 00 48 8b f9" };
+	static inline const SdkPattern LevelMgr_Level_KillDependentProcesses = { L"48 89 5c 24 18 55 56 57 41 54 41 55 41 56 41 57 48 83 ec 70 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 60 44 8b e2" };
+	static inline const SdkPattern LevelMgr_Level_SetWantFlags = { L"0f b6 02 4c 8b d2 44 0f b6 41 02 24 40 41 80 e0 40 75 41 84 c0 74 3d b2 01 45 32 c0 45 0f b7 0a 32 c0 66 44 39 49 02" };
 
 	static inline const SdkPattern PackageMgr_Init = { L"48 89 5c 24 10 48 89 74 24 18 48 89 7c 24 20 55 41 54 41 55 41 56 41 57 48 8d ac 24 ?? ?? ?? ?? 48 81 ec 70 02 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 85 60 01 00 00 48 8b fa 48 8b d9 48 81 c1 68 47 00 00 33 d2 41 b8 00 08 00" };
 	static inline const SdkPattern PackageMgr_ProcessLoginQueue = { L"48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 57 41 56 41 57 48 83 ec 60 c5 f8 29 74 24 50 c5 f8 28 f1 48 8b f9 33 ed 40 38 2d ?? ?? ?? ?? 0f 84 ?? ?? ?? ?? 8d 4d 02" };

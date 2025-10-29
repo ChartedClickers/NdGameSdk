@@ -29,5 +29,8 @@ namespace NdGameSdk::gamelib::level {
 
 	};
 
+	static_assert(sizeof(LevelDefLoader) == 0x1690, "Size of LevelDefLoader is not correct.");
+	static_assert(sizeof(LevelDefLoader::BatchRequest) == 0x600, "Size of LevelDefLoader::BatchRequest is not correct.");
+
 #endif
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <NdGameSdk/sdkregenny.hpp>
 #include <NdGameSdk/sdkstringid.hpp>
+#include "..\..\corelib\system\platform\ndsys.hpp"
 #include "LevelSpec.hpp"
 namespace regenny::shared::gamelib::level {
 struct LevelDef;
@@ -41,8 +42,30 @@ struct Level {
         BackgroundLoginQueued = 64,
     };
 
-    enum Status : uint64_t {
+    enum Status : uint32_t {
         Empty = 0,
+        Initialized = 1,
+        Loading = 2,
+        WaitingForLevelSoundBanks = 3,
+        WaitingForLevelSoundBanksVoxUnload = 4,
+        DoingLogin = 5,
+        LoadSoundBanks = 6,
+        WaitForSoundBanks = 7,
+        WaitForActors = 8,
+        UnknownStatus = 9,
+        PreLoaded = 10,
+        Loaded = 11,
+        LoadedDisplay = 12,
+        Unloading = 13,
+        UnloadingWaiting = 14,
+        UnloadingLogOut = 15,
+        UnloadingWaitForProcessToDie = 16,
+        UnloadingReleasePackages = 17,
+        Zombie = 18,
+        StalledByReplay = 19,
+        InterruptedLoading = 20,
+        Error = 21,
+        Invalid = 22,
     };
 
     struct Info {
@@ -74,6 +97,12 @@ struct Level {
         char* m_soundBanks; // 0x8
     }; // Size: 0x10
 
+    struct BgDrivenByFgCandidate {
+        regenny::shared::gamelib::level::Level* m_pLevel; // 0x0
+        uint32_t m_candidateIndex; // 0x8
+        float m_distance; // 0xc
+    }; // Size: 0x10
+
     struct ListArray_corelib_containers_StringId64 {
         uint32_t m_size; // 0x0
         uint32_t m_capacity; // 0x4
@@ -95,6 +124,7 @@ struct Level {
     private: char pad_20[0x10]; public:
     vec4 m_backgroundLoginOffset; // 0x30
     Status m_state; // 0x40
+    private: char pad_44[0x4]; public:
     // Metadata: utf8*
     char* m_LevelName; // 0x48
     StringId64 m_LevelId; // 0x50
@@ -104,8 +134,7 @@ struct Level {
     void* m_pLevelSoundBankInfo; // 0x78
     void* m_pVoxSoundBankInfo; // 0x80
     regenny::shared::gamelib::level::LevelDef* m_pLevelDef; // 0x88
-    uint64_t m_dependentsLock; // 0x90
-    private: char pad_98[0x18]; public:
+    regenny::shared::corelib::system::platform::ndsys::WaitLock m_dependentsLock; // 0x90
     DependentProcessNode* m_dependentProcHead; // 0xb0
     uint32_t m_reloadTicket; // 0xb8
     private: char pad_bc[0x4]; public:

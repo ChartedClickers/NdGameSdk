@@ -9,19 +9,21 @@
 #endif
 
 #include <NdGameSdk/shared/src/ndlib/nd-config.hpp>
-
-using namespace NdGameSdk::ndlib;
+#include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
 
 namespace NdGameSdk::gamelib::level {
 
 #if defined(T2R)
+
+	using namespace ndlib;
+	using corelib::memory::Memory;
 
 	class NdGameSdk_API DataLoading final : public ISdkComponent {
 	public:
 		using Config = regenny::shared::gamelib::level::DataLoading::Config;
 
 		DataLoading();
-		SDK_DEPENDENCIES(NdConfigComponent);
+		SDK_DEPENDENCIES(NdConfigComponent, Memory);
 
 	private:
 		void Awake() override;
@@ -37,4 +39,3 @@ namespace NdGameSdk::gamelib::level {
 #endif
 
 }
-

@@ -10,6 +10,7 @@
 #include "src/ndlib/io/file-system-win-fios2.hpp"
 #include "src/ndlib/io/loadingheap-mgr.hpp"
 #include "src/ndlib/io/package-mgr.hpp"
+#include "src/gamelib/level/level-mgr.hpp"
 #include "src/gamelib/level/data-loading.hpp"
 #include "src/gamelib/level/game-loading.hpp"
 #include "src/ndlib/script/script-manager.hpp"
@@ -44,7 +45,7 @@ namespace NdGameSdk {
 		SharedComponents->AddComponent<ndlib::io::FileSystem>();
 		SharedComponents->AddComponent<gamelib::level::DataLoading>();
 		SharedComponents->AddComponent<ndlib::io::PackageMgr>();
-
+		SharedComponents->AddComponent<gamelib::level::LevelMgr>();
 	#if SDK_DEBUG
 		SharedComponents->AddComponent<ndlib::profiling::ProfileController>();
 	#endif

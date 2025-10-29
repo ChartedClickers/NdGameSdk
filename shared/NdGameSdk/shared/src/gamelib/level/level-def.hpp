@@ -98,6 +98,10 @@ namespace NdGameSdk::gamelib::level {
 		static constexpr Layer Ingame = Layer::Ingame;
 		static constexpr Layer All = static_cast<Layer>(Base | Phys | Ingame);
 
+		// Common layer combinations
+		static constexpr Layer Geometry = Base;
+		static constexpr Layer Gameplay = static_cast<Layer>(Phys | Ingame);
+
 		static constexpr bool HasLayer(Layer value, Layer flag) noexcept {
 			return (value & flag) == flag;
 		}
@@ -205,6 +209,13 @@ namespace NdGameSdk::gamelib::level {
 		TYPEDEF_FUNCTION_PTR(void, LevelDefCollection_LevelDef_Update, LevelDef* pLevelDef);
 		friend class LevelDefCollection;
 	};
+
+	static_assert(sizeof(LevelDef) == 0xe0, "Size of LevelDef is not correct.");
+	static_assert(sizeof(LevelDef::ActorDefs) == 0x10, "Size of LevelDef::ActorDefs is not correct.");
+	static_assert(sizeof(LevelDef::PackageDef) == 0x18, "Size of LevelDef::PackageDef is not correct.");
+	static_assert(sizeof(LevelDef::ParticleModuleDef) == 0x10, "Size of LevelDef::ParticleModuleDef is not correct.");
+	static_assert(sizeof(LevelDef::SoundBankDef) == 0x10, "Size of LevelDef::SoundBankDef is not correct.");
+	static_assert(sizeof(LevelDef::AsyncTxtLoad) == 0x58, "Size of LevelDef::AsyncTxtLoad is not correct.");
 
 #endif
 }

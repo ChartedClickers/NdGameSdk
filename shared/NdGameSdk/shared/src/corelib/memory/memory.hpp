@@ -118,6 +118,7 @@ namespace NdGameSdk::corelib::memory {
 		std::map<MemoryMapId, MemoryMapEntry*>& GetStaticMemoryMapEntries();
 
 	private:
+		void Awake() override;
 		void Initialize() override;
 
 		bool m_MemoryMapMapped{};

@@ -4,6 +4,19 @@
 namespace regenny::shared::corelib::system::platform {
 #pragma pack(push, 1)
 struct ndsys {
+    struct Mutex {
+        enum Type : uint32_t {
+            MUTEX_RECURSIVE = 1,
+        };
+
+        void* m_data; // 0x0
+        uint32_t m_threadID; // 0x8
+        uint32_t m_lockCount; // 0xc
+        Type m_type; // 0x10
+        bool m_initialized; // 0x14
+        private: char pad_15[0x2b]; public:
+    }; // Size: 0x40
+
     struct Thread {
         void* m_nativeThread; // 0x0
         uint32_t m_id; // 0x8
@@ -36,19 +49,6 @@ struct ndsys {
         char m_field200[64]; // 0x200
         char m_field240[64]; // 0x240
     }; // Size: 0x280
-
-    struct Mutex {
-        enum Type : uint32_t {
-            MUTEX_RECURSIVE = 1,
-        };
-
-        void* m_data; // 0x0
-        uint32_t m_threadID; // 0x8
-        uint32_t m_lockCount; // 0xc
-        Type m_type; // 0x10
-        bool m_initialized; // 0x14
-        private: char pad_15[0x2b]; public:
-    }; // Size: 0x40
 
     struct MutexDesc {
         regenny::shared::corelib::system::platform::ndsys::Mutex::Type m_type; // 0x0

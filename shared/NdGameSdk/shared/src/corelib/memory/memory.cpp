@@ -2,6 +2,7 @@
 #include "allocator-heap.hpp"
 #include "../containers/fixedsizeheap.hpp"
 #include "../containers/fixed-size-hashtable.hpp"
+#include "scoped-temp-allocator.hpp"
 
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
@@ -111,6 +112,10 @@ namespace NdGameSdk::corelib::memory {
 
 	std::map<MemoryMapId, MemoryMapEntry*>& Memory::GetStaticMemoryMapEntries() {
 		return m_MemoryMap.s_MemoryMap;
+	}
+
+	void Memory::Awake() {
+		AddSubComponent<ScopedTempsComponent>();
 	}
 
 	void Memory::Initialize()

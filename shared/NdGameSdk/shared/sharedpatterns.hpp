@@ -55,6 +55,11 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern Memory_FixedSizeHeap_Copy = { L"48 89 5c 24 20 56 48 83 ec 30 48 83 79 30 00 48 8b f2 48 89 6c 24 40 48 8b d9 48 89 7c 24 48 4c 89 74 24 50 0f 85 ?? ?? ?? ?? e8 ?? ?? ?? ?? 48 8b f8 48 85 c0 74 04 b1 01 ff d7" };
 	static inline const SdkPattern Memory_FixedSizeHeap_AddIndex = { L"44 8b 51 28 33 d2 4c 8b d9 49 83 ea 01 74 2c 4c 8b 41 10 0f 1f 40 00 66" };
 
+	static inline const SdkPattern ScopedTempsComponent_InitializeScopedTempAllocSystem = { L"48 89 5c 24 20 55 56 57 41 56 41 57 48 81 ec a0 01 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 90 01 00 00 49 8b f0 48 8b fa 48 8b d9" };
+	static inline const SdkPattern ScopedTempsComponent_ScopedTempAllocator_Init = { L"48 89 5c 24 10 55 56 57 41 54 41 55 41 56 41 57 48 81 ec f0 01 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 84 24 e0 01 00 00 48 8b 84 24 50 02 00 00 4d 8b e8 48 89 44 24 38 44 0f b6 e2" };
+	static inline const SdkPattern ScopedTempsComponent_ScopedTempAllocator_Destructor = { L"48 89 5c 24 10 48 89 6c 24 18 48 89 74 24 20 57 41 56 41 57 48 83 ec 50 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 40 48 8b d9 e8 ?? ?? ?? ?? 84 c0" };
+	static inline const SdkPattern ScopedTempsComponent_ScopedTempAllocator_s_scopedTempData = { L"b9 00 01 00 00 48 8d 05 ?? ?? ?? ?? 33 d2 66 90 89 50 f4 48 c7 00 01 00 00 00 48 8d 40 20 48 83 e9 01 75 ?? c3", +0x94 };
+
 	static inline const SdkPattern NdJob_g_pJobSysData = { L"48 89 05 ?? ?? ?? ?? 48 8b c8 e8 ?? ?? ?? ?? 49 81 ee ?? ?? ?? ?? 4c 89 75 ?? e8 ?? ?? ?? ?? 48 8b d0 44 8b c7 b9 ?? ?? ?? ?? 48 8b 05 ?? ?? ?? ?? 48 89 54 01 ?? 48 8b 05 ?? ?? ?? ?? 48 89 14 01 48 8b 05 ?? ?? ?? ?? 48 89 54 01 ?? 48 8b 05" };
 	static inline const SdkPattern NdJob_g_NdJobHeap = { L"48 89 3d ?? ?? ?? ?? 81 a7 94 00 00 00 ff ff ff 7f 44 89 6d 00 4c 8d 25 ?? ?? ?? ?? 4c 89 64 24 38 c7 44 24 30 59 03 00 00 48 8d 35 ?? ?? ?? ?? 48 89 74 24 28 48 c7 44 24 20 10 00 00 00 4c 8d 4d 00 ba 00 02 00 00 41 b8 20 00 00 00 48 8d 4f 08" };
 	static inline const SdkPattern NdJob_s_JobSystem = { L"48 8b 05 ?? ?? ?? ?? 48 85 c0 79 0d 48 c7 05 ?? ?? ?? ?? 05 00 00 00 eb 29 7e 0c 48 ff c8 48 89 05 ?? ?? ?? ?? eb 1b c6 05 ?? ?? ?? ?? 01 eb 12 48" };
@@ -336,6 +341,11 @@ namespace NdGameSdk::Patterns {
 	static inline const SdkPattern Memory_FixedSizeHeap_FreeIndex = { L"48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 57 48 83 ec 30 48 8b 41 10 48 8b f9 48 63 ea b1 01 48 8b f5 83 e5 3f 48 c1" };
 	static inline const SdkPattern Memory_FixedSizeHeap_Copy = { L"48 89 5c 24 08 48 89 74 24 10 48 89 7c 24 18 41 56 48 83 ec 30 48 83 79 30 00 4c 8b f2 48 8b d9 0f 85 91 00 00 00 48 8b 3d ?? ?? ?? ?? 48 85 ff 74 04 b1 01 ff d7 48 8b 05 ?? ?? ?? ?? 48 85 c0 74 02 ff d0 48 8b 05" };
 	static inline const SdkPattern Memory_FixedSizeHeap_AddIndex = { L"48 89 5c 24 08 57 48 83 ec 20 48 8b d9 48 83 c1 10 e8 ?? ?? ?? ?? 4c 8b d0 48 83 f8 ff 74 3e 48 3b 43 30 73 38 48 ff 43 40 49 8b d2 48 0f af 43 38 4c 8b 43 10 4d 8b ca 48 03 03 83" };
+
+	static inline const SdkPattern ScopedTempsComponent_InitializeScopedTempAllocSystem = { L"48 89 5c 24 08 48 89 74 24 20 57 48 81 ec a0 01 00 00 48 8b 05" };
+	static inline const SdkPattern ScopedTempsComponent_ScopedTempAllocator_Init = { L"48 89 5c 24 10 55 56 57 41 54 41 55 41 56 41 57 48 8d ac 24 80 fd ff ff 48 81 ec 80 03 00 00 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 85 70 02" };
+	static inline const SdkPattern ScopedTempsComponent_ScopedTempAllocator_Destructor = { L"48 89 5c 24 10 48 89 6c 24 18 56 57 41 57 48 83 ec 60 48 8b 05 ?? ?? ?? ?? 48 33 c4 48 89 44 24 50 48 8b d9" };
+	static inline const SdkPattern ScopedTempsComponent_ScopedTempAllocator_s_scopedTempData = { L"c7 05 ?? ?? ?? ?? 88 88 34 12 48 8d 0d ?? ?? ?? ?? c7 05 ?? ?? ?? ?? 99 99 78 56 33 c0 c7 05 ?? ?? ?? ?? de c0 de c0 c7 05", +0x50 };
 
 	static inline const SdkPattern NdJob_g_pJobSysData = { L"48 89 05 ?? ?? ?? ?? e8 ?? ?? ?? ?? 48 8d 8d 90 02 00 00 49 81 ef 80 6d 02 00 ff 15 ?? ?? ?? ?? 48 8b 85 90 02 00 00 8b d6 41 b8 00 54" };
 	static inline const SdkPattern NdJob_g_NdJobHeap = { L"48 89 05 ?? ?? ?? ?? e8 ?? ?? ?? ?? 48 8b 3d ?? ?? ?? ?? 48 85 ff 0f 84 ?? ?? ?? ?? 48 83 cb ff 44 8b 67 08 48 8d 8d ?? ?? ?? ?? 4c 8b 0d ?? ?? ?? ?? 41 ba c5 9d 1c 81 44 89 a5 88 02 00 00 41 bb" };

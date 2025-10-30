@@ -27,6 +27,16 @@ namespace regenny {
     namespace shared {
         
         // Forward declared structures.
+        namespace corelib {
+            namespace system {
+                namespace platform {
+                    struct ndsys {
+                        struct Mutex{};
+                    };
+                }
+            }
+        }
+
         namespace ndlib {
             struct FrameParams{};
 
@@ -100,7 +110,130 @@ namespace regenny {
 
         // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib
         namespace corelib {
-            
+
+            // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib\containers
+            namespace containers {
+                
+                struct TaggedHeap 0xDB308 {
+
+                    struct VTable {
+                        virtual uint64_t GetBlockSize() @ 0x30
+                    };
+
+                    VTable* vftable;
+                };
+
+                struct FixedSizeHeap 0x58 {
+                    void* m_pData;
+                    void* m_pUsageAlloc;
+                    uint64_t* m_pUsage;
+                    uint64_t m_capacity;
+                    uint64_t m_capacityAligned;
+                    uint32_t m_usageWordCount;
+                    uint64_t m_numElements @ 0x30;
+                    uint64_t m_elementSize;
+                    uint64_t m_activeCount;
+                    uint64_t m_alignment;
+                    uint64_t m_lastIndex;
+                }; // fixedsizeheap.h
+
+                // FixedSizeHashTable<typename NodeT>
+                struct FixedSizeHashTable<typename NodeT> 0x98 {
+
+                    enum Flags : uint32_t {
+                        PeakMask = 0x7fffffff,
+                        Initialized = 0x80000000
+                    };
+
+                    NodeT** m_Buckets;
+                    FixedSizeHeap m_Pool;
+                    NodeT* m_Head;
+                    uint64_t m_NodeSize;
+                    uint64_t m_RequestedBuckets;
+                    NodeT** m_Begin;
+                    NodeT** m_End;
+                    uint64_t m_Count;
+                    uint32_t m_BucketCountAligned;
+                    Flags m_PeakAndFlags;
+                }; // fixed-size-hashtable.h
+
+                // internal stuff for FixedSizeHashTable
+                struct FixedSizeHashTable {
+                    struct ListHead 0x10 {
+                        void* m_next;
+                        void* m_prev;
+                    };
+                };
+
+                // Internal stuff for RobinHoodHashTable
+                struct RobinHoodHashTable {
+                    struct OccMask 0x20 {
+                        uint64_t* m_words;
+                        uint64_t m_capacity;
+                        uint64_t m_capacityAligned64;
+                        uint32_t m_wordCount;
+                    };
+
+                    struct OccScan 0x20 {
+                        OccMask* m_pbs;
+                        uint64_t m_currWord;
+                        uint32_t m_wordCount;
+                        uint32_t m_wordIdx;
+                        uint32_t m_limit;
+                        uint32_t m_index;
+                    };
+
+                };
+
+                // RobinHoodHashTable<class KeyT, class ValueT, struct HashT<class KeyT>, struct equality<class KeyT,class KeyT>>
+                struct RobinHoodHashTable<typename KeyT, typename ValueT> 0x30 {
+
+                    struct Slot 0x18 {
+                        // kEmptyHash = 0xfffffffffffffffe
+                        uint64_t m_hash;
+                        KeyT m_key;
+                        ValueT m_value;
+                    };
+
+                    Slot* m_Slots;
+                    RobinHoodHashTable.OccMask m_occ;
+                    uint32_t m_numBuckets;
+                    uint32_t m_numElements;
+                }; // robinhood-hash-table.inl
+                
+                // StaticArray<typename T> 
+                struct StaticArray<typename T> 0x10 {
+                    T* m_data;
+                    uint32_t m_size;
+                }; // static-array.h
+
+                // ListArray<typename T>
+                struct ListArray<typename T> 0x10 {
+                    uint32_t m_size;
+                    uint32_t m_capacity;
+                    T** m_data;
+                }; // list-array.h
+
+                // BitArray<size_t NumBits>
+                struct BitArray<size_t NumBits> {
+                    // BitArray must have at least 1 bit
+                    uint64_t m_bits[(NumBits + 63) / 64];
+                };
+
+                /*Shared Nodes*/
+                
+                struct Node_StringId64_StringId64 : FixedSizeHashTable.ListHead 0x20 {
+                    StringId64 m_key;
+                    StringId64 m_value;
+                };
+
+                // FixedSizeHashTable<SizeT,class StringId64,class StringId64,0,struct HashTableTraits<class StringId64,class StringId64>>
+                struct FixedSizeHashTable_StringId64_StringId64 : FixedSizeHashTable<Node_StringId64_StringId64> {};
+
+                /*Shared Nodes*/
+
+            }
+
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib\memory
             namespace memory {
 
@@ -555,128 +688,41 @@ namespace regenny {
                     bool m_field30 @ 0x30;
                 }; // s_AllocStack
 
-            }
-
-            // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib\containers
-            namespace containers {
-                
-                struct TaggedHeap 0xDB308 {
-
-                    struct VTable {
-                        virtual uint64_t GetBlockSize() @ 0x30
+                struct ScopedTempData 0x4750 {
+                    
+                    struct BlockOwner 0x18 {
+                        char* m_source_file [[utf8*]];
+                        char* m_source_func [[utf8*]];
+                        uint32_t m_source_line;
                     };
 
-                    VTable* vftable;
-                };
-
-                struct FixedSizeHeap 0x58 {
-                    void* m_pData;
-                    void* m_pUsageAlloc;
-                    uint64_t* m_pUsage;
-                    uint64_t m_capacity;
-                    uint64_t m_capacityAligned;
-                    uint32_t m_usageWordCount;
-                    uint64_t m_numElements @ 0x30;
-                    uint64_t m_elementSize;
-                    uint64_t m_activeCount;
-                    uint64_t m_alignment;
-                    uint64_t m_lastIndex;
-                }; // fixedsizeheap.h
-
-                // FixedSizeHashTable<typename NodeT>
-                struct FixedSizeHashTable<typename NodeT> 0x98 {
-
-                    enum Flags : uint32_t {
-                        PeakMask = 0x7fffffff,
-                        Initialized = 0x80000000
+                    struct HashNode : corelib.containers.FixedSizeHashTable.ListHead 0x10 {
+                        uint64_t m_jobId; // received from ndjob::GetActiveJobId()
+                        corelib.memory.HeapAllocatorWithOverflow* m_block;
                     };
 
-                    NodeT** m_Buckets;
-                    FixedSizeHeap m_Pool;
-                    NodeT* m_Head;
-                    uint64_t m_NodeSize;
-                    uint64_t m_RequestedBuckets;
-                    NodeT** m_Begin;
-                    NodeT** m_End;
-                    uint64_t m_Count;
-                    uint32_t m_BucketCountAligned;
-                    Flags m_PeakAndFlags;
-                }; // fixed-size-hashtable.h
+                    void* m_poolBase @ 0x10;
+                    uint64_t m_poolCurrent @ 0x28;
+                    uint64_t m_poolLimit;
+                    uint64_t m_numBlocks;
+                    // BitArray<size_t 128>
+                    containers.BitArray<128> m_usageMask;
+                    // FixedSizeHashTable<struct ScopedTempData::HashNode>
+                    containers.FixedSizeHashTable<HashNode> m_table;
+                    uint32_t m_activeBlocks;
+                    uint32_t m_peakBlocks;
+                    system.platform.ndsys.Mutex m_ScopedTempLock @ 0x100;
+                    corelib.memory.HeapAllocatorWithOverflow m_blocks[0x40];
+                    BlockOwner m_blockOwners[0x40];
+                }; // s_scopedTempData (scoped-temp-allocator.cpp)
 
-                // internal stuff for FixedSizeHashTable
-                struct FixedSizeHashTable {
-                    struct ListHead 0x10 {
-                        void* m_next;
-                        void* m_prev;
-                    };
-                };
-
-                // Internal stuff for RobinHoodHashTable
-                struct RobinHoodHashTable {
-                    struct OccMask 0x20 {
-                        uint64_t* m_words;
-                        uint64_t m_capacity;
-                        uint64_t m_capacityAligned64;
-                        uint32_t m_wordCount;
-                    };
-
-                    struct OccScan 0x20 {
-                        OccMask* m_pbs;
-                        uint64_t m_currWord;
-                        uint32_t m_wordCount;
-                        uint32_t m_wordIdx;
-                        uint32_t m_limit;
-                        uint32_t m_index;
-                    };
-
-                };
-
-                // RobinHoodHashTable<class KeyT, class ValueT, struct HashT<class KeyT>, struct equality<class KeyT,class KeyT>>
-                struct RobinHoodHashTable<typename KeyT, typename ValueT> 0x30 {
-
-                    struct Slot 0x18 {
-                        // kEmptyHash = 0xfffffffffffffffe
-                        uint64_t m_hash;
-                        KeyT m_key;
-                        ValueT m_value;
-                    };
-
-                    Slot* m_Slots;
-                    RobinHoodHashTable.OccMask m_occ;
-                    uint32_t m_numBuckets;
-                    uint32_t m_numElements;
-                }; // robinhood-hash-table.inl
-                
-                // StaticArray<typename T> 
-                struct StaticArray<typename T> 0x10 {
-                    T* m_data;
-                    uint32_t m_size;
-                }; // static-array.h
-
-                // ListArray<typename T>
-                struct ListArray<typename T> 0x10 {
-                    uint32_t m_size;
-                    uint32_t m_capacity;
-                    T** m_data;
-                }; // list-array.h
-
-                // BitArray<size_t NumBits>
-                struct BitArray<size_t NumBits> {
-                    // BitArray must have at least 1 bit
-                    uint64_t m_bits[(NumBits + 63) / 64];
-                };
-
-                /*Shared Nodes*/
-                
-                struct Node_StringId64_StringId64 : FixedSizeHashTable.ListHead 0x20 {
-                    StringId64 m_key;
-                    StringId64 m_value;
-                };
-
-                // FixedSizeHashTable<SizeT,class StringId64,class StringId64,0,struct HashTableTraits<class StringId64,class StringId64>>
-                struct FixedSizeHashTable_StringId64_StringId64 : FixedSizeHashTable<Node_StringId64_StringId64> {};
-
-                /*Shared Nodes*/
+                struct ScopedTempAllocator 0x18 {
+                    corelib.memory.HeapAllocatorWithOverflow* m_block;
+                    uint64_t m_savedState;
+                    bool m_nodeInserted;
+                    bool m_pushedAllocator;
+                    bool m_stateActive;
+                }; // scoped-temp-allocator.cpp
 
             }
 
@@ -794,7 +840,7 @@ namespace regenny {
                         Audio_InvalidArgument = 0x000B,
                     };
 
-                    uint32_t m_code; // ND code
+                    uint32_t m_code; // NDI code
                     uint32_t m_winCode; // Win32 code
                     void* m_payload;
                 };
@@ -3331,13 +3377,13 @@ namespace regenny {
                     uint32_t m_maxSpawnedLevelsPerFrame;
                     uint32_t m_prevFrameSpawnedCount;
                     SoundBankInfos m_soundBankSlots[0x1000] @ 0x2f0;
-                    // BitArray<4096>
+                    // BitArray<size_t 4096>
                     corelib.containers.BitArray<4096> m_aSoundBankInfoBits;
                     MiniSoundBankInfos m_miniSoundBankSlots[0x800];
-                    // BitArray<2048>
+                    // BitArray<size_t 2048>
                     corelib.containers.BitArray<2048> m_aMiniSoundBankInfoBits;
                     ndlib.render.Background m_backgrounds[0xa0];
-                    // BitArray<160>
+                    // BitArray<size_t 160>
                     corelib.containers.BitArray<160> m_backgroundInUseBits;
                     ndlib.render.interface.BgGeometry m_bgGeometries[0xa0];
                     float m_criticalLoadBudgetSec;

@@ -973,12 +973,14 @@ namespace regenny {
                             void* m_ConditionVar; // CONDITION_VARIABLE*
                             bool m_initialized;
                         }; // condition-variable.h
-
-                        struct WaitLock 0x20 {
-                            uint64_t m_value;
-                        };
                     }
                 }
+
+                struct NdRwAtomicLock64Base 0x20 {
+                    uint64_t m_value;
+                    StringId64 m_jlsContext @ 0x10;
+                    uint32_t m_jlsSlotIndex; // job.JlsContext
+                }; // read-write-atomic-lock.cpp
             }
 
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\corelib\job
@@ -1521,7 +1523,7 @@ namespace regenny {
                     uint8_t m_rtFlag;
                     uint32_t m_rtCounter;
                     uint32_t m_nextSequence;
-                    corelib.system.platform.ndsys.WaitLock m_waitListLock @ 0x9a50;
+                    corelib.system.NdRwAtomicLock64Base m_waitListLock @ 0x9a50;
                 }; // settings.cpp
             }
 
@@ -1710,7 +1712,7 @@ namespace regenny {
                     uint32_t m_capacity @ 0x10;
                     uint32_t m_count;
                     StringId64* m_pIds;
-                    corelib.system.platform.ndsys.WaitLock m_lock;
+                    corelib.system.NdRwAtomicLock64Base m_lock;
                 };
 
             }
@@ -3093,7 +3095,7 @@ namespace regenny {
 
                     WantLoads m_WantLoads;
                     WantLoads m_WantLoadsLocked;
-                    corelib.system.platform.ndsys.WaitLock m_WantLoadsLock;
+                    corelib.system.NdRwAtomicLock64Base m_WantLoadsLock;
                     ndlib.script.PointerBase m_levelsets;
                     bool m_ChangedThisFrame;
                     // FixedSizeHashTable<class LoadRegistry::ReloadNode>
@@ -3101,7 +3103,7 @@ namespace regenny {
                     // FixedSizeHashTable<1500,class StringId64,class StringId64,0,struct HashTableTraits<class StringId64,class StringId64>>
                     corelib.containers.FixedSizeHashTable_StringId64_StringId64 m_DisplayMap;
                     uint64_t m_tickAccumulator;
-                    corelib.system.platform.ndsys.WaitLock m_ReloadLock @ 0x2e0;
+                    corelib.system.NdRwAtomicLock64Base m_ReloadLock @ 0x2e0;
                     bool m_DebugLevelSets_MsgCon;
                     bool m_DebugLevelSets_ShowNested;
                     bool m_DebugLevelSets_ShowLevelSetInfo;
@@ -3235,7 +3237,7 @@ namespace regenny {
                     void* m_pLevelSoundBankInfo;
                     void* m_pVoxSoundBankInfo;
                     LevelDef* m_pLevelDef;
-                    corelib.system.platform.ndsys.WaitLock m_dependentsLock;
+                    corelib.system.NdRwAtomicLock64Base m_dependentsLock;
                     DependentProcessNode* m_dependentProcHead;
                     uint32_t m_reloadTicket;
                     uint64_t m_loginStartTicks @ 0xc0;
@@ -3253,7 +3255,7 @@ namespace regenny {
                     void* m_field120;
                     void* m_field128;
                     void* m_pBackground;
-                    void* m_pNavMeshTable;
+                    void* m_pNavMeshTable; // ListArray<NavMesh*>
                     void* m_pVoxelizationArray;
                     uint8_t m_lightTableSlotCount;
                     uint8_t m_featureDbCount;
@@ -3364,8 +3366,8 @@ namespace regenny {
                     // ListArray<class Level *>
                     corelib.containers.ListArray<Level> m_entitySpawnerLevels;
                     uint32_t m_loadedLevelCursor;
-                    corelib.system.platform.ndsys.WaitLock m_updateLock @ 0x1f0;
-                    corelib.system.platform.ndsys.WaitLock m_activeMapLock;
+                    corelib.system.NdRwAtomicLock64Base m_updateLock @ 0x1f0;
+                    corelib.system.NdRwAtomicLock64Base m_activeMapLock;
                     uint32_t m_maxLevelSlots;
                     StringId64* m_levelSelectionStorage @ 0x238;
                     StringId64* m_levelSelectionStorage2;
@@ -3396,7 +3398,7 @@ namespace regenny {
                     vec4 m_blockmeshViewRow0 @ 0x481590;
                     vec4 m_blockmeshViewRow1;
                     uint32_t m_blockmeshRefreshCountdown;
-                    corelib.system.platform.ndsys.WaitLock m_criticalLoadLock @ 0x4815c0;
+                    corelib.system.NdRwAtomicLock64Base m_criticalLoadLock @ 0x4815c0;
                     // ListArray<class StringId64>
                     corelib.containers.ListArray<StringId64> m_criticalLoadIds;
                     uint64_t m_pendingPackageMask[0x100];

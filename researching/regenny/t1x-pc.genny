@@ -889,12 +889,12 @@ namespace regenny {
                             void* m_ConditionVar; // CONDITION_VARIABLE*
                             bool m_initialized;
                         }; // condition-variable.h
-
-                        struct WaitLock 0x20 {
-                            uint64_t m_value;
-                        };
                     };
                 }
+
+                struct NdRwAtomicLock64Base 0x20 {
+                    uint64_t m_value;
+                }; // read-write-atomic-lock.cpp
             }
 
             // c:\branches\discbot??\t1x-pc-?.?.?\shared\src\corelib\job
@@ -1574,7 +1574,7 @@ namespace regenny {
                     uint8_t m_rtFlag;
                     uint32_t m_rtCounter;
                     uint32_t m_nextSequence;
-                    corelib.system.platform.ndsys.WaitLock m_waitListLock @ 0x9a50;
+                    corelib.system.NdRwAtomicLock64Base m_waitListLock @ 0x9a50;
                 }; // settings.cpp
             }
         

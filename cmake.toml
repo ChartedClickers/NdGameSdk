@@ -58,8 +58,8 @@ git = "https://github.com/nlohmann/json"
 tag = "55f93686c01528224f448c19128836e7df245f72"
 
 [vcpkg]
-version = "2025.04.09"
-url = "https://github.com/microsoft/vcpkg/archive/a8954b904ad2a6939ecd8fc213e87702fa1243ea.tar.gz"
+version = "74e6536"
+url = "https://github.com/microsoft/vcpkg/archive/74e6536215718009aae747d86d84b78376bf9e09.tar.gz"
 packages = ["boost-thread", "boost-signals2", "boost-container", "dstorage", "lz4", "zlib"]
 
 [find-package.Boost]

@@ -14,6 +14,20 @@
         "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/vcpkg-overlays/triplets",
         "VCPKG_TARGET_TRIPLET": "x64-windows-ndgamesdk.cmake"
       }
+    },
+    {
+      "name": "vs2026",
+      "displayName": "VS 2026 (Ninja + clang-cl)",
+      "description": "Ninja multi-config build using Visual Studio 2026's clang-cl toolchain",
+      "generator": "Ninja Multi-Config",
+      "binaryDir": "${sourceDir}/build-vs2026",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/",
+        "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/vcpkg-overlays/triplets",
+        "VCPKG_TARGET_TRIPLET": "x64-windows-ndgamesdk.cmake",
+        "CMAKE_C_COMPILER": "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/Llvm/x64/bin/clang-cl.exe",
+        "CMAKE_CXX_COMPILER": "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/Llvm/x64/bin/clang-cl.exe"
+      }
     }
   ],
   "buildPresets": [
@@ -37,6 +51,27 @@
       "displayName": "Debug",
       "configuration": "Debug",
       "configurePreset": "vs2022"
+    },
+    {
+      "name": "Release 2026",
+      "description": "",
+      "displayName": "Release",
+      "configuration": "Release",
+      "configurePreset": "vs2026"
+    },
+    {
+      "name": "RelWithDebInfo 2026",
+      "description": "",
+      "displayName": "RelWithDebInfo",
+      "configuration": "RelWithDebInfo",
+      "configurePreset": "vs2026"
+    },
+    {
+      "name": "Debug 2026",
+      "description": "",
+      "displayName": "Debug",
+      "configuration": "Debug",
+      "configurePreset": "vs2026"
     }
   ]
 }

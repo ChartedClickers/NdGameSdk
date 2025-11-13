@@ -64,10 +64,10 @@ if(CMKR_ROOT_PROJECT AND NOT CMKR_DISABLE_VCPKG)
 	if(POLICY CMP0135)
 		cmake_policy(SET CMP0135 NEW)
 	endif()
-	message(STATUS "Fetching vcpkg (https://github.com/microsoft/vcpkg/archive/a8954b904ad2a6939ecd8fc213e87702fa1243ea.tar.gz)...")
+	message(STATUS "Fetching vcpkg (https://github.com/microsoft/vcpkg/archive/74e6536215718009aae747d86d84b78376bf9e09.tar.gz)...")
 	FetchContent_Declare(vcpkg
 		URL
-			"https://github.com/microsoft/vcpkg/archive/a8954b904ad2a6939ecd8fc213e87702fa1243ea.tar.gz"
+			"https://github.com/microsoft/vcpkg/archive/74e6536215718009aae747d86d84b78376bf9e09.tar.gz"
 		SUBBUILD_DIR
 			"CMakeFiles/vcpkg-subbuild"
 		SOURCE_DIR

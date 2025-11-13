@@ -203,7 +203,7 @@ namespace Utility::memory {
                 }
             }
         }
-
+        return last;
     }
 
     optional<uintptr_t> FindFunctionStart(uintptr_t middle) {

@@ -1715,6 +1715,14 @@ namespace regenny {
                     corelib.system.NdRwAtomicLock64Base m_lock;
                 };
 
+                // StringBuilder<size_t length>
+                struct StringBuilder<size_t length> {
+                    void* m_vfTable;
+                    uint64_t m_capacity;
+                    uint64_t m_length;
+                    char m_buffer[length];
+                }; // string-builder.h
+
             }
 
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\lights
@@ -1888,20 +1896,25 @@ namespace regenny {
 
                 // #lang dc
                 namespace DC {
+
                     struct Entry 0x18 {
-                        StringId64 m_scriptId;
-                        StringId64 m_typeId;
-                        void* m_entryPtr;
-                    };   
-                
-                    struct Header 0x20 {
-                        uint32_t m_magic;
-                        uint32_t m_versionNumber;
-                        uint32_t m_textSize;
-                        uint32_t unk;
-                        uint32_t unk1;
+                        StringId64 m_symbolId; // Symbol token (module namespace, exported name, etc.)
+                        StringId64 m_typeId; // Type tag describing how to interpret m_entryPtr
+                        void* m_entryPtr; // Payload pointer;
+                    };
+
+                    struct EntryArray 0xc {
                         uint32_t m_numEntries;
                         Entry* m_pStartOfData;
+                    };
+                
+                    struct Header 0x20 {
+                        uint32_t m_magic; // 'DC00'
+                        uint32_t m_version; // File format revision (current tooling expects 1)
+                        uint32_t m_size; // Total byte size of the DC image, including header and fixup table
+                        uint32_t m_payloadSize; // Length of the entry payload immediately following the header
+                        uint32_t m_manifestVersion; // Script debugger manifest version (dc1 ⇒ value 1)
+                        EntryArray m_entries; // Array of DC::Entry records
                     };
 
                     // @ map
@@ -2013,7 +2026,7 @@ namespace regenny {
                 // ScriptManager::PointerBase
                 struct PointerBase 0x28 {
                     void* m_ptr; // DC::Entry.m_entryPtr
-                    ModuleInfo* m_module;
+                    ModuleInfo* m_pModule;
                     StringId64 m_symbolId; // actually it's named m_symbolId
                     StringId64 m_moduleId; // where to look for symbol, can be 0 aka global symbol
                     uint32_t m_field20;
@@ -2838,6 +2851,51 @@ namespace regenny {
 
             // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\memory
             namespace memory {
+
+                struct RelocatableHeapRecord 0x28 {
+                    void* m_pMem;
+                    void* m_pOwner;
+                    RelocatableHeapRecord* m_pNext;
+                    RelocatableHeapRecord* m_pPrev;
+                    uint32_t m_allocatedSize;
+                    uint8_t m_flags @ 0x26;
+                }; // relocatable-heap-rec.cpp
+
+                struct RelocatableHeap 0x128 {
+                    void* m_vtable;
+                    void* m_pLogger @ 0x10;
+                    char* m_TraceName [[utf8*]];
+                    // void (* m_MoveRecordHook)(struct RelocatableHeapRecord*, uint64_t, void*);
+                    void* m_MoveRecordHook;
+                    RelocatableHeapRecord m_beginList;
+                    RelocatableHeapRecord m_endList;
+                    RelocatableHeapRecord m_deadList;
+                    RelocatableHeapRecord* m_pFirstGap;
+                    void* m_pHeapBuffer;
+                    uint64_t m_recordSize;
+                    uint32_t m_activeRecordCount;
+                    uint32_t m_maxRecordCount;
+                    uint32_t m_peakActiveRecordCount;
+                    uint32_t m_largestGapSize;
+                    void* m_pHeapBase;
+                    void* m_pHeapEnd;
+                    uint32_t m_relocationCount;
+                    uint32_t m_zeroFillLength;
+                    uint32_t m_relocationBudget;
+                    uint32_t m_extraRelocationBudget;
+                    uint32_t m_targetGapSize;
+                    corelib.system.NdRwAtomicLock64Base m_lockStorage @ 0xf0;
+                    uint32_t m_validatePeriod;
+                    uint32_t m_lastValidateFrame;
+                    bool m_showHeapOverlay;
+                    bool m_printRecordListToConsole;
+                    bool m_zoomHeapOverlay;
+                    bool m_fillFreedBlocks;
+                    bool m_pauseAutoRelocation;
+                    uint32_t m_field120;
+                    bool m_skipCallbackUpdate;
+                    bool m_disableWarnings;
+                }; // relocatable-heap.cpp
                 
                 struct LevelMemAllocator : corelib.memory.Allocator 0x450 {
                    

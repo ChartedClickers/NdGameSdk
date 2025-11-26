@@ -1581,10 +1581,10 @@ namespace regenny {
             // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\debug
             namespace debug {
 
-            struct DMENU 0x670 {
+                struct DMENU 0x670 {
 
-                enum Message : uint32_t
-                {
+                    enum Message : uint32_t
+                    {
                     OnOpen = 0x0,
                     OnClose = 0x1,
                     OnUpdate = 0x3,
@@ -1592,10 +1592,10 @@ namespace regenny {
                     OnReadConfig = 0x7,
                     OnSaveConfig = 0x8,
                     OnFocusOut = 0x10
-                };
+                    };
 
-                // DMENU::Component (class_DMENU::Component_vfTable)
-                struct Component 0xb0 {
+                    // DMENU::Component (class_DMENU::Component_vfTable)
+                    struct Component 0xb0 {
                     struct VTable 0xb0 {}
                     void* vftable;
                     void* UnkString;
@@ -1620,28 +1620,28 @@ namespace regenny {
                     int m_PagePointer + 0x6; // Only with menu component?
                     int m_MaxPagePointers;
                     uint64_t m_ExtraArg;
-                } 
+                    } 
 
-                // DMENU::Menu | DMENU::ItemSubmenu
-                struct Menu : Component 0x30 {
+                    // DMENU::Menu | DMENU::ItemSubmenu
+                    struct Menu : Component 0x30 {
                     Component* m_Item;
                     bool m_isActive + 0x4;
                     uint64_t m_pad : 2;
                     int m_MaxDisplayItems +0x7;
                     uint64_t Unk[0x2];
-                } // 0x14041ec20
+                    } // 0x14041ec20
 
-                // DMENU::MenuGroup
-                struct MenuGroup : Component 0x280 {
+                    // DMENU::MenuGroup
+                    struct MenuGroup : Component 0x280 {
                     Menu* m_RootMenu;
                     bool m_IsDisplayed + 0x8;
                     bool m_Rendering;
                     uint16_t Unk[0x3];
                     uint64_t Unk2[0x4d];
-                } // 0x14041eca0
+                    } // 0x14041eca0
 
-                // DMENU::KeyBoard*
-                struct KeyBoard : Component 0x830 {
+                    // DMENU::KeyBoard*
+                    struct KeyBoard : Component 0x830 {
                     bool m_isEditing;
                     bool m_needsUpdate;
                     bool m_isDirty;
@@ -1652,30 +1652,30 @@ namespace regenny {
                     char m_displayBuffer[0x400] [[utf8*]]
                     char* m_inputBufferPtr [[utf8*]];
                     uint64_t m_maxInputLength;
-                }
+                    }
 
-                // DMENU::Item (class_Dmenu::Item_vfTable)
-                struct Item : Component 0x8  {
+                    // DMENU::Item (class_Dmenu::Item_vfTable)
+                    struct Item : Component 0x8  {
                     struct VTable : DMENU.Component.VTable 0x48 {}
                     void* m_callbackFunct;
-                } // 0x14041e6b0
+                    } // 0x14041e6b0
 
-                // DMENU::ItemSubmenu
-                struct ItemSubmenu : Item 0x10  {
+                    // DMENU::ItemSubmenu
+                    struct ItemSubmenu : Item 0x10  {
                     Menu* m_pHeader; // Entry Pointer
                     uint64_t Unk[0x1];
-                } // 0x14041ea90
+                    } // 0x14041ea90
 
-                // DMENU::ItemBool
-                // Component.m_data - ValuePtr
-                struct ItemBool : Item 0x8  {
+                    // DMENU::ItemBool
+                    // Component.m_data - ValuePtr
+                    struct ItemBool : Item 0x8  {
                    bool m_status;
                    bool m_pad[0x7];
-                } // 0x14041cd70
+                    } // 0x14041cd70
 
-                // DMENU::ItemDecimal* 
-                // Component.m_data - ValuePtr
-                struct ItemDecimal : Item 0xb8  {
+                    // DMENU::ItemDecimal* 
+                    // Component.m_data - ValuePtr
+                    struct ItemDecimal : Item 0xb8  {
                     uint64_t* m_format; // format Printf %d 
                     void* m_HandlerFunc; // handler slider function 
                     uint64_t m_DisplayValue [[i64]];
@@ -1687,11 +1687,11 @@ namespace regenny {
                     uint64_t Unk2[0x7];
                     char m_StringDisplayValue[0x20] [[utf8*]];
                     uint64_t Unk3[0x4];
-                } // 0x14041cd70
+                    } // 0x14041cd70
 
-                // DMENU::ItemFloat* 
-                // Component.m_data - ValuePtr
-                struct ItemFloat : Item 0x98  {
+                    // DMENU::ItemFloat* 
+                    // Component.m_data - ValuePtr
+                    struct ItemFloat : Item 0x98  {
                     uint64_t* m_format; // format Printf %6.2f
                     void* m_HandlerFunc; // handler slider function 
                     float m_DisplayValue;
@@ -1703,62 +1703,83 @@ namespace regenny {
                     uint64_t Unk2[0x6];
                     char m_StringDisplayValue[0x20] [[utf8*]];
                     uint64_t Unk3[0x4];
-                } // 0x14041d960
+                    } // 0x14041d960
 
-                // DMENU::ItemFunction 
-                struct ItemFunction : Item 0x10  {
+                    // DMENU::ItemFunction 
+                    struct ItemFunction : Item 0x10  {
                     void* unkData; // probably for link key->value
                     bool m_isActive @ 0xc1;
                     bool m_pad[0x6];
-                } // 0x14041dad0
+                    } // 0x14041dad0
 
                  // DMENU::ItemSelection* 
-                struct ItemSelection : Item 0x30  {
+                    struct ItemSelection : Item 0x30  {
                     void* UnkData; // m_format probably
                     void* m_callbackFormat;
                     uint64_t Unk2[0x3];
                     void* m_SelectionStruct;
-                } // 0x14041d610
+                    } // 0x14041d610
 
-                // DMENU::ItemSubText*
-                struct ItemSubText : Item {} // 0x14041e6b0;
+                    // DMENU::ItemSubText*
+                    struct ItemSubText : Item {} // 0x14041e6b0;
 
-                // DMENU::String*
-                struct String : Component {}
+                    // DMENU::String*
+                    struct String : Component {}
 
-                // DMENU::ItemPlaceHolder
-                struct ItemPlaceHolder : Component 0x400 {
+                    // DMENU::ItemPlaceHolder
+                    struct ItemPlaceHolder : Component 0x400 {
                     char m_placeholder[0x400] [[utf8*]];
-                } // 0x14041e880;
+                    } // 0x14041e880;
 
-                // DMENU::ItemLine*
-                struct ItemLine : Component {} // 0x14041d490;
+                    // DMENU::ItemLine*
+                    struct ItemLine : Component {} // 0x14041d490;
 
-                void* vftable;
-                bool m_Text2DropShadows +0x8
-                bool m_PauseDuringMenus
-                bool m_PauseDuringMenusMP 
-                bool m_Pauseonexit
-                bool m_ShowPausedIndicator
-                bool UnkBool;
-                bool m_SquareButtontoBackOutofMenus
-                bool m_ChordtoSave
-                bool m_AlignMenusRight
-                int  m_Rightmargin @0x1c
-                float m_MenuAlpha [[f32]]
-                float m_MenuScale [[f32]]
-                bool m_Pause @0x61
-                MenuGroup* m_CurrentMenu +0xe [[u64]]
-                MenuGroup* m_QuickMenu
-                MenuGroup* m_DevMenu [[u64]]
-                MenuGroup* m_FavoritesMenu [[u64]]
-                uint64_t Unk2[0xbc];
-            }  
+                    void* vftable;
+                    bool m_Text2DropShadows +0x8
+                    bool m_PauseDuringMenus
+                    bool m_PauseDuringMenusMP 
+                    bool m_Pauseonexit
+                    bool m_ShowPausedIndicator
+                    bool UnkBool;
+                    bool m_SquareButtontoBackOutofMenus
+                    bool m_ChordtoSave
+                    bool m_AlignMenusRight
+                    int  m_Rightmargin @0x1c
+                    float m_MenuAlpha [[f32]]
+                    float m_MenuScale [[f32]]
+                    bool m_Pause @0x61
+                    MenuGroup* m_CurrentMenu +0xe [[u64]]
+                    MenuGroup* m_QuickMenu
+                    MenuGroup* m_DevMenu [[u64]]
+                    MenuGroup* m_FavoritesMenu [[u64]]
+                    uint64_t Unk2[0xbc];
+                }  
+            }
+
+            // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\text
+            namespace text {
+
+                struct StringIdSelection 0x40 {
+                    void* vftable;
+                    uint32_t m_capacity @ 0x10;
+                    uint32_t m_count;
+                    StringId64* m_pIds;
+                    corelib.system.NdRwAtomicLock64Base m_lock;
+                };
+
+                // StringBuilder<size_t length>
+                struct StringBuilder<size_t length> {
+                    void* m_vfTable;
+                    uint64_t m_capacity;
+                    uint64_t m_length;
+                    char m_buffer[length];
+                }; // string-builder.h
+
             }
     
             // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\process
             namespace process {
-            struct process 0x100 {}
+                struct process 0x100 {}
             }
     
             // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\render
@@ -2398,8 +2419,8 @@ namespace regenny {
 
             }
     
-        // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\io
-        namespace io {
+            // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\ndlib\io
+            namespace io {
 
             // not verified for t1x
             struct FileSystem {
@@ -2511,7 +2532,57 @@ namespace regenny {
             struct AssetView {
             }; // asset-view.cpp
 
-        }
+            }
+
+            // c:\branches\discbot??\t2r-pc-?.?.?\shared\src\ndlib\memory
+            namespace memory {
+
+                struct RelocatableHeapRecord 0x28 {
+                    void* m_pMem;
+                    void* m_pOwner;
+                    RelocatableHeapRecord* m_pNext;
+                    RelocatableHeapRecord* m_pPrev;
+                    uint32_t m_allocatedSize;
+                    uint8_t m_flags @ 0x26;
+                }; // relocatable-heap-rec.cpp
+
+                struct RelocatableHeap 0x128 {
+                    void* m_vtable;
+                    void* m_pLogger @ 0x10;
+                    char* m_TraceName [[utf8*]];
+                    // void (* m_MoveRecordHook)(struct RelocatableHeapRecord*, uint64_t, void*);
+                    void* m_MoveRecordHook;
+                    RelocatableHeapRecord m_beginList;
+                    RelocatableHeapRecord m_endList;
+                    RelocatableHeapRecord m_deadList;
+                    RelocatableHeapRecord* m_pFirstGap;
+                    void* m_pHeapBuffer;
+                    uint64_t m_recordSize;
+                    uint32_t m_activeRecordCount;
+                    uint32_t m_maxRecordCount;
+                    uint32_t m_peakActiveRecordCount;
+                    uint32_t m_largestGapSize;
+                    void* m_pHeapBase;
+                    void* m_pHeapEnd;
+                    uint32_t m_relocationCount;
+                    uint32_t m_zeroFillLength;
+                    uint32_t m_relocationBudget;
+                    uint32_t m_extraRelocationBudget;
+                    uint32_t m_targetGapSize;
+                    corelib.system.NdRwAtomicLock64Base m_lockStorage @ 0xf0;
+                    uint32_t m_validatePeriod;
+                    uint32_t m_lastValidateFrame;
+                    bool m_showHeapOverlay;
+                    bool m_printRecordListToConsole;
+                    bool m_zoomHeapOverlay;
+                    bool m_fillFreedBlocks;
+                    bool m_pauseAutoRelocation;
+                    uint32_t m_field120;
+                    bool m_skipCallbackUpdate;
+                    bool m_disableWarnings;
+                }; // relocatable-heap.cpp
+
+            }
     
         }
 
@@ -2624,8 +2695,8 @@ namespace regenny {
             }
         }
 
-    // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\common
-    namespace common {}
+        // c:\branches\discbot??\t1xfinal-pc-?.?.?\shared\src\common
+        namespace common {}
     }
 
     // c:\branches\discbot??\t1xfinal-pc-?.?.?\t1x\src

@@ -8,8 +8,25 @@ using StringId64 = u64;
 
 namespace DC {
 
-    enum ScriptId : StringId64 {
+    enum SymbolId : StringId64 {
+        // reserved symbols
+        top_level = 0x8666BEE87D00EAD3, // top-level
+        _exclude_from_global_namespace_ = 0x1715E5AF53E3474E, // **exclude-from-global-namespace**
+        _namespace_ = 0x253BB602E393A4CC, // **namespace**
+        enable_struct_instancing = 0x837031DD7AF4B90B, // *enable-struct-instancing*
+        _allow_rebind_ = 0x8A033868145A533F, // **allow-rebind**
+        disable_relocation = 0xAD007EAC63692400, // disable-relocation
+        
         modules = 0x0B4B7080C994E5B8, // *modules*
+        namespace_capacities = 0x0A66B0FB2349C513, // *namespace-capacities*
+        namespace_array = 0x158968AC18929F74, // *namespace-array*
+        audio_module_array = 0x20FC10F914F3A8C6, // *audio-module-array*
+        module_array_debug = 0x6F1C1C18825A62CF, // *module-array-debug*
+        module_array_debug_sp = 0x9A22FEB66C570A95, // *module-array-debug-sp*
+        all_vox_igc_levels = 0xC00B1626CBFCCBE6, // *all-vox-igc-levels*
+        module_array = 0xF3267F82646520ED, // *module-array*
+        module_array_sp = 0xF67FE941AA1605AB, // *module-array-sp*
+        joypad_adrenaline_hold_square = 0x1EBF2A74C5A1B002, // *joypad-adrenaline-hold-square*
         persistent_command_list = 0x0D4214F3AB9F95C3, // *persistent-command-list*
         mouse_default_settings = 0x153A061C977AB3B4, // *mouse-default-settings*
         analog_stick_icon_paths = 0x6ECB9D5F76F9A2E7, // *analog-stick-icon-paths*
@@ -20,10 +37,11 @@ namespace DC {
     };
 
     enum Type : StringId64 {
-        Array = 0x4F9E14B634C6B026, // @ Array
+        Array = 0x4F9E14B634C6B026, // @ array
         _array = 0x104D3D9BAD9D2464, // @ array*
         map = 0x080F5919176D2D91, // @ map
         _float = 0xA00A62A942B20165, // @ float
+        int32 = 0xF9E1C08F4291A8DF, // @ int32
         symbol = 0xE81B0096BC73F511, // @ symbol
         string = 0x704BE0D8FAAFFC58, // @ string
         symbol_array = 0xC8F749F92779D489, // @ symbol-array
@@ -53,6 +71,12 @@ namespace DC {
         _Kty *m_key[m_size] : _Kty;
         _Ty *m_value[m_size] : u64;
     };
+
+    // @ symbol-array
+    struct SymbolArray {
+        u64 m_Count;
+        StringId64 *m_Symbols[m_Count] : StringId64;
+     };
 
     // @ string
     struct String {

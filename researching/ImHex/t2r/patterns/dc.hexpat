@@ -2,16 +2,27 @@
 
 import dc.dctypes;
 import dc.modules;
+import dc.joypad;
 
 namespace DC {
 
    struct Entry {
-        StringId64 m_scriptId;
+        StringId64 m_symbolId;
         StringId64 m_typeId;
 
-    match (m_scriptId, m_typeId) {
+    match (m_symbolId, m_typeId) {
         /* modules.bin */
-        (ScriptId::modules, Type::module_info_array): modules::ModuleInfoArray *m_entryPtr : u64;
+        (SymbolId::modules, Type::module_info_array): modules::ModuleInfoArray *m_entryPtr : u64;
+        /* joypad.bin */
+        (_, Type::action_scheme): joypad::actionscheme::ActionScheme *m_entryPtr : u64;
+        (SymbolId::persistent_command_list, Type::command_list): joypad::PersistentCommandList *m_entryPtr : u64;
+        (SymbolId::mouse_default_settings, Type::mouse_default_settings): joypad::MouseSettings *m_entryPtr : u64;
+        (SymbolId::analog_stick_icon_paths, Type::Array): FixedSizeArray<joypad::AnalogStickIconPath> *m_entryPtr : u64;
+        (SymbolId::melee_override_ids, Type::Array): FixedSizeArray<StringId64> *m_entryPtr : u64;
+        (SymbolId::weapon_cross_press_release_blacklist, Type::Array): FixedSizeArray<StringId64> *m_entryPtr : u64;
+        (SymbolId::action_map, Type::action_collection): joypad::actionmap::ActionCollection *m_entryPtr : u64;
+        (SymbolId::joypad_additional_presets, Type::_array): FixedSizeArray<Array<joypad::presets::AdditionalPresets>> *m_entryPtr : u64;
+
         /* unknown.bin */
         (_,_): u64 *m_entryPtr : u64;
 
@@ -23,14 +34,19 @@ namespace DC {
 
    };
 
+    // @ array
+    struct EntryArray {
+        u32 m_numEntries;
+        Entry *m_Entries[m_numEntries] : u64;
+    };
+
     struct Header {
         u32 m_magic;
         u32 m_version;
         u32 m_size;
-        u32 unk;
-        u32 unk1;
-        u32 m_numEntries;
-        Entry *m_pStartOfData[m_numEntries] : u64;
+        u32 m_payloadSize;
+        u32 m_manifestVersion;
+        EntryArray m_entries;
     };
 }
 
@@ -124,4 +140,4 @@ Please always correctly pass those arguments in the virtual memory.
 lowerBound = Used for relocation in the virtual memory.
 upperBound = Actuall Size of file module
 */
-//Script::Login(dc_header, addressof(dc_header), 0x0, 0xFFFFFFFFFFFFFFFF);
+//Script::Login(dc_module, addressof(dc_module), 0x0, 0xFFFFFFFFFFFFFFFF);

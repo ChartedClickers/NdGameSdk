@@ -8,9 +8,9 @@ cmake-build*/
 CMakerLists.txt
 CMakeLists.txt.user
 
-# Researching
-researching/regenny-sdk/
-researching/regenny/*.json
+# Forge
+**/regenny-sdk/
+**/regenny/*.json
 
 # Misc
 AGENTS.md

@@ -7,16 +7,17 @@ from pathlib import Path
 import shutil
 import sys
 
-def researching_root() -> Path:
+def forge_root() -> Path:
     """
-    Resolve the path to the 'researching' folder based on the current layout:
-      <repo>/tools/regenny-sync/update_regenny.py
+    Resolve the path to the reverse-engineering workspace (renamed from
+    'researching' to 'forge'):
+      <repo>/forge
 
-    Returns: <repo>/researching
+    Returns: <repo>/forge
     """
     here = Path(__file__).resolve()
     repo_root = here.parents[2]  # .../NdGameSdk
-    return repo_root / "researching"
+    return repo_root / "forge"
 
 
 def discover_games(src_base: Path) -> list[str]:
@@ -132,14 +133,14 @@ def run_sync(
 
 
 def main(argv: list[str]) -> int:
-    researching = researching_root()
-    default_src = researching / "regenny-sdk"
-    default_dst = researching.parent / "shared" / "NdGameSdk" / "regenny"
+    forge = forge_root()
+    default_src = forge / "regenny-sdk"
+    default_dst = forge.parent / "src" / "components" / "NdGameSdk" / "regenny"
 
     parser = argparse.ArgumentParser(
         description=(
-            "Sync regenny data from researching/regenny-sdk/<game>/regenny "
-            "into shared/NdGameSdk/regenny/<game>."
+            "Sync regenny data from forge/regenny-sdk/<game>/regenny "
+            "into src/components/NdGameSdk/regenny/<game>."
         )
     )
     parser.add_argument(
@@ -223,4 +224,3 @@ def main(argv: list[str]) -> int:
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))
-

@@ -4,8 +4,8 @@
 #include "NdGameSdk/sdklogger.hpp"
 #include "NdGameSdk/components/SdkComponent.hpp"
 
-#include <Utility/helper.hpp>
-#include <Utility/system/console.hpp>
+#include <helper.hpp>
+#include <system/console.hpp>
 #include <regex>
 
 #if defined(T2R)

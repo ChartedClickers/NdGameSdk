@@ -1,8 +1,8 @@
 #pragma once
 #include "NdGameSdk/sdk.hpp"
 
-#include <Utility/cmacros/for_each.hpp>
-#include <Utility/color.hpp>
+#include <cmacros/for_each.hpp>
+#include <color.hpp>
 #include <boost/function.hpp>
 
 #if defined(T2R)

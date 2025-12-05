@@ -7,8 +7,8 @@
 #include "io/package-mgr.hpp"
 #include "io/prefetch.hpp"
 
-#include <Utility/helper.hpp>
-#include <Utility/global_resolver.hpp>
+#include <helper.hpp>
+#include <global_resolver.hpp>
 
 namespace NdGameSdk::ndlib {
 

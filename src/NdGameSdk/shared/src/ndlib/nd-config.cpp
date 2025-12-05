@@ -1,7 +1,7 @@
 #include "nd-config.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
-#include <Utility/global_resolver.hpp>
+#include <global_resolver.hpp>
 
 namespace NdGameSdk::ndlib {
 

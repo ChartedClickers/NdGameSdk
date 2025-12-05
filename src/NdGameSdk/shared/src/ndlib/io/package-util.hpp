@@ -2,8 +2,8 @@
 #include "NdGameSdk/sdk.hpp"
 #include "package.hpp"
 
-#include <Utility/helper.hpp>
-#include <Utility/function_ptr.hpp>
+#include <helper.hpp>
+#include <function_ptr.hpp>
 
 namespace NdGameSdk::ndlib::io {
 #if defined(T2R)

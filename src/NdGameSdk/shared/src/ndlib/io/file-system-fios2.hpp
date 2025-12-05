@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "NdGameSdk/sdkderived.hpp"
 #include "NdGameSdk/shared/shared.hpp"
 
@@ -18,8 +18,8 @@
 #include <Windows.h>
 #include <dstorage.h>
 
-#include <Utility/helper.hpp>
-#include <Utility/function_ptr.hpp>
+#include <helper.hpp>
+#include <function_ptr.hpp>
 
 using namespace NdGameSdk::corelib::util;
 
@@ -72,7 +72,7 @@ namespace regenny::shared::ndlib::io {
 
 	constexpr FhOpenAccess sanitized_access(FhOpenFlags f) noexcept {
 		auto a = access_of(f);
-		// binary coerces 3 → READ
+		// binary coerces 3 ? READ
 		return (a == FhOpenAccess::FHO_ACCESS_RESERVED3) ? FhOpenAccess::FHO_ACCESS_READ : a;
 	}
 

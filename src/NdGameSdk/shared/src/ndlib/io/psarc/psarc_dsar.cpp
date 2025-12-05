@@ -1,4 +1,4 @@
-﻿#include "psarc_dsar.hpp"
+#include "psarc_dsar.hpp"
 
 #include <algorithm>
 #include <cstring>

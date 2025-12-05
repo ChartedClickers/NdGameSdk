@@ -4,7 +4,7 @@
 #include <string>
 #include <spdlog/spdlog.h>
 
-#include <Utility/memory/Module.hpp>
+#include <memory/Module.hpp>
 
 #include <NdGameSdk/sdk.hpp>
 #include <NdGameSdk/sdkconfig.hpp>

@@ -1,7 +1,7 @@
 #pragma once
 #include "NdGameSdk/sdk.hpp"
 
-#include "Utility/color.hpp"   
+#include "color.hpp"   
 
 #if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/ndlib/render/text/DebugStringBase.hpp>

@@ -3,7 +3,7 @@
 #include "NdGameSdk/sdk.hpp"
 
 #include <Windows.h>
-#include <Utility/function_ptr.hpp>
+#include <function_ptr.hpp>
 
 #if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/corelib/util/MsgCon.hpp>

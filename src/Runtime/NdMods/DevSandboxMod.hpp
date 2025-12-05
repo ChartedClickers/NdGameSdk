@@ -1,7 +1,7 @@
 #pragma once
 
 #include "NdMod.hpp"
-#include <Utility/helper.hpp>
+#include <helper.hpp>
 
 namespace ExampleMod
 {

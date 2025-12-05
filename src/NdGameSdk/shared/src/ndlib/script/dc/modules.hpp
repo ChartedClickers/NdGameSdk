@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "data-compilation.hpp"
 
 #if defined(T2R)
@@ -53,7 +53,7 @@ namespace NdGameSdk::ndlib::script::dc {
                 return reinterpret_cast<const DC::Array<ModuleInfo>*>(&this->Get()->m_modules);
             }
 
-            // STL‑style accessors
+            // STL-style accessors
             ModuleInfo* data() { return reinterpret_cast<ModuleInfo*>(this->Get()->m_modules); }
             const ModuleInfo* data() const { return reinterpret_cast<const ModuleInfo*>(this->Get()->m_modules); }
 

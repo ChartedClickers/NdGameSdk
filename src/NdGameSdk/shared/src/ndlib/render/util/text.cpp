@@ -1,4 +1,4 @@
-ï»¿#include "text.hpp"
+#include "text.hpp"
 
 #include <cstring>
 #include <algorithm>
@@ -44,7 +44,7 @@ namespace NdGameSdk::ndlib::render::util
 			}
 
 
-			// â€”â€” existing ANSI branch â€”â€”
+			// —— existing ANSI branch ——
 			if (text[0] == '\x1b' && text[1] == '[' && text[2] == '0' && text[3] == ';')
 			{
 				
@@ -88,7 +88,7 @@ namespace NdGameSdk::ndlib::render::util
 				continue;
 			}
 
-			// â€”â€” new plainâ€‘text branch â€”â€”
+			// —— new plain-text branch ——
 			{
 				const char* next_esc = std::strchr(text, '\x1b');
 				size_t run_len = next_esc
@@ -99,7 +99,7 @@ namespace NdGameSdk::ndlib::render::util
 				size_t cpy = (std::min)(run_len, sizeof(buf) - 1u);
 				strncpy_s(buf, text, cpy);
 
-				// measureâ€¦
+				// measure…
 				vec2 size{};
 				GetTextWidthHeight(&size,
 					0x80000000,

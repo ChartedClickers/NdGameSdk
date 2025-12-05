@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/sdkconfig.hpp"

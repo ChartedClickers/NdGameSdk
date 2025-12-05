@@ -4,8 +4,8 @@
 #include "NdGameSdk/components/SdkComponent.hpp"
 #include "NdGameSdk/components/SdkModule.hpp"
 
-#include <Utility/helper.hpp>
-#include <Utility/function_ptr.hpp>
+#include <helper.hpp>
+#include <function_ptr.hpp>
 
 #include <NdGameSdk/shared/src/ndlib/engine-components.hpp>
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>

@@ -1,6 +1,6 @@
 #pragma once
 #include "NdGameSdk/sdk.hpp"
-#include <Utility/helper.hpp>
+#include <helper.hpp>
 
 using namespace Utility::memory;
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <Utility/helper.hpp>
-#include <Utility/assertion/assert.hpp>
-#include <Utility/function_ptr.hpp>
+#include <helper.hpp>
+#include <assertion/assert.hpp>
+#include <function_ptr.hpp>
 
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/components/SdkComponent.hpp"

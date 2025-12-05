@@ -7,7 +7,7 @@
 #include <spdlog/sinks/daily_file_sink.h>
 #include <spdlog/sinks/basic_file_sink.h>
 
-#include <Utility/system/console.hpp>
+#include <system/console.hpp>
 
 namespace Utils {
 

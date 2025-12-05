@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "NdGameSdk/database/database.hpp"
 #include "NdGameSdk/sdkstringid.hpp"
 
@@ -10,8 +10,8 @@
 #include <NdGameSdk/regenny/t1x/shared/ndlib/script/ScriptCFunc.hpp>
 #endif
 
-#include <Utility/helper.hpp>
-#include <Utility/function_ptr.hpp>
+#include <helper.hpp>
+#include <function_ptr.hpp>
 
 #include "module-info.hpp"
 #include "script-module.hpp"

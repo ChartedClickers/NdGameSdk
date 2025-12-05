@@ -1,4 +1,4 @@
-﻿#include "package-mgr.hpp"
+#include "package-mgr.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
 

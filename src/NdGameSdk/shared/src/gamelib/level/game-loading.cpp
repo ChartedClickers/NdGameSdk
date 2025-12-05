@@ -3,8 +3,8 @@
 
 #include <NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp>
 
-#include <Utility/helper.hpp>
-#include <Utility/global_resolver.hpp>
+#include <helper.hpp>
+#include <global_resolver.hpp>
 #include <cstddef>
 
 namespace NdGameSdk::gamelib::level {

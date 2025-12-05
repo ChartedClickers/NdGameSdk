@@ -4,8 +4,8 @@
 
 #include <NdGameSdk/shared/src/ndlib/io/asset-view.hpp>
 
-#include <Utility/function_ptr.hpp>
-#include <Utility/assertion/assert.hpp>
+#include <function_ptr.hpp>
+#include <assertion/assert.hpp>
 
 namespace NdGameSdk::gamelib::level {
 #if defined(T2R)

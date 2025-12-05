@@ -3,7 +3,7 @@
 
 #include "../util/error.hpp"
 
-#include <Utility/helper.hpp>
+#include <helper.hpp>
 
 namespace NdGameSdk::corelib::system {
 

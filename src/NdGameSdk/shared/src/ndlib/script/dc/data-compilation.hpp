@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/ndlib/script/DC/Header.hpp>

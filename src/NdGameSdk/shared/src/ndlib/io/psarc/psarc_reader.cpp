@@ -1,4 +1,4 @@
-﻿#include "psarc_reader.hpp"
+#include "psarc_reader.hpp"
 
 #include <Windows.h>
 #include <cstdint>

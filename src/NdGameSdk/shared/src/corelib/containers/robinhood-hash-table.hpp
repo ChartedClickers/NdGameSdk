@@ -19,7 +19,7 @@
 
 #include "../memory/memory.hpp"
 
-#include <Utility/assertion/assert.hpp>
+#include <assertion/assert.hpp>
 
 namespace NdGameSdk::corelib::containers {
 

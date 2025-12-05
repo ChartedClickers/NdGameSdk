@@ -1,4 +1,4 @@
-﻿#include "psarc_parser.hpp"
+#include "psarc_parser.hpp"
 
 #include <algorithm>
 #include <cstring>
@@ -83,7 +83,7 @@ namespace NdGameSdk::ndlib::io {
                 return false;
             }
 
-            // Entry 0 (filenames blob) — copy into PSARCEntryBE and normalize
+            // Entry 0 (filenames blob) � copy into PSARCEntryBE and normalize
             TEntry e0{};
             if (!parse_entry0_struct(entries.data(), ph.SizeOfEntry, e0)) return false;
             uint32_t zindex = e0.ZSizeIndex;

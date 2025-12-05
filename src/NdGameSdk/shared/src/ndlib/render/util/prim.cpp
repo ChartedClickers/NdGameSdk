@@ -1,4 +1,4 @@
-﻿#include "prim.hpp"
+#include "prim.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 #include "../dev/debugdraw-common.hpp"
 

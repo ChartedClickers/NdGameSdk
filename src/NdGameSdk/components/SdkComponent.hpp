@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <windows.h>
 #include <filesystem>
@@ -14,8 +14,8 @@
 #include <atomic>
 #include <numeric>
 #include <spdlog/spdlog.h>
-#include <Utility/helper.hpp>
-#include <Utility/assertion/assert.hpp>
+#include <helper.hpp>
+#include <assertion/assert.hpp>
 
 #include <NdGameSdk/sdk.hpp>
 #include <NdGameSdk/sdkconfig.hpp>

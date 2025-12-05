@@ -10,7 +10,7 @@
 #endif
 
 #include <cstdint>
-#include <Utility/assertion/assert.hpp>
+#include <assertion/assert.hpp>
 
 #include "debug/nd-dmenu.hpp"
 

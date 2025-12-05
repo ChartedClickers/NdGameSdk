@@ -1,8 +1,8 @@
 #pragma once
 #include "NdGameSdk/sdk.hpp"
 
-#include <Utility/helper.hpp>
-#include <Utility/function_ptr.hpp>
+#include <helper.hpp>
+#include <function_ptr.hpp>
 
 #include <NdGameSdk/shared/src/ndlib/render/window-context.hpp>
 

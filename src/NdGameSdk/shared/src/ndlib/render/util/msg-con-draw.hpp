@@ -3,7 +3,7 @@
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/components/SdkSubComponent.hpp"
 
-#include <Utility/helper.hpp>
+#include <helper.hpp>
 
 #include "../window-context.hpp"
 

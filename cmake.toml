@@ -1,7 +1,7 @@
 # Reference: https://build-cpp.github.io/cmkr/cmake-toml
 [project]
-name = "ND.ModClient"
-version = "1.7.0"
+name = "NdGameSdk"
+version = "0.0.7"
 languages = ["C", "CXX"]
 cmake-after = """
 add_compile_options(
@@ -28,7 +28,7 @@ set(VCPKG_TARGET_TRIPLET   "x64-windows-ndgamesdk" CACHE STRING "" FORCE)
 CMAKE_CONFIGURATION_TYPES = "Debug;RelWithDebInfo"
 RUNTIME_OUTPUT_DIRECTORY = "${CMAKE_BINARY_DIR}/bin"
 LIBRARY_OUTPUT_DIRECTORY = "${CMAKE_BINARY_DIR}/lib" 
-PROJECT_TARGET = "ND"
+PROJECT_TARGET = "FDG"
 
 #https://github.com/gabime/spdlog 
 [target.spdlog]
@@ -53,14 +53,10 @@ tag = "09c21bda1dc1b578fa55f4a005d79b0afd481296"
 git = "https://github.com/cursey/safetyhook"
 tag = "629558c64009a7291ba6ed5cfb49187086a27a47"
 
-[fetch-content.nlohmann_json]
-git = "https://github.com/nlohmann/json"
-tag = "55f93686c01528224f448c19128836e7df245f72"
-
 [vcpkg]
 version = "74e6536"
 url = "https://github.com/microsoft/vcpkg/archive/74e6536215718009aae747d86d84b78376bf9e09.tar.gz"
-packages = ["boost-thread", "boost-signals2", "boost-container", "dstorage", "lz4", "zlib"]
+packages = ["boost-thread", "boost-signals2", "boost-container", "dstorage", "lz4", "zlib", "nlohmann-json"]
 
 [find-package.Boost]
 version = "1.85.0"
@@ -69,6 +65,10 @@ config = false
 components = ["thread", "signals2"]
  
 [find-package.dstorage]
+required = true
+config = true
+
+[find-package.nlohmann_json]
 required = true
 config = true
 
@@ -82,29 +82,29 @@ required = true
 [template.NdGameSdk]
 type = "shared"
 sources = [
-"shared/NdGameSdk/*.cpp",
-"shared/NdGameSdk/components/**.cpp",
-"shared/NdGameSdk/shared/**.cpp",
-"shared/NdGameSdk/shared/**.c",
-"shared/NdGameSdk/database/**.cpp",
-"shared/NdGameSdk/sidbase/**.cpp"
+"src/NdGameSdk/*.cpp",
+"src/NdGameSdk/components/**.cpp",
+"src/NdGameSdk/shared/**.cpp",
+"src/NdGameSdk/shared/**.c",
+"src/NdGameSdk/database/**.cpp",
+"src/NdGameSdk/sidbase/**.cpp"
 ] 
 headers = [
-"shared/NdGameSdk/*.hpp",
-"shared/NdGameSdk/config/**.hpp",
-"shared/NdGameSdk/components/**.hpp",
-"shared/NdGameSdk/shared/**.hpp",
-"shared/NdGameSdk/shared/**.h",
-"shared/NdGameSdk/database/**.hpp",
-"shared/NdGameSdk/sidbase/**.hpp"
+"src/NdGameSdk/*.hpp",
+"src/NdGameSdk/config/**.hpp",
+"src/NdGameSdk/components/**.hpp",
+"src/NdGameSdk/shared/**.hpp",
+"src/NdGameSdk/shared/**.h",
+"src/NdGameSdk/database/**.hpp",
+"src/NdGameSdk/sidbase/**.hpp"
 ]
-include-directories = ["shared/"]
+include-directories = ["src", "./shared"]
 compile-features = ["cxx_std_23"]
-alias = "NdGameSdk::SDK"
+alias = "FDG::NdGameSdk"
 link-libraries = [ 
     "spdlog::spdlog",
     "glm_static",
-    "nlohmann_json",
+    "nlohmann_json::nlohmann_json",
     "Utility",
     "Boost::thread",
 	"Boost::signals2",
@@ -122,21 +122,21 @@ LIBRARY_OUTPUT_DIRECTORY = "${LIBRARY_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
 ARCHIVE_OUTPUT_DIRECTORY = "${LIBRARY_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
 #PUBLIC_HEADER = "TODO"
 
-[template.ModClient.properties]
-OUTPUT_NAME = "${PROJECT_TARGET}.ModClient"
+[template.Runtime.properties]
+OUTPUT_NAME = "${PROJECT_TARGET}.Runtime"
 SUFFIX = ".asi"
 RUNTIME_OUTPUT_DIRECTORY = "${RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
 LIBRARY_OUTPUT_DIRECTORY = "${LIBRARY_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
 ARCHIVE_OUTPUT_DIRECTORY = "${LIBRARY_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
 CXX_MODULE_STD = true
   
-[template.ModClient]
+[template.Runtime]
 type = "shared"  
-sources = ["src/**.cpp", "src/**.c"] 
-headers = ["src/**.hpp", "src/**.h"]
+sources = ["src/Runtime/**.cpp", "src/Runtime/**.c"] 
+headers = ["src/Runtime/**.hpp", "src/Runtime/**.h"]
 compile-features = ["cxx_std_23"]
-include-directories = ["shared/", "src/"]
-compile-definitions = [ "${CMKR_TARGET}", "ND_GAME_NAME=\"${CMKR_TARGET}\"", "ND_ModClient_EXPORTS", "ND_MODCLIENT_VERSION=\"${PROJECT_VERSION}\""]
+include-directories = ["shared/", "src/Runtime/"]
+compile-definitions = [ "${CMKR_TARGET}", "ND_GAME_NAME=\"${CMKR_TARGET}\"", "ND_RuntimeClient_EXPORTS", "ND_RuntimeClient_VERSION=\"${PROJECT_VERSION}\""]
 link-libraries = [
     "${CMKR_TARGET}SDK",
     "Utility",
@@ -152,86 +152,56 @@ private-link-libraries = [
 cmake-before="""
 """
 
-[template.ModModule]
-type = "shared"  
-sources = ["modmodules/*.cpp", "modmodules/*.c"] 
-headers = ["modmodules/*.hpp", "modmodules/*.h"]
-compile-features = ["cxx_std_23"]
-include-directories = ["shared/", "modmodules/"]
-compile-definitions = ["${CMKR_TARGET}", "ND_GAME_NAME=\"${PROJECT_TARGET}\"", "ND_ModModule_EXPORTS"]
-link-libraries = [
-    "${PROJECT_TARGET}SDK",
-    "Utility",
-    "spdlog::spdlog"
-]
-# causes an issue with not compiling CMKR TARGET after 0.2.17:
-# https://github.com/build-cpp/cmkr/blob/45e346b4a3cc10619fd8b5c0c6e773f3c6f04a7b/src/cmake_generator.cpp#L1328
-cmake-before="""
-"""
-
-[template.ModModule.properties]
-RUNTIME_OUTPUT_DIRECTORY = "${RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
-LIBRARY_OUTPUT_DIRECTORY = "${LIBRARY_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
-ARCHIVE_OUTPUT_DIRECTORY = "${LIBRARY_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
-CXX_MODULE_STD = true
-
-
 [target.Utility]
 type = "static"
-sources = ["shared/Utility/**.cpp", "shared/Utility/**.c"]
-headers = ["shared/Utility/**.hpp", "shared/Utility/**.h"]
+sources = ["shared/**.cpp", "shared/**.c"]
+headers = ["shared/**.hpp", "shared/**.h"]
 compile-features = ["cxx_std_23"]
 compile-options = ["/MP"]
-compile-definitions = ["PROJECT_NAME=\"${PROJECT_TARGET}.ModClient\""] 
+compile-definitions = ["PROJECT_NAME=\"${PROJECT_TARGET}.Runtime\""] 
 alias = "Utility::Utility"
 private-link-libraries = ["Boost::signals2"]
 link-libraries = [
     "spdlog::spdlog",
     "safetyhook"
 ] 
- 
     
 [target.T1XSDK]  
 type = "NdGameSdk"
 compile-definitions = ["T1X", "ND_GAME_NAME=\"${PROJECT_TARGET}\""]
 sources = [
-"shared/NdGameSdk/ndgame/t1x/**.cpp",
-"shared/NdGameSdk/ndgame/t1x/**.c"
+"src/NdGameSdk/ndgame/t1x/**.cpp",
+"src/NdGameSdk/ndgame/t1x/**.c"
 ] 
 headers = [
-"shared/NdGameSdk/ndgame/t1x/**.hpp", 
-"shared/NdGameSdk/ndgame/t1x/**.h",
-"shared/NdGameSdk/regenny/t1x/**.hpp",
-"shared/NdGameSdk/regenny/t1x/**.h"
+"src/NdGameSdk/ndgame/t1x/**.hpp", 
+"src/NdGameSdk/ndgame/t1x/**.h",
+"src/NdGameSdk/regenny/t1x/**.hpp",
+"src/NdGameSdk/regenny/t1x/**.h"
 ] 
 cmake-before="""
-set(PROJECT_TARGET "T1X") 
+set(PROJECT_TARGET "T1X")
 """
 
 [target.T1X]
-type = "ModClient"
+type = "Runtime"
 
 [target.T2RSDK]  
 type = "NdGameSdk"
 compile-definitions = ["T2R", "ND_GAME_NAME=\"${PROJECT_TARGET}\""]
 sources = [
-"shared/NdGameSdk/ndgame/t2r/**.cpp",
-"shared/NdGameSdk/ndgame/t2r/**.c"
+"src/NdGameSdk/ndgame/t2r/**.cpp",
+"src/NdGameSdk/ndgame/t2r/**.c"
 ] 
 headers = [
-"shared/NdGameSdk/ndgame/t2r/**.hpp", 
-"shared/NdGameSdk/ndgame/t2r/**.h",
-"shared/NdGameSdk/regenny/t2r/**.hpp",  
-"shared/NdGameSdk/regenny/t2r/**.h"
+"src/NdGameSdk/ndgame/t2r/**.hpp", 
+"src/NdGameSdk/ndgame/t2r/**.h",
+"src/NdGameSdk/regenny/t2r/**.hpp",
+"src/NdGameSdk/regenny/t2r/**.h"
 ] 
-cmake-before=""" 
-set(PROJECT_TARGET "T2R") 
+cmake-before="""
+set(PROJECT_TARGET "T2R")
 """
 
 [target.T2R]
-type = "ModClient"
-
-#[target.testmodule]
-#type = "ModModule"
-#sources = ["modmodules/testmodule/*.cpp", "modmodules/testmodule/**.c"]
-#headers = ["modmodules/testmodule/*.hpp", "modmodules/testmodule/**.h"]
+type = "Runtime"

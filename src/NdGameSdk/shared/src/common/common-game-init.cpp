@@ -1,4 +1,4 @@
-﻿#include "common-game-init.hpp"
+#include "common-game-init.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
 #include <NdGameSdk/shared/src/ndlib/render/dev/debugdraw-common.hpp>

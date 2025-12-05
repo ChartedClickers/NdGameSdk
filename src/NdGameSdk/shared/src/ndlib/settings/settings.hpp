@@ -9,8 +9,8 @@
 #include <NdGameSdk/regenny/t1x/shared/ndlib/settings/SettingsControl.hpp>
 #endif
 
-#include <Utility/helper.hpp>
-#include <Utility/function_ptr.hpp>
+#include <helper.hpp>
+#include <function_ptr.hpp>
 #include <type_traits>
 
 namespace regenny::shared::ndlib::settings {

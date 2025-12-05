@@ -4,8 +4,8 @@
 #include "NdGameSdk/sdk.hpp"
 
 #include <Windows.h>
-#include <Utility/function_ptr.hpp>
-#include <Utility/memory/Patch.hpp>
+#include <function_ptr.hpp>
+#include <memory/Patch.hpp>
 
 namespace NdGameSdk::gamelib::render::particle
 {

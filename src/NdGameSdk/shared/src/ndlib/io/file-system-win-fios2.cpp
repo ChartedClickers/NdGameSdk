@@ -6,7 +6,7 @@
 #include <NdGameSdk/shared/src/ndlib/nd-game-info.hpp>
 #include <NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp>
 
-#include <Utility/global_resolver.hpp>
+#include <global_resolver.hpp>
 
 namespace NdGameSdk::ndlib::io {
 

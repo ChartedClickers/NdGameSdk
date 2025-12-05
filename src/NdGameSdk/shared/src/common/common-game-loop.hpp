@@ -7,7 +7,7 @@
 #include <NdGameSdk/shared/src/ndlib/nd-frame-state.hpp>
 #include <NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp>
 
-#include <Utility/helper.hpp>
+#include <helper.hpp>
 
 using namespace NdGameSdk::ndlib;
 using namespace NdGameSdk::gamelib::debug;

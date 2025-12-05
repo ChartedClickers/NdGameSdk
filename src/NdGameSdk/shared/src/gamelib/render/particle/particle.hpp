@@ -8,8 +8,8 @@
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
 #include <NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp>
 
-#include <Utility/assertion/assert.hpp>
-#include <Utility/helper.hpp>
+#include <assertion/assert.hpp>
+#include <helper.hpp>
 
 #include "particle-debug.hpp"
 

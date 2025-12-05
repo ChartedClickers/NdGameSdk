@@ -1,4 +1,4 @@
-﻿#include "common-main-win.hpp"
+#include "common-main-win.hpp"
 #include "common-game-init.hpp"
 
 #include <NdGameSdk/shared/src/ndlib/render/dev/debugdraw-common.hpp>
@@ -447,7 +447,7 @@ namespace NdGameSdk::common {
             cur += read_len;
         }
 
-        out.append("…");
+        out.append("�");
         return out;
     }
 

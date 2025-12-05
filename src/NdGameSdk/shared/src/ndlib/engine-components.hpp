@@ -7,7 +7,7 @@
 #include <string>
 #include <format>
 #include <spdlog/spdlog.h>
-#include <Utility/assertion/assert.hpp>
+#include <assertion/assert.hpp>
 
 #if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/ndlib/EngineComponents.hpp>

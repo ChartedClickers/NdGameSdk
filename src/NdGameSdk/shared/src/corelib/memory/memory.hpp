@@ -9,7 +9,7 @@
 #include "allocator-tagged-heap.hpp"
 #include "memory-area-win.hpp"
 
-#include <Utility/helper.hpp>
+#include <helper.hpp>
 
 #if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/corelib/memory/Allocator.hpp>

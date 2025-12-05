@@ -8,8 +8,8 @@
 
 #include "../memory/memory.hpp"
 
-#include <Utility/assertion/assert.hpp>
-#include <Utility/function_ptr.hpp>
+#include <assertion/assert.hpp>
+#include <function_ptr.hpp>
 
 #include <limits>
 

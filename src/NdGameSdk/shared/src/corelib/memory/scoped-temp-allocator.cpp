@@ -1,8 +1,8 @@
 #include "scoped-temp-allocator.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
-#include <Utility/helper.hpp>
-#include <Utility/global_resolver.hpp>
+#include <helper.hpp>
+#include <global_resolver.hpp>
 
 #include <format>
 #include <mutex>

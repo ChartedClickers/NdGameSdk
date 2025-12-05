@@ -1,4 +1,4 @@
-﻿#include "debugdraw-common.hpp"
+#include "debugdraw-common.hpp"
 #include "./NdGameSdk/shared/sharedpatterns.hpp"
 
 #include <NdGameSdk/shared/src/ndlib/profiling/profile-ctrl.hpp>

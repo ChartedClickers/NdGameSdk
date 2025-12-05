@@ -1,4 +1,4 @@
-﻿#include "nd-dmenu.hpp"
+#include "nd-dmenu.hpp"
 #include <NdGameSdk/shared/src/gamelib/debug/nd-dev-menu.hpp>
 
 namespace NdGameSdk::ndlib::debug {

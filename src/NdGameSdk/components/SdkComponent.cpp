@@ -1,4 +1,4 @@
-﻿#include "SdkComponent.hpp"
+#include "SdkComponent.hpp"
 
 namespace NdGameSdk {
 

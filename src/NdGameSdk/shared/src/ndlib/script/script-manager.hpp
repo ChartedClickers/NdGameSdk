@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/sdkstringid.hpp"
@@ -11,7 +11,7 @@
 #include <NdGameSdk/shared/src/common/common-game-init.hpp>
 #include <NdGameSdk/shared/src/ndlib/debug/nd-dmenu.hpp>
 
-#include <Utility/helper.hpp>
+#include <helper.hpp>
 
 #if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/ndlib/script/ScriptManagerGlobals.hpp>

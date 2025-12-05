@@ -8,8 +8,8 @@
 #include <NdGameSdk/regenny/t1x/shared/ndlib/script/ModuleInfo.hpp>
 #endif
 
-#include <Utility/helper.hpp>
-#include <Utility/function_ptr.hpp>
+#include <helper.hpp>
+#include <function_ptr.hpp>
 
 #include "script-module.hpp"
 

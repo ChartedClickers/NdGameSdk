@@ -1,4 +1,4 @@
-﻿#include "SdkComponentFactory.hpp"
+#include "SdkComponentFactory.hpp"
 #include "SdkComponent.hpp"
 #include "SdkSubComponent.hpp"
 

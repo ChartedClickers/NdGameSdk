@@ -3,9 +3,9 @@
 #include "NdGameSdk/sdk.hpp"
 #include "NdGameSdk/components/SdkSubComponent.hpp"
 
-#include <Utility/helper.hpp>
-#include <Utility/assertion/assert.hpp>
-#include <Utility/function_ptr.hpp>
+#include <helper.hpp>
+#include <assertion/assert.hpp>
+#include <function_ptr.hpp>
 #include <glm/vec4.hpp>
 
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>

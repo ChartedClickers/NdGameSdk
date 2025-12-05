@@ -13,8 +13,8 @@
 #include <NdGameSdk/shared/src/ndlib/debug/nd-dmenu.hpp>
 
 #include <map>
-#include <Utility/helper.hpp>
-#include <Utility/system/clipboard.hpp>
+#include <helper.hpp>
+#include <system/clipboard.hpp>
 
 using namespace NdGameSdk::corelib::memory;
 using namespace NdGameSdk::common;

@@ -8,9 +8,10 @@
     "boost-container",
     "dstorage",
     "lz4",
-    "zlib"
+    "zlib",
+    "nlohmann-json"
   ],
   "description": "",
-  "name": "nd-modclient",
+  "name": "ndgamesdk",
   "version-string": "none"
 }

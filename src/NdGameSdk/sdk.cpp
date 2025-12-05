@@ -1,4 +1,4 @@
-﻿#include "sdk.hpp"
+#include "sdk.hpp"
 #include "sdkconfig.hpp"
 #include "components/SdkModule.hpp"
 #include "database/database.hpp"

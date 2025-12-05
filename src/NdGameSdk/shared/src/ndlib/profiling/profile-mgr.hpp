@@ -10,8 +10,8 @@
 #include <NdGameSdk/regenny/t1x/shared/ndlib/profiling/ProfileMgr.hpp>
 #endif
 
-#include <Utility/helper.hpp>
-#include <Utility/function_ptr.hpp>
+#include <helper.hpp>
+#include <function_ptr.hpp>
 
 namespace NdGameSdk::ndlib::profiling {
 #if defined(T2R)

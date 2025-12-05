@@ -3,9 +3,9 @@
 #include "NdGameSdk/sdk.hpp"
 
 #include <Windows.h>
-#include <Utility/color.hpp>
+#include <color.hpp>
 #include <glm/vec2.hpp>
-#include <Utility/function_ptr.hpp>
+#include <function_ptr.hpp>
 
 #include "../window-context.hpp"
 

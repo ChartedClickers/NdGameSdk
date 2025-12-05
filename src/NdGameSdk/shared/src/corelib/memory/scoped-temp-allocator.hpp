@@ -15,7 +15,7 @@
 #include <NdGameSdk/shared/src/corelib/containers/bit-array.hpp>
 #include <NdGameSdk/shared/src/corelib/system/platform/mutex.hpp>
 
-#include <Utility/function_ptr.hpp>
+#include <function_ptr.hpp>
 
 #include "allocator-heap.hpp"
 

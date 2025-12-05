@@ -5,7 +5,7 @@
 #include <NdGameSdk/shared/src/corelib/containers/tagged-heap.hpp>
 #include <NdGameSdk/shared/src/corelib/memory/memory.hpp>
 
-#include <Utility/helper.hpp>
+#include <helper.hpp>
 
 using namespace NdGameSdk::corelib::memory;
 

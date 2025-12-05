@@ -1,4 +1,4 @@
-﻿#include "player-menu.hpp"
+#include "player-menu.hpp"
 #include "./NdGameSdk/ndgame/t2r/ndgamepatterns.hpp"
 
 #include <stdio.h>

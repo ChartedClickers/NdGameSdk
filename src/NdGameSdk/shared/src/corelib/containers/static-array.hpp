@@ -8,7 +8,7 @@
 
 #include "../memory/memory.hpp"
 
-#include <Utility/assertion/assert.hpp>
+#include <assertion/assert.hpp>
 
 #include <algorithm>
 #include <cstddef>

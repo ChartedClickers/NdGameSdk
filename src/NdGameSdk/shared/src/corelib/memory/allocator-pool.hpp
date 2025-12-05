@@ -6,7 +6,7 @@
 #include "memory-map.hpp"
 #include "heaparena.hpp"
 
-#include <Utility/function_ptr.hpp>
+#include <function_ptr.hpp>
 
 #if defined(T2R)
 #include <NdGameSdk/regenny/t2r/shared/corelib/memory/PoolAllocator.hpp>

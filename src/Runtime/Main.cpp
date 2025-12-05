@@ -7,7 +7,7 @@
 #include <fstream>
 
 #include <spdlog/spdlog.h>
-#include <Utility/helper.hpp>
+#include <helper.hpp>
 
 #include <NdGameSdk/sdk.hpp>
 #include <NdGameSdk/sdkconfig.hpp>
@@ -56,7 +56,7 @@ BOOL Initialize(HMODULE dllModule) {
         SPDLOG_INFO("NdRuntimeClient is enabled.");
         NdGameSdk::RegisterSdkModule(g_NdRuntimeClient.get());
     }
-    
+
     return TRUE; 
 }
 

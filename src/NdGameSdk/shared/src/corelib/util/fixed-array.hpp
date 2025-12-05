@@ -17,7 +17,7 @@
 #include <type_traits>
 #include <utility>
 
-#include <Utility/assertion/assert.hpp>
+#include <assertion/assert.hpp>
 
 namespace NdGameSdk::corelib::util {
 

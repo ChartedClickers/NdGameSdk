@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <Utility/assertion/assert.hpp>
+#include <assertion/assert.hpp>
 
 namespace NdGameSdk::Sidbase {
 

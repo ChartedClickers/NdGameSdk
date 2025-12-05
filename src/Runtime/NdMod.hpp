@@ -7,7 +7,7 @@
 #include <memory>
 
 #include "Utils/config.hpp"
-#include "NdModClient.hpp"
+#include "NdRuntimeClient.hpp"
 
 class NdMod
 {
@@ -23,21 +23,21 @@ protected:
     template <typename NdModComponent>
     std::shared_ptr<NdModComponent> GetNdModComponent() {
         return GetDependentComponent<NdModComponent>(
-            g_ndmodclient->GetNdMods()->GetNdModComponent<NdModComponent>()
+            g_NdRuntimeClient->GetNdMods()->GetNdModComponent<NdModComponent>()
         );
     };
 
     template <typename SdkComponent>
     SdkComponent* GetSharedSdkComponent() {
         return GetDependentComponent<SdkComponent>(
-            g_ndmodclient->GetSharedSdkComponent<SdkComponent>()
+            g_NdRuntimeClient->GetSharedSdkComponent<SdkComponent>()
         );
     };
 
     template <typename SdkComponent>
     SdkComponent* GetNdGameSdkComponent() {
         return GetDependentComponent<SdkComponent>(
-            g_ndmodclient->GetNdGameSdkComponent<SdkComponent>()
+            g_NdRuntimeClient->GetNdGameSdkComponent<SdkComponent>()
         );
     };
 

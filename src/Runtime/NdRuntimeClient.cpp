@@ -4,14 +4,14 @@
 #include <NdGameSdk/shared/src/ndlib/nd-game-info.hpp>
 #include <NdGameSdk/shared/src/common/common-game-init.hpp>
 
-#include "NdModClient.hpp"
+#include "NdRuntimeClient.hpp"
 
 using namespace std;
 using namespace Utils;
 
-std::unique_ptr<NdModClient> g_ndmodclient{};
+std::unique_ptr<NdRuntimeClient> g_NdRuntimeClient{};
 
-NdModClient::NdModClient(HMODULE ndgame_module) :
+NdRuntimeClient::NdRuntimeClient(HMODULE ndgame_module) :
 	m_ndgame_module{ ndgame_module }, ISdkModule(PROJECT_NAME, BuildInfo { BUILD_VERSION, BUILD_STAMP, "main", BUILD_MODE }, get_this_dll_handle()) {
 
 	auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
@@ -28,11 +28,11 @@ NdModClient::NdModClient(HMODULE ndgame_module) :
 	spdlog::flush_on(level::debug);
 };
 
-NdModClient::~NdModClient() {
+NdRuntimeClient::~NdRuntimeClient() {
 	spdlog::info("{:s} shutting down...", GetModuleName());
 }
 
-bool NdModClient::Initialize() {
+bool NdRuntimeClient::Initialize() {
 	if (m_initialized) {
 		return true;
 	}
@@ -59,13 +59,13 @@ bool NdModClient::Initialize() {
 	return m_initialized = true;
 }
 
-void NdModClient::OnModuleRegistered() {
+void NdRuntimeClient::OnModuleRegistered() {
 	m_EngineComponents = GetSharedSdkComponent<ndlib::EngineComponents>();
 	m_CommonGame = GetSharedSdkComponent<common::CommonGame>();
 	m_DebugDraw = GetSharedSdkComponent<ndlib::render::dev::DebugDrawCommon>();
 }
 
-void NdModClient::OnGameInitialized(bool status) {
+void NdRuntimeClient::OnGameInitialized(bool status) {
 	spdlog::info("GAME initialized!");
 
 	auto& gameconfig = m_EngineComponents->GetNdGameInfo();
@@ -73,11 +73,11 @@ void NdModClient::OnGameInitialized(bool status) {
 
 }
 
-void NdModClient::OnMemoryMapped(corelib::memory::Memory* Memory) {
+void NdRuntimeClient::OnMemoryMapped(corelib::memory::Memory* Memory) {
 	spdlog::info("MemoryMapped!");
 }
 
-void NdModClient::DebugDraw(FrameParams* frame) {
+void NdRuntimeClient::DebugDraw(FrameParams* frame) {
 	/*
 	WindowContext ctx{};
 	WindowContext::GetWindowContext(&ctx, WindowContext::ContextType::Context4, frame->m_DynamicRenderContext);

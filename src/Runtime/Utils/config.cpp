@@ -6,6 +6,7 @@
 
 // Global INI Variables
 bool g_bShowDebugConsole{};
+bool g_bRuntimeClient{};
 bool g_bGameDebugMenu{true}; 
 bool g_bDebugMemory{};
 bool g_bSidBase{};
@@ -48,6 +49,7 @@ namespace Utils {
 		}
 		else {
 			g_bShowDebugConsole = ini.GetBoolValue(PROJECT_NAME, "bShowDebugConsole", g_bShowDebugConsole);
+			g_bRuntimeClient = ini.GetBoolValue(PROJECT_NAME, "bRuntimeClient", g_bRuntimeClient);
 		}
 
 		return true; 
@@ -57,11 +59,13 @@ namespace Utils {
 	{
 #ifndef NDEBUG
 		g_bShowDebugConsole = true;
+		g_bRuntimeClient = true;
 		g_bGameDebugMenu = true;
 		g_bDebugMemory = true;
 		g_bSidBase = true;
 #endif
 		Ini.SetBoolValue(PROJECT_NAME, "bShowDebugConsole", g_bShowDebugConsole);
+		Ini.SetBoolValue(PROJECT_NAME, "bRuntimeClient", g_bRuntimeClient);
 		Ini.SetBoolValue(PROJECT_SDK, "bGameDebugMenu", g_bGameDebugMenu);
 		Ini.SetBoolValue(PROJECT_SDK, "bDebugMemory", g_bDebugMemory);
 		Ini.SetBoolValue(PROJECT_SDK, "bSidBase", g_bSidBase);

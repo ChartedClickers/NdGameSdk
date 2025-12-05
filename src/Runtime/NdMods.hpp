@@ -2,7 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "NdModClient.hpp"
+#include "NdRuntimeClient.hpp"
 #include "NdDerived.hpp"
 
 class NdMod;
@@ -56,7 +56,7 @@ private:
 };
 
 
-class NdModComponentEx : public NdModClientException {
+class NdModComponentEx : public NdRuntimeClientException {
 public:
 
 	enum ErrorCode {
@@ -65,7 +65,7 @@ public:
 	};
 
 	NdModComponentEx(const std::string& msg, ErrorCode errcode)
-		: m_errcode{ errcode }, NdModClientException(msg) {}
+		: m_errcode{ errcode }, NdRuntimeClientException(msg) {}
 
 	const ErrorCode ErrCode() const noexcept {
 		return m_errcode;

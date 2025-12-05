@@ -4,13 +4,13 @@
 #define wstr(s) L#s
 #define wxstr(s) wstr(s)
 
-#define PROJECT_NAME ND_GAME_NAME ".ModClient"
+#define PROJECT_NAME ND_GAME_NAME ".RuntimeClient"
 #define PROJECT_SDK ND_GAME_NAME "SDK"
 #define PROJECT_LOG_PATH PROJECT_NAME ".log"
 #define PROJECT_INI_PATH PROJECT_NAME ".ini"
 #define BUILD_STAMP "Built: @" __DATE__ " " __TIME__
 #define BUILD_TIME PROJECT_NAME " " BUILD_STAMP
-#define BUILD_VERSION ND_MODCLIENT_VERSION
+#define BUILD_VERSION ND_RuntimeClient_VERSION
 
 #ifndef NDEBUG
 #define BUILD_MODE "Debug"
@@ -81,6 +81,7 @@ namespace Utils {
 }
 
 extern bool g_bShowDebugConsole;
+extern bool g_bRuntimeClient;
 extern bool g_bGameDebugMenu;
 extern bool g_bDebugMemory;
 extern bool g_bSidBase;

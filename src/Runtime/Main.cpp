@@ -12,14 +12,17 @@
 #include <NdGameSdk/sdk.hpp>
 #include <NdGameSdk/sdkconfig.hpp>
 
-#include "NdModClient.hpp"
+#include "NdRuntimeClient.hpp"
 #include "Utils/config.hpp"
 
 void startup_thread(HMODULE dllModule) {
-    g_ndmodclient->Initialize();
+    g_NdRuntimeClient->Initialize();
 }
 
 BOOL Initialize(HMODULE dllModule) {
+
+    // This is Example module, not for production use.
+    // TODO: Add more example code...
 
     HMODULE baseModule = GetModuleHandle(NULL);
     std::string moduleName = Utility::memory::get_module_name(baseModule).value();
@@ -39,7 +42,7 @@ BOOL Initialize(HMODULE dllModule) {
     SPDLOG_INFO(L"Game Path: {}", exePath);
     SPDLOG_INFO(L"Game Name: {}", VerProductName);
 
-    g_ndmodclient = std::make_unique<NdModClient>(baseModule);
+    g_NdRuntimeClient = std::make_unique<NdRuntimeClient>(baseModule);
 
     SdkConfig pSdkCfg{};
     if (cfg.IsLoaded()) {
@@ -49,7 +52,11 @@ BOOL Initialize(HMODULE dllModule) {
     }
 
     NdGameSdk::InitializeSdk(&pSdkCfg);
-    NdGameSdk::RegisterSdkModule(g_ndmodclient.get());
+    if(g_bRuntimeClient) {
+        SPDLOG_INFO("NdRuntimeClient is enabled.");
+        NdGameSdk::RegisterSdkModule(g_NdRuntimeClient.get());
+    }
+    
     return TRUE; 
 }
 

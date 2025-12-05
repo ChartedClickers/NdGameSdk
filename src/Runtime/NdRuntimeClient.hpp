@@ -13,18 +13,18 @@
 #include "Utils/config.hpp"
 #include "Utils/logger.hpp"
 
-#include "NdModClientException.hpp"
+#include "NdRuntimeClientException.hpp"
 #include "NdMods.hpp"
 
 using namespace NdGameSdk;
 
 class NdMods;
 
-class NdModClient : public ISdkModule {
+class NdRuntimeClient : public ISdkModule {
 
 public:
-	NdModClient(HMODULE ndgame_module);
-	virtual ~NdModClient();
+	NdRuntimeClient(HMODULE ndgame_module);
+	virtual ~NdRuntimeClient();
 
 	bool Initialize();
 	bool is_ready() const { return m_initialized && m_ndmods_initialized; }
@@ -49,4 +49,4 @@ private:
 	HMODULE m_ndgame_module{};
 };
 
-extern std::unique_ptr<NdModClient> g_ndmodclient;
+extern std::unique_ptr<NdRuntimeClient> g_NdRuntimeClient;

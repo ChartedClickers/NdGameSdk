@@ -22,6 +22,8 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 # Configure vcpkg
 set(VCPKG_OVERLAY_TRIPLETS "${CMAKE_SOURCE_DIR}/vcpkg-overlays/triplets" CACHE STRING "" FORCE)
 set(VCPKG_TARGET_TRIPLET   "x64-windows-ndgamesdk" CACHE STRING "" FORCE)
+
+include(${CMAKE_SOURCE_DIR}/cmake/NdGameSdkInstall.cmake)
 """
  
 [variables]
@@ -35,7 +37,8 @@ PROJECT_TARGET = "FDG"
 type = "static"
 sources = ["dependencies/external/spdlog/src/*.cpp"]
 include-directories = ["dependencies/external/spdlog/include"]
-compile-definitions = ["SPDLOG_COMPILED_LIB", "SPDLOG_WCHAR_TO_UTF8_SUPPORT"]  
+compile-definitions = ["SPDLOG_COMPILED_LIB", "SPDLOG_WCHAR_TO_UTF8_SUPPORT", "SPDLOG_FMT_EXTERNAL", "SPDLOG_FMT_EXTERNAL_HO"]
+link-libraries = ["fmt::fmt-header-only"]
 alias = "spdlog::spdlog"
  
 #https://github.com/g-truc/glm
@@ -56,7 +59,7 @@ tag = "629558c64009a7291ba6ed5cfb49187086a27a47"
 [vcpkg]
 version = "74e6536"
 url = "https://github.com/microsoft/vcpkg/archive/74e6536215718009aae747d86d84b78376bf9e09.tar.gz"
-packages = ["boost-thread", "boost-signals2", "boost-container", "dstorage", "lz4", "zlib", "nlohmann-json"]
+packages = ["boost-thread", "boost-signals2", "boost-container", "dstorage", "lz4", "zlib", "nlohmann-json", "fmt"]
 
 [find-package.Boost]
 version = "1.85.0"
@@ -78,7 +81,11 @@ config = true
 
 [find-package.zlib]
 required = true
- 
+
+[find-package.fmt]
+required = true
+config = true
+
 [template.NdGameSdk]
 type = "shared"
 sources = [
@@ -98,21 +105,26 @@ headers = [
 "src/NdGameSdk/database/**.hpp",
 "src/NdGameSdk/sidbase/**.hpp"
 ]
-include-directories = ["src", "./shared"]
+include-directories = ["src", "./shared", "dependencies/external/glm", "dependencies/external/spdlog/include"]
 compile-features = ["cxx_std_23"]
 alias = "FDG::NdGameSdk"
-link-libraries = [ 
+link-libraries = [
+    "nlohmann_json::nlohmann_json"
+]
+private-link-libraries = [
     "spdlog::spdlog",
     "glm_static",
-    "nlohmann_json::nlohmann_json",
     "Utility",
     "Boost::thread",
-	"Boost::signals2",
+    "Boost::signals2",
     "Boost::container",
     "lz4::lz4",
     "ZLIB::ZLIB"
 ]
 cmake-before="""
+"""
+cmake-after = """
+set_property(GLOBAL APPEND PROPERTY NDGAMESDK_SDK_TARGETS ${CMKR_TARGET})
 """
   
 [template.NdGameSdk.properties]

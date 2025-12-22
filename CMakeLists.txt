@@ -58,6 +58,8 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 set(VCPKG_OVERLAY_TRIPLETS "${CMAKE_SOURCE_DIR}/vcpkg-overlays/triplets" CACHE STRING "" FORCE)
 set(VCPKG_TARGET_TRIPLET   "x64-windows-ndgamesdk" CACHE STRING "" FORCE)
 
+include(${CMAKE_SOURCE_DIR}/cmake/NdGameSdkInstall.cmake)
+
 if(CMKR_ROOT_PROJECT AND NOT CMKR_DISABLE_VCPKG)
 	include(FetchContent)
 	# Fix warnings about DOWNLOAD_EXTRACT_TIMESTAMP
@@ -97,6 +99,8 @@ find_package(nlohmann_json REQUIRED CONFIG)
 find_package(lz4 REQUIRED CONFIG)
 
 find_package(zlib REQUIRED)
+
+find_package(fmt REQUIRED CONFIG)
 
 include(FetchContent)
 
@@ -139,10 +143,16 @@ add_library(spdlog::spdlog ALIAS spdlog)
 target_compile_definitions(spdlog PUBLIC
 	SPDLOG_COMPILED_LIB
 	SPDLOG_WCHAR_TO_UTF8_SUPPORT
+	SPDLOG_FMT_EXTERNAL
+	SPDLOG_FMT_EXTERNAL_HO
 )
 
 target_include_directories(spdlog PUBLIC
 	"dependencies/external/spdlog/include"
+)
+
+target_link_libraries(spdlog PUBLIC
+	fmt::fmt-header-only
 )
 
 # Target: glm_static
@@ -531,12 +541,17 @@ target_compile_features(T1XSDK PUBLIC
 target_include_directories(T1XSDK PUBLIC
 	src
 	"./shared"
+	"dependencies/external/glm"
+	"dependencies/external/spdlog/include"
 )
 
 target_link_libraries(T1XSDK PUBLIC
+	nlohmann_json::nlohmann_json
+)
+
+target_link_libraries(T1XSDK PRIVATE
 	spdlog::spdlog
 	glm_static
-	nlohmann_json::nlohmann_json
 	Utility
 	Boost::thread
 	Boost::signals2
@@ -560,6 +575,8 @@ set_target_properties(T1XSDK PROPERTIES
 	ARCHIVE_OUTPUT_DIRECTORY
 		"${LIBRARY_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
 )
+
+set_property(GLOBAL APPEND PROPERTY NDGAMESDK_SDK_TARGETS ${CMKR_TARGET})
 
 # Target: T1X
 set(CMKR_TARGET T1X)
@@ -964,12 +981,17 @@ target_compile_features(T2RSDK PUBLIC
 target_include_directories(T2RSDK PUBLIC
 	src
 	"./shared"
+	"dependencies/external/glm"
+	"dependencies/external/spdlog/include"
 )
 
 target_link_libraries(T2RSDK PUBLIC
+	nlohmann_json::nlohmann_json
+)
+
+target_link_libraries(T2RSDK PRIVATE
 	spdlog::spdlog
 	glm_static
-	nlohmann_json::nlohmann_json
 	Utility
 	Boost::thread
 	Boost::signals2
@@ -993,6 +1015,8 @@ set_target_properties(T2RSDK PROPERTIES
 	ARCHIVE_OUTPUT_DIRECTORY
 		"${LIBRARY_OUTPUT_DIRECTORY}/${PROJECT_TARGET}"
 )
+
+set_property(GLOBAL APPEND PROPERTY NDGAMESDK_SDK_TARGETS ${CMKR_TARGET})
 
 # Target: T2R
 set(CMKR_TARGET T2R)

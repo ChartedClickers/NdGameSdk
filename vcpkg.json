@@ -9,7 +9,8 @@
     "dstorage",
     "lz4",
     "zlib",
-    "nlohmann-json"
+    "nlohmann-json",
+    "fmt"
   ],
   "description": "",
   "name": "ndgamesdk",

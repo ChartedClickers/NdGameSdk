@@ -73,10 +73,10 @@ namespace NdGameSdk::common {
 		static NdConfigComponent* pNdConfigComponent = GetSharedComponents()->GetComponent<NdConfigComponent>();
 		static NdDevMenu* pNdDevMenu = GetSharedComponents()->GetComponent<NdDevMenu>();
 
-		if (pNdDevMenu) {
-			auto& NdConfig = pNdConfigComponent->GetNdConfig();
-			pNdDevMenu->DMENU_Menu_Update(&NdConfig.GetDmenu());
-		}
+        if (pNdDevMenu && pNdDevMenu->IsInitialized()) {
+                auto& NdConfig = pNdConfigComponent->GetNdConfig();
+                pNdDevMenu->DMENU_Menu_Update(&NdConfig.GetDmenu());
+        }
 
 	}
 

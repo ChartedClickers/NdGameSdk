@@ -7,7 +7,7 @@
 #include <string>
 
 #include <spdlog/spdlog.h>
-#include <spdlog/fmt/bundled/printf.h>
+#include <fmt/printf.h>
 
 #include <safetyhook.hpp>
 #include <safetyhook/inline_hook.hpp>

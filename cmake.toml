@@ -106,7 +106,7 @@ headers = [
 "src/NdGameSdk/sidbase/**.hpp"
 ]
 include-directories = ["src", "./shared", "dependencies/external/glm", "dependencies/external/spdlog/include"]
-compile-features = ["cxx_std_23"]
+compile-features = ["cxx_std_26"]
 alias = "FDG::NdGameSdk"
 link-libraries = [
     "nlohmann_json::nlohmann_json"
@@ -146,7 +146,7 @@ CXX_MODULE_STD = true
 type = "shared"  
 sources = ["src/Runtime/**.cpp", "src/Runtime/**.c"] 
 headers = ["src/Runtime/**.hpp", "src/Runtime/**.h"]
-compile-features = ["cxx_std_23"]
+compile-features = ["cxx_std_26"]
 include-directories = ["shared/", "src/Runtime/"]
 compile-definitions = [ "${CMKR_TARGET}", "ND_GAME_NAME=\"${CMKR_TARGET}\"", "ND_RuntimeClient_EXPORTS", "ND_RuntimeClient_VERSION=\"${PROJECT_VERSION}\""]
 link-libraries = [
@@ -168,7 +168,7 @@ cmake-before="""
 type = "static"
 sources = ["shared/**.cpp", "shared/**.c"]
 headers = ["shared/**.hpp", "shared/**.h"]
-compile-features = ["cxx_std_23"]
+compile-features = ["cxx_std_26"]
 compile-options = ["/MP"]
 compile-definitions = ["PROJECT_NAME=\"${PROJECT_TARGET}.Runtime\""] 
 alias = "Utility::Utility"

@@ -1,0 +1,7 @@
+CompileFlags:
+  CompilationDatabase: build/ninja
+  Add: [/std:c++latest, /Zc:__cplusplus]
+Index:
+  Background: Build
+Diagnostics:
+  UnusedIncludes: None

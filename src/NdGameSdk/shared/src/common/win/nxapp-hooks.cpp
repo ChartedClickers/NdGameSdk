@@ -8,9 +8,7 @@ namespace NdGameSdk::common::win {
 
 	NxAppHooks::NxAppHooks() : ISdkSubComponent(TOSTRING(NxAppHooks)) {}
 
-	#if !defined(_MSC_VER) || !defined(_M_X64)
 	void OpenAndRedirectStdIO_CC();
-	#endif
 
 	void NxAppHooks::Init() {
 		static std::once_flag Initialized;
@@ -71,10 +69,6 @@ namespace NdGameSdk::common::win {
 			if (pLogger) {
 				auto** vft = reinterpret_cast<void**>(pLogger->Get()->vftable);
 
-				#if defined(_MSC_VER) && defined(_M_X64)
-					spdlog::warn("NxAppHooks: skipping OpenAndRedirectStdIO hook on MSVC (inline asm not supported).");
-					pNxAppHooks->m_OpenAndRedirectStdIOHook = {};
-				#else
 					pNxAppHooks->m_OpenAndRedirectStdIOHook = Utility::MakeFunctionHook(
 						vft[NxApp::NixxesLogger::kIdx_OpenAndRedirectStdIO],
 						(void*)OpenAndRedirectStdIO_CC,
@@ -83,7 +77,6 @@ namespace NdGameSdk::common::win {
 					if (!pNxAppHooks->m_OpenAndRedirectStdIOHook) {
 						spdlog::warn("Failed to patch {:s}! Logs may not work!", TOSTRING(vft[NxApp::NixxesLogger::kIdx_OpenAndRedirectStdIO]));
 					}
-				#endif
 			}
 			else {
 				spdlog::error("NxApp::NixxesLogger is null! Logs may not work!");
@@ -107,7 +100,6 @@ namespace NdGameSdk::common::win {
 		return reinterpret_cast<NixxesLogger*>(this->Get()->m_logger);
 	}
 
-#if !defined(_MSC_VER) || !defined(_M_X64)
 	void __attribute__((naked)) OpenAndRedirectStdIO_CC() {
 		__asm {
 			push rbx;
@@ -116,6 +108,6 @@ namespace NdGameSdk::common::win {
 			ret;
 		}
 	}
-#endif
+
 }
 #endif

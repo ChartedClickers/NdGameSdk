@@ -1,77 +1,82 @@
-﻿{
+{
   "version": 3,
   "configurePresets": [
     {
-      "name": "vs2022",
-      "displayName": "Visual Studio 17 2022 (LLVM - ClangCL)",
-      "description": "Using compilers for Visual Studio 17 2022 (x64 architecture)",
-      "generator": "Visual Studio 17 2022",
+      "name": "vs2026",
+      "displayName": "Visual Studio 18 2026 (LLVM - ClangCL)",
+      "generator": "Visual Studio 18 2026",
       "toolset": "ClangCL",
       "architecture": "x64",
-      "binaryDir": "${sourceDir}/build",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "installDir": "${sourceDir}/devpack",
       "cacheVariables": {
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/devpack",
         "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/vcpkg-overlays/triplets",
-        "VCPKG_TARGET_TRIPLET": "x64-windows-ndgamesdk.cmake"
+        "VCPKG_TARGET_TRIPLET": "x64-windows-ndgamesdk.cmake",
+        "CMAKE_SUPPRESS_DEVELOPER_WARNINGS": "ON",
+        "CMAKE_WARN_DEPRECATED": "OFF"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "intelliSenseMode": "windows-clang-x64"
+        }
       }
     },
     {
-      "name": "vs2026",
-      "displayName": "VS 2026 (Ninja + clang-cl)",
-      "description": "Ninja multi-config build using Visual Studio 2026's clang-cl toolchain",
+      "name": "ninja",
+      "displayName": "Ninja Multi-Config (clang-cl)",
+      "description": "Ninja multi-config build using Visual Studio clang-cl",
       "generator": "Ninja Multi-Config",
-      "binaryDir": "${sourceDir}/build-vs2026",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "installDir": "${sourceDir}/devpack",
       "cacheVariables": {
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/devpack",
         "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/vcpkg-overlays/triplets",
         "VCPKG_TARGET_TRIPLET": "x64-windows-ndgamesdk.cmake",
-        "CMAKE_C_COMPILER": "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/Llvm/x64/bin/clang-cl.exe",
-        "CMAKE_CXX_COMPILER": "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/Llvm/x64/bin/clang-cl.exe"
+        "CMAKE_C_COMPILER": "clang-cl",
+        "CMAKE_CXX_COMPILER": "clang-cl",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_SUPPRESS_DEVELOPER_WARNINGS": "ON",
+        "CMAKE_WARN_DEPRECATED": "OFF"
       }
     }
   ],
   "buildPresets": [
     {
-      "name": "Release 2022",
-      "description": "",
-      "displayName": "Release",
-      "configuration": "Release",
-      "configurePreset": "vs2022"
-    },
-    {
-      "name": "RelWithDebInfo 2022",
-      "description": "",
-      "displayName": "RelWithDebInfo",
-      "configuration": "RelWithDebInfo",
-      "configurePreset": "vs2022"
-    },
-    {
-      "name": "Debug 2022",
-      "description": "",
-      "displayName": "Debug",
-      "configuration": "Debug",
-      "configurePreset": "vs2022"
-    },
-    {
       "name": "Release 2026",
-      "description": "",
       "displayName": "Release",
       "configuration": "Release",
       "configurePreset": "vs2026"
     },
     {
       "name": "RelWithDebInfo 2026",
-      "description": "",
       "displayName": "RelWithDebInfo",
       "configuration": "RelWithDebInfo",
       "configurePreset": "vs2026"
     },
     {
       "name": "Debug 2026",
-      "description": "",
       "displayName": "Debug",
       "configuration": "Debug",
       "configurePreset": "vs2026"
+    },
+    {
+      "name": "Release ninja",
+      "displayName": "Release (ninja)",
+      "configuration": "Release",
+      "configurePreset": "ninja"
+    },
+    {
+      "name": "RelWithDebInfo ninja",
+      "displayName": "RelWithDebInfo (ninja)",
+      "configuration": "RelWithDebInfo",
+      "configurePreset": "ninja"
+    },
+    {
+      "name": "Debug ninja",
+      "displayName": "Debug (ninja)",
+      "configuration": "Debug",
+      "configurePreset": "ninja"
     }
   ]
 }

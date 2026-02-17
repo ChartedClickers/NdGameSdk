@@ -11,13 +11,7 @@
 #include <NdGameSdk/shared/src/ndlib/nd-game-info.hpp>
 #include <NdGameSdk/shared/src/gamelib/level/game-loading.hpp>
 
-#include <cstddef> 
-
-#if defined(_MSC_VER) && defined(_M_X64)
-#define NDDEV_DISABLE_KB_HOOKS 1
-#else
-#define NDDEV_DISABLE_KB_HOOKS 0
-#endif
+#include <cstddef>
 
 using namespace boost::placeholders;
 using namespace NdGameSdk::corelib::job;
@@ -45,14 +39,10 @@ namespace NdGameSdk::gamelib::debug {
 		- sizeof(regenny::shared::ndlib::debug::DMENU::Component);
 
 	uintptr_t FavoriteItemKeyCode_ReturnAddr = NULL;
-#if !NDDEV_DISABLE_KB_HOOKS
 	void FavoriteItemKeycode_CC();
-#endif
 
 	uintptr_t KeyboardSearchState_ReturnAddr = NULL;
-#if !NDDEV_DISABLE_KB_HOOKS
 	void KeyboardSearchState_CC();
-#endif
 
 	bool NdDevMenu::IsGameDebugMenu() {
 
@@ -696,14 +686,6 @@ namespace NdGameSdk::gamelib::debug {
 			};
 
 			/* KeyBoard Patches */
-#if NDDEV_DISABLE_KB_HOOKS
-			spdlog::warn("NdDevMenu: keyboard search/favorite hooks are disabled on MSVC builds.");
-			m_KeyboardSearchStateHook = {};
-			m_KeyBoard_ClipBoardHook = {};
-#if defined(T2R)
-			m_FavoriteItemKeyCodeHook = {};
-#endif
-#else
 			m_KeyboardSearchStateHook = Utility::MakeFunctionHook((void*)(pKeyboardSearchState),
 				(void*)KeyboardSearchState_CC, wstr(m_KeyboardSearchStateHook));
 
@@ -729,7 +711,6 @@ namespace NdGameSdk::gamelib::debug {
 #if defined(T2R)
 			FavoriteItemKeyCode_ReturnAddr = m_FavoriteItemKeyCodeHook->get_original();
 #endif
-#endif // NDDEV_DISABLE_KB_HOOKS
 
 			m_CommonGame->e_GameInitialized.Subscribe(this, &NdDevMenu::OnGameInitialized);
 
@@ -822,7 +803,6 @@ namespace NdGameSdk::gamelib::debug {
 		return;
 	}
 
-#if !NDDEV_DISABLE_KB_HOOKS
 	void __attribute__((naked)) KeyboardSearchState_CC()
 	{
 		__asm
@@ -861,7 +841,7 @@ namespace NdGameSdk::gamelib::debug {
 		}
 	}
 #endif
-#endif // !NDDEV_DISABLE_KB_HOOKS
+
 	bool* NdDevMenu::s_IsKeyboardSearchActive = nullptr;
 	bool* NdDevMenu::s_IsKeyboardComponentActive = nullptr;
 

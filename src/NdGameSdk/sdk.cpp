@@ -5,6 +5,7 @@
 #include "sidbase/sidbase.hpp"
 
 #include "shared/shared.hpp"
+#include <format>
 #if defined(T1X)
 #include "ndgame/t1x/ndgame.hpp"
 #elif defined(T2R)

@@ -4,12 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#if defined(_MSC_VER) && defined(_M_X64)
-#define ND_WEAPON_HOOKS_DISABLED 1
-#else
-#define ND_WEAPON_HOOKS_DISABLED 0
-#endif
-
 namespace NdGameSdk::game::player {
 
 	PlayerMenu::PlayerMenu(weapon::Weapon* pWeaponProcess) : m_WeaponProcess(pWeaponProcess) {}
@@ -18,21 +12,17 @@ namespace NdGameSdk::game::player {
 	uintptr_t GiveWeaponArtFunctAddr[0x2];
 
 	uintptr_t GiveMenuWeaponMain_Main_ReturnAddr = NULL;
-#if !ND_WEAPON_HOOKS_DISABLED
 	void GiveMenuWeaponMain_Main_CC();
-#endif
+
 	uintptr_t GiveMenuWeaponMain_SubMenu_ReturnAddr = NULL;
-#if !ND_WEAPON_HOOKS_DISABLED
 	void GivePlayerWeapon_SubMenuCC();
-#endif
+
 	uintptr_t GiveMenuWeaponMain_Entry_ReturnAddr = NULL;
-#if !ND_WEAPON_HOOKS_DISABLED
 	void GivePlayerWeapon_EntryCC();
-#endif
+
 	uintptr_t GiveMenuWeaponMain_SubSection_ReturnAddr = NULL;
-#if !ND_WEAPON_HOOKS_DISABLED
 	void GivePlayerWeapon_SubCC();
-#endif
+
 
 	void PlayerMenu::GiveMenuWeaponItemsPatch(/*DMENU::Menu* pMenu*/) {
 
@@ -43,13 +33,6 @@ namespace NdGameSdk::game::player {
 			Patterns::SdkPattern findpattern{};
 			auto module = Utility::memory::get_executable();
 
-#if ND_WEAPON_HOOKS_DISABLED
-			spdlog::warn("PlayerMenu weapon hooks disabled on MSVC builds.");
-			m_GiveMenuWeaponMainHook = {};
-			m_GiveMenuWeaponSubMenuHook = {};
-			m_GiveMenuWeaponEntryHook = {};
-			m_GiveMenuWeaponSubSectionHook = {};
-#else
 			findpattern = Patterns::Player_PlayerMenu_GiveMenuWeapon_Main;
 			m_GiveMenuWeaponMainHook = Utility::WritePatchPattern_Hook(module, findpattern.pattern, wstr(Patterns::Player_PlayerMenu_GiveMenuWeapon_Main),
 				findpattern.offset, (void*)GiveMenuWeaponMain_Main_CC);
@@ -78,7 +61,6 @@ namespace NdGameSdk::game::player {
 			GiveMenuWeaponMain_SubMenu_ReturnAddr = m_GiveMenuWeaponSubMenuHook->get_original();
 			GiveMenuWeaponMain_Entry_ReturnAddr = m_GiveMenuWeaponEntryHook->get_original();
 			GiveMenuWeaponMain_SubSection_ReturnAddr = m_GiveMenuWeaponSubSectionHook->get_original();
-#endif
 	}
 
     const char* GivePlayerWeaponMain(const int32_t index, const int32_t mode)
@@ -116,7 +98,6 @@ namespace NdGameSdk::game::player {
         return string_index;
     }
 
-#if !ND_WEAPON_HOOKS_DISABLED
 	void __attribute__((naked)) GiveMenuWeaponMain_Main_CC() {
 		__asm {
 			push rcx;
@@ -196,7 +177,5 @@ namespace NdGameSdk::game::player {
 			jmp[rip + GiveMenuWeaponMain_Entry_ReturnAddr];
 		}
 	}
-
-#endif // !ND_WEAPON_HOOKS_DISABLED
 
 }

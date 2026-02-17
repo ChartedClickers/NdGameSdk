@@ -10,6 +10,17 @@ if (NOT TARGET Zycore::Zycore)
 endif()
 include("${CMAKE_CURRENT_LIST_DIR}/NdGameSdkTargets.cmake")
 
+# Ensure Debug builds use Debug libs from the devpack
+get_property(_ndg_all_targets GLOBAL PROPERTY TARGETS)
+foreach(_ndg_tgt IN LISTS _ndg_all_targets)
+    if (TARGET ${_ndg_tgt} AND (_ndg_tgt MATCHES "^FDG::" OR _ndg_tgt MATCHES "^Zycore::"))
+        get_target_property(_ndg_imported ${_ndg_tgt} IMPORTED)
+        if (_ndg_imported)
+            set_property(TARGET ${_ndg_tgt} PROPERTY MAP_IMPORTED_CONFIG_DEBUG DEBUG)
+        endif()
+    endif()
+endforeach()
+
 set(NdGameSdk_INCLUDE_DIR "${PACKAGE_PREFIX_DIR}/include")
 set(NdGameSdk_INCLUDE_DIRS "${PACKAGE_PREFIX_DIR}/include")
 

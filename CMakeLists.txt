@@ -213,7 +213,7 @@ target_compile_definitions(Utility PUBLIC
 )
 
 target_compile_features(Utility PUBLIC
-	cxx_std_23
+	cxx_std_26
 )
 
 target_compile_options(Utility PUBLIC
@@ -535,7 +535,7 @@ target_sources(T1XSDK PRIVATE ${T1XSDK_SOURCES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${T1XSDK_SOURCES})
 
 target_compile_features(T1XSDK PUBLIC
-	cxx_std_23
+	cxx_std_26
 )
 
 target_include_directories(T1XSDK PUBLIC
@@ -611,7 +611,7 @@ target_compile_definitions(T1X PUBLIC
 )
 
 target_compile_features(T1X PUBLIC
-	cxx_std_23
+	cxx_std_26
 )
 
 target_include_directories(T1X PUBLIC
@@ -975,7 +975,7 @@ target_sources(T2RSDK PRIVATE ${T2RSDK_SOURCES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${T2RSDK_SOURCES})
 
 target_compile_features(T2RSDK PUBLIC
-	cxx_std_23
+	cxx_std_26
 )
 
 target_include_directories(T2RSDK PUBLIC
@@ -1051,7 +1051,7 @@ target_compile_definitions(T2R PUBLIC
 )
 
 target_compile_features(T2R PUBLIC
-	cxx_std_23
+	cxx_std_26
 )
 
 target_include_directories(T2R PUBLIC

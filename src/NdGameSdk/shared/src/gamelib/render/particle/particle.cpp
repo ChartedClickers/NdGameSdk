@@ -87,10 +87,6 @@ namespace NdGameSdk::gamelib::render::particle {
 					wstr(Patterns::Particle_ParticleInternal_RenderUpdate), findpattern.offset + 0x24);
 
 				findpattern = Patterns::Particle_ParticleInternal_OnExecuteRootDataSelector;
-#if defined(_MSC_VER) && defined(_M_X64)
-				spdlog::warn("ParticleDebug: skipping OnExecuteRootDataSelector hook on MSVC (inline asm not supported).");
-				m_ParticleDebug_OnExecuteRootDataSelectorHook = {};
-#else
 				m_ParticleDebug_OnExecuteRootDataSelectorHook = Utility::WritePatchPattern_Hook(module, findpattern.pattern, wstr(Patterns::Particle_ParticleInternal_OnExecuteRootDataSelector),
 					findpattern.offset + 0x58, (void*)OnExecuteRootDataSelector_CC);
 
@@ -102,18 +98,16 @@ namespace NdGameSdk::gamelib::render::particle {
 				}
 
 				OnExecuteRootDataSelector_ReturnAddr = m_ParticleDebug_OnExecuteRootDataSelectorHook->get_original();
-#endif
+
 			}
 		});
 	}
 
-#if !defined(_MSC_VER) || !defined(_M_X64)
 	void __attribute__((naked)) OnExecuteRootDataSelector_CC() {
 		__asm {
 			mov rax, qword ptr[rax];
 			jmp[rip + OnExecuteRootDataSelector_ReturnAddr];
 		}
 	}
-#endif
 }
 #endif

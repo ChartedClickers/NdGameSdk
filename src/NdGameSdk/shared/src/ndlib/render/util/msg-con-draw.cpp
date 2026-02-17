@@ -16,11 +16,10 @@ namespace NdGameSdk::ndlib::render::util {
 	uintptr_t MsgConDrawBuffersAddr = NULL;
 
 	uintptr_t Msg_MsgConDrawBuffersHook_ReturnAddr = NULL;
-#if !defined(_MSC_VER) || !defined(_M_X64)
 	void Msg_MsgConDrawBuffersHook_SubCC();
+
 	uintptr_t StateScriptPrinterStrncpy_ReturnAddr = NULL;
 	void StateScriptPrinterStrncpy_CC();
-#endif
 
 	void MsgConDraw::Init()
 	{
@@ -28,8 +27,9 @@ namespace NdGameSdk::ndlib::render::util {
 		auto module = Utility::memory::get_executable();
 
 		DebugDrawCommon* DebugDraw{ GetParentComponent<DebugDrawCommon>() };
+
 #if defined(T1X)
-		// https://github.com/ChartedClickers/NdGameSdk/issues/12
+		// https://github.com/VIPO777/NdGameSdk/issues/12
 		if (false/*DebugDraw->m_Memory->IsDebugMemoryAvailable()*/) {
 
 			/* It's a dirty and broken hack for MsgCon, unfortunately, in T1X specific handler for msgcon is stripped out. 
@@ -45,9 +45,7 @@ namespace NdGameSdk::ndlib::render::util {
 				, findpattern.pattern, wstr(Patterns::SsManager_StateScriptConsolePrinter), findpattern.offset);
 
 			StateScriptConsolePrinter = (StateScriptConsolePrinter_ptr)pStateScriptConsolePrinter;
-		#if defined(_MSC_VER) && defined(_M_X64)
-			spdlog::warn("MsgConDraw: skipping console printer hooks on MSVC (inline asm not supported).");
-		#else
+
 			m_StateScriptPrinterStrncpyHook = Utility::MakeFunctionHook((void*)(pStateScriptConsolePrinter + 0xAD),
 				(void*)StateScriptPrinterStrncpy_CC, wstr(StateScriptPrinterStrncpyHook));
 
@@ -64,7 +62,7 @@ namespace NdGameSdk::ndlib::render::util {
 
 			Msg_MsgConDrawBuffersHook_ReturnAddr = m_Msg_MsgConDrawBuffersHook->get_original();
 			StateScriptPrinterStrncpy_ReturnAddr = (m_StateScriptPrinterStrncpyHook->get_original() + 0x5);
-		#endif
+
 		}
 #endif 
 
@@ -103,7 +101,6 @@ namespace NdGameSdk::ndlib::render::util {
 		return 4096;
 	}
 
-#if !defined(_MSC_VER) || !defined(_M_X64)
 	void __attribute__((naked)) StateScriptPrinterStrncpy_CC()
 	{
 		__asm
@@ -142,6 +139,5 @@ namespace NdGameSdk::ndlib::render::util {
 			jmp[rip + Msg_MsgConDrawBuffersHook_ReturnAddr];
 		}
 	}
-#endif
 #endif
 }

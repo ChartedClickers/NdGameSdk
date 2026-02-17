@@ -353,10 +353,6 @@ namespace NdGameSdk::corelib::memory {
 					}
 				}
 
-				#if defined(_MSC_VER) && defined(_M_X64)
-				spdlog::warn("Memory: skipping Memory_AllocateAtContext hook on MSVC (inline asm not supported).");
-				m_AllocateHook = {};
-				#else
 				findpattern = Patterns::Memory_AllocateAtContext;
 				m_AllocateHook = Utility::WritePatchPattern_Hook(module, findpattern.pattern, wstr(Patterns::Memory_AllocateAtContext),
 					findpattern.offset, (void*)Memory_AllocateAtContext_CC);
@@ -367,7 +363,6 @@ namespace NdGameSdk::corelib::memory {
 				}
 
 				Memory_AllocateAtContext_ReturnAddr = m_AllocateHook->get_original();
-				#endif
 
 			#endif
 			}
@@ -404,7 +399,6 @@ namespace NdGameSdk::corelib::memory {
 		return this->Get()->m_initialized;
 	}
 
-	#if !defined(_MSC_VER) || !defined(_M_X64)
 	void __attribute__((naked)) Memory_AllocateAtContext_CC()
 	{
 		__asm
@@ -425,6 +419,5 @@ namespace NdGameSdk::corelib::memory {
 			jmp[rip + Memory_AllocateAtContext_ReturnAddr];
 		}
 	}
-	#endif
 
 }
